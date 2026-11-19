@@ -1,0 +1,58 @@
+{
+  "name": "@alien6-studio/elea-ui",
+  "version": "0.0.0",
+  "description": "Elea UI primitives for React: buttons, badges, fields, checkboxes, toggles, dialogs, menus, tooltips and pagination, styled with Elea tokens only",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alien6-Studio/elea.git",
+    "directory": "packages/ui"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node ../../scripts/copy-file.mjs src/styles.css dist/styles.css",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@alien6-studio/elea-tokens": "^0.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Alien6-Studio/elea/tree/main/packages/ui",
+  "bugs": {
+    "url": "https://github.com/Alien6-Studio/elea/issues"
+  },
+  "keywords": [
+    "elea",
+    "design-system",
+    "react",
+    "components",
+    "accessibility"
+  ]
+}

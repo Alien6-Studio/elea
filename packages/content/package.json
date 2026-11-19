@@ -1,0 +1,50 @@
+{
+  "name": "@alien6-studio/elea-content",
+  "version": "0.0.0",
+  "description": "Elea headless core: block document model, schema, block registry, sanitization and text extraction",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alien6-Studio/elea.git",
+    "directory": "packages/content"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Alien6-Studio/elea/tree/main/packages/content",
+  "bugs": {
+    "url": "https://github.com/Alien6-Studio/elea/issues"
+  },
+  "keywords": [
+    "elea",
+    "design-system",
+    "block-editor",
+    "editorjs",
+    "sanitize"
+  ]
+}

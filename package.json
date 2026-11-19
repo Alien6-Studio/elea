@@ -1,0 +1,52 @@
+{
+  "name": "elea",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Elea design system by Alien6 Studio: design tokens, headless core, block content viewer and editor for React",
+  "type": "module",
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "workspaces": [
+    "packages/*",
+    "examples/*",
+    "apps/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alien6-Studio/elea.git"
+  },
+  "scripts": {
+    "build": "npm run build -w packages/tokens && npm run build -w packages/content && npm run build -w packages/content-viewer && npm run build -w packages/media && npm run build -w packages/ui && npm run build -w packages/content-editor && npm run build -w examples/next && npm run build -w apps/docs",
+    "lint": "npm run lint -w packages/tokens && npm run lint -w packages/content && npm run lint -w packages/content-viewer && npm run lint -w packages/media && npm run lint -w packages/ui && npm run lint -w packages/content-editor && npm run lint -w examples/next && npm run lint -w apps/docs",
+    "test": "node --import tsx --test 'packages/*/src/**/*.test.ts' 'packages/*/src/**/*.test.tsx'",
+    "test:coverage": "c8 --check-coverage --lines 85 --statements 85 --functions 95 --branches 70 --exclude '**/dist/**' --exclude '**/*.test.*' --exclude '**/scripts/**' --exclude '**/src/test/**' --reporter=lcov --reporter=text npm test",
+    "test:package": "node scripts/check-package.mjs",
+    "pack": "npm pack -w packages/tokens -w packages/content -w packages/content-viewer -w packages/media -w packages/content-editor -w packages/ui --pack-destination artifacts",
+    "check": "npm run check:references && npm run build && npm run check:size && npm run lint && npm run test:coverage && npm run test:package && npm pack -w packages/tokens -w packages/content -w packages/content-viewer -w packages/content-editor -w packages/ui --dry-run",
+    "check:references": "node scripts/check-references.mjs",
+    "check:size": "node scripts/check-size.mjs",
+    "test:e2e": "npm run test:e2e -w apps/docs"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@types/jsdom": "30.0.0",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "axe-core": "^4.14.1",
+    "c8": "^12.0.0",
+    "dompurify": "^3.4.17",
+    "jsdom": "30.1.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Alien6-Studio/elea",
+  "bugs": {
+    "url": "https://github.com/Alien6-Studio/elea/issues"
+  }
+}

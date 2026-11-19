@@ -1,0 +1,62 @@
+{
+  "name": "@alien6-studio/elea-content-editor",
+  "version": "0.0.0",
+  "description": "Elea editor: React block editor with rich text, toolbar and injectable services",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alien6-Studio/elea.git",
+    "directory": "packages/content-editor"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node ../../scripts/copy-file.mjs src/styles.css dist/styles.css",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@alien6-studio/elea-content": "^0.0.0",
+    "@alien6-studio/elea-content-viewer": "^0.0.0",
+    "@alien6-studio/elea-media": "^0.0.0",
+    "@alien6-studio/elea-ui": "^0.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Alien6-Studio/elea/tree/main/packages/content-editor",
+  "bugs": {
+    "url": "https://github.com/Alien6-Studio/elea/issues"
+  },
+  "keywords": [
+    "elea",
+    "design-system",
+    "block-editor",
+    "rich-text",
+    "react",
+    "contenteditable"
+  ]
+}
