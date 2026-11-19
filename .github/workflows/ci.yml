@@ -1,0 +1,80 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request: null
+  workflow_dispatch: null
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact source ref selected by a release workflow
+        type: string
+        required: false
+        default: ""
+permissions:
+  contents: read
+concurrency:
+  group: elea-${{ github.workflow }}-${{ inputs.ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  typescript:
+    name: TypeScript Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node:
+          - "22"
+          - "24"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.ref || github.ref }}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm audit --omit=dev --audit-level=high
+  e2e:
+    name: Playground end to end
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.ref || github.ref }}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env:
+          CI: "true"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: failure()
+        with:
+          name: playwright-report
+          path: examples/vite/playwright-report
+          retention-days: 7
+  checks:
+    name: Elea checks
+    if: always()
+    needs:
+      - typescript
+      - e2e
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - env:
+          TYPESCRIPT_RESULT: ${{ needs.typescript.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+        run: test "$TYPESCRIPT_RESULT" = success && test "$E2E_RESULT" = success

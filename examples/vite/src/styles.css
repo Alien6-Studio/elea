@@ -1,0 +1,28 @@
+@import "@alien6-studio/elea-tokens/elea.css";
+@import "@alien6-studio/elea-content-viewer/styles.css";
+@import "@alien6-studio/elea-content-editor/styles.css";
+
+body {
+  margin: 0;
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+  font-family: var(--elea-font-family-sans);
+}
+.playground { display: grid; grid-template-columns: 1fr 1fr; gap: var(--elea-space-8); padding: var(--elea-space-6); min-height: 100vh; }
+.playground__bar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--elea-space-3); }
+.playground__bar h1 { font-size: var(--elea-font-size-xl); margin: 0 auto 0 0; }
+.playground__bar button, .playground__bar select { font: inherit; padding: var(--elea-space-1) var(--elea-space-3); border: 1px solid var(--elea-color-border-strong); border-radius: var(--elea-radius-md); background: var(--elea-color-surface-subtle); color: inherit; cursor: pointer; }
+.playground__pane { min-width: 0; }
+.playground__pane--editor { background: var(--elea-color-surface-subtle); border-radius: var(--elea-radius-xl); padding: var(--elea-space-6); }
+.playground__pane h2 { font-size: var(--elea-font-size-sm); text-transform: uppercase; letter-spacing: 0.05em; color: var(--elea-color-text-subtle); margin: 0 0 var(--elea-space-4); }
+.playground details { margin-top: var(--elea-space-6); }
+.playground pre { font-size: var(--elea-font-size-xs); background: var(--elea-color-surface-subtle); padding: var(--elea-space-3); overflow: auto; max-height: 20rem; }
+.picker { display: flex; flex-direction: column; }
+.picker button { text-align: left; padding: var(--elea-space-3) var(--elea-space-4); border: 0; border-bottom: 1px solid var(--elea-color-border-default); background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.picker button:hover { background: var(--elea-color-surface-subtle); }
+@media (max-width: 60rem) { .playground { grid-template-columns: 1fr; } }
+.tabs { display: flex; gap: var(--elea-space-1); margin-bottom: var(--elea-space-4); }
+.tabs button { font: inherit; font-size: var(--elea-font-size-sm); padding: var(--elea-space-1) var(--elea-space-3); border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-md); background: transparent; color: var(--elea-color-text-muted); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--elea-color-surface-muted); color: var(--elea-color-text-default); }
+.playground .markdown-input { width: 100%; font: inherit; font-family: var(--elea-font-family-mono); font-size: var(--elea-font-size-sm); padding: var(--elea-space-2); border: 1px solid var(--elea-color-border-strong); border-radius: var(--elea-radius-md); background: var(--elea-color-surface-default); color: inherit; margin: var(--elea-space-2) 0; }
+.playground .import-button { font: inherit; padding: var(--elea-space-1) var(--elea-space-3); border: 1px solid var(--elea-color-border-strong); border-radius: var(--elea-radius-md); background: var(--elea-color-surface-subtle); color: inherit; cursor: pointer; }

@@ -1,0 +1,55 @@
+{
+  "name": "@alien6-studio/elea-ui",
+  "version": "0.0.0",
+  "description": "Elea React primitives: planned; nothing is published from this package yet",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alien6-Studio/elea.git",
+    "directory": "packages/ui"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@alien6-studio/elea-tokens": "^0.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Alien6-Studio/elea/tree/main/packages/ui",
+  "bugs": {
+    "url": "https://github.com/Alien6-Studio/elea/issues"
+  },
+  "keywords": [
+    "elea",
+    "design-system",
+    "react",
+    "components",
+    "accessibility"
+  ],
+  "private": true
+}

@@ -1,0 +1,15 @@
+node_modules/
+**/dist/
+**/coverage/
+*.tgz
+.env*
+!.env.example
+
+/.attest/
+/artifacts/
+.attest/keys/
+
+# Playground and end-to-end outputs
+examples/*/dist/
+examples/*/playwright-report/
+examples/*/test-results/

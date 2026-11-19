@@ -1,0 +1,57 @@
+{
+  "name": "@alien6-studio/elea-tokens",
+  "version": "0.0.0",
+  "description": "Elea design tokens: DTCG source, CSS custom properties, Tailwind v4 theme and TypeScript constants",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alien6-Studio/elea.git",
+    "directory": "packages/tokens"
+  },
+  "files": [
+    "dist",
+    "tokens",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./elea.css": "./dist/elea.css",
+    "./theme.css": "./dist/theme.css",
+    "./tokens/elea.tokens.json": "./tokens/elea.tokens.json",
+    "./tokens/elea.dark.tokens.json": "./tokens/elea.dark.tokens.json",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/src/index.d.ts",
+  "main": "./dist/src/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node --import tsx scripts/build-css.ts",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Alien6-Studio/elea/tree/main/packages/tokens",
+  "bugs": {
+    "url": "https://github.com/Alien6-Studio/elea/issues"
+  },
+  "keywords": [
+    "elea",
+    "design-system",
+    "design-tokens",
+    "css",
+    "tailwind"
+  ]
+}

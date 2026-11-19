@@ -1,0 +1,9 @@
+/** Unique identifier for blocks: a UUID when the platform provides one. */
+export function generateId(): string {
+  const cryptoApi = globalThis.crypto;
+  if (cryptoApi && typeof cryptoApi.randomUUID === "function") {
+    return cryptoApi.randomUUID();
+  }
+  // Non-security identifier for runtimes without crypto.randomUUID
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`;
+}

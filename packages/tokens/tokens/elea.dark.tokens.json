@@ -1,0 +1,24 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "color": {
+    "text": {
+      "default": { "$type": "color", "$value": "{color.neutral.100}" },
+      "muted": { "$type": "color", "$value": "{color.neutral.400}" },
+      "subtle": { "$type": "color", "$value": "{color.neutral.500}" },
+      "inverse": { "$type": "color", "$value": "{color.neutral.900}" },
+      "link": { "$type": "color", "$value": "{color.primary.400}" },
+      "link-hover": { "$type": "color", "$value": "{color.primary.300}" }
+    },
+    "surface": {
+      "default": { "$type": "color", "$value": "{color.neutral.950}" },
+      "subtle": { "$type": "color", "$value": "{color.neutral.900}" },
+      "muted": { "$type": "color", "$value": "{color.neutral.800}" },
+      "inverse": { "$type": "color", "$value": "{color.neutral.100}" }
+    },
+    "border": {
+      "default": { "$type": "color", "$value": "{color.neutral.800}" },
+      "strong": { "$type": "color", "$value": "{color.neutral.700}" },
+      "accent": { "$type": "color", "$value": "{color.secondary.400}" }
+    }
+  }
+}

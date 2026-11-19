@@ -1,0 +1,31 @@
+version: "0.1"
+name: elea-qualification
+steps:
+  qualify:
+    run: |-
+      set -eu
+      npm ci
+      npm run check
+      npm audit --audit-level=high
+      npm run pack
+      node --version > artifacts/toolchain.txt
+    inputs:
+      - packages/
+      - examples/
+      - scripts/
+      - .github/release/
+      - package.json
+      - package-lock.json
+      - tsconfig.base.json
+      - README.md
+      - docs/
+      - LICENSE
+      - CONTRIBUTING.md
+      - SECURITY.md
+      - .github/
+      - attest.yaml
+      - artifacts/source-revision.txt
+    outputs:
+      - artifacts/
+    attestation:
+      type: tested-package
