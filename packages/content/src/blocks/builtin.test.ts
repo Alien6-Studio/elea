@@ -46,6 +46,12 @@ test("normalize coerces loose stored data", () => {
     items: ["a", { content: "b", items: ["c"] }],
   });
   assert.deepEqual(listBlock.normalize({ style: "weird", items: "x" }), { style: "unordered", items: [] });
+  assert.deepEqual(listBlock.normalize({ style: "unordered", marker: "lower-alpha", items: [{ content: "a", items: ["b"], childrenMarker: "square" }] }), {
+    style: "ordered", marker: "lower-alpha", items: [{ content: "a", items: ["b"], childrenMarker: "square" }],
+  });
+  assert.deepEqual(listBlock.normalize({ marker: "unknown", items: [{ content: "a", items: ["b"], childrenMarker: "unknown" }] }), {
+    style: "unordered", items: [{ content: "a", items: ["b"] }],
+  });
   assert.deepEqual(quoteBlock.normalize({ text: "q" }), { text: "q", caption: "" });
   assert.deepEqual(imageBlock.normalize({ file: { url: "/a.png", fileId: "f1" }, caption: "c", alt: "alt" }), { file: { url: "/a.png", id: "f1" }, caption: "c", alt: "alt" });
   assert.deepEqual(imageBlock.normalize({ url: "/legacy.png" }), { file: { url: "/legacy.png", id: "" }, caption: "" });

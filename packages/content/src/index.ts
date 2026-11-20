@@ -20,12 +20,14 @@ export {
   LEGACY_BLOCK_TYPES,
   MAX_LIST_DEPTH,
   attachmentBlock,
+  asListMarker,
   builtinBlocks,
   defaultRegistry,
   headerBlock,
   imageBlock,
   legacyBlocks,
   listBlock,
+  listStyleForMarker,
   nestedListBlock,
   paragraphBlock,
   quoteBlock,
@@ -38,6 +40,7 @@ export {
   type ImageData,
   type ListData,
   type ListItem,
+  type ListMarker,
   type ListStyle,
   type ParagraphData,
   type QuoteData,
@@ -66,5 +69,5 @@ export { createSanitizer, type HtmlPurifier, type HtmlSanitizer, type SanitizerO
 export { getVideoEmbedUrl, isDirectVideoFile, isVideoUrl } from "./media/video.js";
 export { fileKind, type FileKind } from "./media/file.js";
 export { en, fr, formatMessage, withDefaultMessages, type DeepPartial, type EleaMessages } from "./messages/index.js";
-export { blockToMarkdown, documentToMarkdown, inlineHtmlToMarkdown, looksLikeMarkdown, markdownInlineToHtml, markdownToBlocks } from "./markdown.js";
+export { blockToMarkdown, documentToMarkdown, inlineHtmlToMarkdown, looksLikeMarkdown, markdownInlineToHtml, markdownToBlocks, type MarkdownParseOptions } from "./markdown.js";
 export { documentToHtml, type HtmlSerializerOptions } from "./serialize.js";

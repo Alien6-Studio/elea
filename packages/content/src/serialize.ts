@@ -1,5 +1,5 @@
 import type { BlockRegistry } from "./blocks/registry.js";
-import type { AttachmentData, HeaderData, ImageData, ListItem, ListData, QuoteData, VideoData } from "./blocks/builtin.js";
+import { asListMarker, listStyleForMarker, type AttachmentData, type HeaderData, type ImageData, type ListItem, type ListData, type ListMarker, type QuoteData, type VideoData } from "./blocks/builtin.js";
 import type { BlockLike, EleaDocument } from "./document.js";
 import { isSafeUrl, isSiteRelativeUrl } from "./html/policy.js";
 import { getVideoEmbedUrl } from "./media/video.js";
@@ -23,16 +23,17 @@ function safe(url: string | undefined): string | null {
   return isSafeUrl(trimmed) || isSiteRelativeUrl(trimmed) ? trimmed : null;
 }
 
-function listHtml(items: readonly ListItem[], ordered: boolean, clean: (html: string) => string, level = 0): string {
-  const tag = ordered ? "ol" : "ul";
+function listHtml(items: readonly ListItem[], ordered: boolean, clean: (html: string) => string, level = 0, marker?: ListMarker): string {
+  const shape = listStyleForMarker(marker, ordered ? "ordered" : "unordered");
+  const tag = shape === "ordered" ? "ol" : "ul";
   const inner = items
     .map((item) => {
       if (typeof item === "string") return `<li class="elea-list__item">${clean(item)}</li>`;
-      const nested = item.items?.length ? listHtml(item.items, !ordered, clean, level + 1) : "";
+      const nested = item.items?.length ? listHtml(item.items, !ordered, clean, level + 1, asListMarker(item.childrenMarker)) : "";
       return `<li class="elea-list__item"><span>${clean(item.content)}</span>${nested}</li>`;
     })
     .join("");
-  return `<${tag} class="elea-list elea-list--${ordered ? "ordered" : "unordered"} elea-list--level-${Math.min(level, 3)}">${inner}</${tag}>`;
+  return `<${tag} class="elea-list elea-list--${shape} elea-list--level-${Math.min(level, 3)}${marker ? ` elea-list-marker-${marker}` : ""}">${inner}</${tag}>`;
 }
 
 /**
@@ -63,9 +64,10 @@ function blockToHtml(block: BlockLike, clean: (html: string) => string, resolve:
       const text = clean(String(header.text ?? ""));
       return text ? `<h${level} class="elea-heading elea-heading--${level}">${text}</h${level}>` : null;
     }
-    case "list": {
+    case "list":
+    case "nestedlist": {
       const list = data as unknown as ListData;
-      return Array.isArray(list.items) && list.items.length > 0 ? listHtml(list.items, list.style === "ordered", clean) : null;
+      return Array.isArray(list.items) && list.items.length > 0 ? listHtml(list.items, list.style === "ordered", clean, 0, asListMarker(list.marker)) : null;
     }
     case "quote": {
       const quote = data as unknown as QuoteData;

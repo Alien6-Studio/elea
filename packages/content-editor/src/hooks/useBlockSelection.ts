@@ -126,6 +126,7 @@ export function useBlockSelection(order: readonly string[], root: RefObject<HTML
   const onMouseDown = useCallback(
     (event: MouseEvent, focusedBlock: string | null) => {
       if (event.button !== 0) return;
+      if ((event.target as HTMLElement).closest?.(".elea-selection-bar")) return;
       const id = blockIdOf(event.target);
       if (!id) return;
       const anchor = selection.anchor ?? focusedBlock;
@@ -136,7 +137,7 @@ export function useBlockSelection(order: readonly string[], root: RefObject<HTML
         return;
       }
       press.current = { id, x: event.clientX, y: event.clientY, dragging: false };
-      if (selection.ids.length > 0 && !(event.target as HTMLElement).closest?.(".elea-selection-bar")) clear();
+      if (selection.ids.length > 0) clear();
     },
     [selection.anchor, selection.ids.length, select, clear, takeFocus],
   );

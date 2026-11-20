@@ -5,11 +5,9 @@ import { gzipSync } from "node:zlib";
 // Size budget of every package, gzip bytes of the compiled JavaScript and CSS.
 // Raising a budget is a deliberate decision made in the same change as the growth.
 // content: 24 KB since the Markdown and HTML serializers joined the model.
-// content-editor: 56 KB since rich paste, block selection, keyboard flow, the slash menu,
-// lists as one rich text field, the code editor, document history, the block menu and the
-// classic mode with its document bar joined the editor.
+// content-editor: 58 KB to cover list marker formatting and selection-aware indentation.
 // ui: 16 KB since Select, a listbox-backed select and checklist, joined the primitives.
-const BUDGETS = { tokens: 6_000, content: 24_000, "content-viewer": 12_000, media: 8_000, "content-editor": 56_000, ui: 16_000 };
+const BUDGETS = { tokens: 6_000, content: 24_000, "content-viewer": 12_000, media: 8_000, "content-editor": 58_000, ui: 16_000 };
 
 function files(dir) {
   return readdirSync(dir).flatMap((name) => {

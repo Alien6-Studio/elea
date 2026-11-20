@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { createDocument, documentToHtml, documentToMarkdown, en, type EleaBlock } from "@alien6-studio/elea-content";
-import { ContentEditor, ContentProvider, type PickedAttachment } from "@alien6-studio/elea-content-editor";
+import { ContentEditor, ContentProvider, type EditorMode, type PickedAttachment } from "@alien6-studio/elea-content-editor";
 import { ContentView, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
-import { Select } from "@alien6-studio/elea-ui";
 
 const sanitizer = createDefaultSanitizer({ links: { siteHostnames: ["alien6-studio.github.io"] } });
 
@@ -29,7 +28,7 @@ export interface LiveEditorProps {
   /** Without the side panel, the editor takes the whole stage. */
   withOutput?: boolean;
   caption?: string;
-  /** Offers the switch between the Medium-like surface and the classic editor. */
+  /** Lets people switch between the visual editors and Markdown. */
   modeSwitch?: boolean;
 }
 
@@ -39,7 +38,7 @@ export function LiveEditor({ initial, title: initialTitle, summary: initialSumma
   const [title, setTitle] = useState(initialTitle ?? "");
   const [summary, setSummary] = useState(initialSummary ?? "");
   const [tab, setTab] = useState<Output>("rendered");
-  const [mode, setMode] = useState<"default" | "toolbar" | "classic">("default");
+  const [mode, setMode] = useState<EditorMode>("default");
   const document_ = useMemo(() => createDocument(blocks), [blocks]);
   const outputs = useMemo(() => ({
     html: documentToHtml(document_, { sanitize: (html) => sanitizer.sanitize(html) }),
@@ -51,11 +50,6 @@ export function LiveEditor({ initial, title: initialTitle, summary: initialSumma
     <div className={`stage${withOutput ? "" : " stage--single"}`}>
       <div className="stage__bar">
         <span>{caption ?? "Try it: this editor runs in the page."}</span>
-        {modeSwitch && (
-          <span className="stage__mode">
-            <Select size="sm" label="Editor mode" value={mode} onChange={(next) => setMode(next as "default" | "toolbar" | "classic")} options={[{ value: "default", label: "Default" }, { value: "toolbar", label: "Toolbar" }, { value: "classic", label: "Classic" }]} />
-          </span>
-        )}
         <span>{blocks.length} blocks</span>
       </div>
       <div className="stage__body">
@@ -77,6 +71,7 @@ export function LiveEditor({ initial, title: initialTitle, summary: initialSumma
               summaryDisabled={initialSummary === undefined}
               enableVirtualization={false}
               mode={mode}
+              onModeChange={modeSwitch ? setMode : undefined}
             />
           </ContentProvider>
         </div>

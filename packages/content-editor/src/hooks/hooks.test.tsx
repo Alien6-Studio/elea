@@ -79,12 +79,29 @@ test("useBlockFocus tracks state and focuses editable fields by block id", () =>
   assert.equal(result.current.focusBlockElement, first);
 });
 
-test("scheduleBlockFocus focuses after a frame", async () => {
-  document.body.innerHTML = `<div data-elea-block-id="late"><input></div>`;
+test("scheduleBlockFocus retries when the field mounts after the first frame", async () => {
   const { result } = renderHook(() => useBlockFocus());
   act(() => result.current.scheduleBlockFocus("late"));
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  document.body.insertAdjacentHTML("beforeend", `<div data-elea-block-id="late"><input></div>`);
   await new Promise((resolve) => setTimeout(resolve, 80));
   assert.ok(document.activeElement === document.querySelector("input"), "focus should be on the expected field");
+});
+
+test("scheduleBlockFocus leaves focus where it moved after the first frame", async () => {
+  document.body.innerHTML = `<div data-elea-block-id="first"><input></div><button>Elsewhere</button>`;
+  const { result } = renderHook(() => useBlockFocus());
+  const field = document.querySelector("input");
+  const button = document.querySelector("button");
+  assert.ok(field && button);
+
+  act(() => result.current.scheduleBlockFocus("first"));
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  assert.equal(document.activeElement, field);
+
+  button.focus();
+  await new Promise((resolve) => setTimeout(resolve, 80));
+  assert.equal(document.activeElement, button);
 });
 
 test("useBlockVisibility observes registered elements and remembers seen blocks", () => {

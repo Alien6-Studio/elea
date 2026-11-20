@@ -1,11 +1,13 @@
 "use client";
 
-import { createDocument, formatMessage, htmlToText, type BlockData, type BlockLike, type EleaBlock } from "@alien6-studio/elea-content";
+import { createDocument, en, formatMessage, htmlToText, type BlockData, type BlockLike, type EleaBlock } from "@alien6-studio/elea-content";
 import { ContentView } from "@alien6-studio/elea-content-viewer";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type ClipboardEvent, type FocusEvent, type KeyboardEvent, type ReactNode } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent, type FocusEvent, type KeyboardEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { AddBlockButton } from "./AddBlockButton.js";
 import { BlockEditor, type BlockEditorMap } from "./BlockEditor.js";
 import { fieldFullySelected } from "./caret.js";
+import { MarkdownEditor, type MarkdownDraft } from "./MarkdownEditor.js";
 import { QuickAddButtons } from "./QuickAddButtons.js";
 import { EMPTY_FORMATS, type ActiveFormats, type RichTextFieldHandle } from "./RichTextField.js";
 import { Toolbar } from "./Toolbar.js";
@@ -54,12 +56,14 @@ export interface ContentEditorProps {
    * `default`: a bare writing surface, controls in the margin, one floating bar over
    * selections. `toolbar`: the same surface with a fixed bar above the document: formats,
    * insertion, history. `classic`: that bar alone over a continuous document, nothing around
-   * the blocks, as a conventional editor.
+   * the blocks, as a conventional editor. `markdown`: the source with line numbers.
    */
   mode?: EditorMode | undefined;
+  /** Shows a mode picker driven by the controlled `mode` prop. */
+  onModeChange?: ((mode: EditorMode) => void) | undefined;
 }
 
-export type EditorMode = "default" | "toolbar" | "classic";
+export type EditorMode = "default" | "toolbar" | "classic" | "markdown";
 
 /** What a host can drive from outside: undo and redo, with their availability. */
 export type ContentEditorHandle = DocumentHistory;
@@ -88,8 +92,13 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   history = true,
   historyGroupWithinMs = 500,
   mode = "default",
+  onModeChange,
 }, ref) {
   const { registry, messages, sanitizer, resolveAssetUrl } = useContentServices();
+  const sourceMessages = messages.source ?? en.source;
+  const isMarkdown = mode === "markdown";
+  const blockMode = isMarkdown ? "default" : mode;
+  const [markdownDraft, setMarkdownDraft] = useState<MarkdownDraft>();
   const documentHistory = useDocumentHistory({ blocks, title, summary }, { onBlocksChange, onTitleChange, onSummaryChange, groupWithinMs: historyGroupWithinMs });
   useImperativeHandle(ref, () => documentHistory, [documentHistory]);
   const { addBlock, updateBlock, removeBlock, insertBlocks, convertBlock, moveBlocks, shiftBlocks } = useBlockManagement({ blocks, onBlocksChange, registry });
@@ -98,6 +107,20 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   const rootRef = useRef<HTMLDivElement>(null);
   const blockSelection = useBlockSelection(order, rootRef);
   const { selection } = blockSelection;
+  const [selectionAnchor, setSelectionAnchor] = useState<Element | null>(null);
+  useLayoutEffect(() => {
+    const anchor = selection.ids.length > 0
+      ? rootRef.current?.querySelector(":scope > .elea-content-editor__blocks > .elea-block-slot > .elea-block-editor--selected")
+      : null;
+    setSelectionAnchor(anchor ?? null);
+  }, [selection.ids, blocks, enableVirtualization, isMarkdown, showPreview]);
+  const clearSelection = blockSelection.clear;
+  useEffect(() => {
+    if (isMarkdown) {
+      clearSelection();
+      setFocusedBlock(null);
+    }
+  }, [isMarkdown, clearSelection, setFocusedBlock]);
   const selectedBlocks = useMemo(() => blocks.filter((block) => selection.ids.includes(block.id)), [blocks, selection.ids]);
 
   // The root takes focus while blocks are selected, so copy, cut, paste and keys reach it
@@ -348,6 +371,9 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     setHasActiveField(handle !== null);
     setActiveFormats(formats);
   }, []);
+  useEffect(() => {
+    if (isMarkdown) handleActiveField(null, EMPTY_FORMATS);
+  }, [isMarkdown, handleActiveField]);
   /** A block gives way to several; the first keeps its id, the one at `focus` takes the caret. */
   const handleReplaceBlock = useCallback(
     (id: string, incoming: BlockLike[], focus: number, position: "start" | "end" = "start") => {
@@ -414,10 +440,13 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     },
     [insertBlocks, setFocusedBlock, scheduleBlockFocus],
   );
+  const handleSourceImage = useCallback((data: BlockData) => {
+    insertBlocks([{ type: "image", data }]);
+  }, [insertBlocks]);
 
   const rendered = useMemo(
     () =>
-      blocks.map((block) => (
+      isMarkdown ? null : blocks.map((block) => (
         <div
           key={block.id}
           className={["elea-block-slot", drag.dropTarget?.id === block.id ? `elea-block-slot--drop-${drag.dropTarget.position}` : "", drag.dragging?.includes(block.id) ? "elea-block-slot--dragging" : ""].filter(Boolean).join(" ")}
@@ -443,16 +472,16 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
           dragHandleProps={drag.handleProps(block.id)}
           context={context}
           editors={editors}
-          mode={mode}
-          onActiveField={mode === "default" ? undefined : handleActiveField}
+          mode={blockMode}
+          onActiveField={blockMode === "default" ? undefined : handleActiveField}
         />
         </div>
       )),
-    [blocks, focusedBlock, selection.ids, handleBlockFocus, handleBlockBlur, handleBlockUpdate, handleBlockRemove, handleAddBlockAfter, handleInsertBlocksAfter, handleNavigate, handleMergeBackward, handleMergeForward, handleConvert, handleReplaceBlock, blockTypes, drag, context, editors, mode, handleActiveField],
+    [blocks, focusedBlock, selection.ids, handleBlockFocus, handleBlockBlur, handleBlockUpdate, handleBlockRemove, handleAddBlockAfter, handleInsertBlocksAfter, handleNavigate, handleMergeBackward, handleMergeForward, handleConvert, handleReplaceBlock, blockTypes, drag, context, editors, blockMode, isMarkdown, handleActiveField],
   );
 
   const classes = ["elea-content-editor", `elea-content-editor--${mode}`, className, blockSelection.dragging ? "elea-content-editor--selecting" : ""].filter(Boolean).join(" ");
-  const documentToolbar = mode !== "default" && (
+  const documentToolbar = blockMode !== "default" && (
     <div className="elea-doc-toolbar">
       <div className={`elea-doc-toolbar__group${hasActiveField ? "" : " elea-doc-toolbar__group--idle"}`} aria-disabled={!hasActiveField || undefined}>
         <Toolbar editorRef={activeFieldRef} activeFormats={activeFormats} />
@@ -470,21 +499,22 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     </div>
   );
   const count = selection.ids.length;
-  const selectionBar = count > 0 && (
-    <div className="elea-selection-bar" role="toolbar" aria-label={count === 1 ? messages.selection.one : formatMessage(messages.selection.count, { count })}>
+  const selectionBar = count > 0 && selectionAnchor && createPortal(
+    <div className="elea-toolbar elea-selection-bar" role="toolbar" aria-label={count === 1 ? messages.selection.one : formatMessage(messages.selection.count, { count })}>
       <span className="elea-selection-bar__count">{count === 1 ? messages.selection.one : formatMessage(messages.selection.count, { count })}</span>
-      <button type="button" className="elea-icon-button" onClick={copyToSystemClipboard} aria-label={messages.selection.copy} title={messages.selection.copy}>
+      <button type="button" className="elea-toolbar__button" onClick={copyToSystemClipboard} aria-label={messages.selection.copy} title={messages.selection.copy}>
         <CopyIcon />
       </button>
-      <button type="button" className="elea-icon-button" onClick={() => { copyToSystemClipboard(); deleteSelection(); }} aria-label={messages.selection.cut} title={messages.selection.cut}>
+      <button type="button" className="elea-toolbar__button" onClick={() => { copyToSystemClipboard(); deleteSelection(); }} aria-label={messages.selection.cut} title={messages.selection.cut}>
         <ScissorsIcon />
       </button>
-      <button type="button" className="elea-icon-button" onClick={deleteSelection} aria-label={messages.selection.delete} title={messages.selection.delete}>
+      <button type="button" className="elea-toolbar__button" onClick={deleteSelection} aria-label={messages.selection.delete} title={messages.selection.delete}>
         <TrashIcon />
       </button>
       {renderSelectionActions?.({ ids: selection.ids, blocks: selectedBlocks, clear: blockSelection.clear })}
       <button type="button" className="elea-button elea-button--link" onClick={blockSelection.clear}>{messages.selection.clear}</button>
-    </div>
+    </div>,
+    selectionAnchor,
   );
 
   if (showPreview) {
@@ -508,16 +538,27 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
       ref={rootRef}
       className={classes}
       tabIndex={-1}
-      onMouseDown={(event) => blockSelection.onMouseDown(event, focusedBlock)}
-      onDragStart={handleRootDragStart}
-      onKeyDownCapture={handleRootKeyDownCapture}
-      onKeyDown={handleRootKeyDown}
-      onCopy={handleRootCopy}
-      onCut={handleRootCut}
-      onPaste={handleRootPaste}
+      onMouseDown={isMarkdown ? undefined : (event) => blockSelection.onMouseDown(event, focusedBlock)}
+      onDragStart={isMarkdown ? undefined : handleRootDragStart}
+      onKeyDownCapture={isMarkdown ? undefined : handleRootKeyDownCapture}
+      onKeyDown={isMarkdown ? undefined : handleRootKeyDown}
+      onCopy={isMarkdown ? undefined : handleRootCopy}
+      onCut={isMarkdown ? undefined : handleRootCut}
+      onPaste={isMarkdown ? undefined : handleRootPaste}
     >
+      {onModeChange && (
+        <label className="elea-content-editor__mode">
+          {sourceMessages.mode}
+          <select value={mode} onChange={(event) => onModeChange(event.currentTarget.value as EditorMode)}>
+            <option value="default">{sourceMessages.writing}</option>
+            <option value="toolbar">{sourceMessages.toolbar}</option>
+            <option value="classic">{sourceMessages.classic}</option>
+            <option value="markdown">{sourceMessages.markdown}</option>
+          </select>
+        </label>
+      )}
       {documentToolbar}
-      {selectionBar}
+      {!isMarkdown && selectionBar}
       {onTitleChange && (
         <textarea
           ref={titleRef}
@@ -543,7 +584,9 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
         />
       )}
       <div className="elea-content-editor__blocks">
-        {enableVirtualization ? (
+        {isMarkdown ? (
+          <MarkdownEditor blocks={blocks} draft={markdownDraft} onDraftChange={setMarkdownDraft} onBlocksChange={onBlocksChange} onAddImage={handleSourceImage} context={context ?? {}} />
+        ) : enableVirtualization ? (
           <VirtualizedBlockList
             blocks={blocks}
             focusedBlock={focusedBlock}
@@ -567,16 +610,18 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
             context={context}
             editors={editors}
             threshold={virtualizationThreshold}
-            mode={mode}
-            onActiveField={mode === "default" ? undefined : handleActiveField}
+            mode={blockMode}
+            onActiveField={blockMode === "default" ? undefined : handleActiveField}
           />
         ) : (
           rendered
         )}
       </div>
-      <div className="elea-content-editor__add">
-        <AddBlockButton onAdd={(type) => handleAddBlock(type)} types={blockTypes} />
-      </div>
+      {!isMarkdown && (
+        <div className="elea-content-editor__add">
+          <AddBlockButton onAdd={(type) => handleAddBlock(type)} types={blockTypes} />
+        </div>
+      )}
     </div>
   );
 });

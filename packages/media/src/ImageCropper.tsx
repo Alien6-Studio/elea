@@ -24,6 +24,8 @@ export interface ImageCropperProps {
   /** Height cap of the frame in pixels; defaults to 480. */
   maxHeight?: number | undefined;
   export?: ExportOptions | undefined;
+  /** Keeps the confirm and cancel controls unavailable while the host saves the image. */
+  busy?: boolean | undefined;
   labels: ImageCropperLabels;
   /** The exported picture, or `null` where canvases cannot draw; the crop window in rotated image pixels. */
   onConfirm: (blob: Blob | null, rect: CropRect, state: CropState) => void;
@@ -42,13 +44,14 @@ const FALLBACK_WIDTH = 640;
  * Frames an image: drag to move it, zoom with the wheel or the slider, rotate with the slider.
  * The frame always stays covered, so the export never has empty corners.
  */
-export function ImageCropper({ src, aspect, shape = "rect", maxZoom = 3, maxHeight = 480, export: exportOptions, labels, onConfirm, onCancel, actions, className, onChange }: ImageCropperProps) {
+export function ImageCropper({ src, aspect, shape = "rect", maxZoom = 3, maxHeight = 480, export: exportOptions, busy: saving = false, labels, onConfirm, onCancel, actions, className, onChange }: ImageCropperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [natural, setNatural] = useState<Size | null>(null);
   const [containerWidth, setContainerWidth] = useState(FALLBACK_WIDTH);
   const [state, setState] = useState<CropState>(INITIAL);
-  const [busy, setBusy] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const busy = saving || exporting;
   const drag = useRef<{ origin: Point; offset: Point } | null>(null);
 
   useLayoutEffect(() => {
@@ -112,12 +115,12 @@ export function ImageCropper({ src, aspect, shape = "rect", maxZoom = 3, maxHeig
       onConfirm(null, rect, state);
       return;
     }
-    setBusy(true);
+    setExporting(true);
     try {
       const blob = await exportCrop(Object.assign(element, { width: natural.width, height: natural.height }), rect, state.rotation, exportOptions);
       onConfirm(blob, rect, state);
     } finally {
-      setBusy(false);
+      setExporting(false);
     }
   };
 

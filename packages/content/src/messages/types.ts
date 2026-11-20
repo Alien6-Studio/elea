@@ -4,7 +4,8 @@ import type { en } from "./en.js";
 type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
 
 /** Every label of the viewer and editor. Consumers pass a full object or merge over `en`. */
-export type EleaMessages = Widen<typeof en>;
+type DefaultMessages = Widen<typeof en>;
+export type EleaMessages = Omit<DefaultMessages, "source" | "list"> & Partial<Pick<DefaultMessages, "source" | "list">>;
 
 /** Fills a partial translation with the English defaults, section by section. */
 export function withDefaultMessages(partial: DeepPartial<EleaMessages>, defaults: EleaMessages): EleaMessages {

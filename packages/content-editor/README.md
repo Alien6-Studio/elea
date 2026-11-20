@@ -14,6 +14,7 @@ import { createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { fr } from "@alien6-studio/elea-content";
 import "@alien6-studio/elea-tokens/elea.css";
 import "@alien6-studio/elea-content-viewer/styles.css";
+import "@alien6-studio/elea-media/styles.css";
 import "@alien6-studio/elea-content-editor/styles.css";
 
 <ContentProvider
@@ -30,6 +31,26 @@ import "@alien6-studio/elea-content-editor/styles.css";
 
 `blocks` is the `blocks` array of a document; `createDocument(blocks)` from `elea-content` turns it
 back into a stored document. `showPreview` renders the current content read-only.
+
+## Writing modes
+
+Use `mode="default"` for writing with margin controls and a floating formatting bar,
+`mode="toolbar"` to add a fixed toolbar, or `mode="classic"` for a continuous visual document
+with the fixed toolbar. `mode="markdown"` opens a source area with line numbers and updates the
+same block document as you type. Pass `onModeChange` and the current `mode` for a built-in picker.
+
+Markdown keeps unchanged blocks as they are. Blocks without a Markdown equivalent appear as
+comments that reference their stored data. Keep these comments in the source and use a visual mode
+to edit their blocks. Text edited in Markdown uses the formatting expressed by its source.
+
+For images, insert an image block in a visual mode or open **Add an image** in Markdown.
+Both paths accept a dropped file or a file from the picker and use the same cropper and host
+upload service. Set `imageCrop` on the provider to customize the frame and export options.
+
+Select text in a list to choose the marker for its list level and move the selected items
+together with the indent and outdent buttons. Tab and Shift+Tab offer the same movement.
+Outdenting first-level items turns them into paragraphs.
+Lists with custom markers retain their formatting through a block reference in the Markdown editor.
 
 ## Pieces
 

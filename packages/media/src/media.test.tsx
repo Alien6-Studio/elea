@@ -101,6 +101,10 @@ test("the cropper frames the picture, follows the sliders and confirms with the 
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(confirmed[2], null);
   assert.ok(container.ownerDocument.querySelector(".elea-cropper--round"));
+  cleanup();
+  render(<ImageCropper src="x" labels={labels} busy onConfirm={() => confirmed.push("confirm")} onCancel={() => confirmed.push("cancel")} />);
+  assert.equal((screen.getByRole("button", { name: "Use this image" }) as HTMLButtonElement).disabled, true);
+  assert.equal((screen.getByRole("button", { name: "Cancel" }) as HTMLButtonElement).disabled, true);
 });
 
 test("useObjectUrl creates and revokes a URL for the file", () => {

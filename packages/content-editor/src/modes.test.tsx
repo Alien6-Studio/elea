@@ -4,7 +4,7 @@ import { afterEach, test } from "node:test";
 import { useState } from "react";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { en, type EleaBlock } from "@alien6-studio/elea-content";
-import { ContentEditor } from "./ContentEditor.js";
+import { ContentEditor, type EditorMode } from "./ContentEditor.js";
 import { resetSelection, selectText } from "./test/dom.js";
 
 afterEach(() => {
@@ -106,4 +106,43 @@ test("the toolbar mode keeps the writing surface, fixes a bar above the document
   assert.ok(within(bubble).getByRole("button", { name: en.toolbar.bold }));
   fireEvent.mouseDown(within(bar).getByRole("button", { name: en.toolbar.h2 }));
   assert.ok(alpha.querySelector("h2"));
+});
+
+test("switching through Markdown edits the same document and keeps stored images and custom blocks", () => {
+  const initial: EleaBlock[] = [
+    paragraph("p", "<p>Keep <u>the emphasis</u></p>"),
+    { id: "h", type: "header", data: { text: "Title", level: 2 } },
+    { id: "photo", type: "image", data: { file: { url: "/assets/a.png", id: "file-a" }, caption: "Before", alt: "Photo" } },
+    { id: "document", type: "attachment", data: { resourceId: "resource", title: "Report", extensionData: { edition: 2 } } },
+    { id: "custom", type: "callout", data: { content: "Keep this" } },
+  ];
+  let current = initial;
+  function Editor() {
+    const [blocks, setBlocks] = useState(initial);
+    const [mode, setMode] = useState<EditorMode>("default");
+    return <ContentEditor blocks={blocks} onBlocksChange={(next) => { current = next; setBlocks([...next]); }} mode={mode} onModeChange={setMode} />;
+  }
+  render(<Editor />);
+  const mode = screen.getByRole("combobox", { name: "Editor mode" });
+  fireEvent.change(mode, { target: { value: "markdown" } });
+  assert.equal(current, initial);
+  const source = screen.getByRole("textbox", { name: "Markdown source" }) as HTMLTextAreaElement;
+  assert.match(source.value, /## Title/);
+  assert.match(source.value, /<!-- elea:block .*attachment/);
+  const edited = source.value.replace("## Title", "### Revised title").replace('"Before"', '"After"') + "\n\nNew **paragraph**\n";
+  fireEvent.change(source, { target: { value: edited } });
+  assert.equal(source.value, edited);
+  assert.equal(current[0], initial[0]);
+  assert.deepEqual(current[1], { id: "h", type: "header", data: { text: "Revised title", level: 3 } });
+  assert.deepEqual(current[2], { ...initial[2], data: { ...initial[2]?.data, caption: "After" } });
+  assert.equal(current[3], initial[3]);
+  assert.equal(current[4], initial[4]);
+  assert.deepEqual(current[5]?.data, { text: "New <strong>paragraph</strong>" });
+
+  fireEvent.change(mode, { target: { value: "classic" } });
+  assert.ok(document.querySelector(".elea-doc-toolbar"));
+  assert.ok(document.querySelector("[data-elea-block-id='p'] u"));
+  assert.equal(screen.queryByRole("textbox", { name: "Markdown source" }), null);
+  fireEvent.change(mode, { target: { value: "markdown" } });
+  assert.equal((screen.getByRole("textbox", { name: "Markdown source" }) as HTMLTextAreaElement).value, edited);
 });

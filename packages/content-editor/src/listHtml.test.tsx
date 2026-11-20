@@ -1,7 +1,7 @@
 import "./test/dom.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { cleanContent, htmlToItems, itemsToHtml, sameItems } from "./listHtml.js";
+import { cleanContent, htmlToItems, htmlToList, itemsToHtml, sameItems } from "./listHtml.js";
 
 test("items become nested list markup, the tag flipping at each level, and come back as items", () => {
   const items = ["one", { content: "two <strong>bold</strong>", items: ["deep", { content: "deeper", items: ["deepest"] }] }, ""];
@@ -25,4 +25,13 @@ test("sameItems compares values whatever the shape", () => {
   assert.ok(!sameItems(["a"], ["a", "b"]));
   assert.ok(!sameItems(["a"], ["b"]));
   assert.ok(!sameItems([{ content: "a", items: ["c"] }], [{ content: "a", items: ["d"] }]));
+});
+
+test("the field keeps explicit markers at the root and at a nested level", () => {
+  const items = ["first", { content: "parent", items: ["child"], childrenMarker: "lower-roman" as const }];
+  const markup = itemsToHtml(items, "unordered", "circle");
+  assert.match(markup, /^<ul class="elea-list-marker-circle">/);
+  assert.match(markup, /<ol class="elea-list-marker-lower-roman">/);
+  assert.deepEqual(htmlToList(markup), { style: "unordered", marker: "circle", items });
+  assert.equal(sameItems(items, ["first", { content: "parent", items: ["child"] }]), false);
 });

@@ -1,8 +1,9 @@
 "use client";
 
-import { htmlToText, type BlockData, type BlockLike, type EleaBlock, type HeaderData, type ListData, type ListItem, type QuoteData } from "@alien6-studio/elea-content";
-import { memo, useCallback, useEffect, useRef, useState, type ComponentType, type FocusEvent, type FormEvent, type KeyboardEvent, type RefObject } from "react";
-import { htmlToItems, itemContent, itemsToHtml, sameItems } from "./listHtml.js";
+import { asListMarker, htmlToText, listStyleForMarker, type BlockData, type BlockLike, type EleaBlock, type HeaderData, type ListData, type ListItem, type QuoteData } from "@alien6-studio/elea-content";
+import { memo, useCallback, useEffect, useImperativeHandle, useRef, useState, type ComponentType, type FocusEvent, type FormEvent, type KeyboardEvent, type RefObject } from "react";
+import { htmlToItems, htmlToList, itemsToHtml, sameItems } from "./listHtml.js";
+import { applyListCommand, topLevelListItems, type ListCommand } from "./listCommands.js";
 import { Select } from "@alien6-studio/elea-ui";
 import { AttachmentBlock } from "./blocks/AttachmentBlock.js";
 import { ImageBlock, type MediaBlockProps } from "./blocks/ImageBlock.js";
@@ -153,6 +154,7 @@ const notifyInput = (field: HTMLElement) => field.dispatchEvent(new window.Event
 
 interface ListEditorProps extends Pick<BlockEditorProps, "block" | "onUpdate" | "onFocus" | "onBlur" | "onNavigate" | "onMergeForward" | "onAddBlockAfter" | "onConvert" | "onReplaceWith"> {
   fieldRef: RefObject<RichTextFieldHandle | null>;
+  commandRef: RefObject<((command: ListCommand) => void) | null>;
   onSelectionChange: (formats: ActiveFormats, info: SelectionInfo) => void;
 }
 
@@ -161,61 +163,76 @@ interface ListEditorProps extends Pick<BlockEditorProps, "block" | "onUpdate" | 
  * marks and links apply, Enter adds an item, Enter on an empty one leaves the list, Backspace at
  * the start of an item joins it to the previous one, Tab and Shift+Tab nest and unnest.
  */
-function ListEditor({ block, onUpdate, onFocus, onBlur, onNavigate, onMergeForward, onAddBlockAfter, onConvert, onReplaceWith, fieldRef, onSelectionChange }: ListEditorProps) {
+function ListEditor({ block, onUpdate, onFocus, onBlur, onNavigate, onMergeForward, onAddBlockAfter, onConvert, onReplaceWith, fieldRef, commandRef, onSelectionChange }: ListEditorProps) {
   const { messages } = useContentServices();
   const data = block.data as ListData;
-  const style: ListData["style"] = data.style === "ordered" ? "ordered" : "unordered";
+  const marker = asListMarker(data.marker);
+  const style = listStyleForMarker(marker, data.style === "ordered" ? "ordered" : "unordered");
   const items: ListItem[] = Array.isArray(data.items) && data.items.length > 0 ? data.items : [""];
-  const [html, setHtml] = useState(() => itemsToHtml(items, style));
-  const styleRef = useRef(style);
+  const [html, setHtml] = useState(() => itemsToHtml(items, style, marker));
   const wrapperRef = useRef<HTMLDivElement>(null);
   const field = () => wrapperRef.current?.querySelector<HTMLElement>("[contenteditable='true']") ?? null;
+  const runCommand = (command: ListCommand) => {
+    const editable = field();
+    if (!editable) return false;
+    const result = applyListCommand(editable, command, onReplaceWith ? block.type : undefined);
+    if (typeof result === "object") {
+      onReplaceWith?.(result.blocks, result.focus, "end");
+      return true;
+    }
+    if (result) notifyInput(editable);
+    return result;
+  };
+  useImperativeHandle(commandRef, () => runCommand);
 
   // The field owns its markup while people type; items that change elsewhere (undo, the block
   // menu, a paste) rewrite it
   useEffect(() => {
-    if (styleRef.current === style && sameItems(htmlToItems(html), items)) return;
-    styleRef.current = style;
-    setHtml(itemsToHtml(items, style));
+    const current = htmlToList(html);
+    if (current.style === style && current.marker === marker && sameItems(current.items, items)) return;
+    setHtml(itemsToHtml(items, style, marker));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, style]);
+  }, [items, style, marker]);
 
   const change = (next: string) => {
     setHtml(next);
-    const parsed = htmlToItems(next);
-    if (parsed.length === 0) return;
-    if (!sameItems(parsed, items)) onUpdate({ ...data, items: parsed });
+    const parsed = htmlToList(next);
+    if (parsed.items.length === 0) return;
+    if (parsed.style !== style || parsed.marker !== marker || !sameItems(parsed.items, items)) {
+      const updated = { ...data, ...parsed };
+      if (!parsed.marker) delete updated.marker;
+      onUpdate(updated);
+    }
   };
 
   const currentItems = () => htmlToItems(field()?.innerHTML ?? html);
 
   const keyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const editable = field();
-    const item = caretItem(editable);
-    if (!editable || !item) return;
-    const topLevel = [...editable.querySelectorAll(":scope > ul > li, :scope > ol > li")] as HTMLLIElement[];
-    const index = topLevel.indexOf(item);
-
+    if (!editable || !editable.contains(event.target as Node)) return;
     if (event.key === "Tab") {
       event.preventDefault();
       event.stopPropagation();
-      if (event.shiftKey) unnest(item, editable); else nest(item);
-      notifyInput(editable);
+      runCommand(event.shiftKey ? "outdent" : "indent");
       return;
     }
+    const item = caretItem(editable);
+    if (!item) return;
+    const topLevel = [...topLevelListItems(editable)];
+    const index = topLevel.indexOf(item);
+
     if (event.key === "Enter" && !event.shiftKey && isEmptyItem(item)) {
       event.preventDefault();
       event.stopPropagation();
-      const parent = item.parentElement as HTMLElement;
-      const nested = parent !== editable.firstElementChild;
-      if (nested) { unnest(item, editable); notifyInput(editable); return; }
-      // An empty top-level item leaves the list: at the end as a new paragraph, in the middle by splitting the list
-      const before = currentItems().slice(0, index);
-      const after = currentItems().slice(index + 1);
-      if (before.length === 0 && after.length === 0) { onConvert?.("paragraph"); return; }
-      if (after.length === 0) { onUpdate({ ...data, items: before }); onAddBlockAfter?.("paragraph"); return; }
-      if (before.length === 0) { onReplaceWith?.([{ type: "paragraph", data: { text: "" } }, { type: "list", data: { ...data, items: after } }], 0); return; }
-      onReplaceWith?.([{ type: "list", data: { ...data, items: before } }, { type: "paragraph", data: { text: "" } }, { type: "list", data: { ...data, items: after } }], 1);
+      const selection = editable.ownerDocument.getSelection();
+      if (selection && !selection.isCollapsed) selection.collapseToStart();
+      if (runCommand("outdent")) return;
+      const current = currentItems();
+      if (current.length === 1) onConvert?.("paragraph");
+      else if (index === current.length - 1) {
+        onUpdate({ ...data, items: current.slice(0, -1) });
+        onAddBlockAfter?.("paragraph");
+      }
       return;
     }
     if (event.key === "Backspace" && !event.shiftKey && !event.ctrlKey && !event.metaKey && caretAtStartOf(item)) {
@@ -224,18 +241,13 @@ function ListEditor({ block, onUpdate, onFocus, onBlur, onNavigate, onMergeForwa
         // Nested: the item goes up a level
         event.preventDefault();
         event.stopPropagation();
-        unnest(item, editable);
-        notifyInput(editable);
+        runCommand("outdent");
         return;
       }
       event.preventDefault();
       event.stopPropagation();
       if (index === 0) {
-        // The first item becomes a paragraph before the rest of the list, or the whole block when alone
-        const rest = currentItems().slice(1);
-        const text = itemContent(currentItems()[0] as ListItem);
-        if (rest.length === 0) { onConvert?.("paragraph"); return; }
-        onReplaceWith?.([{ type: "paragraph", data: { text } }, { type: "list", data: { ...data, items: rest } }], 0, "end");
+        if (!runCommand("outdent") && currentItems().length === 1) onConvert?.("paragraph");
         return;
       }
       joinWithPrevious(item);
@@ -259,36 +271,6 @@ function ListEditor({ block, onUpdate, onFocus, onBlur, onNavigate, onMergeForwa
       />
     </div>
   );
-}
-
-/** The item moves under the previous one, as its last child; the first item has nowhere to go. */
-function nest(item: HTMLLIElement) {
-  const previous = item.previousElementSibling as HTMLLIElement | null;
-  if (!previous) return;
-  const parentTag = (item.parentElement as HTMLElement).tagName === "OL" ? "ul" : "ol";
-  let sublist = [...previous.children].find((child) => child.tagName === "UL" || child.tagName === "OL") as HTMLElement | undefined;
-  if (!sublist) {
-    sublist = document.createElement(parentTag);
-    previous.appendChild(sublist);
-  }
-  sublist.appendChild(item);
-}
-
-/** The item goes up after its parent item, taking the items that followed it along as its children. */
-function unnest(item: HTMLLIElement, editable: HTMLElement) {
-  const list = item.parentElement as HTMLElement;
-  const parentItem = list.parentElement as HTMLElement;
-  if (parentItem === editable || parentItem.tagName !== "LI") return;
-  const following = [] as Element[];
-  let sibling = item.nextElementSibling;
-  while (sibling) { following.push(sibling); sibling = sibling.nextElementSibling; }
-  if (following.length > 0) {
-    const carried = document.createElement(list.tagName.toLowerCase());
-    for (const element of following) carried.appendChild(element);
-    item.appendChild(carried);
-  }
-  parentItem.parentNode?.insertBefore(item, parentItem.nextSibling);
-  if (list.children.length === 0) list.remove();
 }
 
 /** The item's content joins the end of the previous item's text; its children follow as the previous item's. */
@@ -426,8 +408,11 @@ function BlockMenu({ block, onUpdate, onConvert, onRemove, labelled = false, lab
     setOpen(false);
     if (shape.current(block)) return;
     // The same type keeps its content and only changes shape; another type converts it
-    if (shape.type === block.type) onUpdate({ ...block.data, ...shape.data });
-    else onConvert?.(shape.type, shape.data);
+    if (shape.type === block.type) {
+      const data = { ...block.data, ...shape.data };
+      if (shape.type === "list") delete data.marker;
+      onUpdate(data);
+    } else onConvert?.(shape.type, shape.data);
   };
   const Icon = block.type === "paragraph" ? PilcrowIcon : blockTypeIcons[block.type];
   return (
@@ -468,6 +453,7 @@ function BlockMenu({ block, onUpdate, onConvert, onRemove, labelled = false, lab
 export const BlockEditor = memo(function BlockEditor({ block, isFocused, isSelected = false, onFocus, onBlur, onUpdate, onRemove, onAddBlockAfter, onInsertBlocksAfter, onNavigate, onMergeBackward, onMergeForward, onConvert, onReplaceWith, blockTypes, dragHandleProps, context = NO_CONTEXT, editors, mode = "default", onActiveField }: BlockEditorProps) {
   const { messages } = useContentServices();
   const richTextRef = useRef<RichTextFieldHandle>(null);
+  const listCommandRef = useRef<((command: ListCommand) => void) | null>(null);
   const [activeFormats, setActiveFormats] = useState<ActiveFormats>(EMPTY_FORMATS);
   // The toolbar floats above a text selection and leaves when the caret collapses
   const [selectionInfo, setSelectionInfo] = useState<SelectionInfo>({ collapsed: true, rect: null });
@@ -505,6 +491,7 @@ export const BlockEditor = memo(function BlockEditor({ block, isFocused, isSelec
     }
   }, [onActiveField, block.type, isFocused, activeFormats]);
   const classic = mode === "classic";
+  const list = block.type === "list" || block.type === "nestedlist";
   const labels = messages.blockTypes as Record<string, string | undefined>;
   const typeLabel = labels[block.type] ?? block.type;
 
@@ -518,7 +505,8 @@ export const BlockEditor = memo(function BlockEditor({ block, isFocused, isSelec
       case "header":
         return <HeaderEditor block={block} onUpdate={onUpdate} onFocus={onFocus} onBlur={onBlur} onAddBlockAfter={onAddBlockAfter} onNavigate={onNavigate} onMergeBackward={onMergeBackward} />;
       case "list":
-        return <ListEditor block={block} onUpdate={onUpdate} onFocus={onFocus} onBlur={onBlur} onNavigate={onNavigate} onMergeForward={onMergeForward} onAddBlockAfter={onAddBlockAfter} onConvert={onConvert} onReplaceWith={onReplaceWith} fieldRef={richTextRef} onSelectionChange={handleSelectionChange} />;
+      case "nestedlist":
+        return <ListEditor block={block} onUpdate={onUpdate} onFocus={onFocus} onBlur={onBlur} onNavigate={onNavigate} onMergeForward={onMergeForward} onAddBlockAfter={onAddBlockAfter} onConvert={onConvert} onReplaceWith={onReplaceWith} fieldRef={richTextRef} commandRef={listCommandRef} onSelectionChange={handleSelectionChange} />;
       case "quote":
         return <QuoteEditor block={block} onUpdate={onUpdate} onFocus={onFocus} onBlur={onBlur} onNavigate={onNavigate} onMergeBackward={onMergeBackward} onAddBlockAfter={onAddBlockAfter} />;
       case "image":
@@ -581,10 +569,9 @@ export const BlockEditor = memo(function BlockEditor({ block, isFocused, isSelec
           }
         }}
       >
-        {(block.type === "paragraph" ? !classic : block.type === "list") && isFocused && !selectionInfo.collapsed && typeof document !== "undefined" && createPortal(
+        {(block.type === "paragraph" ? !classic : list) && isFocused && !selectionInfo.collapsed && typeof document !== "undefined" && createPortal(
           <div className="elea-bubble" style={{ position: "fixed", top: Math.max(8, (selectionInfo.rect?.top ?? 8) - 48), left: selectionInfo.rect?.left ?? 8 }} data-elea-bubble>
-            {/* With no fixed bar, the floating one carries every format, as Medium's does; list items take the marks only */}
-            <Toolbar editorRef={richTextRef} activeFormats={activeFormats} inline={mode !== "default" || block.type === "list"} />
+            <Toolbar editorRef={richTextRef} activeFormats={activeFormats} inline={mode !== "default" || list} onListCommand={list ? (command) => listCommandRef.current?.(command) : undefined} />
           </div>,
           document.body,
         )}

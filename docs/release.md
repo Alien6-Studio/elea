@@ -34,11 +34,14 @@ No npm token is stored in this repository. Released versions are immutable.
 
 ## Attestation
 
-The [Attestation workflow](https://github.com/Alien6-Studio/elea/actions/workflows/attest.yml)
-runs the checks and packs every workspace without signing credentials. A separate
-job recomputes the evidence against the reviewed commit, signs it with Continuum
-Attest 0.2.0 and verifies signature, hashes and successful execution. Releases
-publish those exact archives. The public signer is pinned in
+The qualification job runs `npm run check -- --pack-destination artifacts`. It packs each
+publishable workspace once and installs the archives in clean projects with React 18 and React 19.
+After the consumer checks pass, it copies those same archives to `artifacts/` for the release.
+[Attestation workflow](https://github.com/Alien6-Studio/elea/actions/workflows/attest.yml)
+
+A separate job recomputes the evidence against the reviewed commit, signs it with Continuum
+Attest 0.2.0 and verifies the signature, hashes and successful execution. The release publishes
+the archives recorded in that evidence. The repository pins the public signer in
 [.github/attest/trust](../.github/attest/trust).
 
 To check a downloaded proof, check out its source revision and extract the

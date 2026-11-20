@@ -11,11 +11,22 @@ export function WritingPage() {
       <h1>Writing</h1>
       <p className="lead">The editor asks nothing of people that a modern writing tool does not. Paragraphs are the unit, formatting follows the selection, blocks come from a slash or a shortcut, and the host only provides what the editor cannot know: where images go, where attachments come from.</p>
       <LiveEditor initial={writingBlocks} withOutput={false} caption="A blank page: try the keys below." modeSwitch />
-      <h2>Three modes</h2>
-      <p><strong>Default</strong> is the Medium-like one: a bare writing surface, controls in the margin on hover, and one floating bar over the selection that carries every format, headings and lists included. <strong>Toolbar</strong> keeps that surface and fixes a bar above the document with formatting, insertion and history, for people who format with the caret rather than a selection. <strong>Classic</strong> is for teams used to conventional editors: a fixed bar above the document with formatting, insertion and history, and every block framed with its type, its move and delete controls always visible. Same document, same keys; switch with the <code>mode</code> prop.</p>
-      <pre><code>{`<ContentEditor mode="classic" blocks={blocks} onBlocksChange={setBlocks} />`}</code></pre>
+      <h2>Editing modes</h2>
+      <ul>
+        <li><strong>Writing</strong> shows controls in the margin and a formatting bar over the selection.</li>
+        <li><strong>Toolbar</strong> adds a fixed bar for formatting, insertion and history.</li>
+        <li><strong>Classic</strong> uses that bar above a continuous visual document.</li>
+        <li><strong>Markdown</strong> edits the same document in a monospaced source area with line numbers. Edits update the preview as you type. Media and custom blocks can appear as comments that retain the original block.</li>
+      </ul>
+      <pre><code>{`const [mode, setMode] = useState<EditorMode>("default");
+
+<ContentEditor mode={mode} onModeChange={setMode} blocks={blocks} onBlocksChange={setBlocks} />`}</code></pre>
+      <h2>Images</h2>
+      <p>In a visual mode, insert an image block. In Markdown, open <strong>Add an image</strong>. Drop an image into the zone or use the file picker, then adjust the framing, zoom and rotation before confirming the upload.</p>
       <h2>Selection</h2>
       <p>Text and blocks never select together. Inside a block, the browser's text selection applies: drag, double and triple click, Shift+arrows, Ctrl+A for the block's text. Blocks take over when the gesture leaves the block: a drag across a boundary, Shift+arrow on the first or last line, Ctrl+A when the text is already selected, Shift+click on another block. With blocks selected, typing replaces them, a plain arrow releases them at the matching edge, Escape releases them in place.</p>
+      <h2>Lists</h2>
+      <p>Select text in a list to choose filled, hollow or square bullets, or numbering with digits, letters or Roman numerals. The marker applies to the list at the selected level. The indent and outdent commands move the selected items together, as do Tab and Shift+Tab. Outdenting first-level items turns them into paragraphs.</p>
       <h2>Keys</h2>
       <table className="keys">
         <tbody>
@@ -49,7 +60,7 @@ export function WritingPage() {
   <ContentEditor blocks={blocks} onBlocksChange={setBlocks} title={title} onTitleChange={setTitle} />
 </ContentProvider>`}</code></pre>
       <h2>Controlled content</h2>
-      <p>The editor owns no state: every change goes through <code>onBlocksChange</code>, with ids kept stable. Undo and redo are exposed through the ref for a toolbar of your own, and large documents virtualize their blocks after fifty of them.</p>
+      <p>The host owns the block document and receives edits through <code>onBlocksChange</code>. The editor exposes undo and redo through its ref and virtualizes large documents in visual modes.</p>
     </>
   );
 }

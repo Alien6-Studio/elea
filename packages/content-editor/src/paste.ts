@@ -169,7 +169,11 @@ export function parsePastedHtml(html: string, sanitizer: HtmlSanitizer): PastedC
 }
 
 function sanitizeItems(items: ListItem[], sanitizer: HtmlSanitizer): ListItem[] {
-  return items.map((item) => (typeof item === "string" ? sanitizer.sanitize(item) : { content: sanitizer.sanitize(item.content), ...(item.items ? { items: sanitizeItems(item.items, sanitizer) } : {}) }));
+  return items.map((item) => (typeof item === "string" ? sanitizer.sanitize(item) : {
+    content: sanitizer.sanitize(item.content),
+    ...(item.items && { items: sanitizeItems(item.items, sanitizer) }),
+    ...(item.childrenMarker && { childrenMarker: item.childrenMarker }),
+  }));
 }
 
 function escapeHtml(text: string): string {

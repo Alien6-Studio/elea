@@ -7,9 +7,19 @@ export type ParagraphData = { text: string };
 export type HeaderLevel = 1 | 2 | 3 | 4 | 5 | 6;
 export type HeaderData = { text: string; level: HeaderLevel };
 /** EditorJS nested list item; plain strings are the common case. */
-export type ListItem = string | { content: string; items?: ListItem[] };
+export type ListItem = string | { content: string; items?: ListItem[]; childrenMarker?: ListMarker };
 export type ListStyle = "ordered" | "unordered";
-export type ListData = { style: ListStyle; items: ListItem[] };
+const LIST_MARKER_STYLES = { disc: "unordered", circle: "unordered", square: "unordered", decimal: "ordered", "lower-alpha": "ordered", "lower-roman": "ordered" } as const;
+export type ListMarker = keyof typeof LIST_MARKER_STYLES;
+export type ListData = { style: ListStyle; items: ListItem[]; marker?: ListMarker };
+
+export function asListMarker(value: unknown): ListMarker | undefined {
+  return typeof value === "string" && Object.hasOwn(LIST_MARKER_STYLES, value) ? value as ListMarker : undefined;
+}
+
+export function listStyleForMarker(marker: ListMarker | undefined, fallback: ListStyle): ListStyle {
+  return marker ? LIST_MARKER_STYLES[marker] : fallback;
+}
 export type QuoteData = { text: string; caption: string };
 export type FileRef = { url: string; id: string };
 export type ImageData = { file: FileRef; caption: string; alt?: string };
@@ -43,7 +53,8 @@ function asListItem(value: unknown, depth = 0): ListItem | null {
   if (typeof record.content !== "string") return null;
   if (depth >= MAX_LIST_DEPTH || !Array.isArray(record.items)) return { content: record.content };
   const items = record.items.map((item) => asListItem(item, depth + 1)).filter((item): item is ListItem => item !== null);
-  return items.length > 0 ? { content: record.content, items } : { content: record.content };
+  const marker = asListMarker(record.childrenMarker);
+  return items.length > 0 ? { content: record.content, items, ...(marker && { childrenMarker: marker }) } : { content: record.content };
 }
 
 function listItemText(item: ListItem): string {
@@ -76,10 +87,14 @@ export const headerBlock = defineBlock<HeaderData>({
 
 const listDefinition = {
   defaults: (): ListData => ({ style: "unordered", items: [""] }),
-  normalize: (data: BlockData): ListData => ({
-    style: data.style === "ordered" ? "ordered" : "unordered",
-    items: Array.isArray(data.items) ? data.items.map((item) => asListItem(item)).filter((item): item is ListItem => item !== null) : [],
-  }),
+  normalize: (data: BlockData): ListData => {
+    const marker = asListMarker(data.marker);
+    return {
+      style: listStyleForMarker(marker, data.style === "ordered" ? "ordered" : "unordered"),
+      items: Array.isArray(data.items) ? data.items.map((item) => asListItem(item)).filter((item): item is ListItem => item !== null) : [],
+      ...(marker && { marker }),
+    };
+  },
   toText: (data: ListData) => data.items.map(listItemText).filter((text) => text.length > 0).join("\n"),
 };
 

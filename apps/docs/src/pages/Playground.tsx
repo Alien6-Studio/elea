@@ -1,5 +1,5 @@
 import { createDocument, documentToHtml, documentToMarkdown, en, fr, markdownToBlocks, parseDocument, type EleaBlock, type EleaMessages } from "@alien6-studio/elea-content";
-import { ContentEditor, ContentProvider, type PickedAttachment } from "@alien6-studio/elea-content-editor";
+import { ContentEditor, ContentProvider, type EditorMode, type PickedAttachment } from "@alien6-studio/elea-content-editor";
 import { ContentView, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { Select } from "@alien6-studio/elea-ui";
 import { useMemo, useState } from "react";
@@ -55,8 +55,9 @@ export function PlaygroundPage() {
   const [tab, setTab] = useState<Output>("rendered");
   const [markdownInput, setMarkdownInput] = useState("");
   const [layout, setLayout] = useState<"write" | "split">("split");
-  const [mode, setMode] = useState<"default" | "toolbar" | "classic">("default");
+  const [mode, setMode] = useState<EditorMode>("default");
   const messages = MESSAGES[locale] ?? en;
+  const modes = messages.source ?? en.source;
   const document_ = useMemo(() => createDocument(blocks), [blocks]);
   const outputs = useMemo(
     () => ({
@@ -78,9 +79,9 @@ export function PlaygroundPage() {
       <div className={`playground playground--${layout}`}>
         <header className="playground__bar">
           <h1 className="playground__brand">Elea playground</h1>
-          <p className="playground__hint">{blocks.length} blocks, {words} words. Select text to format it, type / for the block menu, drag a block by its grip.</p>
+          <p className="playground__hint">{blocks.length} blocks, {words} words.</p>
           <div className="playground__controls">
-            <Select size="sm" label="Editor mode" value={mode} onChange={(next) => setMode(next as "default" | "toolbar" | "classic")} options={[{ value: "default", label: "Default" }, { value: "toolbar", label: "Toolbar" }, { value: "classic", label: "Classic" }]} triggerProps={{ "data-testid": "mode-select" }} />
+            <Select size="sm" label={modes.mode} value={mode} onChange={(next) => setMode(next as EditorMode)} options={[{ value: "default", label: modes.writing }, { value: "toolbar", label: modes.toolbar }, { value: "classic", label: modes.classic }, { value: "markdown", label: modes.markdown }]} triggerProps={{ "data-testid": "mode-select" }} />
             <Select size="sm" label="Language" value={locale} onChange={(next) => setLocale(next as "en" | "fr")} options={[{ value: "en", label: "English" }, { value: "fr", label: "Français" }]} />
             <button type="button" onClick={() => setLayout(layout === "write" ? "split" : "write")} aria-pressed={layout === "write"} data-testid="layout-toggle">
               {layout === "write" ? "Show output" : "Write only"}

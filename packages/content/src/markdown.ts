@@ -1,4 +1,4 @@
-import type { AttachmentData, HeaderData, ImageData, ListData, ListItem, QuoteData, VideoData } from "./blocks/builtin.js";
+import { asListMarker, listStyleForMarker, type AttachmentData, type HeaderData, type ImageData, type ListData, type ListItem, type ListMarker, type QuoteData, type VideoData } from "./blocks/builtin.js";
 import type { BlockLike, EleaDocument } from "./document.js";
 import { decodeHtmlEntities, stripHtmlTags } from "./html/text.js";
 import { isSafeUrl, isSiteRelativeUrl } from "./html/policy.js";
@@ -26,16 +26,17 @@ export function inlineHtmlToMarkdown(html: string): string {
   return text.replace(/\n{3,}/g, "\n\n").replace(/^\n+|\n+$/g, "").trim();
 }
 
-function listToMarkdown(items: readonly ListItem[], ordered: boolean, depth = 0): string[] {
+function listToMarkdown(items: readonly ListItem[], ordered: boolean, depth = 0, marker?: ListMarker): string[] {
   const lines: string[] = [];
+  const numbered = listStyleForMarker(marker, ordered ? "ordered" : "unordered") === "ordered";
   items.forEach((item, index) => {
-    const marker = ordered ? `${index + 1}.` : "-";
+    const marker = numbered ? `${index + 1}.` : "-";
     const indent = "  ".repeat(depth);
     if (typeof item === "string") {
       lines.push(`${indent}${marker} ${inlineHtmlToMarkdown(item).replaceAll("\n", " ")}`);
     } else {
       lines.push(`${indent}${marker} ${inlineHtmlToMarkdown(item.content).replaceAll("\n", " ")}`);
-      if (item.items?.length) lines.push(...listToMarkdown(item.items, !ordered, depth + 1));
+      if (item.items?.length) lines.push(...listToMarkdown(item.items, !ordered, depth + 1, asListMarker(item.childrenMarker)));
     }
   });
   return lines;
@@ -54,9 +55,10 @@ export function blockToMarkdown(block: BlockLike): string | null {
       const text = inlineHtmlToMarkdown(String(header.text ?? "")).replaceAll("\n", " ");
       return text ? `${"#".repeat(Math.min(6, Math.max(1, Number(header.level) || 2)))} ${text}` : null;
     }
-    case "list": {
+    case "list":
+    case "nestedlist": {
       const list = data as unknown as ListData;
-      const lines = listToMarkdown(Array.isArray(list.items) ? list.items : [], list.style === "ordered");
+      const lines = listToMarkdown(Array.isArray(list.items) ? list.items : [], list.style === "ordered", 0, asListMarker(list.marker));
       return lines.length > 0 ? lines.join("\n") : null;
     }
     case "quote": {
@@ -134,8 +136,8 @@ export function markdownInlineToHtml(text: string): string {
     parts.push(rest.slice(0, match.index));
     const [whole, code, imageAlt, imageSource, linkText, linkHref, bold1, bold2, em1, em2] = match;
     if (code !== undefined) parts.push(`<code>${code}</code>`);
-    else if (imageSource !== undefined) parts.push(isSafeUrl(imageSource) || isSiteRelativeUrl(imageSource) ? `<img src="${imageSource}" alt="${imageAlt ?? ""}">` : (imageAlt ?? ""));
-    else if (linkHref !== undefined) parts.push(isSafeUrl(linkHref) || isSiteRelativeUrl(linkHref) ? `<a href="${linkHref}">${markdownInlineToHtml(unescape(linkText ?? ""))}</a>` : markdownInlineToHtml(unescape(linkText ?? "")));
+    else if (imageSource !== undefined) parts.push(isSafeUrl(imageSource) || isSiteRelativeUrl(imageSource) ? `<img src="${attribute(imageSource)}" alt="${attribute(imageAlt ?? "")}">` : (imageAlt ?? ""));
+    else if (linkHref !== undefined) parts.push(isSafeUrl(linkHref) || isSiteRelativeUrl(linkHref) ? `<a href="${attribute(linkHref)}">${markdownInlineToHtml(unescape(linkText ?? ""))}</a>` : markdownInlineToHtml(unescape(linkText ?? "")));
     else if (bold1 !== undefined || bold2 !== undefined) parts.push(`<strong>${markdownInlineToHtml(unescape(bold1 ?? bold2 ?? ""))}</strong>`);
     else if (em1 !== undefined || em2 !== undefined) parts.push(`<em>${markdownInlineToHtml(unescape(em1 ?? em2 ?? ""))}</em>`);
     rest = rest.slice(match.index + whole.length);
@@ -145,6 +147,10 @@ export function markdownInlineToHtml(text: string): string {
 
 function unescape(text: string): string {
   return text.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+}
+
+function attribute(text: string): string {
+  return text.replaceAll('"', "&quot;");
 }
 
 const HEADING = /^(#{1,6})\s+(.+?)\s*#*$/;
@@ -192,8 +198,13 @@ function parseList(lines: string[]): ParsedList {
   return { style, items: build(0, 0).items };
 }
 
+export interface MarkdownParseOptions {
+  /** Resolves a standalone comment outside code fences to an existing block. */
+  resolveComment?: (comment: string) => BlockLike | undefined;
+}
+
 /** Parses Markdown into blocks: headings, paragraphs, lists, quotes, fenced code, tables, rules, images. */
-export function markdownToBlocks(markdown: string): BlockLike[] {
+export function markdownToBlocks(markdown: string, { resolveComment }: MarkdownParseOptions = {}): BlockLike[] {
   const lines = markdown.replaceAll("\r\n", "\n").replaceAll("\r", "\n").split("\n");
   const blocks: BlockLike[] = [];
   let paragraph: string[] = [];
@@ -211,6 +222,15 @@ export function markdownToBlocks(markdown: string): BlockLike[] {
       flushParagraph();
       index += 1;
       continue;
+    }
+    if (resolveComment && trimmed.startsWith("<!--") && trimmed.endsWith("-->")) {
+      const block = resolveComment(trimmed.slice(4, -3).trim());
+      if (block) {
+        flushParagraph();
+        blocks.push(block);
+        index += 1;
+        continue;
+      }
     }
     if (trimmed.startsWith("```")) {
       flushParagraph();

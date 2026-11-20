@@ -2,7 +2,7 @@
 
 import type { EleaBlock, ImageData } from "@alien6-studio/elea-content";
 import { DropZone, ImageCropper, useObjectUrl } from "@alien6-studio/elea-media";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UploadIcon } from "../icons.js";
 import { useContentServices, type EditorContextInfo } from "../provider.js";
 
@@ -25,23 +25,30 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: MediaBlockProp
   const [pending, setPending] = useState<File | null>(null);
   const pendingUrl = useObjectUrl(pending);
   const replaceInput = useRef<HTMLInputElement>(null);
+  const uploading = useRef(false);
+  const latest = useRef({ data, onUpdate });
+  useEffect(() => { latest.current = { data, onUpdate }; }, [data, onUpdate]);
 
   const upload = async (file: File) => {
     if (!uploadImage) {
       setError(messages.image.errorUpload);
       return;
     }
+    if (uploading.current) return;
+    uploading.current = true;
     setError(null);
     setIsUploading(true);
     try {
       const result = await uploadImage(file, context);
-      onUpdate({ ...data, file: { url: result.url, id: result.id } });
+      const current = latest.current;
+      current.onUpdate({ ...current.data, file: { url: result.url, id: result.id } });
       setPending(null);
     } catch {
       // Back to the drop zone, the error beside it, so the picture can be picked again
       setPending(null);
       setError(messages.image.errorUpload);
     } finally {
+      uploading.current = false;
       setIsUploading(false);
     }
   };
@@ -81,6 +88,7 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: MediaBlockProp
           aspect={cropOptions.aspect}
           shape={cropOptions.shape}
           export={exportOptions}
+          busy={isUploading}
           labels={{ zoom: messages.image.cropZoom, rotation: messages.image.cropRotation, confirm: isUploading ? messages.image.uploading : messages.image.cropConfirm, cancel: messages.image.cropCancel, image: messages.image.cropImage }}
           onConfirm={confirmCrop}
           onCancel={() => setPending(null)}
@@ -93,7 +101,7 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: MediaBlockProp
   if (hasImage) {
     return (
       <div className="elea-media-block" onClick={onFocus}>
-        <img src={resolveAssetUrl(data.file)} alt={data.caption || messages.viewer.imageAlt} className="elea-media-block__image" />
+        <img src={resolveAssetUrl(data.file)} alt={data.alt ?? (data.caption || messages.viewer.imageAlt)} className="elea-media-block__image" />
         <input
           type="text"
           className="elea-media-block__caption"
@@ -105,7 +113,7 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: MediaBlockProp
         <div className="elea-media-block__actions">
           <input ref={replaceInput} type="file" accept="image/*" className="elea-visually-hidden" tabIndex={-1} aria-hidden="true" onChange={(event) => { pick(event.target.files?.[0]); event.target.value = ""; }} />
           <button type="button" className="elea-button elea-button--outline" onClick={() => replaceInput.current?.click()} disabled={isUploading}>{isUploading ? messages.image.uploading : messages.image.replace}</button>
-          <button type="button" className="elea-button elea-button--outline" onClick={() => onUpdate({ ...data, file: { url: "", id: "" } })}>{messages.image.remove}</button>
+          <button type="button" className="elea-button elea-button--outline" onClick={() => onUpdate({ ...data, file: { url: "", id: "" } })} disabled={isUploading}>{messages.image.remove}</button>
         </div>
         {error && <p className="elea-field-error" role="alert">{error}</p>}
       </div>

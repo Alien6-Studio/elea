@@ -69,8 +69,6 @@ pre code { background: transparent; padding: 0; font-size: inherit; color: inher
 .stage { border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-xl); overflow: hidden; background: var(--elea-color-surface-default); box-shadow: var(--elea-shadow-lg); }
 .stage__bar { display: flex; align-items: center; gap: var(--elea-space-2); padding: var(--elea-space-2) var(--elea-space-4); border-bottom: 1px solid var(--elea-color-border-default); background: var(--elea-color-surface-subtle); font-size: var(--elea-font-size-sm); color: var(--elea-color-text-muted); }
 .stage__bar span:first-child { margin-right: auto; }
-.stage__mode { display: flex; align-items: center; gap: var(--elea-space-2); }
-.stage__mode .elea-ui-select { min-width: 7rem; }
 .stage__body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
 .stage__editor { padding: var(--elea-space-8) var(--elea-space-6) var(--elea-space-8) var(--elea-space-4); min-height: 24rem; }
 .stage__editor .elea-content-editor { --elea-editor-gutter: 2.75rem; }

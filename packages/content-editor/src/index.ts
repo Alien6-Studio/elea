@@ -1,4 +1,4 @@
-export { ContentEditor, type ContentEditorHandle, type ContentEditorProps } from "./ContentEditor.js";
+export { ContentEditor, type ContentEditorHandle, type ContentEditorProps, type EditorMode } from "./ContentEditor.js";
 export { useDocumentHistory, type DocumentHistory, type DocumentHistoryOptions, type DocumentSnapshot } from "./hooks/useDocumentHistory.js";
 export { BlockEditor, type BlockEditorComponent, type BlockEditorMap, type BlockEditorProps } from "./BlockEditor.js";
 export { RichTextField, EMPTY_FORMATS, type ActiveFormats, type BlockTag, type InlineTag, type ListTag, type RichTextFieldHandle, type RichTextFieldProps, type SelectionInfo } from "./RichTextField.js";

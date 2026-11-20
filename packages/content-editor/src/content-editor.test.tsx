@@ -333,6 +333,58 @@ test("a nested list is one field: edits reach the data, nested items and marks s
   assert.equal(field.innerHTML, html);
 });
 
+test("the list toolbar persists marker changes and moves a selected run without losing its text", () => {
+  render(<Harness initial={[{ id: "l", type: "list", data: { style: "unordered", items: ["first", { content: "parent", items: ["one", "two"] }, "last"] } }]} />);
+  const field = listField();
+  field.focus();
+  fireEvent.focus(field);
+  const [first, last] = [...field.querySelectorAll("li > ol > li")];
+  assert.ok(first?.firstChild && last?.firstChild);
+  const selection = document.getSelection();
+  assert.ok(selection);
+  selection.setBaseAndExtent(first.firstChild, 0, last.firstChild, 3);
+  act(() => { document.dispatchEvent(new window.Event("selectionchange")); });
+
+  const button = (name: string) => screen.getByRole("button", { name });
+  fireEvent.mouseDown(button(en.list.square));
+  assert.deepEqual(itemsState()[1], { content: "parent", items: ["one", "two"], childrenMarker: "square" });
+  fireEvent.click(button(en.list["lower-roman"]));
+  assert.equal(itemsState()[1].childrenMarker, "lower-roman");
+  assert.equal(selection.toString().replace(/\s+/g, ""), "onetwo");
+
+  fireEvent.mouseDown(button(en.list.outdent));
+  assert.deepEqual(itemsState(), ["first", "parent", "one", "two", "last"]);
+  fireEvent.mouseDown(button(en.list.indent));
+  assert.deepEqual(itemsState(), ["first", { content: "parent", items: ["one", "two"] }, "last"]);
+});
+
+test("outdenting at the first level makes paragraphs and keeps the lists around them", () => {
+  render(<Harness initial={[{
+    id: "l", type: "list", data: {
+      style: "ordered", marker: "lower-roman",
+      items: ["before", { content: "<strong>one</strong>", items: ["child"], childrenMarker: "square" }, "two", "after"],
+    },
+  }]} />);
+  const field = listField();
+  field.focus();
+  fireEvent.focus(field);
+  const start = field.querySelector("strong")?.firstChild;
+  const end = field.querySelector(":scope > ol > li:last-child")?.firstChild;
+  const selection = document.getSelection();
+  assert.ok(start && end && selection);
+  selection.setBaseAndExtent(start, 0, end, 0);
+  act(() => { document.dispatchEvent(new window.Event("selectionchange")); });
+  fireEvent.mouseDown(screen.getByRole("button", { name: en.list.outdent }));
+
+  assert.deepEqual(blocksState().map(({ type, data }) => [type, data]), [
+    ["list", { style: "ordered", marker: "lower-roman", items: ["before"] }],
+    ["paragraph", { text: "<strong>one</strong>" }],
+    ["list", { style: "unordered", marker: "square", items: ["child"] }],
+    ["paragraph", { text: "two" }],
+    ["list", { style: "ordered", marker: "lower-roman", items: ["after"] }],
+  ]);
+});
+
 test("Enter splits an item, Backspace at the start joins it to the previous one, an empty last item leaves the list", async () => {
   render(<Harness initial={[{ id: "l", type: "list", data: { style: "ordered", items: ["one", "two"] } }]} />);
   const field = listField();
@@ -416,10 +468,6 @@ test("Tab nests an item under the previous one and Shift+Tab brings it back with
   assert.deepEqual(itemsState(), ["one", "two", { content: "", items: ["three"] }]);
   caretIn(listItemsOf(field)[3] as HTMLElement, false);
   fireEvent.keyDown(field, { key: "Backspace" });
-  assert.deepEqual(itemsState(), ["one", "two", "", "three"]);
-  // A top-level item cannot go higher
-  caretIn(listItemsOf(field)[0] as HTMLElement);
-  fireEvent.keyDown(field, { key: "Tab", shiftKey: true });
   assert.deepEqual(itemsState(), ["one", "two", "", "three"]);
   // Joining an item that carries children hands them to the previous one
   caretIn(listItemsOf(field)[3] as HTMLElement);

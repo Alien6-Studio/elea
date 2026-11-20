@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const PIXEL = fileURLToPath(new URL("./pixel.png", import.meta.url));
@@ -42,6 +43,8 @@ async function selectInEditable(page: Page, locator: ReturnType<Page["locator"]>
 }
 
 test.beforeEach(async ({ page }) => {
+  // A static frame keeps the video provider's overlays from taking keyboard focus.
+  await page.route("https://www.youtube.com/embed/**", (route) => route.fulfill({ contentType: "text/html", body: "<!doctype html>" }));
   await page.goto("/elea/#/playground");
   await expect(page.getByRole("heading", { name: "Elea playground" })).toBeVisible();
 });
@@ -109,12 +112,17 @@ test("Enter starts a new paragraph with the rest of the text, Backspace at its s
   await page.keyboard.press("Backspace");
   await expect(editorPane(page).locator("[data-elea-block-id]")).toHaveCount(1);
   await expect(paragraphs.nth(0)).toHaveText("First part|second part");
+  await expect(editable).toBeFocused();
   await page.keyboard.type("+");
   await expect(paragraphs.nth(0)).toHaveText("First part+|second part");
 });
 
 test("a mouse drag across blocks selects them, Delete removes them", async ({ page }) => {
-  const blocks = editorPane(page).locator("[data-elea-block-id]");
+  const editor = editorPane(page);
+  const blocks = editor.locator("[data-elea-block-id]");
+  const title = editor.getByRole("textbox", { name: "Your content title..." });
+  const titleOffset = () => title.evaluate((element) => (element as HTMLElement).offsetTop);
+  const initialTitleTop = await titleOffset();
   const first = blocks.nth(1);
   const third = blocks.nth(3);
   const from = await first.boundingBox();
@@ -124,8 +132,19 @@ test("a mouse drag across blocks selects them, Delete removes them", async ({ pa
   await page.mouse.down();
   await page.mouse.move(to.x + 40, to.y + to.height / 2, { steps: 8 });
   await page.mouse.up();
-  await expect(editorPane(page).locator(".elea-block-editor--selected")).toHaveCount(3);
-  await expect(editorPane(page).getByRole("toolbar", { name: "3 blocks selected" })).toBeVisible();
+  const selected = editor.locator(".elea-block-editor--selected");
+  await expect(selected).toHaveCount(3);
+  const toolbar = selected.first().getByRole("toolbar", { name: "3 blocks selected" });
+  await expect(toolbar).toBeVisible();
+  await expect(toolbar).toHaveClass(/\belea-toolbar\b/);
+  expect(await titleOffset()).toBe(initialTitleTop);
+  const highlights = await selected.locator(".elea-block-editor__card").evaluateAll((cards) => cards.map((card) => {
+    const rect = card.getBoundingClientRect();
+    const style = getComputedStyle(card, "::before");
+    return { top: rect.top + parseFloat(style.top), bottom: rect.bottom - parseFloat(style.bottom) };
+  }));
+  expect(highlights[0]!.bottom).toBeLessThan(highlights[1]!.top);
+  expect(highlights[1]!.bottom).toBeLessThan(highlights[2]!.top);
   await page.keyboard.press("Delete");
   await expect(blocks).toHaveCount(10);
   await expect(editorPane(page).locator(".elea-block-editor--selected")).toHaveCount(0);
@@ -147,7 +166,7 @@ test("blocks are added from the menu and lists grow with Enter", async ({ page }
   await page.keyboard.press("Shift+Home");
   await page.locator("[data-elea-bubble]").getByRole("button", { name: "Bold (Ctrl+B)" }).click();
   await expect(viewerPane(page).locator(".elea-list .elea-list__item strong")).toHaveCount(2);
-  await page.keyboard.press("End");
+  await selectInEditable(page, list.getByRole("listitem").last(), 3, 3);
   await page.keyboard.press("Tab");
   await expect(viewerPane(page).locator(".elea-list .elea-list .elea-list__item")).toHaveText(["two"]);
 
@@ -156,6 +175,59 @@ test("blocks are added from the menu and lists grow with Enter", async ({ page }
   await editorPane(page).getByRole("textbox", { name: "Heading..." }).fill("A title");
   await pick(editorPane(page).getByRole("combobox", { name: "Heading" }), "H3");
   await expect(viewerPane(page).getByRole("heading", { level: 3, name: "A title" })).toBeVisible();
+});
+
+test("the list toolbar changes the selected sublist and moves its selected items together", async ({ page }) => {
+  const editor = editorPane(page).locator('[data-elea-block-id="list"]');
+  const viewer = viewerPane(page).locator('[data-elea-block-id="list"]');
+  const nested = editor.locator("li > ol");
+  const itemText = (await nested.textContent()) ?? "";
+  await editor.getByRole("textbox", { name: "List item..." }).focus();
+  await selectInEditable(page, nested, 0, itemText.length);
+  const toolbar = page.locator("[data-elea-bubble]");
+  const nestedList = viewer.locator(".elea-list--level-1");
+  await toolbar.getByRole("button", { name: "Square bullets" }).click();
+  await expect(nestedList).toHaveCSS("list-style-type", "square");
+  await expect(viewer.locator(".elea-list--level-0")).toHaveCSS("list-style-type", "disc");
+  await toolbar.getByRole("button", { name: "Numbers" }).click();
+  await expect(nestedList).toHaveCSS("list-style-type", "decimal");
+  await expect(nestedList.locator(":scope > li")).toHaveText(["Second level", "Still synthetic"]);
+
+  await toolbar.getByRole("button", { name: "Outdent list items" }).click();
+  await expect(nestedList).toHaveCount(0);
+  await expect(viewer.locator(".elea-list--level-0 > li")).toHaveText([
+    "Paragraphs with rich text", "Nested lists", "Second level", "Still synthetic", "Quotes, images, videos, attachments",
+  ]);
+  await toolbar.getByRole("button", { name: "Indent list items" }).click();
+  await expect(nestedList.locator(":scope > li")).toHaveText(["Second level", "Still synthetic"]);
+  await toolbar.getByRole("button", { name: "Roman numerals" }).click();
+  await expect(nestedList).toHaveCSS("list-style-type", "lower-roman");
+
+  const mode = page.getByTestId("mode-select");
+  await pick(mode, "Markdown");
+  await expect(editorPane(page).getByRole("textbox", { name: "Markdown source" })).toHaveValue(/<!-- elea:block \["list","list"\] -->/);
+  await pick(mode, "Writing");
+  await expect(editor.locator("ol.elea-list-marker-lower-roman")).toHaveCSS("list-style-type", "lower-roman");
+});
+
+test("the toolbar and Shift+Tab turn first-level items into paragraphs", async ({ page }) => {
+  const editor = editorPane(page).locator('[data-elea-block-id="list"]');
+  const list = editorPane(page).getByRole("textbox", { name: "List item..." });
+  const items = list.locator(":scope > ul > li");
+  await list.focus();
+  await selectInEditable(page, items.first(), 0, 0);
+  await page.keyboard.press("Shift+Tab");
+  await expect(editor).toHaveAttribute("data-elea-block-type", "paragraph");
+  await expect(editor.getByRole("textbox")).toBeFocused();
+
+  const lastItem = "Quotes, images, videos, attachments";
+  await list.focus();
+  await selectInEditable(page, items.last(), 0, lastItem.length);
+  await page.locator("[data-elea-bubble]").getByRole("button", { name: "Outdent list items" }).click();
+  const viewer = viewerPane(page);
+  await expect(viewer.locator('[data-elea-block-id="list"]')).toHaveText("Paragraphs with rich text");
+  await expect(viewer.locator(".elea-paragraph").filter({ hasText: lastItem })).toBeVisible();
+  await expect(viewer.locator(".elea-list--level-1 > li")).toHaveText(["Second level", "Still synthetic"]);
 });
 
 test("images upload through the host service and attachments come from the picker", async ({ page }) => {
@@ -180,6 +252,45 @@ test("images upload through the host service and attachments come from the picke
   await expect(viewerPane(page).locator(".elea-attachment__icon--spreadsheet")).toBeVisible();
   await editorPane(page).getByRole("button", { name: "Remove attachment" }).click();
   await expect(page.getByTestId("picker")).toBeVisible();
+});
+
+test("Markdown edits the document and accepts a dropped image with cropping", async ({ page }) => {
+  const mode = page.getByTestId("mode-select");
+  await pick(mode, "Markdown");
+  const editor = editorPane(page);
+  const viewer = viewerPane(page);
+  const source = editor.getByRole("textbox", { name: "Markdown source" });
+  const existing = await source.inputValue();
+  const revised = existing.replace("## Every block type", "### Revised heading") + "\n";
+  await source.fill(revised);
+  await expect(viewer.getByRole("heading", { name: "Revised heading", level: 3 })).toBeVisible();
+  await expect(viewer.locator(".elea-attachment__title")).toHaveText("Quarterly report");
+
+  await editor.getByText("Add an image", { exact: true }).click();
+  const dropZone = editor.locator(".elea-dropzone");
+  const file = (await readFile(PIXEL)).toString("base64");
+  const dataTransfer = await page.evaluateHandle((encoded) => {
+    const bytes = Uint8Array.from(atob(encoded), (character) => character.charCodeAt(0));
+    const transfer = new DataTransfer();
+    transfer.items.add(new File([bytes], "sample.png", { type: "image/png" }));
+    return transfer;
+  }, file);
+  await dropZone.dispatchEvent("dragover", { dataTransfer });
+  await expect(dropZone).toHaveClass(/elea-dropzone--active/);
+  await dropZone.dispatchEvent("drop", { dataTransfer });
+  await dataTransfer.dispose();
+  await expect(editor.getByRole("img", { name: "Picture to frame" })).toBeVisible();
+  await editor.getByRole("slider", { name: "Zoom" }).press("ArrowRight");
+  await editor.getByRole("button", { name: "Use this image" }).click();
+  await expect(viewer.locator('img[src^="data:image/png"]')).toHaveCount(1);
+  expect((await source.inputValue()).startsWith(revised)).toBe(true);
+
+  await pick(mode, "Classic");
+  await expect(editor.locator(".elea-doc-toolbar")).toBeVisible();
+  await expect(editor.locator('.elea-media-block__image[src^="data:image/png"]')).toHaveCount(1);
+  await pick(mode, "Writing");
+  await expect(editor.locator("[data-elea-block-id='intro'] u")).toHaveText("editor");
+  await expect(viewer.getByRole("heading", { name: "Revised heading", level: 3 })).toBeVisible();
 });
 
 test("preview, language and theme switches", async ({ page }) => {
@@ -379,6 +490,7 @@ test("text and blocks never select together: Shift+arrows, Ctrl+A, release outsi
   // A plain arrow releases the blocks and puts the caret in the last one
   await page.keyboard.press("ArrowDown");
   expect(await selectedBlocks()).toBe(0);
+  await expect(editorPane(page).locator('[data-elea-block-id="list"] [contenteditable="true"]')).toBeFocused();
   // Ctrl+A: the paragraph's text first, then every block
   await paragraph.click();
   await page.keyboard.press("ControlOrMeta+a");
@@ -440,7 +552,7 @@ test("the classic mode shows a fixed bar above a continuous document, nothing ar
   await expect(editorPane(page).getByRole("textbox", { name: "Quote..." }).first()).toBeFocused();
   await bar.getByRole("button", { name: "Undo (Ctrl+Z)" }).click();
   expect((await types()).slice(0, 2)).toEqual(["intro", "how"]);
-  await pick(page.getByTestId("mode-select"), "Default");
+  await pick(page.getByTestId("mode-select"), "Writing");
   await expect(editorPane(page).locator(".elea-doc-toolbar")).toHaveCount(0);
   // Default mode: no bar on the paragraph, the floating one carries the headings too
   await firstParagraph(page).click();

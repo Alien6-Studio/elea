@@ -83,11 +83,29 @@ test("markdownInlineToHtml escapes HTML, keeps safe links and images, drops unsa
   assert.equal(markdownInlineToHtml("<b>raw</b> **bold** __also__ *em* _em_ `code` [t](/local) [u](javascript:x) ![a](https://example.org/i.png) ![b](data:x)"), '&lt;b&gt;raw&lt;/b&gt; <strong>bold</strong> <strong>also</strong> <em>em</em> <em>em</em> <code>code</code> <a href="/local">t</a> u <img src="https://example.org/i.png" alt="a"> b');
   assert.equal(markdownInlineToHtml("**[link](https://example.org)**"), '<strong><a href="https://example.org">link</a></strong>');
   assert.equal(markdownInlineToHtml("line  \nbreak\\\nagain\nplain"), "line<br>break<br>again<br>plain");
+  assert.equal(markdownInlineToHtml('Photo ![A "quote"](/pictures/photo.png) and [report](/files/"report".pdf)'), 'Photo <img src="/pictures/photo.png" alt="A &quot;quote&quot;"> and <a href="/files/&quot;report&quot;.pdf">report</a>');
+});
+
+test("standalone Markdown comments can resolve to blocks outside code fences", () => {
+  const kept = block("kept", "attachment", { resourceId: "file", title: "Report" });
+  const result = markdownToBlocks("Before\n<!-- saved -->\nAfter\n\n```\n<!-- saved -->\n```", { resolveComment: (comment) => comment === "saved" ? kept : undefined });
+  assert.deepEqual(result, [
+    { type: "paragraph", data: { text: "Before" } },
+    kept,
+    { type: "paragraph", data: { text: "After" } },
+    { type: "code", data: { code: "<!-- saved -->" } },
+  ]);
 });
 
 test("looksLikeMarkdown", () => {
   for (const text of ["# Title", "- item", "1. item", "> quote", "```", "---", "![a](https://x)", "| a | b |", "some **bold** words", "a [link](https://example.org)"]) assert.equal(looksLikeMarkdown(text), true, text);
   for (const text of ["plain text", "two\nlines", "", "a * b * c", "[not a link](x)"]) assert.equal(looksLikeMarkdown(text), false, text);
+});
+
+test("styled nested lists retain their type in HTML and Markdown exports", () => {
+  const document = { blocks: [block("l", "list", { style: "unordered", items: [{ content: "Alpha", items: ["Beta"], childrenMarker: "square" }] })] };
+  assert.equal(documentToMarkdown(document), "- Alpha\n  - Beta");
+  assert.match(documentToHtml(document), /<ul class="elea-list elea-list--unordered elea-list--level-1 elea-list-marker-square">/);
 });
 
 test("documentToHtml writes the viewer markup with every URL checked", () => {

@@ -5,9 +5,8 @@ steps:
     run: |-
       set -eu
       npm ci
-      npm run check
+      npm run check -- --pack-destination artifacts
       npm audit --audit-level=high
-      npm run pack
       node --version > artifacts/toolchain.txt
     inputs:
       - packages/

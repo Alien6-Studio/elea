@@ -1,5 +1,4 @@
-import type { HeaderData, ListItem, ParagraphData, QuoteData, ListData, EleaMessages, HtmlSanitizer } from "@alien6-studio/elea-content";
-import { formatMessage } from "@alien6-studio/elea-content";
+import { asListMarker, formatMessage, listStyleForMarker, type HeaderData, type ListItem, type ParagraphData, type QuoteData, type ListData, type ListMarker, type EleaMessages, type HtmlSanitizer } from "@alien6-studio/elea-content";
 import { SanitizedHtml } from "../components/SanitizedHtml.js";
 import type { BlockRendererProps } from "../context.js";
 
@@ -22,16 +21,18 @@ export function HeaderBlock({ block, context }: BlockRendererProps) {
 interface ListProps {
   items: readonly ListItem[];
   style: ListData["style"];
+  marker?: ListMarker | undefined;
   level: number;
   sanitizer: HtmlSanitizer;
   messages: EleaMessages;
 }
 
-function List({ items, style, level, sanitizer, messages }: ListProps) {
+function List({ items, style, marker, level, sanitizer, messages }: ListProps) {
   if (items.length === 0) return null;
-  const Tag = style === "ordered" ? "ol" : "ul";
+  const shape = listStyleForMarker(marker, style);
+  const Tag = shape === "ordered" ? "ol" : "ul";
   return (
-    <Tag className={`elea-list elea-list--${style} elea-list--level-${Math.min(level, 3)}`} aria-label={level > 0 ? formatMessage(messages.viewer.listLevel, { level }) : undefined}>
+    <Tag className={`elea-list elea-list--${shape} elea-list--level-${Math.min(level, 3)}${marker ? ` elea-list-marker-${marker}` : ""}`} aria-label={level > 0 ? formatMessage(messages.viewer.listLevel, { level }) : undefined}>
       {items.map((item, index) =>
         typeof item === "string" ? (
           <SanitizedHtml key={index} as="li" html={item} sanitizer={sanitizer} className="elea-list__item" />
@@ -39,7 +40,7 @@ function List({ items, style, level, sanitizer, messages }: ListProps) {
           <li key={index} className="elea-list__item">
             <SanitizedHtml as="span" html={item.content} sanitizer={sanitizer} />
             {item.items && item.items.length > 0 && (
-              <List items={item.items} style={style === "ordered" ? "unordered" : "ordered"} level={level + 1} sanitizer={sanitizer} messages={messages} />
+              <List items={item.items} style={style === "ordered" ? "unordered" : "ordered"} marker={asListMarker(item.childrenMarker)} level={level + 1} sanitizer={sanitizer} messages={messages} />
             )}
           </li>
         ),
@@ -50,7 +51,7 @@ function List({ items, style, level, sanitizer, messages }: ListProps) {
 
 export function ListBlock({ block, context }: BlockRendererProps) {
   const data = block.data as ListData;
-  return <List items={data.items ?? []} style={data.style === "ordered" ? "ordered" : "unordered"} level={0} sanitizer={context.sanitizer} messages={context.messages} />;
+  return <List items={data.items ?? []} style={data.style === "ordered" ? "ordered" : "unordered"} marker={asListMarker(data.marker)} level={0} sanitizer={context.sanitizer} messages={context.messages} />;
 }
 
 export function QuoteBlock({ block, context }: BlockRendererProps) {

@@ -1,29 +1,26 @@
-import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, existsSync } from "node:fs";
+import { copyFileSync, mkdtempSync, readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { parseArgs } from "node:util";
 
-// Qualifies the packages as a stranger would use them: packed archives installed in a
-// throwaway consumer outside the repository, with no path to the sources. The consumer
-// imports every entry point, checks every declared export resolves to a shipped file,
-// type-checks against the published declarations, renders the viewer on the server and
-// the editor in a browser-like DOM, with React 18 then React 19.
+// Installs the packed archives in clean consumers outside the repository. It imports every
+// package, checks that all declared exports ship, and verifies the published types and rendering.
+const { values } = parseArgs({ options: { "pack-destination": { type: "string" } } });
+const destination = values["pack-destination"];
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const publishable = readdirSync(join(root, "packages"))
   .map((dir) => ({ dir, manifest: JSON.parse(readFileSync(join(root, "packages", dir, "package.json"), "utf8")) }))
   .filter(({ manifest }) => !manifest.private);
 const temporary = mkdtempSync(join(tmpdir(), "elea-consumer-"));
-const consumer = join(temporary, "consumer");
-mkdirSync(consumer);
-writeFileSync(join(consumer, "package.json"), JSON.stringify({ private: true, type: "module" }));
 const userConfig = join(temporary, "empty.npmrc");
 writeFileSync(userConfig, "registry=https://registry.npmjs.org\n");
 const env = { ...process.env, npm_config_userconfig: userConfig };
 delete env.NODE_AUTH_TOKEN;
 delete env.NPM_TOKEN;
 
-function run(command, args, cwd = consumer, capture = false) {
+function run(command, args, cwd, capture = false) {
   const result = spawnSync(command, args, { cwd, env, encoding: "utf8", stdio: capture ? "pipe" : "inherit" });
   if (result.error) throw result.error;
   if (result.status !== 0) throw new Error(`${command} ${args.slice(0, 2).join(" ")} failed (${result.status})${capture ? `: ${result.stderr}` : ""}`);
@@ -33,7 +30,7 @@ function run(command, args, cwd = consumer, capture = false) {
 const install = ["install", "--ignore-scripts", "--no-audit", "--no-fund", "--registry=https://registry.npmjs.org"];
 
 /** Every `exports` entry of a package must point at a file that the archive shipped. */
-function checkExports(name) {
+function checkExports(name, consumer) {
   const dir = join(consumer, "node_modules", name);
   const manifest = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
   const targets = [];
@@ -62,6 +59,7 @@ import { createDocument, defaultRegistry, documentToText, parseDocument, fr } fr
 import { tokens, toStylesheet, cssVar } from "@alien6-studio/elea-tokens";
 import { ContentView, ContentExcerpt, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { DropZone, cropRect } from "@alien6-studio/elea-media";
+import { Button } from "@alien6-studio/elea-ui";
 import { JSDOM } from "jsdom";
 
 const require = createRequire(import.meta.url);
@@ -81,6 +79,10 @@ assert.ok(renderToString(React.createElement(ContentExcerpt, { data: doc })).inc
 // Media on the server: the drop zone renders its input and label, the geometry needs no DOM
 assert.ok(renderToString(React.createElement(DropZone, { label: "Add", onFiles: () => {} })).includes('type="file"'));
 assert.equal(cropRect({ width: 200, height: 100 }, { width: 100, height: 100 }, { zoom: 1, rotation: 0, offset: { x: 0, y: 0 } }).width, 100);
+
+// UI primitives render on the server from the published entry point
+const button = renderToString(React.createElement(Button, null, "Save"));
+assert.ok(button.startsWith("<button") && button.includes("Save"), button);
 
 // ContentEditor in a browser-like DOM, the client entry points behind "use client"
 const dom = new JSDOM("<!doctype html><html><body><div id=root></div></body></html>", { url: "https://example.org/" });
@@ -110,6 +112,7 @@ import { ContentView, type ContentViewProps } from "@alien6-studio/elea-content-
 import { ContentEditor, ContentProvider, type ContentEditorProps } from "@alien6-studio/elea-content-editor";
 import { tokens, type FlatToken } from "@alien6-studio/elea-tokens";
 import { ImageCropper, type CropState, type DropZoneProps } from "@alien6-studio/elea-media";
+import { Button, type ButtonProps } from "@alien6-studio/elea-ui";
 
 const registry: BlockRegistry = defaultRegistry;
 const document: EleaDocument = parseDocument("text", { registry });
@@ -119,7 +122,8 @@ const editorProps: ContentEditorProps = { blocks: document.blocks, onBlocksChang
 const first: FlatToken | undefined = tokens[0];
 const zone: DropZoneProps = { label: "Add", onFiles: () => {} };
 const crop: CropState = { zoom: 1, rotation: 0, offset: { x: 0, y: 0 } };
-export { ContentView, ContentEditor, ContentProvider, ImageCropper, viewerProps, editorProps, block, first, zone, crop };
+const buttonProps: ButtonProps = { children: "Save", variant: "primary" };
+export { ContentView, ContentEditor, ContentProvider, ImageCropper, Button, viewerProps, editorProps, block, first, zone, crop, buttonProps };
 `;
 
 try {
@@ -127,23 +131,34 @@ try {
   const archives = packed.map((entry) => join(temporary, entry.filename));
   if (archives.length !== publishable.length) throw new Error(`Expected ${publishable.length} archives, packed ${archives.length}`);
 
-  for (const reactVersion of ["18.3.1", "19.3.1"]) {
+  const react19 = "19.3.1";
+  for (const reactVersion of ["18.3.1", react19]) {
+    const consumer = join(temporary, reactVersion);
+    mkdirSync(consumer);
+    writeFileSync(join(consumer, "package.json"), JSON.stringify({ private: true, type: "module" }));
     console.log(`\n== React ${reactVersion}`);
-    run("npm", [...install, `react@${reactVersion}`, `react-dom@${reactVersion}`, "jsdom@30.1.3", ...archives]);
+    run("npm", [...install, `react@${reactVersion}`, `react-dom@${reactVersion}`, "jsdom@30.1.3", ...archives], consumer);
     let exported = 0;
-    for (const { manifest } of publishable) exported += checkExports(manifest.name);
+    for (const { manifest } of publishable) exported += checkExports(manifest.name, consumer);
     console.log(`exports verified: ${exported} declared targets shipped, LICENSE present in every archive`);
     writeFileSync(join(consumer, "consume.mjs"), CONSUMER_SCRIPT);
-    run("node", ["consume.mjs"]);
+    run("node", ["consume.mjs"], consumer);
   }
 
   // Types resolve from the published declarations with a bundler-style consumer configuration
+  const consumer = join(temporary, react19);
   writeFileSync(join(consumer, "types.ts"), CONSUMER_TYPES);
   writeFileSync(join(consumer, "tsconfig.json"), JSON.stringify({ compilerOptions: { module: "ESNext", moduleResolution: "bundler", target: "ES2022", jsx: "react-jsx", strict: true, noEmit: true, skipLibCheck: true, types: [] }, files: ["types.ts"] }));
-  run("npm", [...install, "@types/react@19.3.0", "@types/react-dom@19.3.0"]);
-  run(join(root, "node_modules", ".bin", "tsc"), ["-p", "tsconfig.json"]);
+  run("npm", [...install, "@types/react@19.3.0", "@types/react-dom@19.3.0"], consumer);
+  run(join(root, "node_modules", ".bin", "tsc"), ["-p", "tsconfig.json"], consumer);
   console.log("types verified: published declarations resolve under moduleResolution bundler");
   console.log(`consumer imports verified: ${publishable.length} packages`);
+
+  if (destination) {
+    mkdirSync(destination, { recursive: true });
+    for (const archive of archives) copyFileSync(archive, join(destination, basename(archive)));
+    console.log(`Qualified archives saved to ${destination}`);
+  }
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }

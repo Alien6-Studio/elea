@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /** Where the caret lands: the start, the end, or a character offset of the field's text. */
 export type CaretPosition = "start" | "end" | number;
@@ -10,7 +10,7 @@ export interface BlockFocus {
   setFocusedBlock: (id: string | null) => void;
   /** Puts the caret in the editable field of a block, if the block is in the DOM. */
   focusBlockElement: (id: string, position?: CaretPosition) => void;
-  /** Focuses after the next frame, then once more shortly after, in case the DOM is still updating. */
+  /** Focuses after the next frame, with a retry if the field is still mounting. */
   scheduleBlockFocus: (id: string, position?: CaretPosition) => void;
 }
 
@@ -52,13 +52,16 @@ function placeCaret(element: HTMLElement, position: CaretPosition): void {
 
 export function useBlockFocus(): BlockFocus {
   const [focusedBlock, setFocusedBlock] = useState<string | null>(null);
+  const focusRequest = useRef(0);
+
+  useEffect(() => () => { focusRequest.current += 1; }, []);
 
   const focusBlockElement = useCallback((id: string, position: CaretPosition = "start") => {
     const block = document.querySelector(`[data-elea-block-id="${CSS.escape(id)}"]`);
     const element = block ? findEditable(block) : null;
-    if (!element) return;
+    if (!element) return false;
     // Already focused: the user may be typing, moving the caret would send it back to the start
-    if (document.activeElement === element) return;
+    if (document.activeElement === element) return true;
     if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
       const field = element as HTMLInputElement | HTMLTextAreaElement;
       field.focus();
@@ -68,16 +71,25 @@ export function useBlockFocus(): BlockFocus {
       } catch {
         // Some input types refuse a selection range
       }
-      return;
+    } else {
+      placeCaret(element, position);
     }
-    placeCaret(element, position);
+    return document.activeElement === element;
   }, []);
 
   const scheduleBlockFocus = useCallback(
     (id: string, position: CaretPosition = "start") => {
+      const request = ++focusRequest.current;
+      const previous = document.activeElement;
+      const canFocus = () => {
+        const active = document.activeElement;
+        return request === focusRequest.current && (active === previous || active === document.body);
+      };
       requestAnimationFrame(() => {
-        focusBlockElement(id, position);
-        setTimeout(() => focusBlockElement(id, position), 50);
+        if (!canFocus() || focusBlockElement(id, position)) return;
+        setTimeout(() => {
+          if (canFocus()) focusBlockElement(id, position);
+        }, 50);
       });
     },
     [focusBlockElement],
