@@ -31,4 +31,4 @@
 .elea-card--interactive .elea-card__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 .elea-card--interactive:hover { border-color: var(--elea-color-border-strong); box-shadow: var(--elea-shadow-md); translate: 0 calc(-3px * var(--elea-motion, 0)); }
 .elea-card--interactive:hover .elea-card__title a { color: var(--elea-color-text-link); }
-.elea-card--interactive:has(.elea-card__title a:focus-visible) { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: 2px; }
+.elea-card--interactive:has(.elea-card__title a:focus-visible) { border-color: transparent; outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: -2px; }

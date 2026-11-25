@@ -38,6 +38,11 @@ any cascade layer wins over the `elea.tokens` layer whatever the import order. U
 `--elea-color-text-on-brand` for the foreground on filled primary and secondary
 controls. Check its contrast when changing the fill colors.
 
+Override `--elea-color-success`, `--elea-color-info`, `--elea-color-warning`, or
+`--elea-color-danger` on a theme to recolor the corresponding buttons, badges,
+alerts and toasts. Set the override on the theme selector so portaled surfaces
+receive it too.
+
 A custom theme joins the same layer with `toStylesheet(tokens, { layer: "elea.tokens" })`, or
 with `inLayer("elea.tokens", css)` for a stylesheet you already hold. With Tailwind v4, declare
 `@layer theme, base, elea, components, utilities;` before the imports; see

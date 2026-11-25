@@ -204,8 +204,8 @@ container. Tooltips, popovers and menus stay inside their container and inherit 
 - `Accordion` for sections that fold under their heading, one at a time or `multiple`, with a
   heading level that fits the page outline.
 - `Slider`, a native range input with a filled track, a visible label and a worded value.
-- `ToastProvider` and `useToast` for brief messages above the page: tones, an action, a lifetime
-  that waits while a toast is hovered or focused, and replacement under a shared `id`.
+- `ToastProvider` and `useToast` show brief messages with themed tones, an optional icon and an
+  action. Toasts pause while hovered or focused and can be replaced under a shared `id`.
 - `Footer` with a brand slot, labelled link groups and a row for a signature or legal links.
 
 Components ship their skeleton and pages compose them: a component with a stable shape exports its

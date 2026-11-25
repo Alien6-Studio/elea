@@ -17,7 +17,7 @@
   text-decoration: none;
   --_elea-button-rest: var(--elea-button-shadow, var(--elea-control-edge, var(--elea-_control-edge, none)));
   box-shadow: var(--_elea-button-rest);
-  /* Movement and colour alternate, so each two-value list below gives them their own pace. */
+  /* Alternate motion and colour to apply separate timings. */
   transition-property: translate, background-color, scale, border-color, transform, color, box-shadow, filter;
   transition-duration: calc(var(--elea-motion-duration-base) + 450ms * var(--elea-motion, 0)), var(--elea-motion-duration-base);
   transition-timing-function: var(--elea-motion-rebound, var(--elea-motion-easing-standard)), var(--elea-motion-easing-standard);
@@ -36,25 +36,28 @@
 .elea-button--shadow-md { --elea-button-shadow: var(--elea-shadow-md); }
 .elea-button--full { width: 100%; }
 .elea-button--primary { background: var(--elea-color-primary-600); color: var(--elea-color-text-on-brand); }
-.elea-button--primary:hover:not(:disabled) { background-color: var(--elea-color-primary-700); }
+.elea-button--primary:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-color-primary-700); }
 .elea-button--secondary { background: var(--elea-color-secondary-700); color: var(--elea-color-text-on-brand); }
-.elea-button--secondary:hover:not(:disabled) { background-color: var(--elea-color-secondary-800); }
+.elea-button--secondary:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-color-secondary-800); }
 .elea-button--outline { background: var(--elea-control-outline-surface, color-mix(in srgb, var(--elea-color-surface-muted) var(--elea-_outline-tint, 0%), transparent)); border-color: var(--elea-control-border, var(--elea-color-border-strong)); color: var(--elea-color-text-default); }
-.elea-button--outline:hover:not(:disabled) { background-color: var(--elea-control-hover-surface, var(--elea-color-surface-subtle)); }
+.elea-button--outline:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-control-hover-surface, var(--elea-color-surface-subtle)); }
 .elea-button--ghost { --elea-_control-edge: none; background: transparent; color: var(--elea-color-text-muted); }
-.elea-button--ghost:hover:not(:disabled) { background-color: var(--elea-color-surface-muted); color: var(--elea-color-text-default); }
-.elea-button--danger, .elea-button--success, .elea-button--info { background: var(--elea-color-danger); color: var(--elea-color-text-inverse); }
+.elea-button--ghost:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-color-surface-muted); color: var(--elea-color-text-default); }
+:is(.elea-button--danger, .elea-button--success, .elea-button--info, .elea-button--warning) { color: var(--elea-color-text-inverse); }
+.elea-button--danger { background: var(--elea-color-danger); }
 .elea-button--success { background: var(--elea-color-success); }
 .elea-button--info { background: var(--elea-color-info); }
-:is(.elea-button--danger, .elea-button--success, .elea-button--info):hover:not(:disabled) { filter: brightness(0.9); }
+.elea-button--warning { background: var(--elea-color-warning); }
+:is(.elea-button--danger, .elea-button--success, .elea-button--info, .elea-button--warning):hover:not(:disabled, [aria-disabled="true"]) { filter: brightness(0.9); }
 .elea-button:is(.elea-button--primary, .elea-button--secondary, .elea-button--outline) {
   --_elea-button-press: var(--elea-control-press-shadow, var(--elea-_control-press-shadow, var(--_elea-button-rest)));
 }
 .elea-button:active:enabled {
   box-shadow: var(--_elea-button-press, var(--_elea-button-rest));
 }
-.elea-button:disabled, .elea-button[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+.elea-button:is(:disabled, [aria-disabled="true"]) { opacity: 0.5; cursor: not-allowed; }
 .elea-button:focus-visible { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: 2px; }
+.elea-button--outline:focus-visible { border-color: transparent; outline-offset: -2px; }
 .elea-button--icon { padding: 0; width: var(--_elea-button-height); }
 .elea-button--disc {
   flex: none;

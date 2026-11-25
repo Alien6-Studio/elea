@@ -19,7 +19,7 @@
 .elea-checkbox__input:checked + .elea-checkbox__box, .elea-checkbox__input:indeterminate + .elea-checkbox__box { background: var(--elea-color-primary-600); border-color: var(--elea-color-primary-600); }
 .elea-checkbox__input:checked + .elea-checkbox__box::after { content: ""; position: absolute; left: 0.3rem; top: 0.1rem; width: 0.3rem; height: 0.6rem; border: solid var(--elea-color-text-on-brand); border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .elea-checkbox__input:indeterminate + .elea-checkbox__box::after { content: ""; position: absolute; left: 0.25rem; right: 0.25rem; top: 50%; height: 2px; background: var(--elea-color-text-on-brand); }
-.elea-checkbox__input:focus-visible + .elea-checkbox__box { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: 2px; }
+.elea-checkbox__input:focus-visible + .elea-checkbox__box { border-color: transparent; outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: 2px; }
 .elea-checkbox__text { display: flex; flex-direction: column; }
 .elea-checkbox__label { font-size: var(--elea-font-size-base); }
 .elea-checkbox__description { font-size: var(--elea-font-size-sm); color: var(--elea-color-text-muted); }

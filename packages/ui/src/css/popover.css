@@ -24,7 +24,7 @@
   animation: elea-enter var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
 }
 .elea-popover__panel:focus { outline: none; }
-.elea-popover__panel:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+.elea-popover__panel:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: -2px; }
 /* The side the panel really took, which is the other one when the preferred side lacks room. */
 .elea-popover__panel[data-side="top"] { transform-origin: bottom; --elea-enter-y: 0.25rem; }
 /* ConfirmPopover */
