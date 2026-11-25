@@ -4,7 +4,7 @@ import { afterEach, test } from "node:test";
 import { useState } from "react";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { placeCaret, selectText } from "./test/dom.js";
-import { en, fr, type EleaBlock } from "@alien6-studio/elea-content";
+import { createDocument, en, fr, parseDocument, prepareEditorBlocks, type EleaBlock } from "@alien6-studio/elea-content";
 import { FakeIntersectionObserver, resetSelection } from "./test/dom.js";
 import { AddBlockButton } from "./AddBlockButton.js";
 import { ContentEditor, type ContentEditorHandle } from "./ContentEditor.js";
@@ -749,6 +749,36 @@ const tick = async () => {
   await act(async () => {});
 };
 const blocksState = () => JSON.parse(document.querySelector("[data-testid='blocks']")?.textContent ?? "[]") as EleaBlock[];
+
+test("a historical EditorJS document keeps its stored fields through an edit and reload", () => {
+  const intro = { ...paragraph("intro", "Archived draft"), tunes: { alignment: { alignment: "left" } } };
+  const historical = {
+    time: 1_700_000_000_000,
+    version: "2.28.2",
+    blocks: [
+      intro,
+      { id: "heading", type: "header", data: { text: "<em>Field notes</em>", level: 5 } },
+      { id: "tasks", type: "list", data: { style: "checklist", items: [
+        { content: "Review", meta: { checked: true }, items: [] },
+        { content: "Publish", meta: { checked: false }, items: [{ content: "Approve", meta: { checked: false }, items: [] }] },
+      ] } },
+      { id: "download", type: "attaches", data: { file: { url: "https://example.org/notes.pdf", name: "notes.pdf" } } },
+      { id: "reference", type: "customReference", data: { label: "Source", display: { compact: true } } },
+    ],
+  };
+  const { rerender } = render(<Harness key="original" initial={prepareEditorBlocks(JSON.stringify(historical))} />);
+  const draft = screen.getByRole("textbox", { name: en.editor.startWriting });
+  draft.textContent = "Updated draft";
+  fireEvent.input(draft);
+
+  const saved = JSON.stringify(createDocument(blocksState(), { time: historical.time, version: historical.version }));
+  const expected = { ...historical, blocks: [{ ...intro, data: { text: "Updated draft" } }, ...historical.blocks.slice(1)] };
+  assert.deepEqual(parseDocument(saved), expected);
+
+  rerender(<Harness key="reopened" initial={prepareEditorBlocks(saved)} />);
+  assert.deepEqual(blocksState(), expected.blocks);
+  assert.equal(screen.getByRole("textbox", { name: en.editor.headerPlaceholder }).querySelector("em")?.textContent, "Field notes");
+});
 
 test("a return breaks the quoted line; a second moves its formatted suffix to a paragraph and keeps the attribution", () => {
   const data = { text: "Left <em>middle</em> right", caption: "Author", alignment: "center" };

@@ -541,6 +541,19 @@ test("Pagination range and rendering", () => {
   fireEvent.click(within(nav).getByRole("button", { name: "Previous" }));
   fireEvent.click(within(nav).getByRole("button", { name: "Page 10" }));
   assert.deepEqual(pages, [4, 2, 10]);
+  assert.equal(within(nav).getByRole("button", { name: "Page 3" }).getAttribute("aria-current"), "page");
+  assert.ok(within(nav).getByText("21–30 of 95"));
+  rerender(<Pagination page={10} pageCount={10} onPageChange={(page) => pages.push(page)} labels={labels} totalItems={95} pageSize={10} />);
+  assert.equal(within(nav).getByRole("button", { name: "Page 10" }).getAttribute("aria-current"), "page");
+  assert.ok(within(nav).getByText("91–95 of 95"));
+  const lastNext = within(nav).getByRole<HTMLButtonElement>("button", { name: "Next" });
+  assert.equal(lastNext.disabled, true);
+  fireEvent.click(lastNext);
+  assert.deepEqual(pages, [4, 2, 10]);
+
+  rerender(<Pagination page={1} pageCount={0} onPageChange={() => {}} labels={labels} totalItems={0} pageSize={10} />);
+  assert.ok(screen.getByText("0–0 of 0"));
+  assert.equal(screen.queryByRole("list"), null);
   rerender(<Pagination page={1} pageCount={1} onPageChange={() => {}} labels={labels} />);
   assert.equal(screen.queryByRole("navigation"), null);
   rerender(<Pagination page={1} pageCount={1} onPageChange={() => {}} labels={labels} totalItems={3} pageSize={10} />);
