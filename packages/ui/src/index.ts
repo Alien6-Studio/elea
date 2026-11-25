@@ -3,6 +3,8 @@ export { scopeOf, useSurfaceScope, type Appearance, type SurfaceScope } from "./
 export { Button, ButtonSkeleton, IconButton, type ButtonSkeletonProps, type ButtonEffect, type ButtonProps, type ButtonRadius, type ButtonShadow, type ButtonSize, type ButtonVariant, type IconButtonProps, type LinkButtonProps } from "./Button.js";
 export { Badge, BadgeSkeleton, type BadgeProps, type BadgeSkeletonProps, type BadgeTone, type BadgeVariant } from "./Badge.js";
 export { Field, FieldSkeleton, Input, Label, Textarea, type FieldProps, type FieldSkeletonProps, type InputProps, type LabelProps, type TextareaProps } from "./Field.js";
+export { Calendar, type CalendarProps } from "./Calendar.js";
+export { Combobox, type ComboboxOption, type ComboboxProps } from "./Combobox.js";
 export { Checkbox, Toggle, type CheckboxProps, type ToggleProps } from "./Checkbox.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./RadioGroup.js";
 export { type ConfirmField } from "./ConfirmField.js";
@@ -15,7 +17,7 @@ export { Pagination, paginationRange, type PaginationLabels, type PaginationProp
 export { Select, type MultipleSelectProps, type SelectOption, type SelectProps, type SingleSelectProps } from "./Select.js";
 export { Footer, type FooterGroup, type FooterLink, type FooterProps } from "./Footer.js";
 export { Tab, TabList, TabPanel, Tabs, TabsRoot, type TabItem, type TabListProps, type TabPanelProps, type TabPresentation, type TabProps, type TabsProps, type TabsRootProps } from "./Tabs.js";
-export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardSkeleton, CardTitle, type CardSkeletonProps, type CardPartProps, type CardProps, type CardTitleProps } from "./Card.js";
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardImage, CardSkeleton, CardTitle, type CardImageProps, type CardSkeletonProps, type CardPartProps, type CardProps, type CardTitleProps } from "./Card.js";
 export { Separator, type SeparatorProps } from "./Separator.js";
 export { Skeleton, type SkeletonProps } from "./Skeleton.js";
 export { SkeletonRegion, type SkeletonRegionProps } from "./SkeletonRegion.js";

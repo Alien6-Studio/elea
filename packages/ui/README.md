@@ -175,11 +175,19 @@ container. Tooltips, popovers and menus stay inside their container and inherit 
   navigation then measures its own width, and in a narrow one the text gives way to the arrows
   alone, the accessible names staying.
 - `Select` for a single choice or a checklist.
+- `Combobox` filters labelled options as the user types. Pass `options`, the controlled `value`,
+  `onChange`, `label` and `emptyMessage`. The search hint defaults to `label`.
+  Pass a localized `placeholder` to customize it or `""` to omit it. Its optional `name` submits the selected value.
+- `Calendar` selects one Gregorian day as a `YYYY-MM-DD` string. Supply `value`, `onChange`,
+  `locale`, `label` and translated `labels.previousMonth` and `labels.nextMonth`.
+  Use `min` and `max` for inclusive bounds. Pass a value or a `YYYY-MM` `defaultMonth` to
+  render the grid on the server. With neither supplied it opens to the user's local month on mount.
 - `Tabs` for keyboard-navigable panels. Supply labelled items and use `keepMounted` to retain
   form state when switching panels. When the list and the panels sit apart, or a tab holds more than
   a label, compose `TabsRoot`, `TabList`, `Tab` and `TabPanel`.
-- `Card` in outline, elevated or subtle variants, with `CardHeader`, `CardTitle`, `CardDescription`,
+- `Card` in outline, elevated or subtle variants, with `CardImage`, `CardHeader`, `CardTitle`, `CardDescription`,
   `CardContent` and `CardFooter`. With `interactive`, the link in its title covers the whole card.
+  `CardImage` accepts native image attributes, including `srcSet`, `sizes`, intrinsic dimensions and a required `alt`.
 - `Separator`, horizontal or vertical, decorative by default, with an optional label as children.
 - `Skeleton` placeholders (`text`, `rect`, `circle`, several `lines`, a `count` of stacked blocks),
   hidden from assistive technology. `className` names what holds the lines or the blocks, and
@@ -213,7 +221,7 @@ companion, built from its own markup so the two cannot drift apart, and a page l
 out the way it lays out the loaded components. The library holds no page-level skeleton, since the
 shape of a page belongs to the application.
 
-`Accordion`, `Avatar`, `Dialog`, `Menu`, `Popover`, `Select`, `Sheet`, `SkeletonRegion`, `Slider`, `Tabs`, `ToastProvider` and `Tooltip` carry a `"use client"` boundary. With
+`Accordion`, `Avatar`, `Calendar`, `Combobox`, `Dialog`, `Menu`, `Popover`, `Select`, `Sheet`, `SkeletonRegion`, `Slider`, `Tabs`, `ToastProvider` and `Tooltip` carry a `"use client"` boundary. With
 React Server Components, keep components with interaction callbacks in a client
 component. Display-only elements like `Badge` can render on the server.
 

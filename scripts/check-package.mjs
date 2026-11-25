@@ -167,6 +167,10 @@ for (const [part, module] of Object.entries(parts)) {
   const holder = [...chunks.values()].find((chunk) => chunk.moduleIds.some((id) => id.replaceAll("\\", "/").endsWith(module)));
   assert.ok(holder, "the bundle holds " + module);
   assert.ok(!first.has(holder.fileName), "the " + part + " part is downloaded with the editor instead of on demand");
+  if (part === "cropper") {
+    const adjustable = [...chunks.values()].find(chunk => chunk.moduleIds.some(id => id.endsWith("/AdjustableCrop.js")));
+    assert.ok(!adjustable, "the editor should omit the optional crop controls from its bundle");
+  }
   sizes.push(part + " " + size([holder.fileName]));
 }
 const total = size([...first]);
@@ -184,7 +188,7 @@ import { tokens, toStylesheet, cssVar } from "@alien6-studio/elea-tokens";
 import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ContentView, ContentExcerpt, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { DropZone, cropRect } from "@alien6-studio/elea-media";
-import { Button, Dialog, Footer } from "@alien6-studio/elea-ui";
+import { Button, Calendar, Combobox, Dialog, Footer } from "@alien6-studio/elea-ui";
 import { JSDOM } from "jsdom";
 
 const require = createRequire(import.meta.url);
@@ -210,6 +214,10 @@ assert.equal(cropRect({ width: 200, height: 100 }, { width: 100, height: 100 }, 
 // UI primitives render on the server from the published entry point
 const button = renderToString(React.createElement(Button, null, "Save"));
 assert.ok(button.startsWith("<button") && button.includes("Save"), button);
+const calendar = renderToString(React.createElement(Calendar, { label: "Publication date", labels: { previousMonth: "Previous", nextMonth: "Next" }, locale: "en-GB", value: "2028-02-29", onChange() {} }));
+assert.ok(calendar.includes('role="grid"') && calendar.includes("29 February 2028"), calendar);
+const collection = renderToString(React.createElement(Combobox, { label: "Collection", emptyMessage: "No matches", options: [{ value: "ice", label: "Glaciers" }], value: "ice", onChange() {} }));
+assert.ok(collection.includes('role="combobox"') && collection.includes("Glaciers"), collection);
 const footer = renderToString(React.createElement(Footer, { groups: [{ label: "Project", links: [{ label: "Docs", href: "/docs" }] }] }));
 assert.ok(footer.startsWith("<footer") && footer.includes('aria-label="Project"') && footer.includes('href="/docs"'), footer);
 

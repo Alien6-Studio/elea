@@ -8,7 +8,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import axe from "axe-core";
 import { Alert } from "./Alert.js";
 import { Avatar, AvatarGroup } from "./Avatar.js";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./Card.js";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardImage, CardTitle } from "./Card.js";
 import { Progress } from "./Progress.js";
 import { Separator } from "./Separator.js";
 import { Skeleton } from "./Skeleton.js";
@@ -38,6 +38,19 @@ test("Card composes a surface from its parts and hands its element to a ref", ()
   render(<Card data-testid="plain"><CardTitle>Plain</CardTitle></Card>);
   assert.equal(screen.getByTestId("plain").className, "elea-card elea-card--outline elea-card--pad-md");
   assert.equal(screen.getByRole("heading", { level: 3 }).textContent, "Plain");
+});
+
+test("CardImage preserves responsive sources, alternative text and intrinsic dimensions", () => {
+  const ref = createRef<HTMLImageElement>();
+  const { rerender } = render(<Card><CardImage ref={ref} src="/cover.jpg" srcSet="/cover.jpg 640w, /cover-wide.jpg 1280w"
+    sizes="(max-width: 640px) 100vw, 640px" alt="Blue crevasses in the ice" width={640} height={360} /></Card>);
+  const image = screen.getByRole("img", { name: "Blue crevasses in the ice" });
+  assert.equal(image, ref.current);
+  assert.equal(image.getAttribute("srcset"), "/cover.jpg 640w, /cover-wide.jpg 1280w");
+  assert.equal(image.getAttribute("sizes"), "(max-width: 640px) 100vw, 640px");
+  assert.deepEqual([ref.current?.width, ref.current?.height], [640, 360]);
+  rerender(<Card><CardImage src="/cover.jpg" alt="" /></Card>);
+  assert.equal(screen.queryByRole("img"), null);
 });
 
 test("Separator is decorative unless it separates content, and can carry a label", () => {

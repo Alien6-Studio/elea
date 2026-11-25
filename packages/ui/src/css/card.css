@@ -1,4 +1,3 @@
-/* Card */
 .elea-card {
   display: flex;
   flex-direction: column;
@@ -15,15 +14,16 @@
 .elea-card--pad-none { padding: 0; }
 .elea-card--pad-sm { padding: var(--elea-space-3); gap: var(--elea-space-3); }
 .elea-card--pad-lg { padding: var(--elea-space-8); gap: var(--elea-space-5); }
+.elea-card__image { display: block; width: 100%; height: auto; object-fit: cover; border-radius: var(--elea-radius-md); }
+.elea-card--pad-none > .elea-card__image:first-child { border-radius: var(--elea-radius-xl) var(--elea-radius-xl) 0 0; }
 .elea-card__header { display: flex; flex-direction: column; gap: var(--elea-space-1); }
 .elea-card__title { margin: 0; font-size: var(--elea-font-size-lg); font-weight: var(--elea-font-weight-semibold); line-height: var(--elea-font-leading-tight); }
 .elea-card__description { margin: 0; font-size: var(--elea-font-size-sm); color: var(--elea-color-text-muted); }
 .elea-card__content { min-width: 0; }
 .elea-card__footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--elea-space-2); margin-top: auto; }
-/* The title's link stretches over an interactive card: one link to read, the whole surface to press. */
 .elea-card--interactive {
   position: relative;
-  transition: var(--elea-motion-duration-base) var(--elea-motion-easing-standard);
+  transition-duration: var(--elea-motion-duration-base);
   transition-property: border-color, box-shadow, translate;
   transition-timing-function: var(--elea-motion-easing-standard), var(--elea-motion-easing-standard), var(--elea-motion-bounce, var(--elea-motion-easing-standard));
 }

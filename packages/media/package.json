@@ -26,17 +26,19 @@
       "default": "./dist/index.js"
     },
     "./styles.css": "./dist/styles.css",
+    "./crop-adjustments.css": "./dist/crop-adjustments.css",
     "./bundle.css": "./dist/bundle.css",
     "./package.json": "./package.json"
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node ../../scripts/build-styles.mjs src/styles.css dist @alien6-studio/elea-tokens/elea.css",
+    "build": "tsc -p tsconfig.build.json && node ../../scripts/build-styles.mjs src/styles.css dist --sheet src/crop-adjustments.css @alien6-studio/elea-tokens/elea.css @alien6-studio/elea-ui/css/field.css @alien6-studio/elea-ui/css/select.css @alien6-studio/elea-ui/css/slider.css @alien6-studio/elea-ui/css/button.css",
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-tokens": "^0.0.0"
+    "@alien6-studio/elea-tokens": "^0.0.0",
+    "@alien6-studio/elea-ui": "^0.0.0"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",

@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode, type WheelEvent } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode, type WheelEvent } from "react";
 import { useObjectUrl } from "./useObjectUrl.js";
-import { clampOffset, cropRect, displayScale, exportCrop, frameSize, type CropRect, type CropState, type ExportOptions, type Point, type Size } from "./crop.js";
+import type { CropFormats } from "./createCropFormats.js";
+import type { CropButtonProps, CropLayout, CropSliderProps } from "./AdjustableCrop.js";
+import { clampOffset, cropRect, displayScale, exportCrop, frameSize, isValidOutputSize, measureCropRect, type CropRect, type CropState, type ExportOptions, type Point, type Size } from "./crop.js";
 
 export interface ImageCropperLabels {
   zoom: string;
@@ -27,6 +29,8 @@ export interface ImageCropperProps {
   /** Height cap of the frame in pixels; defaults to 480. */
   maxHeight?: number | undefined;
   export?: ExportOptions | undefined;
+  /** Show an editable output format picker. A selected format sets both the frame and the export. */
+  formats?: CropFormats | undefined;
   /** Keeps the confirm and cancel controls unavailable while the host saves the image. */
   busy?: boolean | undefined;
   labels: ImageCropperLabels;
@@ -42,6 +46,16 @@ export interface ImageCropperProps {
 
 const INITIAL: CropState = { zoom: 1, rotation: 0, offset: { x: 0, y: 0 } };
 const FALLBACK_WIDTH = 640;
+
+function CropSlider({ label, value, onChange, ...range }: CropSliderProps) {
+  return <label className="elea-cropper__slider"><span>{label}</span>
+    <input type="range" {...range} value={value} onChange={event => onChange(event.currentTarget.valueAsNumber)} />
+  </label>;
+}
+
+function CropButton({ variant, ...props }: CropButtonProps) {
+  return <button type="button" className={variant === "primary" ? "elea-cropper__button elea-cropper__button--primary" : "elea-cropper__button"} {...props} />;
+}
 
 function cropImageSource(src: string): string | undefined {
   const url = src.trim();
@@ -62,7 +76,7 @@ function cropImageSource(src: string): string | undefined {
  * Frames an image: drag to move it, zoom with the wheel or the slider, rotate with the slider.
  * The frame always stays covered, so the export never has empty corners.
  */
-export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, maxHeight = 480, export: exportOptions, busy: saving = false, labels, onConfirm, onCancel, actions, className, onChange }: Readonly<ImageCropperProps>) {
+export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, maxHeight = 480, export: exportOptions, formats, busy: saving = false, labels, onConfirm, onCancel, actions, className, onChange }: Readonly<ImageCropperProps>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [natural, setNatural] = useState<Size | null>(null);
@@ -91,9 +105,13 @@ export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, m
   }, [src, file]);
 
   const image = natural ?? { width: 1, height: 1 };
-  const ratio = aspect ?? (natural ? natural.width / natural.height : 4 / 3);
-  const frame = frameSize(containerWidth, ratio, maxHeight);
+  const sourceRatio = natural ? natural.width / natural.height : 4 / 3;
+  const requestedSize = exportOptions?.outputSize;
+  const validSize = isValidOutputSize(requestedSize);
+  const ratio = validSize ? requestedSize.width / requestedSize.height : aspect ?? sourceRatio;
+  const frame = frameSize(containerWidth, formats ? sourceRatio : ratio, maxHeight);
   const scale = displayScale(image, frame, state);
+  const offset = clampOffset(state.offset, image, frame, scale, state.rotation);
 
   const update = useCallback((next: Partial<CropState>) => {
     setState((previous) => {
@@ -112,9 +130,10 @@ export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, m
   };
 
   const onPointerDown = (event: ReactPointerEvent) => {
+    if (formats) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    drag.current = { origin: { x: event.clientX, y: event.clientY }, offset: state.offset };
+    drag.current = { origin: { x: event.clientX, y: event.clientY }, offset };
   };
   const onPointerMove = (event: ReactPointerEvent) => {
     if (!drag.current) return;
@@ -128,54 +147,71 @@ export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, m
     update({ zoom: Math.min(maxZoom, Math.max(1, state.zoom - event.deltaY / 500)) });
   };
 
-  const confirm = async () => {
+  const confirm = async ({ outputSize, mask }: CropLayout) => {
     const element = imageRef.current;
-    const rect = cropRect(image, frame, state);
+    const current = { ...state, offset };
+    let rect = outputSize || formats ? measureCropRect(image, frame, current) : cropRect(image, frame, current);
+    if (mask) {
+      rect = {
+        x: rect.x + mask.x / scale,
+        y: rect.y + mask.y / scale,
+        width: mask.width / scale,
+        height: mask.height / scale,
+      };
+    }
     if (!element || !natural) {
-      onConfirm(null, rect, state);
+      onConfirm(null, rect, current);
       return;
     }
     setExporting(true);
     try {
-      const blob = await exportCrop(Object.assign(element, { width: natural.width, height: natural.height }), rect, state.rotation, exportOptions);
-      onConfirm(blob, rect, state);
+      const blob = await exportCrop(Object.assign(element, { width: natural.width, height: natural.height }), rect, current.rotation, { ...exportOptions, outputSize });
+      onConfirm(blob, rect, current);
     } finally {
       setExporting(false);
     }
   };
 
-  const transform = `translate(calc(-50% + ${state.offset.x}px), calc(-50% + ${state.offset.y}px)) rotate(${state.rotation}deg) scale(${scale})`;
+  const transform = `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px)) rotate(${state.rotation}deg) scale(${scale})`;
+  const render = (layout: CropLayout) => {
+    const Slider = layout.Slider ?? CropSlider;
+    const Button = layout.Button ?? CropButton;
+    return (
+      <>
+        <div
+          className="elea-cropper__frame"
+          style={{ width: frame.width, height: frame.height }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          onWheel={onWheel}
+          role={formats ? "group" : "img"}
+          aria-label={labels.image}
+        >
+          <img ref={imageRef} src={imageSource} alt="" draggable={false} className="elea-cropper__image" style={{ transform }} onLoad={onLoad} />
+          {formats ? layout.overlay : <div className="elea-cropper__mask" aria-hidden="true" />}
+        </div>
+        {layout.controls}
+        <div className="elea-cropper__controls">
+          <Slider label={labels.zoom} min={1} max={maxZoom} step={0.01} value={state.zoom} onChange={zoom => update({ zoom })} />
+          <Slider label={labels.rotation} min={-180} max={180} step={1} value={state.rotation} onChange={rotation => update({ rotation })} />
+          <div className="elea-cropper__actions">
+            {actions}
+            {onCancel && <Button variant="outline" onClick={onCancel} disabled={busy}>{labels.cancel}</Button>}
+            <Button variant="primary" onClick={() => void confirm(layout)} disabled={busy || layout.invalid || (!!formats && !natural)}>{labels.confirm}</Button>
+          </div>
+        </div>
+      </>
+    );
+  };
   return (
     <div className={["elea-cropper", shape === "round" ? "elea-cropper--round" : "", className ?? ""].filter(Boolean).join(" ")} ref={containerRef}>
-      <div
-        className="elea-cropper__frame"
-        style={{ width: frame.width, height: frame.height }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-        onWheel={onWheel}
-        role="img"
-        aria-label={labels.image}
-      >
-        <img ref={imageRef} src={imageSource} alt="" draggable={false} className="elea-cropper__image" style={{ transform }} onLoad={onLoad} />
-        <div className="elea-cropper__mask" aria-hidden="true" />
-      </div>
-      <div className="elea-cropper__controls">
-        <label className="elea-cropper__slider">
-          <span>{labels.zoom}</span>
-          <input type="range" min={1} max={maxZoom} step={0.01} value={state.zoom} onChange={(event) => update({ zoom: Number(event.target.value) })} />
-        </label>
-        <label className="elea-cropper__slider">
-          <span>{labels.rotation}</span>
-          <input type="range" min={-180} max={180} step={1} value={state.rotation} onChange={(event) => update({ rotation: Number(event.target.value) })} />
-        </label>
-        <div className="elea-cropper__actions">
-          {actions}
-          {onCancel && <button type="button" className="elea-cropper__button" onClick={onCancel} disabled={busy}>{labels.cancel}</button>}
-          <button type="button" className="elea-cropper__button elea-cropper__button--primary" onClick={() => void confirm()} disabled={busy}>{labels.confirm}</button>
-        </div>
-      </div>
+      {formats ? (
+        <Suspense fallback={render({ invalid: true })}>
+          {formats({ frame, natural, initialSize: requestedSize, disabled: busy, children: render })}
+        </Suspense>
+      ) : render({ outputSize: requestedSize, invalid: requestedSize !== undefined && !validSize })}
     </div>
   );
 }

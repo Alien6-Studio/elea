@@ -15,7 +15,7 @@
     "url": "git+https://github.com/Alien6-Studio/elea.git"
   },
   "scripts": {
-    "build:packages": "npm run build -w packages/tokens && npm run build -w packages/content && npm run build -w packages/content-viewer && npm run build -w packages/media && npm run build -w packages/ui && npm run build -w packages/content-editor",
+    "build:packages": "npm run build -w packages/tokens && npm run build -w packages/content && npm run build -w packages/content-viewer && npm run build -w packages/ui && npm run build -w packages/media && npm run build -w packages/content-editor",
     "build": "npm run build:packages",
     "lint": "npm run lint -w packages/tokens && npm run lint -w packages/content && npm run lint -w packages/content-viewer && npm run lint -w packages/media && npm run lint -w packages/ui && npm run lint -w packages/content-editor",
     "test": "node --import tsx --test 'packages/*/src/**/*.test.ts' 'packages/*/src/**/*.test.tsx'",

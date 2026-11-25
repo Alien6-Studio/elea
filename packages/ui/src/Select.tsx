@@ -67,7 +67,7 @@ function clippingAncestors(button: HTMLElement, doc: Document, view: Window): El
   return found;
 }
 
-function watchList(button: HTMLElement | null, list: HTMLElement | null, setOpen: (open: boolean) => void): (() => void) | undefined {
+export function watchList(button: HTMLElement | null, list: HTMLElement | null, setOpen: (open: boolean) => void): (() => void) | undefined {
   const doc = button?.ownerDocument;
   const view = doc?.defaultView;
   if (!button || !list || !doc || !view) return undefined;
@@ -128,8 +128,8 @@ function useListFit(open: boolean, disabled: boolean, setOpen: (open: boolean) =
   }, [open, disabled]);
 }
 
-function reveal(list: HTMLElement | null, index: number) {
-  const option = list?.children[index] as HTMLElement | undefined;
+export function reveal(list: HTMLElement | null, index: number, items = list) {
+  const option = items?.children[index] as HTMLElement | undefined;
   if (!list || !option) return;
   const top = option.offsetTop;
   if (top < list.scrollTop) list.scrollTop = top;

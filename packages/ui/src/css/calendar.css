@@ -1,0 +1,38 @@
+.elea-calendar {
+  box-sizing: border-box;
+  inline-size: min(100%, 21rem);
+  padding: var(--elea-space-3);
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+  font: var(--elea-font-size-sm) / var(--elea-font-leading-normal) var(--elea-font-family-sans);
+  font-variant-numeric: tabular-nums;
+}
+.elea-calendar__header { display: flex; align-items: center; gap: var(--elea-space-1); margin-block-end: var(--elea-space-2); }
+.elea-calendar__header > span { margin-inline-end: auto; font-size: var(--elea-font-size-base); font-weight: var(--elea-font-weight-semibold); }
+.elea-calendar table { inline-size: 100%; table-layout: fixed; border-collapse: collapse; }
+.elea-calendar th, .elea-calendar td { padding: 0; text-align: center; }
+.elea-calendar th { padding-block: var(--elea-space-2); font-size: var(--elea-font-size-xs); font-weight: var(--elea-font-weight-medium); color: var(--elea-color-text-muted); }
+.elea-calendar__step, .elea-calendar__day {
+  box-sizing: border-box;
+  border: 0;
+  border-radius: var(--elea-control-radius, var(--elea-radius-md));
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.elea-calendar__day { position: relative; inline-size: 100%; min-block-size: var(--elea-control-height, calc(2.5rem + var(--elea-_density, 0px))); }
+.elea-calendar__step { display: grid; place-items: center; inline-size: 2rem; min-block-size: 2rem; }
+.elea-calendar__step:dir(rtl) svg { scale: -1 1; }
+.elea-calendar button:where(:enabled):hover { background: var(--elea-color-surface-muted); }
+.elea-calendar button:disabled { color: var(--elea-color-text-subtle); opacity: .55; cursor: not-allowed; }
+.elea-calendar [aria-selected="true"] .elea-calendar__day { background: var(--elea-color-primary-600); color: var(--elea-color-text-on-brand); font-weight: var(--elea-font-weight-semibold); }
+.elea-calendar__day[aria-current="date"]::after { content: ""; position: absolute; inset-block-end: var(--elea-space-1); inset-inline-start: calc(50% - 2px); inline-size: 4px; block-size: 4px; border-radius: 50%; background: currentColor; }
+.elea-calendar button:focus-visible { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: -2px; }
+.elea-calendar [aria-selected="true"] button:focus-visible { outline-color: var(--elea-color-text-on-brand); }
+@media (forced-colors: active) {
+  .elea-calendar [aria-selected="true"] .elea-calendar__day { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+  .elea-calendar [aria-selected="true"] button:focus-visible { outline-color: HighlightText; }
+  .elea-calendar button:disabled { color: GrayText; opacity: 1; }
+}

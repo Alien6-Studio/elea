@@ -18,8 +18,10 @@ mkdirSync("dist/css", { recursive: true });
 writeFileSync(`dist/css/${BASE}`, `${LAYERS}\n${layered("base", read(BASE))}`);
 const parts = ordered.map((name) => {
   const css = read(name);
-  const keyframes = keyframesOf(css);
-  writeFileSync(`dist/css/${name}`, `${LAYERS}\n${keyframes.length > 0 ? layered("base", keyframes.join("\n")) : ""}${layered("components", css)}`);
+  // The editable combobox uses the Field input and Select list styles.
+  const standalone = name === "combobox.css" ? [read("field.css"), read("select.css"), css].join("\n") : css;
+  const keyframes = keyframesOf(standalone);
+  writeFileSync(`dist/css/${name}`, `${LAYERS}\n${keyframes.length > 0 ? layered("base", keyframes.join("\n")) : ""}${layered("components", standalone)}`);
   return css;
 });
 writeFileSync("dist/styles.css", [

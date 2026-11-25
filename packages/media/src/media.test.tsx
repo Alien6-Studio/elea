@@ -1,6 +1,6 @@
 import "./test/dom.js";
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { afterEach, test } from "node:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import axe from "axe-core";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import { useObjectUrl } from "./useObjectUrl.js";
 
 const png = (name = "pixel.png") => new File([new Uint8Array([137, 80, 78, 71])], name, { type: "image/png" });
 const labels = { zoom: "Zoom", rotation: "Rotation", confirm: "Use this image", cancel: "Cancel", image: "Picture to frame" };
+afterEach(cleanup);
 
 test("acceptsFile reads accept lists like the file picker", () => {
   assert.ok(acceptsFile(png(), "image/*"));
@@ -105,6 +106,18 @@ test("the cropper frames the picture, follows the sliders and confirms with the 
   render(<ImageCropper src="x" labels={labels} busy onConfirm={() => confirmed.push("confirm")} onCancel={() => confirmed.push("cancel")} />);
   assert.equal((screen.getByRole("button", { name: "Use this image" }) as HTMLButtonElement).disabled, true);
   assert.equal((screen.getByRole("button", { name: "Cancel" }) as HTMLButtonElement).disabled, true);
+});
+
+test("exact output dimensions set the frame and invalid dimensions cannot be confirmed", () => {
+  const props = { labels, onConfirm: () => {}, src: "cover.jpg", aspect: 1 };
+  const { rerender } = render(<ImageCropper {...props} export={{ outputSize: { width: 640, height: 320 } }} />);
+  const frame = screen.getByRole("img", { name: labels.image });
+  assert.equal(frame.style.width, "640px");
+  assert.equal(frame.style.height, "320px");
+  assert.equal(screen.queryByRole("combobox"), null);
+  rerender(<ImageCropper {...props} export={{ outputSize: { width: 0, height: 320 } }} />);
+  assert.ok(screen.getByRole<HTMLButtonElement>("button", { name: labels.confirm }).disabled);
+  cleanup();
 });
 
 test("the cropper preserves image sources and leaves other data URLs unloaded", () => {

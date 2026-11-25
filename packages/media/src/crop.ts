@@ -27,28 +27,43 @@ export interface CropState {
 
 const RADIANS = Math.PI / 180;
 
+function rotationAxes(rotation: number) {
+  const radians = rotation * RADIANS;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  return rotation % 90 === 0 ? { cos: Math.round(cos), sin: Math.round(sin) } : { cos, sin };
+}
+
+function projectedSize(size: Size, cos: number, sin: number): Size {
+  return {
+    width: size.width * Math.abs(cos) + size.height * Math.abs(sin),
+    height: size.width * Math.abs(sin) + size.height * Math.abs(cos),
+  };
+}
+
 /** The bounding box of an image rotated by `rotation` degrees. */
 export function rotatedSize(image: Size, rotation: number): Size {
-  const radians = rotation * RADIANS;
-  const cos = Math.abs(Math.cos(radians));
-  const sin = Math.abs(Math.sin(radians));
-  return { width: image.width * cos + image.height * sin, height: image.width * sin + image.height * cos };
+  const { cos, sin } = rotationAxes(rotation);
+  return projectedSize(image, cos, sin);
 }
 
 /** The smallest scale at which the rotated image covers the frame entirely. */
 export function coverScale(image: Size, frame: Size, rotation = 0): number {
-  const rotated = rotatedSize(image, rotation);
-  if (rotated.width <= 0 || rotated.height <= 0) return 1;
-  return Math.max(frame.width / rotated.width, frame.height / rotated.height);
+  if (image.width <= 0 || image.height <= 0) return 1;
+  const required = rotatedSize(frame, -rotation);
+  return Math.max(required.width / image.width, required.height / image.height);
 }
 
 /** Keeps the frame inside the image: the offset cannot reveal space beyond an edge. */
 export function clampOffset(offset: Point, image: Size, frame: Size, scale: number, rotation = 0): Point {
-  const rotated = rotatedSize(image, rotation);
-  const maxX = Math.max(0, (rotated.width * scale - frame.width) / 2);
-  const maxY = Math.max(0, (rotated.height * scale - frame.height) / 2);
-  // `|| 0` turns a negative zero into zero, so clamped values compare as plain numbers
-  return { x: Math.min(maxX, Math.max(-maxX, offset.x)) || 0, y: Math.min(maxY, Math.max(-maxY, offset.y)) || 0 };
+  const { cos, sin } = rotationAxes(rotation);
+  // In the image's axes its edges are horizontal and vertical, so we can clamp the two coordinates independently.
+  const required = projectedSize(frame, cos, sin);
+  const maxX = Math.max(0, (image.width * scale - required.width) / 2);
+  const maxY = Math.max(0, (image.height * scale - required.height) / 2);
+  const localX = Math.min(maxX, Math.max(-maxX, cos * offset.x + sin * offset.y));
+  const localY = Math.min(maxY, Math.max(-maxY, cos * offset.y - sin * offset.x));
+  return { x: (cos * localX - sin * localY) || 0, y: (sin * localX + cos * localY) || 0 };
 }
 
 /** The scale on screen for a state: the covering scale times the zoom. */
@@ -56,19 +71,23 @@ export function displayScale(image: Size, frame: Size, state: CropState): number
   return coverScale(image, frame, state.rotation) * state.zoom;
 }
 
-/** The frame, mapped to the pixels of the rotated image. */
-export function cropRect(image: Size, frame: Size, state: CropState): CropRect {
+/** Keep subpixel dimensions through a fixed-size export, even if the source crop is thinner than 0.01px. */
+export function measureCropRect(image: Size, frame: Size, state: CropState): CropRect {
   const rotated = rotatedSize(image, state.rotation);
   const scale = displayScale(image, frame, state);
   const offset = clampOffset(state.offset, image, frame, scale, state.rotation);
-  const width = frame.width / scale;
-  const height = frame.height / scale;
   return {
-    x: round(rotated.width / 2 - (frame.width / 2 + offset.x) / scale),
-    y: round(rotated.height / 2 - (frame.height / 2 + offset.y) / scale),
-    width: round(width),
-    height: round(height),
+    x: rotated.width / 2 - (frame.width / 2 + offset.x) / scale,
+    y: rotated.height / 2 - (frame.height / 2 + offset.y) / scale,
+    width: frame.width / scale,
+    height: frame.height / scale,
   };
+}
+
+/** The frame, mapped to the pixels of the rotated image and rounded to two decimal places. */
+export function cropRect(image: Size, frame: Size, state: CropState): CropRect {
+  const rect = measureCropRect(image, frame, state);
+  return { x: round(rect.x), y: round(rect.y), width: round(rect.width), height: round(rect.height) };
 }
 
 /** The frame size for a container width and an aspect ratio, capped in height. */
@@ -90,30 +109,74 @@ export interface ExportOptions {
   quality?: number | undefined;
   /** The output is scaled down to this width when the crop is wider. */
   maxWidth?: number | undefined;
+  /** Exact output pixels, including upscaling. Takes precedence over maxWidth. */
+  outputSize?: Size | undefined;
 }
 
-/**
- * Draws the crop of a loaded image to a Blob through a canvas. Resolves to `null` where
- * canvases cannot draw (no 2D context, as under jsdom), so callers can fall back to the file.
- */
-export function exportCrop(image: CanvasImageSource & Size, rect: CropRect, rotation: number, options: ExportOptions = {}): Promise<Blob | null> {
-  if (typeof document === "undefined") return Promise.resolve(null);
+export const MAX_OUTPUT_DIMENSION = 8192;
+export const MAX_OUTPUT_PIXELS = 16_777_216;
+
+/** The exact-size canvas is capped at 64 MiB of RGBA pixels. */
+export function isValidOutputSize(size: Size | null | undefined): size is Size {
+  if (!size) return false;
+  const { width, height } = size;
+  return Number.isInteger(width) && width > 0 && width <= MAX_OUTPUT_DIMENSION
+    && Number.isInteger(height) && height > 0 && height <= MAX_OUTPUT_DIMENSION
+    && width * height <= MAX_OUTPUT_PIXELS;
+}
+
+function exactCropCanvas(image: CanvasImageSource & Size, rect: CropRect, rotation: number, size: Size): HTMLCanvasElement | null {
+  const canvas = document.createElement("canvas");
+  canvas.width = size.width;
+  canvas.height = size.height;
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+  const rotated = rotatedSize(image, rotation);
+  const scale = coverScale(rect, size);
+  // Map the crop centre to the canvas centre. Uniform scaling clips excess source pixels on both sides.
+  context.translate(size.width / 2, size.height / 2);
+  context.scale(scale, scale);
+  context.translate((rotated.width - rect.width) / 2 - rect.x, (rotated.height - rect.height) / 2 - rect.y);
+  context.rotate(rotation * RADIANS);
+  context.drawImage(image, -image.width / 2, -image.height / 2);
+  return canvas;
+}
+
+function cropCanvas(image: CanvasImageSource & Size, rect: CropRect, rotation: number, maxWidth?: number): HTMLCanvasElement | null {
   const rotated = rotatedSize(image, rotation);
   const stage = document.createElement("canvas");
   stage.width = Math.max(1, Math.round(rotated.width));
   stage.height = Math.max(1, Math.round(rotated.height));
   const context = stage.getContext("2d");
-  if (!context) return Promise.resolve(null);
+  if (!context) return null;
   context.translate(stage.width / 2, stage.height / 2);
   context.rotate(rotation * RADIANS);
   context.drawImage(image, -image.width / 2, -image.height / 2);
 
-  const ratio = options.maxWidth && rect.width > options.maxWidth ? options.maxWidth / rect.width : 1;
+  const ratio = maxWidth && rect.width > maxWidth ? maxWidth / rect.width : 1;
   const output = document.createElement("canvas");
   output.width = Math.max(1, Math.round(rect.width * ratio));
   output.height = Math.max(1, Math.round(rect.height * ratio));
   const target = output.getContext("2d");
-  if (!target) return Promise.resolve(null);
+  if (!target) return null;
   target.drawImage(stage, rect.x, rect.y, rect.width, rect.height, 0, 0, output.width, output.height);
+  return output;
+}
+
+/**
+ * Draws the crop of a loaded image to a Blob through a canvas. Resolves to `null` where
+ * canvases cannot draw. An exact output centre-crops a mismatched rectangle to fit.
+ */
+export function exportCrop(image: CanvasImageSource & Size, rect: CropRect, rotation: number, options: ExportOptions = {}): Promise<Blob | null> {
+  const size = options.outputSize;
+  if (size !== undefined && !isValidOutputSize(size)) {
+    return Promise.reject(new RangeError(`Output dimensions must be whole pixels from 1 to ${MAX_OUTPUT_DIMENSION}, with at most ${MAX_OUTPUT_PIXELS} pixels in total.`));
+  }
+  if (size && (rect.width <= 0 || rect.height <= 0 || ![rect.x, rect.y, rect.width, rect.height].every(Number.isFinite))) {
+    return Promise.reject(new RangeError("The source crop must have finite coordinates and positive dimensions."));
+  }
+  if (typeof document === "undefined") return Promise.resolve(null);
+  const output = size ? exactCropCanvas(image, rect, rotation, size) : cropCanvas(image, rect, rotation, options.maxWidth);
+  if (!output) return Promise.resolve(null);
   return new Promise((resolve) => output.toBlob((blob) => resolve(blob), options.type, options.quality));
 }

@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { gzipSync } from "node:zlib";
 
 // Size budget of every package, gzip bytes of the compiled JavaScript and CSS.
@@ -21,11 +21,15 @@ import { gzipSync } from "node:zlib";
 // the package can grow by components without any of them growing unnoticed. This includes scoped
 // control tokens for buttons, fields and choices, plus the optional Tabs presentations.
 const BUDGETS = { tokens: 14_950, content: 28_100, "content-viewer": 12_750, media: 8_000, "content-editor": 75_500 };
+// The interactive mask and format picker have their own budget. The base cropper keeps its
+// original limit, and the packed-consumer check verifies that the new controls load on demand.
+const cropAdjustmentFiles = new Set(["AdjustableCrop.js", "CropFormatControls.js", "CropMask.js", "createCropFormats.js", "crop-adjustments.css"]);
 
 // Gzip bytes of dist/<Component>.js plus dist/css/<component>.css. A sheet without a script
 // (motion, button-effects) or a script without a sheet (cx, index, scope) answers alone. A sheet
 // holds alone: it states the layer order and carries the shared keyframes it names.
 const UI_BUDGETS = {
+  calendar: 3_600, combobox: 4_200,
   accordion: 2_500, alert: 1_500, avatar: 1_500, badge: 1_000, button: 3_300, "button-effects": 1_500, card: 1_500, checkbox: 1_750, "confirm-field": 1_000, cx: 250,
   dialog: 3_700, field: 2_000, footer: 1_250, index: 600, menu: 2_700, motion: 1_250, pagination: 2_000, popover: 4_100, progress: 1_500,
   "radio-group": 1_750, select: 4_875, separator: 750, sheet: 1_750, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, table: 2_250, tabs: 3_100, toast: 3_250, tooltip: 2_250,
@@ -40,12 +44,19 @@ function files(dir) {
 }
 
 let failed = false;
-for (const [pkg, budget] of Object.entries(BUDGETS)) {
-  const dist = join("packages", pkg, "dist");
-  const size = files(dist).reduce((total, file) => total + gzipSync(readFileSync(file)).length, 0);
-  const status = size <= budget ? "ok" : "OVER";
+function checkBudget(name, paths, budget) {
+  const size = paths.reduce((total, file) => total + gzipSync(readFileSync(file)).length, 0);
   if (size > budget) failed = true;
-  console.log(`${status.padEnd(4)} ${pkg.padEnd(7)} ${String(size).padStart(7)} B gzip (budget ${budget})`);
+  console.log(`${size <= budget ? "ok  " : "OVER"} ${name.padEnd(7)} ${String(size).padStart(7)} B gzip (budget ${budget})`);
+}
+for (const [pkg, budget] of Object.entries(BUDGETS)) {
+  const paths = files(join("packages", pkg, "dist"));
+  if (pkg === "media") {
+    checkBudget(pkg, paths.filter(file => !cropAdjustmentFiles.has(basename(file))), budget);
+    checkBudget("media/crop-adjustments", paths.filter(file => cropAdjustmentFiles.has(basename(file))), 4_800);
+  } else {
+    checkBudget(pkg, paths, budget);
+  }
 }
 const gzip = (path) => (existsSync(path) ? gzipSync(readFileSync(path)).length : 0);
 const kebab = (name) => name.replaceAll(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();

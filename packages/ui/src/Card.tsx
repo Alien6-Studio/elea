@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, type ReactNode } from "react";
+import { forwardRef, type HTMLAttributes, type ImgHTMLAttributes, type ReactNode } from "react";
 import { cx } from "./cx.js";
 import { Skeleton } from "./Skeleton.js";
 
@@ -18,6 +18,14 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card({ varian
 export interface CardPartProps extends Omit<HTMLAttributes<HTMLElement>, "className"> {
   className?: string | undefined;
 }
+
+export interface CardImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+  alt: string;
+}
+
+export const CardImage = forwardRef<HTMLImageElement, CardImageProps>(function CardImage({ className, ...rest }, ref) {
+  return <img {...rest} ref={ref} className={cx("elea-card__image", className)} />;
+});
 
 export interface CardTitleProps extends CardPartProps {
   /** Heading level that fits the page outline; `h3` by default. */
