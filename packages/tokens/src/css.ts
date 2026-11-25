@@ -1,8 +1,14 @@
 import type { FlatToken } from "./dtcg.js";
+import { statusFallback } from "./status.js";
 
 /** The CSS custom property of a token path: `color.text.default` becomes `--elea-color-text-default`. */
 export function cssVariableName(path: string, prefix = "elea"): string {
   return `--${prefix}-${path.replaceAll(".", "-")}`;
+}
+
+export function cssReference(path: string, prefix = "elea"): string {
+  const fallback = statusFallback(path, prefix);
+  return `var(${cssVariableName(path, prefix)}${fallback ? ", " + fallback : ""})`;
 }
 
 /** The CSS text of a token value. */
@@ -46,15 +52,27 @@ export function brandAppearanceVariable(path: string, mode: "light" | "dark", pr
 
 function localAppearance(light: readonly FlatToken[], dark: readonly FlatToken[], prefix: string): string {
   const lightByPath = new Map(light.map(token => [token.path, token]));
+  const unassigned: string[] = [];
+  function modeValue(mode: "light" | "dark", token: FlatToken): string {
+    const name = brandAppearanceVariable(token.path, mode, prefix);
+    if (token.value !== "initial") {
+      const fallback = cssValue(token);
+      return fallback.startsWith(`var(${name},`) ? fallback : `var(${name}, ${fallback})`;
+    }
+    // An unassigned role must invalidate the whole pair so the component can use its local fallback.
+    unassigned.push(`    ${name}: initial;`);
+    return `var(${name})`;
+  }
   const declarations = dark.flatMap(token => {
     const base = lightByPath.get(token.path);
     if (token.type !== "color" || base?.type !== "color") return [];
-    const day = `var(${brandAppearanceVariable(token.path, "light", prefix)}, ${cssValue(base)})`;
-    const night = `var(${brandAppearanceVariable(token.path, "dark", prefix)}, ${cssValue(token)})`;
+    const day = modeValue("light", base);
+    const night = modeValue("dark", token);
     return [`    ${cssVariableName(token.path, prefix)}: light-dark(${day}, ${night});`];
   });
   return [
     "@supports (color: light-dark(white, black)) {",
+    ...(unassigned.length ? ["  :where(:root) {", ...unassigned, "  }"] : []),
     ...["light", "dark", "auto"].map(mode => `  [data-elea-appearance="${mode}"] { color-scheme: ${mode === "auto" ? "light dark" : mode}; }`),
     `  ${localAppearanceSelector}:is(:root, *) {`, ...declarations, "  }", "}",
   ].join("\n");
@@ -111,7 +129,7 @@ export function toTailwindTheme(tokens: readonly FlatToken[], prefix = "elea"): 
   const lines = tokens
     .map((token) => {
       const name = tailwindVariableName(token.path, prefix);
-      return name ? `  ${name}: var(${cssVariableName(token.path, prefix)});` : null;
+      return name ? `  ${name}: ${cssReference(token.path, prefix)};` : null;
     })
     .filter((line): line is string => line !== null);
   return `@theme inline {\n${lines.join("\n")}\n}\n`;
@@ -136,7 +154,7 @@ export interface TailwindPreset {
 
 /** A Tailwind v3 colour on a runtime variable that still takes opacity modifiers such as `/50`. */
 function alphaColour(path: string, prefix: string): string {
-  return `color-mix(in srgb, var(${cssVariableName(path, prefix)}) calc(<alpha-value> * 100%), transparent)`;
+  return `color-mix(in srgb, ${cssReference(path, prefix)} calc(<alpha-value> * 100%), transparent)`;
 }
 
 /**
@@ -164,16 +182,16 @@ const SHADCN: Record<string, string> = {
   "card-foreground": "color.text.default",
   popover: "color.surface.default",
   "popover-foreground": "color.text.default",
-  primary: "color.primary.600",
-  "primary-foreground": "color.text.on-brand",
-  secondary: "color.surface.muted",
-  "secondary-foreground": "color.text.default",
+  primary: "color.action.primary",
+  "primary-foreground": "color.action.primary-text",
+  secondary: "color.action.secondary",
+  "secondary-foreground": "color.action.secondary-text",
   muted: "color.surface.muted",
   "muted-foreground": "color.text.muted",
   accent: "color.surface.muted",
   "accent-foreground": "color.text.default",
-  destructive: "color.danger",
-  "destructive-foreground": "color.text.inverse",
+  destructive: "color.action.danger",
+  "destructive-foreground": "color.action.danger-text",
   border: "color.border.default",
   input: "color.border.strong",
   ring: "color.focus",
@@ -186,7 +204,7 @@ const SHADCN: Record<string, string> = {
  * declared, so give every scope that restyles Elea (a brand class) in `selector`.
  */
 export function toShadcnAliases(selector = ":root, [data-theme], [data-elea-theme], [data-elea-appearance]", prefix = "elea"): string {
-  const lines = Object.entries(SHADCN).map(([name, path]) => `  --${name}: var(${cssVariableName(path, prefix)});`);
+  const lines = Object.entries(SHADCN).map(([name, path]) => `  --${name}: ${cssReference(path, prefix)};`);
   return `${selector} {\n${lines.join("\n")}\n}\n`;
 }
 

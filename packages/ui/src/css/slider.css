@@ -19,12 +19,12 @@
 .elea-slider__input::-webkit-slider-runnable-track {
   block-size: var(--elea-slider-track);
   border-radius: var(--elea-radius-full);
-  background: linear-gradient(to var(--elea-slider-to), var(--elea-color-primary-600) var(--elea-slider-fill), var(--elea-color-border-default) var(--elea-slider-fill));
+  background: linear-gradient(to var(--elea-slider-to), var(--elea-color-action-primary-ink) var(--elea-slider-fill), var(--elea-color-border-default) var(--elea-slider-fill));
 }
 .elea-slider__input::-moz-range-track {
   block-size: var(--elea-slider-track);
   border-radius: var(--elea-radius-full);
-  background: linear-gradient(to var(--elea-slider-to), var(--elea-color-primary-600) var(--elea-slider-fill), var(--elea-color-border-default) var(--elea-slider-fill));
+  background: linear-gradient(to var(--elea-slider-to), var(--elea-color-action-primary-ink) var(--elea-slider-fill), var(--elea-color-border-default) var(--elea-slider-fill));
 }
 /* The thumb grows under the pointer and springs back, scaled by the motion factor. */
 .elea-slider__input::-webkit-slider-thumb {
@@ -33,7 +33,7 @@
   inline-size: var(--elea-slider-thumb);
   block-size: var(--elea-slider-thumb);
   margin-block-start: calc((var(--elea-slider-track) - var(--elea-slider-thumb)) / 2);
-  border: 2px solid var(--elea-color-primary-600);
+  border: 2px solid var(--elea-color-action-primary-ink);
   border-radius: var(--elea-radius-full);
   background: var(--elea-color-surface-default);
   box-shadow: var(--elea-shadow-sm);
@@ -43,14 +43,14 @@
   box-sizing: border-box;
   inline-size: var(--elea-slider-thumb);
   block-size: var(--elea-slider-thumb);
-  border: 2px solid var(--elea-color-primary-600);
+  border: 2px solid var(--elea-color-action-primary-ink);
   border-radius: var(--elea-radius-full);
   background: var(--elea-color-surface-default);
   box-shadow: var(--elea-shadow-sm);
   transition: scale var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)), box-shadow var(--elea-motion-duration-fast);
 }
-.elea-slider__input:hover:enabled::-webkit-slider-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--elea-color-primary-600) 18%, transparent); scale: calc(1 + 0.1 * var(--elea-motion, 0)); }
-.elea-slider__input:hover:enabled::-moz-range-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--elea-color-primary-600) 18%, transparent); scale: calc(1 + 0.1 * var(--elea-motion, 0)); }
+.elea-slider__input:hover:enabled::-webkit-slider-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--elea-color-action-primary-ink) 18%, transparent); scale: calc(1 + 0.1 * var(--elea-motion, 0)); }
+.elea-slider__input:hover:enabled::-moz-range-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--elea-color-action-primary-ink) 18%, transparent); scale: calc(1 + 0.1 * var(--elea-motion, 0)); }
 .elea-slider__input:active:enabled::-webkit-slider-thumb { scale: calc(1 + 0.2 * var(--elea-motion, 0)); }
 .elea-slider__input:active:enabled::-moz-range-thumb { scale: calc(1 + 0.2 * var(--elea-motion, 0)); }
 .elea-slider__input:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; border-radius: var(--elea-radius-full); }

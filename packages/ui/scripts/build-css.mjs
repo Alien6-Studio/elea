@@ -9,6 +9,7 @@ const FIRST = ["button.css", "button-effects.css"];
 const read = (name) => readFileSync(`src/css/${name}`, "utf8");
 const sheets = readdirSync("src/css").filter((name) => name.endsWith(".css") && name !== BASE).sort();
 const ordered = [...FIRST, ...sheets.filter((name) => !FIRST.includes(name))];
+const dependencies = { "carousel.css": ["button.css"], "color-picker.css": ["field.css"], "combobox.css": ["field.css", "select.css"] };
 
 // A sheet loaded alone still animates: it carries the shared keyframes it names
 const shared = keyframesIn(read(BASE));
@@ -18,8 +19,7 @@ mkdirSync("dist/css", { recursive: true });
 writeFileSync(`dist/css/${BASE}`, `${LAYERS}\n${layered("base", read(BASE))}`);
 const parts = ordered.map((name) => {
   const css = read(name);
-  // The editable combobox uses the Field input and Select list styles.
-  const standalone = name === "combobox.css" ? [read("field.css"), read("select.css"), css].join("\n") : css;
+  const standalone = [...(dependencies[name] ?? []).map(read), css].join("\n");
   const keyframes = keyframesOf(standalone);
   writeFileSync(`dist/css/${name}`, `${LAYERS}\n${keyframes.length > 0 ? layered("base", keyframes.join("\n")) : ""}${layered("components", standalone)}`);
   return css;

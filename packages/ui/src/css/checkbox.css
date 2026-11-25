@@ -17,9 +17,9 @@
 }
 .elea-checkbox:active:not(.elea-checkbox--disabled) .elea-checkbox__box { scale: calc(1 - 0.12 * var(--elea-motion, 0)); }
 .elea-checkbox__box::after { animation: elea-pop var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }
-.elea-checkbox__input:checked + .elea-checkbox__box, .elea-checkbox__input:indeterminate + .elea-checkbox__box { background: var(--elea-color-primary-600); border-color: var(--elea-color-primary-600); }
-.elea-checkbox__input:checked + .elea-checkbox__box::after { content: ""; position: absolute; left: 0.3rem; top: 0.1rem; width: 0.3rem; height: 0.6rem; border: solid var(--elea-color-text-on-brand); border-width: 0 2px 2px 0; transform: rotate(45deg); }
-.elea-checkbox__input:indeterminate + .elea-checkbox__box::after { content: ""; position: absolute; left: 0.25rem; right: 0.25rem; top: 50%; height: 2px; background: var(--elea-color-text-on-brand); }
+.elea-checkbox__input:checked + .elea-checkbox__box, .elea-checkbox__input:indeterminate + .elea-checkbox__box { background: var(--elea-color-action-primary); border-color: var(--elea-color-action-primary); }
+.elea-checkbox__input:checked + .elea-checkbox__box::after { content: ""; position: absolute; left: 0.3rem; top: 0.1rem; width: 0.3rem; height: 0.6rem; border: solid var(--elea-color-action-primary-text); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.elea-checkbox__input:indeterminate + .elea-checkbox__box::after { content: ""; position: absolute; left: 0.25rem; right: 0.25rem; top: 50%; height: 2px; background: var(--elea-color-action-primary-text); }
 .elea-checkbox__input:focus-visible + .elea-checkbox__box { border-color: transparent; outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: 2px; }
 .elea-checkbox__text { display: flex; flex-direction: column; }
 .elea-checkbox__label { font-size: var(--elea-font-size-base); }
@@ -28,9 +28,9 @@
 .elea-toggle--disabled { cursor: not-allowed; opacity: 0.5; }
 .elea-toggle__input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
 .elea-toggle__track { width: 2.5rem; height: 1.5rem; border-radius: var(--elea-radius-full); background: var(--elea-color-neutral-300); position: relative; transition: background-color var(--elea-motion-duration-base) var(--elea-motion-easing-standard); }
-.elea-toggle--on .elea-toggle__track { background: var(--elea-color-primary-600); }
+.elea-toggle--on .elea-toggle__track { background: var(--elea-color-action-primary); }
 .elea-toggle__thumb { position: absolute; top: 0.125rem; left: 0.125rem; width: 1.25rem; height: 1.25rem; border-radius: var(--elea-radius-full); background: var(--elea-color-surface-default); box-shadow: var(--elea-shadow-sm); transition: var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); transition-property: transform, width; }
-.elea-toggle--on .elea-toggle__thumb { transform: translateX(1rem); }
+.elea-toggle--on .elea-toggle__thumb { background: var(--elea-color-action-primary-text); transform: translateX(1rem); }
 .elea-toggle:active:not(.elea-toggle--disabled) .elea-toggle__thumb { width: calc(1.25rem + 0.25rem * var(--elea-motion, 0)); }
 .elea-toggle--on:active:not(.elea-toggle--disabled) .elea-toggle__thumb { transform: translateX(calc(1rem - 0.25rem * var(--elea-motion, 0))); }
 .elea-toggle__input:focus-visible + .elea-toggle__track { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: 2px; }

@@ -1,0 +1,20 @@
+.elea-color-picker__controls {
+  display: flex;
+  align-items: stretch;
+  gap: var(--elea-space-2);
+}
+.elea-ui-input.elea-color-picker__swatch {
+  flex: 0 0 var(--elea-control-height, 2.5rem);
+  width: var(--elea-control-height, 2.5rem);
+  height: auto;
+  padding: var(--elea-space-1);
+  cursor: pointer;
+}
+.elea-color-picker__swatch:disabled { cursor: not-allowed; }
+.elea-color-picker__swatch::-webkit-color-swatch-wrapper { padding: 0; }
+.elea-color-picker__swatch::-webkit-color-swatch { border: 0; border-radius: var(--elea-radius-sm); }
+.elea-color-picker__swatch::-moz-color-swatch { border: 0; border-radius: var(--elea-radius-sm); }
+.elea-ui-input.elea-color-picker__hex {
+  min-width: 0;
+  font-family: var(--elea-font-family-mono);
+}

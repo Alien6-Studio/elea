@@ -43,9 +43,9 @@ Tailwind CLI, copy the two `.woff2` files from
 `node_modules/@alien6-studio/elea-tokens/dist/fonts/` beside your compiled CSS.
 
 Override tokens on `:root` or within a container, anywhere in your own styles: a rule outside
-any cascade layer wins over the `elea.tokens` layer whatever the import order. Use
-`--elea-color-text-on-brand` for the foreground on filled primary and secondary
-controls. Check its contrast when changing the fill colors.
+any cascade layer wins over the `elea.tokens` layer whatever the import order. Use the paired
+`--elea-color-action-primary-text` and `--elea-color-action-secondary-text`
+properties for labels on filled actions. Check contrast when overriding a pair.
 
 Override `--elea-color-success`, `--elea-color-info`, `--elea-color-warning`, or
 `--elea-color-danger` on a theme to recolor the corresponding buttons, badges,
@@ -134,18 +134,27 @@ Elea’s styles. The optional second argument names the theme: `"journal"` answe
 `data-elea-theme="journal"` and to `class="journal"`.
 
 ```ts
-import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
+import { brandPalettes, editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 
-const { css } = makeBrandTheme({ ...editions.Editorial, seed: "#31584a" }, "journal");
+const { css, palettes } = makeBrandTheme({ ...editions.Editorial, ...brandPalettes.Plum }, "journal");
 // Write css to a stylesheet and set data-elea-theme="journal" on the publication.
+// palettes.primary and palettes.secondary contain { step, value } swatches.
 ```
 
 The viewer reads the resulting font, line height and measure. Named editions
 also supply light and dark surfaces, readable text and control treatments.
 Spreading an edition keeps those choices while replacing its brand colour,
 type or corners. Pass a brand configuration without an edition to use just
-your own colour and type settings on the host’s surfaces. Each theme returns its eleven primary shades in `colours`, ordered
-from 50 to 950.
+your own colour and type settings on the host’s surfaces.
+
+`brandPalettes` offers Emerald, Cobalt, Copper, Plum and Lagoon. Each pair sets
+only `seed` and `accent`. The generated `palettes.primary` spans 50–950 and
+`palettes.secondary` spans 50–900. The exact seed and accent occupy step 500
+and supply the default action fills. If a custom stylesheet used primary 600 or
+secondary 700 to reference the entered brand colour, use the 500 step or the
+corresponding `--elea-color-action-*` property. The ordered primary hex values
+are also available in `colours`. Without an edition or accent,
+`palettes.secondary` is empty and the CSS inherits that scale from the host.
 
 Three optional fields open a theme to an existing identity: `font` takes the product's own
 interface font as a CSS stack, `accent` a second six-digit colour that drives the secondary
@@ -154,6 +163,72 @@ ramp, and `radius` a free corner in `rem` or `px` that replaces the `corner` ste
 ```ts
 makeBrandTheme({ ...editions.Precision, seed: "#0f766e", accent: "#f2c94c", font: "var(--font-inter), system-ui", radius: "0.625rem" }, "product");
 ```
+
+## Reference colours and semantic roles
+
+`makeBrandTheme(createThemeProfile("braise"))` from the brand entry point generates
+the same scoped CSS as selecting Braise in the Studio. Each of the four profiles
+combines a colour scheme with a reading typeface, density, corner shape and
+control treatment. Inspect these choices on `colorThemes.braise.profile`.
+Set `controls` to `"flat"`, `"raised"` or `"inset"` to change the treatment
+of buttons, fields and tabs independently of the palette.
+
+`applyColorTheme(editions.Editorial, "rasance")` from the brand entry point applies
+a colour theme while keeping the edition’s typography, spacing and corners.
+Import `colorThemes` from the palette entry point to inspect each theme’s seven
+key colours and its surface family. Rasance uses carbon and ivory, Réserve
+ultramarine, Braise apricot and madder, and Hors champ petrol, sky and vermilion.
+All four profiles use `Gray` for backgrounds, fields, menus, body text and borders.
+Default surfaces run from white in light mode to `#151515` in dark mode.
+Fjord, Cyanotype, Signal and Vellum retain their original surface families.
+
+Import `colorFamilies` and `colorSteps` from `@alien6-studio/elea-tokens/palette`
+to browse ELEA’s sixteen hue families. Each family contains eleven sRGB swatches
+from 50 (lightest) to 950 (darkest). For surfaces, `surfaceFamilies` also
+includes Gray, Ivory, Porcelain, Madder and Chalk. CSS-only consumers can import
+`@alien6-studio/elea-tokens/palette.css` and use properties such as
+`--elea-palette-amber-200`.
+
+```ts
+import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
+
+const { css, roles } = makeBrandTheme({
+  ...editions.Precision,
+  palette: {
+    primary: { family: "Amber", step: 200 },
+    secondary: { family: "Cobalt", step: 700 },
+    tertiary: { family: "Violet", step: 500 },
+    success: { seed: "#176c50" },
+    neutral: "Slate",
+  },
+}, "journal");
+```
+
+An explicit reference assignment replaces the step-500 fill with the exact
+selected shade. `makeBrandTheme(brand).roleScales` exposes the full 50–950
+scale of each seeded or reference role. An inherited role has no entry.
+For both seeded and reference colours, the foreground maintains
+4.5:1 contrast across the resting, hover and pressed fills. Each action also has
+a tinted container, a foreground for that container, and a readable ink for use
+on the theme’s surfaces. Inspect the resolved hex values in `roles.primary?.light`
+and `roles.primary?.dark`. In CSS use `--elea-color-action-primary` and the
+suffixes `-text`, `-hover`, `-pressed`, `-container`, `-on-container` and `-ink`.
+The same properties exist for secondary, tertiary, success, info, warning and
+danger. Iterate `brandColorRoles` from the brand entry point to inspect them.
+Tertiary and feedback roles accept an independent `{ family, step }` or
+`{ seed: "#rrggbb" }` assignment. Existing status properties such as
+`--elea-color-warning` use the assigned role’s readable ink, so icons, badges,
+alerts and toasts follow the same choice. A neutral assignment maps the selected
+family to the surface, text and border properties in both appearances.
+
+Each assignment is optional. Editions start with Violet 500 as tertiary. Their
+default feedback follows the existing status colours, including the edition’s
+primary-derived info tone. Status action properties are optional CSS overrides.
+For example, `background: var(--elea-color-action-warning, var(--elea-color-warning))`
+lets a nested host override its warning colour when the theme has no warning assignment. A brand with no edition inherits unassigned tertiary
+and feedback roles from its host. It also inherits secondary if it has no accent. The generated CSS includes reference values for
+standalone use. If you override reference swatches in CSS, check contrast for
+the new values.
 
 ## Groups
 

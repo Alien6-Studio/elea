@@ -3,6 +3,8 @@ import { test } from "node:test";
 import { cssDeclarations, cssValue, cssVariableName, inLayer, tailwindVariableName, toShadcnAliases, toShadcnPreset, toStylesheet, toTailwindPreset, toTailwindTheme } from "./css.js";
 import { flattenTokens, mergeTokens, resolveReference, type TokenGroup } from "./dtcg.js";
 import { cssVar, darkTokens, lightTokens, tokens } from "./index.js";
+import { colorFamilies, defaultColorStep, defaultTertiaryFamily } from "./palette.js";
+import { statusColors, statusRoles } from "./status.js";
 
 const tree: TokenGroup = {
   $schema: "x",
@@ -91,6 +93,8 @@ test("the shipped token sets resolve and the dark theme only overrides existing 
   assert.equal(tokens.find((token) => token.path === "color.text.default")?.value, "#141a26");
   assert.equal(darkTokens.find((token) => token.path === "color.text.default")?.value, "#eef2f7");
   assert.equal(cssVar("color.text.default"), "var(--elea-color-text-default)");
+  assert.equal(cssVar("color.action.warning-ink"), "var(--elea-color-action-warning-ink, var(--elea-color-warning))");
+  assert.equal(cssVar("color.action.warning-container"), "var(--elea-color-action-warning-container, color-mix(in srgb, var(--elea-color-warning) 10%, var(--elea-color-surface-default)))");
   assert.equal(tokens.find((token) => token.path === "motion.duration.base")?.value, "150ms");
   const easing = tokens.find((token) => token.path === "motion.easing.standard");
   assert.equal(easing && cssValue(easing), "cubic-bezier(0.2, 0, 0, 1)");
@@ -110,6 +114,33 @@ test("the default reading and interface stacks start with ELEA Sans", () => {
   assert.ok(sans);
   assert.match(cssValue(sans), /^"ELEA Sans", system-ui,/);
   assert.deepEqual(tokens.find((token) => token.path === "font.family.content")?.value, sans.value);
+});
+
+test("standalone actions use the default tone and keep readable interaction and surface pairs", () => {
+  const luminance = (hex: string) => [0.2126, 0.7152, 0.0722].reduce((sum, weight, index) => {
+    const channel = parseInt(hex.slice(1 + 2 * index, 3 + 2 * index), 16) / 255;
+    return sum + weight * (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
+  }, 0);
+  for (const dark of [false, true]) {
+    const values = new Map((dark ? [...tokens, ...darkTokens] : tokens).map(token => [token.path, String(token.value)]));
+    function readable(fill: string, ink: string) {
+      const a = luminance(values.get(fill)!) + 0.05;
+      const b = luminance(values.get(ink)!) + 0.05;
+      assert.ok(Math.max(a / b, b / a) >= 4.5, fill + " and " + ink);
+    }
+    for (const role of ["primary", "secondary", "tertiary", ...statusRoles]) {
+      const action = "color.action." + role;
+      if (role === "primary" || role === "secondary") assert.equal(values.get(action), values.get(`color.${role}.${defaultColorStep}`));
+      if (role === "tertiary") assert.equal(values.get(action), colorFamilies[defaultTertiaryFamily].find(({step}) => step === defaultColorStep)!.value);
+      for (const suffix of ["", "-hover", "-pressed"]) readable(action + suffix, action + "-text");
+      for (const surface of ["default", "muted"]) readable("color.surface." + surface, action + "-ink");
+      readable(action + "-container", action + "-on-container");
+    }
+    for (const role of statusRoles) {
+      const resolved = statusColors(values.get("color." + role)!, values.get("color.surface.default")!, values.get("color.text.inverse")!, dark);
+      for (const key of ["hover", "pressed", "container"] as const) assert.equal(values.get(`color.action.${role}-${key}`), resolved[key]);
+    }
+  }
 });
 
 test("the Tailwind v3 preset names utilities like the v4 theme and keeps opacity modifiers", () => {
@@ -138,7 +169,7 @@ test("the shadcn bridge points every variable at a shipped token, as aliases and
   const css = toShadcnAliases();
   assert.ok(css.startsWith(":root, [data-theme], [data-elea-theme], [data-elea-appearance] {\n  --background: var(--elea-color-surface-default);"));
   assert.ok(toShadcnAliases(".brand").startsWith(".brand {"));
-  const targets = [...css.matchAll(/^  --([a-z-]+): var\((--elea-[a-z0-9-]+)\);$/gm)];
+  const targets = [...css.matchAll(/^  --([a-z-]+): var\((--elea-[a-z0-9-]+)(?:, var\(--elea-[a-z-]+\))?\);$/gm)];
   const shipped = new Set(tokens.map((token) => cssVariableName(token.path)));
   for (const [, , target = ""] of targets) assert.ok(shipped.has(target), target);
   assert.deepEqual(
@@ -147,8 +178,12 @@ test("the shadcn bridge points every variable at a shipped token, as aliases and
   );
   const { colors, borderRadius } = toShadcnPreset().theme.extend;
   assert.deepEqual(colors?.primary, {
-    DEFAULT: "color-mix(in srgb, var(--elea-color-primary-600) calc(<alpha-value> * 100%), transparent)",
-    foreground: "color-mix(in srgb, var(--elea-color-text-on-brand) calc(<alpha-value> * 100%), transparent)",
+    DEFAULT: "color-mix(in srgb, var(--elea-color-action-primary) calc(<alpha-value> * 100%), transparent)",
+    foreground: "color-mix(in srgb, var(--elea-color-action-primary-text) calc(<alpha-value> * 100%), transparent)",
+  });
+  assert.deepEqual(colors?.secondary, {
+    DEFAULT: "color-mix(in srgb, var(--elea-color-action-secondary) calc(<alpha-value> * 100%), transparent)",
+    foreground: "color-mix(in srgb, var(--elea-color-action-secondary-text) calc(<alpha-value> * 100%), transparent)",
   });
   assert.deepEqual(colors?.border, { DEFAULT: "color-mix(in srgb, var(--elea-color-border-default) calc(<alpha-value> * 100%), transparent)" });
   assert.equal(Object.keys(colors ?? {}).length, 12);

@@ -118,8 +118,8 @@
 .elea-list__task { position: relative; display: block; padding-left: 1.75em; }
 .elea-list__check { position: absolute; left: 0; top: calc((1lh - 1em) / 2); width: 1em; height: 1em; margin: 0; opacity: 0; }
 .elea-list__task::before { content: ""; position: absolute; left: 0; top: calc((1lh - 1em) / 2); box-sizing: border-box; width: 1em; height: 1em; border: 1px solid var(--elea-color-border-strong); border-radius: 0.2em; }
-.elea-list__task:has(:checked)::before { background: var(--elea-color-primary-600); border-color: var(--elea-color-primary-600); }
-.elea-list__task:has(:checked)::after { content: ""; position: absolute; left: 0.35em; top: calc((1lh - 1em) / 2 + 0.14em); box-sizing: border-box; width: 0.3em; height: 0.58em; border: solid var(--elea-color-text-on-brand); border-width: 0 2px 2px 0; rotate: 45deg; }
+.elea-list__task:has(:checked)::before { background: var(--elea-color-action-primary); border-color: var(--elea-color-action-primary); }
+.elea-list__task:has(:checked)::after { content: ""; position: absolute; left: 0.35em; top: calc((1lh - 1em) / 2 + 0.14em); box-sizing: border-box; width: 0.3em; height: 0.58em; border: solid var(--elea-color-action-primary-text); border-width: 0 2px 2px 0; rotate: 45deg; }
 
 .elea-quote {
   border-left: 4px solid var(--elea-color-border-accent);
@@ -200,10 +200,10 @@
   text-transform: uppercase;
   color: var(--elea-color-text-muted);
 }
-.elea-attachment__icon--pdf { background: color-mix(in srgb, var(--elea-color-danger) 15%, transparent); }
-.elea-attachment__icon--spreadsheet { background: color-mix(in srgb, var(--elea-color-success) 15%, transparent); }
-.elea-attachment__icon--presentation { background: color-mix(in srgb, var(--elea-color-warning) 15%, transparent); }
-.elea-attachment__icon--document, .elea-attachment__icon--image, .elea-attachment__icon--video { background: color-mix(in srgb, var(--elea-color-primary-500) 15%, transparent); }
+.elea-attachment__icon--pdf { background: var(--elea-color-action-danger-container, color-mix(in srgb, var(--elea-color-danger) 10%, var(--elea-color-surface-default))); color: var(--elea-color-action-danger-on-container, var(--elea-color-danger)); }
+.elea-attachment__icon--spreadsheet { background: var(--elea-color-action-success-container, color-mix(in srgb, var(--elea-color-success) 10%, var(--elea-color-surface-default))); color: var(--elea-color-action-success-on-container, var(--elea-color-success)); }
+.elea-attachment__icon--presentation { background: var(--elea-color-action-warning-container, color-mix(in srgb, var(--elea-color-warning) 10%, var(--elea-color-surface-default))); color: var(--elea-color-action-warning-on-container, var(--elea-color-warning)); }
+.elea-attachment__icon--document, .elea-attachment__icon--image, .elea-attachment__icon--video { background: var(--elea-color-action-primary-container); color: var(--elea-color-action-primary-on-container); }
 .elea-attachment__body { display: flex; flex-direction: column; min-width: 0; }
 .elea-attachment__title { font-weight: var(--elea-font-weight-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .elea-attachment__description { color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); margin-top: var(--elea-space-1); }

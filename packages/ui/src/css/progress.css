@@ -1,9 +1,9 @@
 /* Progress */
-.elea-progress { font-family: var(--elea-font-family-sans); --elea-progress-color: var(--elea-color-primary-600); display: flex; flex-direction: column; gap: var(--elea-space-1); min-width: 0; }
-.elea-progress--success { --elea-progress-color: var(--elea-color-success); }
-.elea-progress--info { --elea-progress-color: var(--elea-color-info); }
-.elea-progress--warning { --elea-progress-color: var(--elea-color-warning); }
-.elea-progress--danger { --elea-progress-color: var(--elea-color-danger); }
+.elea-progress { font-family: var(--elea-font-family-sans); --elea-progress-color: var(--elea-color-action-primary-ink); display: flex; flex-direction: column; gap: var(--elea-space-1); min-width: 0; }
+.elea-progress--success { --elea-progress-color: var(--elea-color-action-success-ink, var(--elea-color-success)); }
+.elea-progress--info { --elea-progress-color: var(--elea-color-action-info-ink, var(--elea-color-info)); }
+.elea-progress--warning { --elea-progress-color: var(--elea-color-action-warning-ink, var(--elea-color-warning)); }
+.elea-progress--danger { --elea-progress-color: var(--elea-color-action-danger-ink, var(--elea-color-danger)); }
 .elea-progress__header { display: flex; justify-content: space-between; gap: var(--elea-space-3); font-size: var(--elea-font-size-sm); }
 .elea-progress__label { font-weight: var(--elea-font-weight-medium); color: var(--elea-color-text-default); }
 .elea-progress__value { margin-inline-start: auto; color: var(--elea-color-text-muted); font-variant-numeric: tabular-nums; }

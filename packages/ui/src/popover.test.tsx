@@ -322,6 +322,7 @@ test("the popover sheet styles every tone and leaves the placement to the script
   }
   for (const tone of ["success", "info"]) assert.ok(css("button").includes(`.elea-button--${tone} {`));
   // The info tone has its own colour everywhere, apart from the links.
-  for (const name of ["alert", "badge", "toast", "progress"]) assert.ok(css(name).includes(`.elea-${name}--info { --elea-${name}-color: var(--elea-color-info); }`));
-  assert.ok(css("button").includes(".elea-button--info { background: var(--elea-color-info); }"));
+  for (const name of ["alert", "badge", "progress"]) assert.ok(css(name).includes(`--elea-${name}-color: var(--elea-color-action-info-ink,`));
+  assert.ok(css("toast").includes("--elea-toast-color: var(--elea-color-action-info-on-container, var(--elea-color-info));"));
+  assert.ok(css("button").includes("background: var(--elea-color-action-info, var(--_elea-button-status));"));
 });

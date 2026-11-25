@@ -203,15 +203,17 @@ console.log("bundler host verified: UI fonts and brand override; first load of t
 
 const CONSUMER_SCRIPT = String.raw`
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { createDocument, defaultRegistry, documentToText, parseDocument, fr } from "@alien6-studio/elea-content";
 import { tokens, toStylesheet, cssVar } from "@alien6-studio/elea-tokens";
+import { colorFamilies } from "@alien6-studio/elea-tokens/palette";
 import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ContentView, ContentExcerpt, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { DropZone, cropRect } from "@alien6-studio/elea-media";
-import { Button, Calendar, Combobox, Dialog, Footer } from "@alien6-studio/elea-ui";
+import { Button, Calendar, Carousel, ColorPicker, Combobox, Dialog, Footer } from "@alien6-studio/elea-ui";
 import { JSDOM } from "jsdom";
 
 const require = createRequire(import.meta.url);
@@ -221,6 +223,16 @@ console.log("react", require("react/package.json").version);
 const doc = parseDocument({ blocks: [{ type: "paragraph", data: { text: "<p>Hi <b>there</b> <img src=\"data:image/png;base64,AA\"></p>" } }, { type: "header", data: { text: "T", level: 2 } }] }, { registry: defaultRegistry });
 assert.equal(documentToText(doc, defaultRegistry), "Hi there\n\nT");
 assert.ok(tokens.length > 50 && toStylesheet(tokens).includes("--elea-color-text-default") && cssVar("space.4") === "var(--elea-space-4)");
+const baseSheet = readFileSync(require.resolve("@alien6-studio/elea-tokens/elea.css"), "utf8");
+for (const role of ["primary", "secondary"]) {
+  assert.ok(baseSheet.includes("--elea-color-action-" + role + ": var(--elea-color-" + role + "-500);"));
+}
+const paletteSheet = readFileSync(require.resolve("@alien6-studio/elea-tokens/palette.css"), "utf8");
+for (const [family, swatches] of Object.entries(colorFamilies)) {
+  for (const { step, value } of swatches) {
+    assert.ok(paletteSheet.includes("--elea-palette-" + family.toLowerCase() + "-" + step + ": " + value + ";"));
+  }
+}
 
 assert.ok(makeBrandTheme(editions.Editorial, "journal").css.startsWith('.journal, [data-elea-theme="journal"] {'));
 
@@ -239,6 +251,13 @@ const button = renderToString(React.createElement(Button, null, "Save"));
 assert.ok(button.startsWith("<button") && button.includes("Save"), button);
 const calendar = renderToString(React.createElement(Calendar, { label: "Publication date", labels: { previousMonth: "Previous", nextMonth: "Next" }, locale: "en-GB", value: "2028-02-29", onChange() {} }));
 assert.ok(calendar.includes('role="grid"') && calendar.includes("29 February 2028"), calendar);
+const carousel = renderToString(React.createElement(Carousel, {
+  label: "Editions", previousLabel: "Previous", nextLabel: "Next", items: ["First", "Second"],
+  itemKey: value => value, renderItem: value => value,
+}));
+assert.ok(carousel.includes('aria-label="Editions"') && carousel.includes("First") && !carousel.includes("Second"), carousel);
+const picker = renderToString(React.createElement(ColorPicker, { label: "Ink", hexLabel: "Ink hex", invalidMessage: "Enter six hex digits.", value: "#345678", onChange() {} }));
+assert.ok(picker.includes('type="color"') && picker.includes("#345678") && picker.includes("Ink hex"), picker);
 const collection = renderToString(React.createElement(Combobox, { label: "Collection", emptyMessage: "No matches", options: [{ value: "ice", label: "Glaciers" }], value: "ice", onChange() {} }));
 assert.ok(collection.includes('role="combobox"') && collection.includes("Glaciers"), collection);
 const footer = renderToString(React.createElement(Footer, { groups: [{ label: "Project", links: [{ label: "Docs", href: "/docs" }] }] }));

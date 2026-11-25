@@ -105,7 +105,10 @@ copies the value of the nearest one, with the nearest `data-elea-motion`, onto i
 ```
 
 ```css
-[data-elea-theme="editorial"] { --elea-color-primary-600: #1637a1; }
+[data-elea-theme="editorial"] {
+  --elea-color-action-primary: #1637a1;
+  --elea-color-action-primary-text: #ffffff;
+}
 ```
 
 The editions and the brand themes of `@alien6-studio/elea-tokens` answer to this attribute. A
@@ -119,6 +122,7 @@ container. Tooltips, popovers and menus stay inside their container and inherit 
 - `Button` supports links, loading states and leading or trailing icons, in five sizes from `xs` to `xl`,
   with a `radius` from square to pill and an optional resting `shadow`. `IconButton` takes an accessible
   `label` and offers a neutral circular `variant="disc"` for toolbar or overlay actions.
+  Use `variant="tertiary"` for an action in the theme's third brand colour.
 - Under expressive motion a button moves on a damped spring and plays the gesture named by `effect`:
   `lift` (default), `scale`, `push` and `shine`, plus four that follow the pointer: `ripple`,
   `spotlight`, `magnetic` and `tilt`. An effect does nothing while motion is off.
@@ -129,6 +133,24 @@ container. Tooltips, popovers and menus stay inside their container and inherit 
   trigger and cascade their items, tooltips and dialogs spring in, an invalid field shakes. `Button`, `IconButton`, `Dialog` and `Sheet` also take a `motion` prop; a dialog or a sheet
   is rendered in a portal and follows its own prop, or else the container it is rendered in. Nothing of it runs under `prefers-reduced-motion: reduce`.
 - `Badge` with tones and solid, subtle or outline variants.
+- `Carousel` shows one item at a time, or as many as fit when given a
+  `minItemWidth` in CSS pixels. Give it `items`, a stable `itemKey`,
+  `renderItem` and translated `label`, `previousLabel` and `nextLabel`.
+  Start at `defaultIndex` or control the first visible item with `index`
+  and `onIndexChange`. Arrow keys, Home, End and touch swipes navigate.
+  Set `loop` to wrap at either end. In a collection of buttons or links,
+  return each action directly from `renderItem` to support arrow-key focus.
+  Only visible items are mounted. The server renders the initial specimen,
+  and navigation appears after hydration.
+  Set `itemsPerView` for a fixed count, or combine it with `minItemWidth`
+  to cap a responsive row. Choose `gap` from `none`, `sm`, `md` (default)
+  or `lg`. Navigation defaults to arrows with a counter at the top end.
+  Set `navigation="dots"` or `"both"` for direct access to positions.
+  `getDotLabel(index)` returns a localized label for each starting index.
+  Long collections show a compact window of dots around the current position.
+  `showCounter` controls the visible counter. Place controls below with
+  `controlsPosition="bottom"` and align them with `controlsAlign="start"`,
+  `"center"` or `"end"`.
 - `Field` wiring a label, help text and error to any control through ARIA, with `Input`,
   `Textarea` and `Label`. `Input` and `Textarea` forward their `ref`, so `register` from a form
   library spreads onto them.
@@ -175,6 +197,9 @@ container. Tooltips, popovers and menus stay inside their container and inherit 
   navigation then measures its own width, and in a narrow one the text gives way to the arrows
   alone, the accessible names staying.
 - `Select` for a single choice or a checklist.
+- `ColorPicker` pairs a native colour swatch with a hex input. Supply `value`, `onChange`,
+  `label`, `hexLabel` and `invalidMessage`. The swatch applies immediately. Enter or blur applies
+  a six-digit hex value (with or without `#`), and Escape cancels an edit. Both inputs support `disabled`.
 - `Combobox` filters labelled options as the user types. Pass `options`, the controlled `value`,
   `onChange`, `label` and `emptyMessage`. The search hint defaults to `label`.
   Pass a localized `placeholder` to customize it or `""` to omit it. Its optional `name` submits the selected value.
@@ -221,7 +246,7 @@ companion, built from its own markup so the two cannot drift apart, and a page l
 out the way it lays out the loaded components. The library holds no page-level skeleton, since the
 shape of a page belongs to the application.
 
-`Accordion`, `Avatar`, `Calendar`, `Combobox`, `Dialog`, `Menu`, `Popover`, `Select`, `Sheet`, `SkeletonRegion`, `Slider`, `Tabs`, `ToastProvider` and `Tooltip` carry a `"use client"` boundary. With
+`Accordion`, `Avatar`, `Calendar`, `Carousel`, `ColorPicker`, `Combobox`, `Dialog`, `Menu`, `Popover`, `Select`, `Sheet`, `SkeletonRegion`, `Slider`, `Tabs`, `ToastProvider` and `Tooltip` carry a `"use client"` boundary. With
 React Server Components, keep components with interaction callbacks in a client
 component. Display-only elements like `Badge` can render on the server.
 
@@ -258,7 +283,7 @@ rules in force. Use border-box on controls to align their outer heights.
 | `--elea-control-radius`, `--elea-control-border` | Radius for actions, fields, the Select trigger and segmented tabs. Border color for outline actions, fields and the Select trigger. An explicit Button `radius` prop takes precedence. |
 | `--elea-control-surface`, `--elea-control-outline-surface`, `--elea-control-hover-surface` | Field and alternate tab track fill, outline action fill, and hover color for enabled fields, outline actions and tabs. Filled action colors still follow their semantic variant. |
 | `--elea-field-border-width` | Border width on Input, Textarea and the Select trigger. Accepts the CSS border-width shorthand. |
-| `--elea-control-edge`, `--elea-control-press-shadow` | A resting box shadow on actions and fields and a selected segment. The press shadow applies to primary, secondary and outline buttons. An explicit Button shadow takes precedence at rest. |
+| `--elea-control-edge`, `--elea-control-press-shadow` | A resting box shadow on actions and fields and a selected segment. The press shadow applies to primary, secondary, tertiary and outline buttons. An explicit Button shadow takes precedence at rest. |
 | `--elea-control-focus-outline`, `--elea-control-focus-shadow` | Full CSS outline shorthand for controls, navigation and interactive cards, and box-shadow for field focus. Retain a visible focus indicator. |
 | `--elea-tabs-font-family`, `--elea-tabs-selected-surface`, `--elea-tabs-panel-padding` | Tabs font, selected surface and block-axis panel padding. |
 

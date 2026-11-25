@@ -1,6 +1,13 @@
+import baseTokens from "../tokens/elea.tokens.json" with { type: "json" };
+import darkTokens from "../tokens/elea.dark.tokens.json" with { type: "json" };
 import { brandAppearanceVariable, cssVariableName, localAppearanceSelector } from "./css.js";
+import { colorFamilies, surfaceFamilies, colorSteps, defaultColorStep, defaultTertiaryFamily, brandColorRoles, type BrandColorRole, type ColorFamily, type ColorStep, type SurfaceFamily } from "./palette.js";
 
-const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
+import { statusColors } from "./status.js";
+
+export { brandColorRoles, type BrandColorRole };
+export { applyColorTheme, createThemeProfile, matchingColorTheme } from "./color-themes.js";
+
 const RADII = {
   Square: ["0", "0", "0", "0"],
   Soft: ["0.25rem", "0.375rem", "0.5rem", "0.75rem"],
@@ -26,10 +33,20 @@ export const typefaces: readonly Typeface[] = Object.keys(typeFamilies) as Typef
 export const rhythms: readonly Rhythm[] = Object.keys(READING) as Rhythm[];
 
 export type Edition = "Precision" | "Editorial" | "Obsidian";
+export type ControlTreatment = keyof typeof controlStyles;
+
+export interface PaletteSelection {
+  family: ColorFamily;
+  step: ColorStep;
+}
+
+export type RoleAssignment = PaletteSelection | { seed: string };
 
 export interface BrandTheme {
   /** Retains a built-in edition's surfaces and control treatment while customizing its identity. */
   edition?: Edition | undefined;
+  /** Control surfaces, elevation, density and tab treatment. Overrides the edition's treatment. */
+  controls?: ControlTreatment | undefined;
   /** Six hexadecimal digits prefixed by a hash. */
   seed: string;
   corner: Corners;
@@ -39,17 +56,37 @@ export interface BrandTheme {
   font?: string | undefined;
   /** A second brand colour, six hexadecimal digits; it drives the secondary ramp. */
   accent?: string | undefined;
+  /** Exact reference shades for actions and an optional family for surfaces, text and borders. */
+  palette?: {
+    primary?: PaletteSelection | undefined;
+    secondary?: PaletteSelection | undefined;
+    neutral?: SurfaceFamily | undefined;
+    tertiary?: RoleAssignment | undefined;
+    success?: RoleAssignment | undefined;
+    info?: RoleAssignment | undefined;
+    warning?: RoleAssignment | undefined;
+    danger?: RoleAssignment | undefined;
+  } | undefined;
   /** A free corner radius in `rem` or `px` for large surfaces; the other steps follow it and `corner` is ignored. */
   radius?: string | undefined;
 }
 
+/** Primary and secondary seeds that can be applied to any edition. */
+export const brandPalettes = {
+  Emerald: { seed: "#08745e", accent: "#465451" },
+  Cobalt: { seed: "#2945c7", accent: "#454a70" },
+  Copper: { seed: "#a15f3e", accent: "#495060" },
+  Plum: { seed: "#873b76", accent: "#625078" },
+  Lagoon: { seed: "#096a88", accent: "#81542f" },
+} as const;
+
 export const editions = {
-  Precision: { edition: "Precision", seed: "#08745e", accent: "#465451", corner: "Soft", typeface: "Sans", rhythm: "Balanced" },
-  Editorial: { edition: "Editorial", seed: "#2945c7", accent: "#454a70", corner: "Square", typeface: "Serif", rhythm: "Airy" },
-  Obsidian: { edition: "Obsidian", seed: "#a15f3e", accent: "#495060", corner: "Soft", radius: "0.375rem", typeface: "Sans", rhythm: "Compact" },
+  Precision: { edition: "Precision", ...brandPalettes.Emerald, corner: "Soft", typeface: "Sans", rhythm: "Balanced" },
+  Editorial: { edition: "Editorial", ...brandPalettes.Cobalt, corner: "Square", typeface: "Serif", rhythm: "Airy" },
+  Obsidian: { edition: "Obsidian", ...brandPalettes.Copper, corner: "Soft", radius: "0.375rem", typeface: "Sans", rhythm: "Compact" },
 } as const satisfies Record<Edition, BrandTheme>;
 
-// Each color pair uses the same semantic role in both appearances.
+// Light and dark surface pairs for historical editions.
 const surfaces = {
   Precision: {
     "color.surface.default": ["#ffffff", "#11161e"],
@@ -90,7 +127,7 @@ const surfaces = {
 } as const;
 
 const controlStyles = {
-  Precision: {
+  raised: {
     "_density": "0px",
     "_tabs-presentation": "segmented",
     "_control-fill": "100%",
@@ -102,7 +139,7 @@ const controlStyles = {
     "shadow-sm": "0 1px 2px rgb(0 0 0 / 0.12)",
     "shadow-md": "0 1px 3px rgb(0 0 0 / 0.12), 0 8px 22px -10px rgb(0 0 0 / 0.24)",
   },
-  Editorial: {
+  flat: {
     "_density": "2px",
     "_tabs-presentation": "underline",
     "_control-fill": "100%",
@@ -114,7 +151,7 @@ const controlStyles = {
     "shadow-sm": "0 1px rgb(0 0 0 / 0.14)",
     "shadow-md": "0 1px 0 1px rgb(0 0 0 / 0.12), var(--elea-_shadow-ambient)",
   },
-  Obsidian: {
+  inset: {
     "_density": "-2px",
     "_tabs-presentation": "rail",
     "_control-fill": "0%",
@@ -127,6 +164,8 @@ const controlStyles = {
     "shadow-md": "inset 0 1px rgb(255 255 255 / 0.14), var(--elea-_shadow-ambient)",
   },
 } as const;
+
+const editionControls = { Precision: "raised", Editorial: "flat", Obsidian: "inset" } as const satisfies Record<Edition, ControlTreatment>;
 
 function channels(hex: string) {
   return [1, 3, 5].map((index) => Number.parseInt(hex.slice(index, index + 2), 16));
@@ -142,17 +181,6 @@ function luminance(colour: string) {
     return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
   });
   return r * 0.2126 + g * 0.7152 + b * 0.0722;
-}
-
-/** The seed darkened until a white label on it reaches a contrast ratio of 4.5:1. */
-function readable(seed: string) {
-  let solid = seed.toLowerCase();
-  let step = 1;
-  while (luminance(solid) > 1.05 / 4.5 - 0.05) {
-    solid = mix(seed, 0, step / 100);
-    step += 1;
-  }
-  return solid;
 }
 
 const HEX = /^#[a-f0-9]{6}$/i;
@@ -177,32 +205,112 @@ function parseRadius(radius: string | undefined) {
   return length;
 }
 
-/** Generate a scoped stylesheet and its ordered primary ramp (50 to 950). */
-export function makeBrandTheme({ edition, seed, corner, typeface, rhythm, font, accent, radius }: BrandTheme, className = "elea-brand") {
+type Swatch = { step: ColorStep; value: string };
+type ColorPair = [path: string, light: string, dark: string];
+const brandRamps = ["primary", "secondary"] as const;
+type Ramp = typeof brandRamps[number];
+type Action = ReturnType<typeof assignedAction>;
+const actionSuffixes = { fill: "", text: "-text", hover: "-hover", pressed: "-pressed", ink: "-ink",
+  container: "-container", onContainer: "-on-container" } as const;
+
+type SurfacePairs = Readonly<Record<keyof typeof surfaces.Precision, readonly [string, string]>>;
+
+function referenceFamily(family: ColorFamily) {
+  if (!Object.hasOwn(colorFamilies, family)) throw new RangeError("Unknown reference colour family");
+  return colorFamilies[family];
+}
+
+function referenceShade(pick: PaletteSelection | undefined) {
+  if (pick === undefined) return;
+  if (pick === null || !colorSteps.includes(pick.step)) throw new RangeError("Unknown reference colour step");
+  return referenceFamily(pick.family);
+}
+
+function contrast(foreground: string, background: string) {
+  const a = luminance(foreground) + 0.05;
+  const b = luminance(background) + 0.05;
+  return Math.max(a / b, b / a);
+}
+
+function seedScale(seed: string): Swatch[] {
+  const colours = [
+    ...[0.96, 0.71, 0.57, 0.39, 0.18].map(amount => mix(seed, 255, amount)),
+    seed.toLowerCase(),
+    ...[0.17, 0.32, 0.64, 0.8, 0.92].map(amount => mix(seed, 0, amount)),
+  ];
+  return colorSteps.map((step, index) => ({ step, value: colours[index]! }));
+}
+
+function swatchAt(scale: readonly Swatch[], step: ColorStep) {
+  return scale[colorSteps.indexOf(step)]!.value;
+}
+
+/** Keep exported themes usable with or without the optional reference sheet. */
+function referenceVariable(family: SurfaceFamily, swatch: Swatch) {
+  return `var(--elea-palette-${family.toLowerCase()}-${swatch.step}, ${swatch.value})`;
+}
+
+function neutralSurfaces(family: SurfaceFamily): SurfacePairs {
+  if (!Object.hasOwn(surfaceFamilies, family)) throw new RangeError("Unknown surface colour family");
+  const scale = surfaceFamilies[family];
+  const pair = (light: ColorStep, dark: ColorStep) => [swatchAt(scale, light), swatchAt(scale, dark)] as const;
+  return {
+    "color.surface.default": pair(50, 950), "color.surface.subtle": pair(100, 900),
+    "color.surface.muted": pair(200, 800), "color.surface.inverse": pair(900, 100),
+    "color.text.default": pair(950, 50), "color.text.muted": pair(800, 100),
+    "color.text.subtle": pair(700, 200), "color.text.inverse": pair(50, 950),
+    "color.border.default": pair(200, 800), "color.border.strong": pair(600, 400),
+  };
+}
+
+function readableInk(scale: readonly Swatch[], step: ColorStep, surfaces: SurfacePairs, mode: 0 | 1, minimum: number) {
+  const backgrounds = [surfaces["color.surface.default"][mode], surfaces["color.surface.muted"][mode]];
+  return scale.filter(({ value }) => backgrounds.every(background => contrast(value, background) >= minimum))
+    .reduce((closest, next) => Math.abs(next.step - step) < Math.abs(closest.step - step) ? next : closest);
+}
+
+function assignedAction(scale: readonly Swatch[], step: ColorStep, surfaces: SurfacePairs) {
+  const fill = swatchAt(scale, step);
+  const text = contrast(fill, "#000000") > contrast(fill, "#ffffff") ? "#000000" : "#ffffff";
+  // Pure black and white collapse one half of a seeded ramp. Use distinct tones with the same foreground.
+  const states = scale.filter(({ value }) => contrast(value, text) >= 4.5 && contrast(value, fill) >= 1.1);
+  const darker = states.filter(swatch => swatch.step > step);
+  const lighter = states.filter(swatch => swatch.step < step).reverse();
+  const order = darker.length >= 2 ? [...darker, ...lighter] : [...lighter, ...darker];
+  const [hover, pressed] = [...new Set(order.map(swatch => swatch.value))];
+  function appearance(mode: 0 | 1) {
+    return {
+      fill, text, hover: hover!, pressed: pressed!, ink: readableInk(scale, step, surfaces, mode, 4.5).value,
+      container: swatchAt(scale, mode === 0 ? 100 : 800),
+      onContainer: swatchAt(scale, mode === 0 ? 900 : 50),
+    };
+  }
+  return { light: appearance(0), dark: appearance(1) };
+}
+
+/** Generate scoped CSS, colour roles and their tone scales. */
+export function makeBrandTheme({ edition, controls, seed, corner, typeface, rhythm, font, accent, palette, radius }: BrandTheme, className = "elea-brand") {
   assertBrandTheme({ seed, corner, typeface, rhythm, font, accent }, className);
   if (edition !== undefined && !Object.hasOwn(editions, edition)) throw new RangeError("Unknown edition");
+  if (palette !== undefined && (palette === null || typeof palette !== "object" || Array.isArray(palette))) throw new RangeError("Expected palette assignments");
   const length = parseRadius(radius);
   const radii = length
     ? [0.5, 0.75, 1, 1.5].map((factor) => `${Number((Number(length[1]) * factor).toFixed(4))}${length[2]}`)
     : RADII[corner];
   const reading = READING[rhythm];
-  const solid = readable(seed);
-  const colours = [
-    ...[0.94, 0.85, 0.71, 0.57, 0.39, 0.18].map((amount) => mix(solid, 255, amount)),
-    solid,
-    ...[0.17, 0.32, 0.48, 0.68].map((amount) => mix(solid, 0, amount)),
-  ];
-  // Secondary buttons fill with the 700 step, so that is where the readable accent sits.
   const accentSeed = accent ?? (edition && editions[edition].accent);
-  const second = accentSeed === undefined ? null : readable(accentSeed);
-  const secondary = second === null ? [] : [
-    ...[0.94, 0.85, 0.71, 0.57, 0.42, 0.28, 0.14].map((amount) => mix(second, 255, amount)),
-    second,
-    ...[0.17, 0.32].map((amount) => mix(second, 0, amount)),
-  ];
+  const primary = referenceShade(palette?.primary) ?? seedScale(seed);
+  const secondary = referenceShade(palette?.secondary) ?? (accentSeed === undefined ? undefined : seedScale(accentSeed));
+  const roleScales: Partial<Record<BrandColorRole, readonly Readonly<Swatch>[]>> = { primary };
+  // The public secondary ramp historically spans 50–900.
+  const palettes = { primary: [...primary], secondary: secondary ? secondary.slice(0, -1) : [] };
+  const colours = primary.map(swatch => swatch.value);
   const tokens = [
-    ...SHADES.map((shade, index) => `  --elea-color-primary-${shade}: ${colours[index]};`),
-    ...secondary.map((colour, index) => `  --elea-color-secondary-${SHADES[index]}: ${colour};`),
+    ...brandRamps.flatMap(role => palettes[role].map(swatch => {
+      const selected = palette?.[role];
+      const value = selected ? referenceVariable(selected.family, swatch) : swatch.value;
+      return `  --elea-color-${role}-${swatch.step}: ${value};`;
+    })),
     ...["sm", "md", "lg", "xl"].map((size, index) => `  --elea-radius-${size}: ${radii[index]};`),
     ...(font === undefined ? [] : [`  --elea-font-family-sans: ${font};`]),
     `  --elea-font-family-content: ${typeFamilies[typeface]};`,
@@ -212,44 +320,132 @@ export function makeBrandTheme({ edition, seed, corner, typeface, rhythm, font, 
     "  --elea-color-text-on-brand: #ffffff;",
   ];
   const shade = (step: number, ramp = "primary") => `var(--elea-color-${ramp}-${step})`;
-  const semantic: [string, string, string][] = [
-    ["color.text.link", shade(700), shade(300)],
-    ["color.text.link-hover", shade(800), shade(200)],
-    ["color.focus", shade(600), shade(300)],
-    ["color.info", shade(700), shade(300)],
+  const surface = palette?.neutral !== undefined ? neutralSurfaces(palette.neutral) : edition && surfaces[edition];
+  if (palette?.neutral === "Gray") {
+    for (const swatch of surfaceFamilies.Gray) {
+      tokens.push(`  --elea-color-neutral-${swatch.step}: ${referenceVariable("Gray", swatch)};`);
+    }
+  }
+  const backgrounds = surface || surfaces.Precision;
+  const tokenFor = (role: Ramp, swatch: Swatch) => {
+    if (role !== "secondary" || swatch.step !== 950) return shade(swatch.step, role);
+    const selected = palette?.secondary;
+    return selected ? referenceVariable(selected.family, swatch) : swatch.value;
+  };
+  function inkPair(path: string, role: Ramp, light: ColorStep, dark: ColorStep, minimum = 4.5): ColorPair {
+    const scale = roleScales[role]!;
+    return [path, tokenFor(role, readableInk(scale, light, backgrounds, 0, minimum)),
+      tokenFor(role, readableInk(scale, dark, backgrounds, 1, minimum))];
+  }
+  // Keep historical link and info tones with the seed at 500.
+  const linkSteps: [ColorStep, ColorStep] = palette?.primary ? [700, 300] : [600, 200];
+  const hoverSteps: [ColorStep, ColorStep] = palette?.primary ? [800, 200] : [700, 100];
+  const statusDefaults: ColorPair[] = [];
+  const semantic: ColorPair[] = [
+    inkPair("color.text.link", "primary", ...linkSteps), inkPair("color.text.link-hover", "primary", ...hoverSteps),
+    inkPair("color.focus", "primary", 600, 300, 3),
   ];
-  if (edition) {
-    for (const [path, [day, night]] of Object.entries(surfaces[edition])) semantic.push([path, day, night]);
-    for (const [property, value] of Object.entries(controlStyles[edition])) tokens.push(`  --elea-${property}: ${value};`);
-    // Rebind these roles inside a named scope, including when it sits in another edition.
+  if (surface) {
+    const neutral = palette?.neutral;
+    const surfaceValue = (value: string) => neutral ? referenceVariable(neutral, surfaceFamilies[neutral].find(swatch => swatch.value === value)!) : value;
+    for (const [path, [day, night]] of Object.entries(surface)) semantic.push([path, surfaceValue(day), surfaceValue(night)]);
+  }
+  const treatment = controls === undefined && edition ? editionControls[edition] : controls;
+  if (treatment !== undefined) {
+    if (!Object.hasOwn(controlStyles, treatment)) throw new RangeError("Unknown control treatment");
+    for (const [property, value] of Object.entries(controlStyles[treatment])) tokens.push(`  --elea-${property}: ${value};`);
+  }
+  if (secondary) {
+    roleScales.secondary = secondary;
     semantic.push(
-      ["color.text.accent", shade(700, "secondary"), shade(300, "secondary")],
-      ["color.border.accent", shade(600, "secondary"), shade(400, "secondary")],
+      inkPair("color.text.accent", "secondary", 700, 300), inkPair("color.border.accent", "secondary", 600, 400, 3),
     );
   }
-  const declarations = (mode: "light" | "dark", indent: string) => semantic.map(([path, day, night]) =>
-    `${indent}${cssVariableName(path)}: ${mode === "light" ? day : night};`).join("\n");
+  const roles: Partial<Record<BrandColorRole, Action>> = {};
+
+  function emitAction(role: BrandColorRole, action: Action,
+    resolve: (key: keyof typeof actionSuffixes, value: string) => string, pairs = semantic) {
+    roles[role] = action;
+    for (const key of Object.keys(actionSuffixes) as (keyof typeof actionSuffixes)[]) {
+      const path = `color.action.${role}${actionSuffixes[key]}`;
+      const day = resolve(key, action.light[key]);
+      const night = resolve(key, action.dark[key]);
+      const isStatus = role !== "primary" && role !== "secondary" && role !== "tertiary";
+      if (isStatus || key === "ink" || key === "container" || key === "onContainer") {
+        pairs.push([path, day, night]);
+      } else {
+        tokens.push(`  ${cssVariableName(path)}: ${day};`);
+      }
+    }
+  }
+
+  for (const role of brandRamps) {
+    const scale = roleScales[role];
+    if (!scale) continue;
+    const step = palette?.[role]?.step ?? defaultColorStep;
+    emitAction(role, assignedAction(scale, step, backgrounds), (key, value) =>
+      key === "text" ? value : tokenFor(role, key === "fill" ? scale[colorSteps.indexOf(step)]! : scale.find(swatch => swatch.value === value)!));
+  }
+  for (const role of brandColorRoles) {
+    if (role === "primary" || role === "secondary") continue;
+    const assignment = palette?.[role];
+    const pick: RoleAssignment | undefined = assignment === undefined && role === "tertiary" && edition
+      ? { family: defaultTertiaryFamily, step: defaultColorStep } : assignment;
+    if (pick !== undefined) {
+      if (!pick || typeof pick !== "object") throw new RangeError("Expected a reference shade or a hex seed");
+      if ("seed" in pick && (typeof pick.seed !== "string" || !HEX.test(pick.seed))) throw new RangeError("Expected a six-digit hex colour");
+      const scale = "seed" in pick ? seedScale(pick.seed) : referenceShade(pick)!;
+      roleScales[role] = scale;
+      const action = assignedAction(scale, "seed" in pick ? defaultColorStep : pick.step, backgrounds);
+      const variable = (value: string) => "seed" in pick ? value : referenceVariable(pick.family, scale.find(swatch => swatch.value === value)!);
+      emitAction(role, action, (key, value) => key === "text" ? value : variable(value));
+      if (role !== "tertiary") semantic.push([`color.${role}`, variable(action.light.ink), variable(action.dark.ink)]);
+    } else if (edition && role !== "tertiary") {
+      const info = role === "info";
+      const light = info ? readableInk(primary, linkSteps[0], backgrounds, 0, 4.5).value : baseTokens.color[role].$value;
+      const dark = info ? readableInk(primary, linkSteps[1], backgrounds, 1, 4.5).value : darkTokens.color[role].$value;
+      statusDefaults.push(info ? inkPair("color.info", "primary", ...linkSteps) : [`color.${role}`, light, dark]);
+      const action = {
+        light: statusColors(light, backgrounds["color.surface.default"][0], backgrounds["color.text.inverse"][0], false),
+        dark: statusColors(dark, backgrounds["color.surface.default"][1], backgrounds["color.text.inverse"][1], true),
+      };
+      // Consumers resolve the legacy status where they render so nested host overrides apply.
+      emitAction(role, action, () => "initial", statusDefaults);
+    }
+  }
   // The aliases remain available when a local appearance is introduced inside this brand.
-  for (const [path, day, night] of semantic) {
+  for (const [path, day, night] of [...semantic, ...statusDefaults]) {
     tokens.push(`  ${brandAppearanceVariable(path, "light")}: ${day};`,
       `  ${brandAppearanceVariable(path, "dark")}: ${night};`);
   }
   const scopes = [`.${className}`, `[data-elea-theme="${className.replace(/^elea-/, "")}"]`];
   const selector = scopes.join(", ");
   const darkScope = (root: string) => scopes.flatMap((scope) => [`${root}${scope}`, `${root} ${scope}`]).join(", ");
-  // Match the specificity of the legacy root+theme rules, winning by source order within this sheet.
+  // Match the legacy root and theme specificity.
   const local = scopes.flatMap(scope => [
     `${scope}${localAppearanceSelector}:is(:root, *)`, `${localAppearanceSelector} ${scope}:is(:root, *)`,
   ]).join(", ");
+  function rules(scope: string, mode: "light" | "dark" | "local", indent = "") {
+    function declarations(pairs: ColorPair[]) {
+      return pairs.map(([path, light, dark]) => {
+        const value = mode === "dark" ? dark : mode === "light" || light === dark ? light
+          : `light-dark(var(${brandAppearanceVariable(path, "light")}), var(${brandAppearanceVariable(path, "dark")}))`;
+        return `${indent}  ${cssVariableName(path)}: ${value};`;
+      });
+    }
+    return [
+      `${indent}${scope} {`, ...(mode === "light" ? tokens : []), ...declarations(semantic), `${indent}}`,
+      // A named edition resets inherited feedback. A host selector on this very element
+      // can still supply its own status before or after the generated sheet.
+      ...(statusDefaults.length ? [`${indent}:where(${scope}) {`, ...declarations(statusDefaults), `${indent}}`] : []),
+    ];
+  }
   const css = [
-    `${selector} {`, ...tokens, declarations("light", "  "), "}", "",
+    ...rules(selector, "light"), "",
     "@media (prefers-color-scheme: dark) {",
-    `  ${darkScope(':root:not([data-theme="light"])')} {`,
-    declarations("dark", "    "), "  }", "}", "",
-    `${darkScope(':root[data-theme="dark"]')} {`, declarations("dark", "  "), "}", "",
-    "@supports (color: light-dark(white, black)) {", `  ${local} {`,
-    ...semantic.map(([path]) => `    ${cssVariableName(path)}: light-dark(var(${brandAppearanceVariable(path, "light")}), var(${brandAppearanceVariable(path, "dark")}));`),
-    "  }", "}", "",
+    ...rules(darkScope(':root:not([data-theme="light"])'), "dark", "  "), "}", "",
+    ...rules(darkScope(':root[data-theme="dark"]'), "dark"), "",
+    "@supports (color: light-dark(white, black)) {", ...rules(local, "local", "  "), "}", "",
   ].join("\n");
-  return { css, colours };
+  return { css, colours, palettes, roles, roleScales };
 }

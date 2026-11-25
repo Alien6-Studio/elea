@@ -4,6 +4,8 @@ export { Button, ButtonSkeleton, IconButton, type ButtonSkeletonProps, type Butt
 export { Badge, BadgeSkeleton, type BadgeProps, type BadgeSkeletonProps, type BadgeTone, type BadgeVariant } from "./Badge.js";
 export { Field, FieldSkeleton, Input, Label, Textarea, type FieldProps, type FieldSkeletonProps, type InputProps, type LabelProps, type TextareaProps } from "./Field.js";
 export { Calendar, type CalendarProps } from "./Calendar.js";
+export { Carousel, type CarouselGap, type CarouselNavigation, type CarouselProps } from "./Carousel.js";
+export { ColorPicker, type ColorPickerProps } from "./ColorPicker.js";
 export { Combobox, type ComboboxOption, type ComboboxProps } from "./Combobox.js";
 export { Checkbox, Toggle, type CheckboxProps, type ToggleProps } from "./Checkbox.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./RadioGroup.js";

@@ -21,9 +21,9 @@
 .elea-dialog__header { display: flex; align-items: flex-start; gap: var(--elea-space-4); }
 .elea-dialog__title { flex: 1; margin: 0; font-size: var(--elea-font-size-xl); font-weight: var(--elea-font-weight-semibold); }
 .elea-dialog__icon { display: inline-flex; margin-inline-end: var(--elea-space-2); vertical-align: -0.15em; color: var(--elea-color-text-link); }
-.elea-dialog__icon--danger { color: var(--elea-color-danger); }
-.elea-dialog__icon--success { color: var(--elea-color-success); }
-.elea-dialog__icon--info { color: var(--elea-color-info); }
+.elea-dialog__icon--danger { color: var(--elea-color-action-danger-ink, var(--elea-color-danger)); }
+.elea-dialog__icon--success { color: var(--elea-color-action-success-ink, var(--elea-color-success)); }
+.elea-dialog__icon--info { color: var(--elea-color-action-info-ink, var(--elea-color-info)); }
 .elea-dialog__close { display: inline-flex; padding: var(--elea-space-1); border: 0; border-radius: var(--elea-radius-md); background: transparent; color: var(--elea-color-text-subtle); cursor: pointer; transition: rotate var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }
 .elea-dialog__close:hover { background: var(--elea-color-surface-muted); color: var(--elea-color-text-default); rotate: calc(90deg * var(--elea-motion, 0)); }
 .elea-dialog__close:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }

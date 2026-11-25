@@ -22,8 +22,8 @@
 .elea-avatar--lg { --elea-avatar-size: 3rem; }
 .elea-avatar--xl { --elea-avatar-size: 4rem; }
 .elea-avatar--square { border-radius: var(--elea-radius-md); }
-.elea-avatar--primary { background: var(--elea-color-primary-100); color: var(--elea-color-primary-800); }
-.elea-avatar--secondary { background: var(--elea-color-secondary-100); color: var(--elea-color-secondary-800); }
+.elea-avatar--primary { background: var(--elea-color-action-primary-container); color: var(--elea-color-action-primary-on-container); }
+.elea-avatar--secondary { background: var(--elea-color-action-secondary-container); color: var(--elea-color-action-secondary-on-container); }
 .elea-avatar img { inline-size: 100%; block-size: 100%; object-fit: cover; }
 .elea-avatar-group { display: inline-flex; align-items: center; }
 .elea-avatar-group > .elea-avatar { box-shadow: 0 0 0 2px var(--elea-color-surface-default); transition: translate var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }

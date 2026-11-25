@@ -1,6 +1,7 @@
 import base from "../tokens/elea.tokens.json" with { type: "json" };
 import dark from "../tokens/elea.dark.tokens.json" with { type: "json" };
 import { flattenTokens, mergeTokens, type TokenGroup } from "./dtcg.js";
+import { cssReference } from "./css.js";
 
 export { cssDeclarations, cssValue, cssVariableName, inLayer, tailwindVariableName, toShadcnAliases, toShadcnPreset, toStylesheet, toTailwindPreset, toTailwindTheme, type StylesheetOptions, type TailwindPreset } from "./css.js";
 export { flattenTokens, mergeTokens, resolveReference, type FlatToken, type TokenGroup, type TokenLeaf } from "./dtcg.js";
@@ -17,5 +18,5 @@ export const darkTokens = flattenTokens(darkTokenOverrides, mergeTokens(lightTok
 
 /** The CSS custom property of a token path, e.g. `cssVar("color.text.default")`. */
 export function cssVar(path: string): string {
-  return `var(--elea-${path.replaceAll(".", "-")})`;
+  return cssReference(path);
 }

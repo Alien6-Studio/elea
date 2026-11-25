@@ -35,21 +35,61 @@
 .elea-button--shadow-sm { --elea-button-shadow: var(--elea-shadow-sm); }
 .elea-button--shadow-md { --elea-button-shadow: var(--elea-shadow-md); }
 .elea-button--full { width: 100%; }
-.elea-button--primary { background: var(--elea-color-primary-600); color: var(--elea-color-text-on-brand); }
-.elea-button--primary:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-color-primary-700); }
-.elea-button--secondary { background: var(--elea-color-secondary-700); color: var(--elea-color-text-on-brand); }
-.elea-button--secondary:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-color-secondary-800); }
+.elea-button--primary {
+  background: var(--elea-color-action-primary);
+  color: var(--elea-color-action-primary-text);
+  --_elea-button-hover: var(--elea-color-action-primary-hover);
+  --_elea-button-pressed: var(--elea-color-action-primary-pressed);
+}
+.elea-button--secondary {
+  background: var(--elea-color-action-secondary);
+  color: var(--elea-color-action-secondary-text);
+  --_elea-button-hover: var(--elea-color-action-secondary-hover);
+  --_elea-button-pressed: var(--elea-color-action-secondary-pressed);
+}
+.elea-button--tertiary {
+  background: var(--elea-color-action-tertiary);
+  color: var(--elea-color-action-tertiary-text);
+  --_elea-button-hover: var(--elea-color-action-tertiary-hover);
+  --_elea-button-pressed: var(--elea-color-action-tertiary-pressed);
+}
+.elea-button--success {
+  --_elea-button-status: var(--elea-color-success);
+  background: var(--elea-color-action-success, var(--_elea-button-status));
+  color: var(--elea-color-action-success-text, var(--elea-color-text-inverse));
+  --_elea-button-hover: var(--elea-color-action-success-hover);
+  --_elea-button-pressed: var(--elea-color-action-success-pressed);
+}
+.elea-button--info {
+  --_elea-button-status: var(--elea-color-info);
+  background: var(--elea-color-action-info, var(--_elea-button-status));
+  color: var(--elea-color-action-info-text, var(--elea-color-text-inverse));
+  --_elea-button-hover: var(--elea-color-action-info-hover);
+  --_elea-button-pressed: var(--elea-color-action-info-pressed);
+}
+.elea-button--warning {
+  --_elea-button-status: var(--elea-color-warning);
+  background: var(--elea-color-action-warning, var(--_elea-button-status));
+  color: var(--elea-color-action-warning-text, var(--elea-color-text-inverse));
+  --_elea-button-hover: var(--elea-color-action-warning-hover);
+  --_elea-button-pressed: var(--elea-color-action-warning-pressed);
+}
+.elea-button--danger {
+  --_elea-button-status: var(--elea-color-danger);
+  background: var(--elea-color-action-danger, var(--_elea-button-status));
+  color: var(--elea-color-action-danger-text, var(--elea-color-text-inverse));
+  --_elea-button-hover: var(--elea-color-action-danger-hover);
+  --_elea-button-pressed: var(--elea-color-action-danger-pressed);
+}
+:is(.elea-button--primary, .elea-button--secondary, .elea-button--tertiary, .elea-button--success, .elea-button--info, .elea-button--warning, .elea-button--danger):not(:disabled, [aria-disabled="true"]) {
+  &:hover { background-color: var(--_elea-button-hover, color-mix(in srgb, var(--_elea-button-status) 90%, var(--elea-_status-edge))); }
+  &:active { background-color: var(--_elea-button-pressed, color-mix(in srgb, var(--_elea-button-status) 80%, var(--elea-_status-edge))); }
+}
 .elea-button--outline { background: var(--elea-control-outline-surface, color-mix(in srgb, var(--elea-color-surface-muted) var(--elea-_outline-tint, 0%), transparent)); border-color: var(--elea-control-border, var(--elea-color-border-strong)); color: var(--elea-color-text-default); }
 .elea-button--outline:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-control-hover-surface, var(--elea-color-surface-subtle)); }
 .elea-button--ghost { --elea-_control-edge: none; background: transparent; color: var(--elea-color-text-muted); }
 .elea-button--ghost:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-color-surface-muted); color: var(--elea-color-text-default); }
-:is(.elea-button--danger, .elea-button--success, .elea-button--info, .elea-button--warning) { color: var(--elea-color-text-inverse); }
-.elea-button--danger { background: var(--elea-color-danger); }
-.elea-button--success { background: var(--elea-color-success); }
-.elea-button--info { background: var(--elea-color-info); }
-.elea-button--warning { background: var(--elea-color-warning); }
-:is(.elea-button--danger, .elea-button--success, .elea-button--info, .elea-button--warning):hover:not(:disabled, [aria-disabled="true"]) { filter: brightness(0.9); }
-.elea-button:is(.elea-button--primary, .elea-button--secondary, .elea-button--outline) {
+.elea-button:is(.elea-button--primary, .elea-button--secondary, .elea-button--tertiary, .elea-button--outline) {
   --_elea-button-press: var(--elea-control-press-shadow, var(--elea-_control-press-shadow, var(--_elea-button-rest)));
 }
 .elea-button:active:enabled {

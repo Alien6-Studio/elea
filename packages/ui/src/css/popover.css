@@ -31,9 +31,9 @@
 /* ConfirmPopover */
 .elea-popover__title { display: flex; align-items: flex-start; gap: var(--elea-space-2); margin: 0; font-weight: var(--elea-font-weight-semibold); }
 .elea-popover__icon { display: inline-flex; flex: none; padding-block-start: 0.15em; color: var(--elea-color-text-link); }
-.elea-popover__icon--danger { color: var(--elea-color-danger); }
-.elea-popover__icon--success { color: var(--elea-color-success); }
-.elea-popover__icon--info { color: var(--elea-color-info); }
+.elea-popover__icon--danger { color: var(--elea-color-action-danger-ink, var(--elea-color-danger)); }
+.elea-popover__icon--success { color: var(--elea-color-action-success-ink, var(--elea-color-success)); }
+.elea-popover__icon--info { color: var(--elea-color-action-info-ink, var(--elea-color-info)); }
 .elea-popover__description { margin: var(--elea-space-1) 0 0; color: var(--elea-color-text-muted); }
 .elea-popover__panel > .elea-field { margin-block-start: var(--elea-space-3); }
 .elea-popover__actions { display: flex; justify-content: flex-end; gap: var(--elea-space-2); margin-block-start: var(--elea-space-3); }

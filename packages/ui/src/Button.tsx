@@ -2,7 +2,7 @@ import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type 
 import { cx } from "./cx.js";
 import { Skeleton } from "./Skeleton.js";
 
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "success" | "info" | "warning";
+export type ButtonVariant = "primary" | "secondary" | "tertiary" | "outline" | "ghost" | "danger" | "success" | "info" | "warning";
 export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 export type ButtonRadius = "none" | "sm" | "md" | "lg" | "full";
 export type ButtonShadow = "none" | "sm" | "md";

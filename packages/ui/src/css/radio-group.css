@@ -29,9 +29,9 @@
   border-color: var(--elea-color-text-link);
   background: color-mix(in srgb, var(--elea-color-text-link) 6%, var(--elea-color-surface-default));
 }
-.elea-radio-group[aria-invalid="true"] .elea-radio { --_elea-field-focus: var(--elea-color-danger); border-color: var(--elea-color-danger); }
+.elea-radio-group[aria-invalid="true"] .elea-radio { --_elea-field-focus: var(--elea-color-action-danger-ink, var(--elea-color-danger)); border-color: var(--elea-color-action-danger-ink, var(--elea-color-danger)); }
 .elea-radio:has(input:disabled) { opacity: 0.5; cursor: not-allowed; }
-.elea-radio input { flex: none; margin: 0; accent-color: var(--elea-color-primary-600); }
+.elea-radio input { flex: none; margin: 0; accent-color: var(--elea-color-action-primary-ink); }
 .elea-radio input:focus-visible { outline: none; }
 .elea-radio:has(input:focus-visible) {
   outline: var(--elea-control-focus-outline, 2px solid var(--_elea-field-focus, var(--elea-color-focus)));
