@@ -596,11 +596,11 @@ test("preview, language and theme switches", async ({ page }) => {
   await pick(page.getByRole("combobox", { name: "Language" }), "Français");
   await expect(editorPane(page).getByRole("button", { name: "Mode d’édition · Écriture" })).toBeVisible();
 
-  const surface = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--elea-color-surface-default").trim());
-  const light = await surface();
+  const body = page.locator("body");
+  await expect(body).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await page.getByTestId("theme-toggle").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  expect(await surface()).not.toBe(light);
+  await expect(body).toHaveCSS("background-color", "rgb(21, 21, 21)");
 });
 
 test("the document JSON keeps the EditorJS shape", async ({ page }) => {
@@ -808,15 +808,12 @@ test("text and blocks never select together: Shift+arrows, Ctrl+A, release outsi
   await page.keyboard.press("Shift+ArrowDown");
   expect(await selectedBlocks()).toBe(0);
   expect((await selectedText()).length).toBeGreaterThan(10);
-  // On the last line, the next Shift+Down takes the blocks and the caret leaves the field
-  // Line by line to the last one, whatever the wrap width, then the blocks take over
-  await page.keyboard.press("End");
+  // Continue from the selected text. Wrapping depends on the active theme and viewport.
   let presses = 0;
   while ((await selectedBlocks()) === 0 && presses < 8) {
     await page.keyboard.press("Shift+ArrowDown");
     presses += 1;
   }
-  expect(presses).toBeGreaterThan(1);
   expect(await selectedBlocks()).toBe(2);
   await page.keyboard.press("Shift+ArrowDown");
   expect(await selectedBlocks()).toBe(3);

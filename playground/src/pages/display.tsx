@@ -1,16 +1,77 @@
 import { useState } from "react";
 import {
-  Alert, Avatar, AvatarGroup, Badge, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardImage, CardTitle,
+  Alert, Avatar, AvatarGroup, Badge, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardImage, CardTitle, Carousel,
   AvatarSkeleton, BadgeSkeleton, ButtonSkeleton, CardSkeleton, Field, FieldSkeleton, Input, Progress, Separator, Skeleton, SkeletonRegion,
-  Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, TableSkeleton, Toggle,
+  Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, TableSkeleton, Toggle, type CarouselProps,
 } from "@alien6-studio/elea-ui";
 import { glacierImage, notebookSummary, notebookTitle } from "../notebook.js";
 import { Demo, PropsTable } from "../components/Demo.js";
+import { colourPlates } from "../data/colourPlates.js";
 import { brandRoute, type BrandTheme } from "./brandTheme.js";
 // A local portrait, so the guide loads no remote image.
 import portrait from "./portrait.svg";
 
 const InfoIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5v.5" /></svg>;
+
+const { rasance, reserve, braise, "hors-champ": horsChamp } = colourPlates;
+const exhibitionPlates = [rasance, reserve, braise, horsChamp];
+type Plate = (typeof exhibitionPlates)[number];
+type PlateLayout = Pick<CarouselProps<Plate>, "itemsPerView" | "minItemWidth" | "gap" | "navigation" | "controlsPosition" | "controlsAlign" | "showCounter">;
+
+const presentations = [
+  { title: "Single plate", plates: exhibitionPlates, layout: { navigation: "arrows" } },
+  { title: "Contact sheet", plates: [reserve, braise, rasance, horsChamp], layout: {
+    itemsPerView: 2, minItemWidth: 100, gap: "sm", navigation: "dots", controlsPosition: "bottom", controlsAlign: "center",
+  } },
+  { title: "Filmstrip", plates: [horsChamp, rasance, reserve, braise], layout: {
+    itemsPerView: 3, minItemWidth: 72, gap: "none", navigation: "both", controlsPosition: "bottom", controlsAlign: "start", showCounter: true,
+  } },
+] satisfies { title: string; plates: Plate[]; layout: PlateLayout }[];
+
+export function PlateCarousel({ label = "Exhibition plates", plates = exhibitionPlates, ...layout }: PlateLayout & { label?: string; plates?: Plate[] }) {
+  return <Carousel items={plates} itemKey={plate => plate.src} loop className="catalog-plate-carousel"
+    label={label} roleDescription="carousel" previousLabel="Previous plate" nextLabel="Next plate"
+    getDotLabel={index => `Show plate ${index + 1}`} {...layout}
+    renderItem={plate => <img src={plate.src} alt={plate.alt} width={840} height={560} loading="lazy" />} />;
+}
+
+function plateExample(title: string, layout: PlateLayout) {
+  const props = Object.entries(layout).map(([key, value]) =>
+    typeof value === "string" ? `${key}="${value}"` : `${key}={${value}}`);
+  return `<Carousel items={plates} itemKey={plate => plate.src} loop
+  label="${title}" roleDescription="carousel"
+  previousLabel="Previous plate" nextLabel="Next plate"
+  ${props.join("\n  ")}
+  getDotLabel={index => "Show plate " + (index + 1)}
+  renderItem={plate => <img src={plate.src} alt={plate.alt} width={840} height={560} />} />`;
+}
+
+export function CarouselPage() {
+  return <>
+    <h1>Carousel</h1>
+    <p className="lead">Browse the same four photographs one at a time, in pairs or as a continuous strip.</p>
+    <div className="carousel-gallery">
+      {presentations.map(({ title, plates, layout }) => (
+        <Demo key={title} title={title} code={plateExample(title, layout)}>
+          <PlateCarousel label={title} plates={plates} {...layout} />
+        </Demo>
+      ))}
+    </div>
+    <h2>Props</h2>
+    <PropsTable rows={[
+      { name: "items, itemKey, renderItem", type: "Array and render callbacks", description: "Provide the collection, a stable key and the content of each slide." },
+      { name: "label, previousLabel, nextLabel", type: "string", description: "Name the collection and its two navigation actions." },
+      { name: "navigation, getDotLabel", type: '"arrows" | "dots" | "both", (index: number) => string', description: "Choose the navigation controls and give each dot a localised accessible name." },
+      { name: "controlsPosition, controlsAlign", type: '"top" | "bottom", "start" | "center" | "end"', description: "Place the controls above or below the slides and align them along the row." },
+      { name: "showCounter", type: "boolean", description: "Display the visible slide numbers and collection size." },
+      { name: "itemsPerView, minItemWidth", type: "number", description: "Set a slide count. Add a minimum width in pixels to fit fewer slides in narrower containers." },
+      { name: "gap", type: '"none" | "sm" | "md" | "lg"', description: "Set the spacing between visible slides." },
+      { name: "index, onIndexChange", type: "number, (index: number) => void", description: "Control the first visible item using a zero-based index." },
+      { name: "defaultIndex", type: "number", defaultValue: "0", description: "Choose the starting item in an uncontrolled carousel." },
+      { name: "loop", type: "boolean", defaultValue: "false", description: "Continue at the opposite end when reaching a boundary." },
+    ]} />
+  </>;
+}
 
 export function CardPage({ brand }: { brand?: BrandTheme }) {
   return (

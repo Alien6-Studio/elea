@@ -4,79 +4,79 @@ import { createDocument, en } from "@alien6-studio/elea-content";
 import { SiteTypefaceField } from "../components/SiteTypefaceField.js";
 import { notebookBlocks, notebookSummary, notebookTitle } from "../samples.js";
 import { ReaderEdition } from "./ReaderEdition.js";
-import { corners, editions, makeBrandTheme, rhythms, typefaces, typeFamilies, type BrandTheme, type Corners } from "@alien6-studio/elea-tokens/brand";
-import { brandRoute, readBrandTheme, validBrand } from "./brandTheme.js";
+import { corners, makeBrandTheme, rhythms, typefaces, type Corners } from "@alien6-studio/elea-tokens/brand";
+import { colorThemes } from "@alien6-studio/elea-tokens/palette";
+import { brandRoute, featuredColourThemes, readBrandTheme, studioTheme, studioThemeName, validBrand, type BrandTheme, type StudioThemeId } from "./brandTheme.js";
 import "./studio.css";
 
 const notebook = createDocument(notebookBlocks);
 
-function studioBrand(): BrandTheme {
-  return readBrandTheme() ?? editions.Precision;
+function themeOption(id: StudioThemeId) {
+  const { name, colours } = colorThemes[id];
+  return {
+    value: id, label: <span className="studio-colour-option">
+      <span className="studio-colour-option__swatches" aria-hidden="true">
+        {[colours.primary, colours.secondary, colours.tertiary].map((colour, index) =>
+          <span key={index} style={{ backgroundColor: colour }} />)}
+      </span>
+      {name}
+    </span>,
+  };
 }
 
-export function ThemeStudioPage({ replaceRoute }: { replaceRoute: (route: string) => void }) {
-  const [brand, setBrand] = useState(studioBrand);
+export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChange: (next: BrandTheme) => void }) {
   const [mobileView, setMobileView] = useState<"preview" | "settings">("preview");
   // What is being typed for the free values; the theme takes them once the generator accepts them.
   const [draft, setDraft] = useState(() => ({ radius: brand.radius ?? "", font: brand.font ?? "" }));
   useEffect(() => {
     const followLocation = () => {
-      const next = studioBrand();
-      setBrand(next);
-      setDraft({ radius: next.radius ?? "", font: next.font ?? "" });
+      const next = readBrandTheme();
+      setDraft({ radius: next?.radius ?? "", font: next?.font ?? "" });
     };
     window.addEventListener("hashchange", followLocation);
     return () => window.removeEventListener("hashchange", followLocation);
   }, []);
-  const { seed, corner, typeface, rhythm, accent } = brand;
-  const { css, colours } = makeBrandTheme(brand);
-  const defaultAccent = brand.edition ? editions[brand.edition].accent : undefined;
-  const displayedAccent = accent ?? defaultAccent;
-  const currentPreset = brandRoute("theme", { ...brand, accent: displayedAccent });
+  const { corner, typeface, rhythm } = brand;
+  const { css } = makeBrandTheme(brand);
+  const selectedProfile = brand.profile && brandRoute("theme", brand) === brandRoute("theme", studioTheme(brand.profile))
+    ? brand.profile : null;
 
-  function changeBrand(next: typeof brand) {
-    setBrand(next);
-    replaceRoute(brandRoute("theme", next));
-  }
-  function changeEdition(next: BrandTheme) {
+  function changeTheme(next: BrandTheme) {
     setDraft({ radius: next.radius ?? "", font: next.font ?? "" });
-    changeBrand(next);
+    onChange(next);
   }
   function changeCorners(corner: Corners) {
     const { radius: _removed, ...rest } = brand;
     setDraft({ ...draft, radius: "" });
-    changeBrand({ ...rest, corner });
+    onChange({ ...rest, corner });
   }
   function changeFree(key: "radius" | "font", value: string) {
     setDraft({ ...draft, [key]: value });
     const { [key]: _previous, ...rest } = brand;
     const next = validBrand(value.trim() ? { ...rest, [key]: value.trim() } : rest);
-    if (next) changeBrand(next);
+    if (next) onChange(next);
   }
   const refused = (key: "radius" | "font") => draft[key].trim() !== (brand[key] ?? "");
   return (
-    <div className="theme-studio">
+    <div className="theme-studio" data-elea-theme="brand">
       <style>{css}</style>
       <header className="studio-intro">
         <div>
           <h1 className="site-page-title">Theme studio</h1>
-          <p>Choose an edition, then tune its colour, type and spacing. Try it on components or in the editorial workspace.</p>
+          <p>Choose a theme, then adjust its colours, type, spacing and corners.</p>
         </div>
-        <Button href={brandRoute("ui", brand)} trailingIcon="→">Open themed gallery</Button>
+        <div className="studio-page-actions">
+          <Button href={brandRoute("ui", brand)} trailingIcon="→">Open themed gallery</Button>
+        </div>
       </header>
-      <div className="studio-presets" role="group" aria-label="Theme presets">
-        {Object.entries(editions).map(([name, edition]) => {
-          const active = currentPreset === brandRoute("theme", edition);
-          return (
-            <Button key={name} variant="outline" aria-label={name} aria-pressed={active} aria-describedby={`edition-${name}`} onClick={() => changeEdition(edition)}>
-              <span className="studio-preset__mark" aria-hidden="true" style={{ backgroundColor: edition.seed }} />
-              <span className="studio-preset__text">
-                <span style={{ fontFamily: typeFamilies[edition.typeface] }}>{name}</span>
-                <small id={`edition-${name}`}>{edition.typeface} · {edition.rhythm} spacing</small>
-              </span>
-            </Button>
-          );
-        })}
+      <div className="studio-colour-theme">
+        <Field label={<span id="studio-colour-theme-label">Theme</span>} id="studio-colour-theme">
+          {({ id }) => <Select id={id} labelledBy="studio-colour-theme-label"
+            value={selectedProfile} placeholder={brand.profile ? studioThemeName(brand) + " (customised)" : "Custom theme"}
+            options={featuredColourThemes.map(themeOption)}
+            onChange={value => changeTheme(studioTheme(value as StudioThemeId))} />}
+        </Field>
+        <Button href={brandRoute("colours", brand)} variant="ghost">Edit colours</Button>
       </div>
       <div className="studio-view-switch" role="group" aria-label="Studio view">
         <Button size="sm" variant="ghost" aria-controls="studio-canvas" aria-pressed={mobileView === "preview"} onClick={() => setMobileView("preview")}>Preview</Button>
@@ -86,27 +86,18 @@ export function ThemeStudioPage({ replaceRoute }: { replaceRoute: (route: string
         <div id="studio-controls" className="studio-controls">
           <SiteTypefaceField />
           <h2>Brand settings</h2>
-          <Field label="Brand colour">{({ id }) => <div className="studio-colour">
-            <input id={id} type="color" value={seed} onChange={(event) => changeBrand({ ...brand, seed: event.currentTarget.value })} /><code>{seed.toUpperCase()}</code>
-          </div>}</Field>
-          <div className="studio-ramp" aria-hidden="true">{colours.map((color, index) => <i key={index} style={{ background: color }} />)}</div>
           <div className="studio-reading">
             <div><span className="elea-field__label" id="studio-typeface">Reading typeface</span>
               <Select labelledBy="studio-typeface" value={typeface} options={typefaces.map((value) => ({ value, label: value }))}
-                onChange={(value) => changeBrand({ ...brand, typeface: value as typeof typeface })} />
+                onChange={(value) => onChange({ ...brand, typeface: value as typeof typeface })} />
             </div>
             <div><span className="elea-field__label" id="studio-rhythm">Reading density</span>
               <Select labelledBy="studio-rhythm" value={rhythm} options={rhythms.map((value) => ({ value, label: value }))}
-                onChange={(value) => changeBrand({ ...brand, rhythm: value as typeof rhythm })} />
+                onChange={(value) => onChange({ ...brand, rhythm: value as typeof rhythm })} />
             </div>
           </div>
           <RadioGroup label="Corners" name="corners" value={corner} onChange={(value) => changeCorners(value as Corners)} options={corners.map((value) => ({ value, label: value }))} />
           <h2>Your product’s identity</h2>
-          <Field label="Second colour" help="Fills secondary buttons.">{({ id, ...described }) => <div className="studio-colour">
-            <input id={id} {...described} type="color" value={displayedAccent ?? "#82591c"} onChange={(event) => changeBrand({ ...brand, accent: event.currentTarget.value })} />
-            <code>{displayedAccent?.toUpperCase() ?? "Elea default"}</code>
-            {accent && accent !== defaultAccent && <Button size="xs" variant="ghost" onClick={() => { const { accent: _removed, ...rest } = brand; changeBrand(rest); }}>Remove</Button>}
-          </div>}</Field>
           <Field label="Corner radius" help="In rem or px; replaces the corner steps." error={refused("radius") ? "Use a length such as 10px or 0.625rem." : undefined}>
             {(control) => <Input {...control} placeholder="0.625rem" value={draft.radius} invalid={refused("radius")} onChange={(event) => changeFree("radius", event.currentTarget.value)} />}
           </Field>
@@ -115,7 +106,7 @@ export function ThemeStudioPage({ replaceRoute }: { replaceRoute: (route: string
           </Field>
         </div>
         <div id="studio-canvas" className="studio-canvas">
-          <section data-elea-theme="brand" aria-labelledby="studio-preview-title">
+          <section aria-labelledby="studio-preview-title">
             <h2 className="site__visually-hidden" id="studio-preview-title">Publication preview</h2>
             <ReaderEdition document={notebook} title={notebookTitle} summary={notebookSummary} audience="Members" messages={en} />
           </section>

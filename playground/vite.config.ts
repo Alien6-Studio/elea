@@ -2,7 +2,11 @@ import react from "@vitejs/plugin-react";
 import { readFileSync } from "node:fs";
 import { defineConfig, type PreviewServer, type ViteDevServer } from "vite";
 
-function serveSitePreferences(server: ViteDevServer | PreviewServer) {
+function serveSiteAssets(server: ViteDevServer | PreviewServer) {
+  server.middlewares.use("/elea/colours", (_request, response) => {
+    response.setHeader("Content-Type", "text/html; charset=utf-8");
+    response.end(readFileSync(new URL("../docs/colours/index.html", import.meta.url)));
+  });
   server.middlewares.use("/elea/assets/site-theme.js", (_request, response) => {
     response.setHeader("Content-Type", "text/javascript; charset=utf-8");
     response.end(readFileSync(new URL("../docs/assets/site-theme.js", import.meta.url)));
@@ -20,9 +24,9 @@ export default defineConfig({
   plugins: [
     react(),
     {
-      name: "site-preferences",
-      configureServer: serveSitePreferences,
-      configurePreviewServer: serveSitePreferences,
+      name: "site-assets",
+      configureServer: serveSiteAssets,
+      configurePreviewServer: serveSiteAssets,
     },
   ],
 });

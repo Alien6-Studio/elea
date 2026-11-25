@@ -1,8 +1,16 @@
-import { IconButton } from "@alien6-studio/elea-ui";
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { Button, Carousel } from "@alien6-studio/elea-ui";
+import { useState, type KeyboardEvent } from "react";
 import glyphData from "../data/specimen-glyphs.json" with { type: "json" };
 
-const letters = Object.keys(glyphData) as (keyof typeof glyphData)[];
+type Glyph = keyof typeof glyphData;
+const characters = Object.keys(glyphData) as Glyph[];
+const sets = {
+  Letters: characters.filter(char => /\p{L}/u.test(char)),
+  Figures: characters.filter(char => /\p{N}/u.test(char)),
+  Symbols: characters.filter(char => /[\p{P}\p{S}]/u.test(char)),
+};
+type GlyphSet = keyof typeof sets;
+const setNames = Object.keys(sets) as GlyphSet[];
 const xHeight = 510;
 const capHeight = 695;
 
@@ -17,7 +25,8 @@ const viewBox = `${labelX - 12} ${-upper} ${edge - labelX + 28} ${upper + measur
 function GlyphDiagram({ letter }: { letter: keyof typeof glyphData }) {
   const { d, advance, bounds, curve } = glyphData[letter];
   const [left, bottom, right, top] = bounds as [number, number, number, number];
-  const uppercase = letter === letter.toUpperCase();
+  const uppercase = /\p{Lu}/u.test(letter);
+  const kind = uppercase ? "uppercase" : /\p{Ll}/u.test(letter) ? "lowercase" : /\p{N}/u.test(letter) ? "figure" : "symbol";
   // Optical overshoot is part of a round letter, not a descender.
   const descends = bottom < -50;
   const guides = [
@@ -25,7 +34,7 @@ function GlyphDiagram({ letter }: { letter: keyof typeof glyphData }) {
     { y: 0, label: "Baseline" },
   ];
   if (uppercase) guides.unshift({ y: -capHeight, label: "Cap height" });
-  if (descends) {
+  if (descends && (kind === "lowercase" || uppercase)) {
     const label = letter.toLowerCase() === "ç" ? "Cedilla" : letter === "Q" ? "Tail" : "Descender";
     guides.push({ y: -bottom, label });
   }
@@ -33,8 +42,8 @@ function GlyphDiagram({ letter }: { letter: keyof typeof glyphData }) {
   return (
     <svg id="glyph-diagram" viewBox={viewBox}
       role="img" aria-labelledby="glyph-title" aria-describedby="glyph-description">
-      <title id="glyph-title">{`Construction of ${uppercase ? "uppercase" : "lowercase"} ${letter}`}</title>
-      <desc id="glyph-description">Horizontal guides show where the letter sits relative to the baseline. The vertical guides mark an advance of {advance} font units.</desc>
+      <title id="glyph-title">{`Construction of ${kind} ${letter}`}</title>
+      <desc id="glyph-description">Horizontal guides locate the glyph against the baseline. The vertical guides mark an advance of {advance} font units.</desc>
       <defs>
         <path id="regular-glyph" vectorEffect="non-scaling-stroke" d={d}/>
         <clipPath id="ink-half"><rect x={left} y={bottom} width={(right - left) / 2} height={top - bottom}/></clipPath>
@@ -65,55 +74,31 @@ function GlyphDiagram({ letter }: { letter: keyof typeof glyphData }) {
 }
 
 export function GlyphCarousel() {
-  const [index, setIndex] = useState(0);
-  const [interactive, setInteractive] = useState(false);
-  const swipe = useRef<{ id: number; x: number; y: number } | null>(null);
-  useEffect(() => setInteractive(true), []);
-  const letter = letters[index]!;
-  const step = (delta: number) => setIndex(i => (i + delta + letters.length) % letters.length);
-
-  function startSwipe(event: PointerEvent) {
-    swipe.current = event.pointerType === "touch" && event.isPrimary
-      ? { id: event.pointerId, x: event.clientX, y: event.clientY }
-      : null;
-  }
-
-  function endSwipe(event: PointerEvent) {
-    const start = swipe.current;
-    swipe.current = null;
-    if (!start || event.pointerId !== start.id) return;
-    const dx = event.clientX - start.x;
-    if (Math.abs(dx) >= 45 && Math.abs(dx) > 1.5 * Math.abs(event.clientY - start.y)) step(dx < 0 ? 1 : -1);
-  }
-
-  function navigate(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.ctrlKey || event.altKey || event.metaKey || event.nativeEvent.isComposing) return;
-    switch (event.key) {
-      case "ArrowLeft": step(-1); break;
-      case "ArrowRight": step(1); break;
-      case "Home": setIndex(0); break;
-      case "End": setIndex(letters.length - 1); break;
-      default: {
-        if (!Object.hasOwn(glyphData, event.key)) return;
-        setIndex(letters.indexOf(event.key as keyof typeof glyphData));
-      }
-    }
+  const [letter, setLetter] = useState<Glyph>("a");
+  const activeSet = setNames.find(name => sets[name].includes(letter))!;
+  const entries = sets[activeSet];
+  const index = entries.indexOf(letter);
+  const noun = { Letters: "letter", Figures: "figure", Symbols: "symbol" }[activeSet];
+  function jumpToGlyph(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.defaultPrevented || event.ctrlKey || event.altKey || event.metaKey || event.nativeEvent.isComposing) return;
+    if (!Object.hasOwn(glyphData, event.key)) return;
     event.preventDefault();
+    setLetter(event.key as Glyph);
   }
 
   return (
-    <section className="type-plate" aria-labelledby="anatomy">
-      <div className="type-plate__header">
-        <h2 id="anatomy" aria-live="polite" aria-atomic="true">Anatomy of {letter}</h2>
-        {interactive && <div className="type-plate__controls" role="group" aria-label="Letter navigation" onKeyDown={navigate}>
-          <IconButton label="Previous letter" aria-controls="glyph-diagram" onClick={() => step(-1)}>←</IconButton>
-          <span aria-hidden="true">{index + 1} / {letters.length}</span>
-          <IconButton label="Next letter" aria-controls="glyph-diagram" onClick={() => step(1)}>→</IconButton>
+    <div className="type-plate" onKeyDown={jumpToGlyph}>
+      <Carousel label="Glyph anatomy" controlsLabel="Glyph navigation" roleDescription="carousel"
+        previousLabel={`Previous ${noun}`} nextLabel={`Next ${noun}`}
+        items={entries} itemKey={char => char} renderItem={char => <GlyphDiagram letter={char} />}
+        index={index} onIndexChange={next => setLetter(entries[next]!)} loop
+        itemsPerView={1} gap="none" navigation="arrows" controlsPosition="top" controlsAlign="end" showCounter
+        heading={<h2 id="anatomy" aria-live="polite" aria-atomic="true">Anatomy of {letter}</h2>}
+        toolbar={<div className="type-plate__sets" role="group" aria-label="Glyph set">
+          {setNames.map(name => <Button key={name} variant="ghost" size="sm" aria-pressed={activeSet === name}
+            aria-controls="glyph-diagram" onClick={() => setLetter(sets[name][0]!)}>{name}</Button>)}
         </div>}
-      </div>
-      <div className="type-plate__drawing" onPointerDown={startSwipe} onPointerUp={endSwipe} onPointerCancel={() => { swipe.current = null; }}>
-        <GlyphDiagram letter={letter}/>
-      </div>
-    </section>
+      />
+    </div>
   );
 }

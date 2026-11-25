@@ -9,7 +9,14 @@ description: A type specimen of ELEA Sans, with its roman and italic cuts, small
     <p class="type-alphabet">ABCDEFGHIJKLM<wbr>NOPQRSTUVWXYZ</p>
     <p class="type-alphabet">abcdefghijklm<wbr>nopqrstuvwxyz</p>
     <p>ÀÉÈÊË ÎÏ Ç Œ œ æ</p>
-    <p>0123456789</p>
+    <figure>
+      <figcaption>Figures</figcaption>
+      <p class="type-display">0123456789</p>
+    </figure>
+    <figure>
+      <figcaption>Punctuation and symbols</figcaption>
+      <p class="type-display">. , : ; ! ? … · – — - _<br>« » ‘ ’ “ ” &quot; &apos; ` ´ ¨<br>( ) [ ] { } &lt; &gt; / \ |<br>+ = * ^ ~ ° % € $ # @ &amp;</p>
+    </figure>
     <figure>
       <figcaption>Small capitals</figcaption>
       <p class="type-small-caps">Épreuve de caractère</p>

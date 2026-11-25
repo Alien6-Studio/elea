@@ -92,6 +92,8 @@ test("the construction plate shows each Latin letter and its own advance", async
   const previous = main.getByRole("button", { name: "Previous letter", exact: true });
   const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     + "ÀÁÂÃÄÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝàáâãäæçèéêëìíîïñòóôõöùúûüýÿŒœŸ";
+  const position = main.getByRole("region", { name: "Glyph anatomy" }).getByRole("status");
+  await expect(position).toHaveText("1 / " + letters.length);
   const outlines = new Set<string>();
   const guides = main.locator('.type-plate__guide line:is([y1="-510"][y2="-510"], [y1="0"][y2="0"])');
   const guidePositions = () => guides.evaluateAll(lines => lines.map(line => {
@@ -136,6 +138,38 @@ test("the construction plate shows each Latin letter and its own advance", async
   await expect(main.getByRole("img", { name: "Construction of lowercase a", exact: true })).toBeVisible();
   await previous.click();
   await expect(main.getByRole("img", { name: "Construction of uppercase Ÿ", exact: true })).toBeVisible();
+  await expect(position).toHaveText(letters.length + " / " + letters.length);
+});
+
+test("figures and symbols use the font's outlines, advances and fixed guides", async ({ page }) => {
+  await page.goto("/elea/typography/");
+  const main = page.getByRole("main");
+  await main.getByRole("button", { name: "Figures", exact: true }).click();
+  const plate = main.locator("#glyph-diagram");
+  const viewBox = await plate.getAttribute("viewBox");
+  const outlines = new Set<string>();
+  for (const [set, character] of [["figure", "0"], ["figure", "9"], ["symbol", "@"], ["symbol", "€"]] as const) {
+    const navigation = main.getByRole("group", { name: "Glyph navigation" });
+    await navigation.getByRole("button").last().dispatchEvent("keydown", { key: character });
+    await expect(plate).toHaveAccessibleName(`Construction of ${set} ${character}`);
+    await expect(plate).toHaveAttribute("viewBox", viewBox!);
+    const advance = await page.evaluate(async c => {
+      const font = '400 1000px "ELEA Sans"';
+      await document.fonts.load(font, c);
+      const ctx = document.createElement("canvas").getContext("2d")!;
+      ctx.font = font;
+      return Math.round(ctx.measureText(c).width);
+    }, character);
+    await expect(plate.getByText(`${advance} units`, { exact: true })).toBeVisible();
+    const path = await plate.locator("#regular-glyph").getAttribute("d");
+    expect(path).toMatch(/^M/);
+    outlines.add(path!);
+  }
+  expect(outlines.size).toBe(4);
+  await main.getByRole("button", { name: "Symbols", exact: true }).click();
+  await expect(plate).toHaveAccessibleName("Construction of symbol !");
+  await main.getByRole("button", { name: "Previous symbol" }).click();
+  await expect(plate).toHaveAccessibleName("Construction of symbol €");
 });
 
 test("letter navigation responds to keys only while its controls have focus", async ({ page }) => {
@@ -162,6 +196,28 @@ test("letter navigation responds to keys only while its controls have focus", as
   await expect(heading).toHaveText("Anatomy of a");
 });
 
+test.describe("typography on a touch screen", () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test("swiping the construction plate turns one letter", async ({ page }) => {
+    await page.goto("/elea/typography/");
+    const plate = page.getByRole("img", { name: "Construction of lowercase a", exact: true });
+    await expect(page.getByRole("button", { name: "Next letter" })).toBeVisible();
+    await plate.scrollIntoViewIfNeeded();
+    const box = (await plate.boundingBox())!;
+    const y = Math.round(box.y + box.height / 2);
+    const touch = await page.context().newCDPSession(page);
+    for (const [index, fraction] of [0.75, 0.5, 0.25].entries()) {
+      await touch.send("Input.dispatchTouchEvent", {
+        type: index === 0 ? "touchStart" : "touchMove",
+        touchPoints: [{ x: Math.round(box.x + box.width * fraction), y }],
+      });
+    }
+    await touch.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await expect(page.getByRole("img", { name: "Construction of lowercase b", exact: true })).toBeVisible();
+  });
+});
+
 test("the header and footer wordmarks follow the site typeface", async ({ page }) => {
   for (const route of ["/elea/getting-started/", "/elea/playground/#/ui"]) {
     await page.goto(route);
@@ -179,7 +235,7 @@ test("the header and footer wordmarks follow the site typeface", async ({ page }
   }
 });
 
-for (const width of [1440, 320]) {
+for (const width of [1440, 850, 320]) {
   test(`the guides and tools share a navigation grid at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/elea/getting-started/");
@@ -192,6 +248,7 @@ for (const width of [1440, 320]) {
       links.map((link) => ({ label: link.textContent, href: link.getAttribute("href") })),
     );
     const destinations = await primaryDestinations();
+    expect(await main.evaluate(nav => nav.scrollWidth - nav.clientWidth)).toBe(0);
 
     await expect(docs).toHaveAttribute("aria-current", "true");
     await expect(firstGuide).toHaveAttribute("aria-current", "page");
@@ -246,8 +303,9 @@ for (const width of [1440, 320]) {
         { label: "Docs", heading: "Getting started", url: /\/getting-started\/$/ },
         { label: "Components", heading: "Components", url: /#\/ui$/ },
         { label: "Typography", heading: "Typography", url: /\/elea\/typography\/$/ },
-        { label: "Theme studio", heading: "Theme studio", url: /#\/theme$/ },
-        { label: "Editorial workspace", heading: "Editorial workspace", url: /#\/playground$/ },
+        { label: "Colours", heading: "Colours", url: /#\/colours$/ },
+        { label: "Theme studio", heading: "Theme studio", url: /#\/theme\?scheme=reserve$/ },
+        { label: "Editorial workspace", heading: "Editorial workspace", url: /#\/playground\?scheme=reserve$/ },
       ] as const;
       const labels = destinations.map(destination => destination.label);
       for (const destination of destinations) {
@@ -266,7 +324,7 @@ for (const width of [1440, 320]) {
       }
 
       await page.goBack();
-      await expect(page).toHaveURL(/#\/theme$/);
+      await expect(page).toHaveURL(/#\/theme\?scheme=reserve$/);
       await expect(main.getByRole("heading", { name: "Theme studio", exact: true, level: 1 })).toBeVisible();
       await expect(nav.locator("a[aria-current]")).toHaveText(["Theme studio"]);
       await page.getByRole("contentinfo").getByRole("link", { name: "Elea", exact: true }).press("Enter");

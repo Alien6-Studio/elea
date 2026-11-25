@@ -40,8 +40,8 @@ test("a host opts in a single region without changing its identity or neighborin
   });
   await page.addStyleTag({ content: `
     .client-app {
-      --elea-color-primary-600: #365235;
-      --elea-color-primary-700: #273c26;
+      --elea-color-action-primary: #365235;
+      --elea-color-action-primary-hover: #273c26;
       --elea-font-family-sans: Georgia, serif;
       font: 15px Georgia, serif;
     }

@@ -1,17 +1,121 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { textContrast } from "./contrast.js";
 
 const studioPath = "/elea/playground/#/theme";
 
+const coloursPath = "/elea/playground/#/colours";
+
+function cssRgb(hex: string) {
+  const channels = hex.slice(1).match(/../g)!.map(pair => Number.parseInt(pair, 16));
+  return `rgb(${channels.join(", ")})`;
+}
+
+async function expectButtonFills(gallery: Locator, seed: string, accent: string) {
+  for (const [name, hex] of [["Primary", seed], ["Secondary", accent]] as const) {
+    const button = gallery.getByRole("button", { name, exact: true });
+    await expect(button).toHaveCSS(`--elea-color-${name.toLowerCase()}-500`, hex);
+    await expect(button).toHaveCSS("background-color", cssRgb(hex));
+    expect(await textContrast(button.locator(".elea-button__label"))).toBeGreaterThanOrEqual(4.5);
+  }
+}
+
+async function selectColourRole(page: Page, name: string) {
+  await page.getByRole("combobox", { name: "Colour role" }).click();
+  await page.getByRole("option", { name, exact: true }).click();
+}
+
+async function setThemeColours(page: Page, colours: { primary?: string; secondary?: string }) {
+  await page.getByRole("link", { name: "Edit colours", exact: true }).click();
+  if (colours.primary) await page.getByLabel("Primary colour", { exact: true }).fill(colours.primary);
+  if (colours.secondary) {
+    await selectColourRole(page, "Secondary");
+    await page.getByLabel("Secondary colour", { exact: true }).fill(colours.secondary);
+  }
+  await page.getByRole("link", { name: "Open theme studio", exact: true }).click();
+}
+
+test("primary and secondary colours travel independently with the edition", async ({ page }) => {
+  await page.goto(studioPath + "?edition=editorial");
+  await expect(page.getByRole("grid", { name: "Reference colours" })).toHaveCount(0);
+  await expect(page.getByRole("combobox", { name: "Colour role" })).toHaveCount(0);
+  await setThemeColours(page, { primary: "#873b76", secondary: "#625078" });
+  await expect(page.getByRole("combobox", { name: "Reading typeface" })).toHaveText("Serif");
+  await expect(page.getByRole("radio", { name: "Square" })).toBeChecked();
+  const preview = page.getByRole("region", { name: "Publication preview" });
+  await expect(preview).toHaveCSS("--elea-color-primary-500", "#873b76");
+  await expect(preview).toHaveCSS("--elea-color-secondary-500", "#625078");
+  const css = decodeURIComponent((await page.getByRole("link", { name: "Download CSS" }).getAttribute("href"))!);
+  expect(css).toContain("--elea-color-primary-500: #873b76");
+  expect(css).toContain("--elea-color-secondary-500: #625078");
+  await page.reload();
+  await page.getByRole("link", { name: "Open themed gallery" }).click();
+  await page.getByRole("link", { name: "Button", exact: true }).click();
+  await expectButtonFills(page.locator(".catalog-demos"), "#873b76", "#625078");
+  await page.getByRole("link", { name: "ColorPicker", exact: true }).click();
+  await expect(page.getByLabel("Ink colour", { exact: true })).toHaveValue("#873b76");
+  await page.getByRole("link", { name: "Edit theme", exact: true }).click();
+  await page.getByRole("link", { name: "Edit colours", exact: true }).click();
+  await selectColourRole(page, "Secondary");
+  await expect(page.getByLabel("Secondary colour", { exact: true })).toHaveValue("#625078");
+  await page.getByRole("button", { name: "Reset colours", exact: true }).click();
+  await expect(page).toHaveURL(/#\/colours\?edition=editorial$/);
+});
+
+test("a custom hex can be corrected and inspected on the mobile colours page", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto(coloursPath + "?edition=precision");
+  const url = page.url();
+  const hex = page.getByRole("textbox", { name: "Primary hex", exact: true });
+  await hex.fill("02Z");
+  await hex.press("Enter");
+  await expect(hex).toHaveAttribute("aria-invalid", "true");
+  await expect(page).toHaveURL(url);
+  await hex.press("Escape");
+  await expect(hex).toHaveValue(/^#08745e$/i);
+  await hex.fill("FAF2C3");
+  await hex.press("Enter");
+  await expect(page.getByLabel("Primary colour", { exact: true })).toHaveValue("#faf2c3");
+  await selectColourRole(page, "Secondary");
+  const secondary = page.getByRole("textbox", { name: "Secondary hex", exact: true });
+  await secondary.fill("152447");
+  await secondary.press("Enter");
+  await selectColourRole(page, "Primary");
+  await page.getByText("Primary scale", { exact: true }).click();
+  await expect(page.getByRole("list", { name: "Primary scale" }).getByRole("listitem").filter({ hasText: "#FAF2C3" })).toContainText("500");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.getByRole("link", { name: "Try buttons" }).click();
+  await expectButtonFills(page.locator(".catalog-demos"), "#faf2c3", "#152447");
+});
+
+test("an accentless shared theme inherits its host colour until a second colour is chosen", async ({ page }) => {
+  await page.goto(studioPath + "?brand=19634e&corners=Soft");
+  await page.getByRole("link", { name: "Edit colours", exact: true }).click();
+  await selectColourRole(page, "Secondary");
+  const swatch = page.getByLabel("Secondary colour", { exact: true });
+  await page.evaluate(() => document.documentElement.style.setProperty("--elea-color-secondary-500", "rgb(12 34 56)"));
+  await expect(swatch).toHaveValue("#0c2238");
+  await expect(page.getByText("The secondary scale is inherited from the surrounding theme.")).toBeVisible();
+  const role = page.getByRole("region", { name: "Colour roles" }).locator(".atlas-role--secondary");
+  await expect(role).toHaveCSS("background-color", "rgb(12, 34, 56)");
+  const css = decodeURIComponent((await page.getByRole("link", { name: "Download CSS" }).getAttribute("href"))!);
+  expect(css).not.toContain("--elea-color-secondary-500:");
+  await swatch.fill("#516780");
+  await expect(page.getByText("Secondary scale", { exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/accent=516780/);
+  await page.getByRole("button", { name: "Reset secondary", exact: true }).click();
+  await expect(swatch).toHaveValue("#0c2238");
+  await expect(page).not.toHaveURL(/accent=/);
+});
+
 test("Typography shows ELEA Sans and preserves the Studio typeface preference", async ({ page }) => {
-  await page.goto(studioPath);
+  await page.goto(studioPath + "?edition=editorial");
   const siteTypeface = page.getByRole("combobox", { name: "Site typeface", exact: true });
   const readingTypeface = page.getByRole("combobox", { name: "Reading typeface", exact: true });
   const root = page.locator("html");
   const mainNav = page.getByRole("navigation", { name: "Main", exact: true });
   await expect(siteTypeface).toHaveText("ELEA Sans");
-  await page.getByRole("button", { name: "Editorial", exact: true }).click();
   const editionUrl = page.url();
   const download = page.getByRole("link", { name: "Download CSS" });
   const editionCss = await download.getAttribute("href");
@@ -98,13 +202,12 @@ const editions = [
 ] as const;
 
 for (const colorScheme of ["light", "dark"] as const) {
-  test(`the three built-in themes match across Studio, Playground and Gallery in ${colorScheme}`, async ({ page }) => {
+  test(`shared edition URLs match across Studio, Playground and Gallery in ${colorScheme}`, async ({ page }) => {
     await page.emulateMedia({ colorScheme });
     for (const { name, seed, accent, surfaces, radius } of editions) {
       const background = surfaces[colorScheme === "light" ? 0 : 1];
-      await page.goto(studioPath);
-      await expect(page.locator("html")).toHaveAttribute("data-elea-theme", "precision");
-      await page.getByRole("button", { name, exact: true }).click();
+      await page.goto(studioPath + "?edition=" + name.toLowerCase());
+      await expect(page.locator("html")).toHaveCSS("--elea-color-primary-500", "#2926bf");
       const studioReader = page.getByRole("region", { name: "Publication preview" }).getByRole("article");
       await expect(studioReader).toHaveCSS("background-color", background);
       expect(await textContrast(studioReader.locator(".elea-paragraph").first())).toBeGreaterThanOrEqual(4.5);
@@ -112,7 +215,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 
       await page.getByRole("link", { name: "Open themed workspace" }).click();
       await expect(page.getByTestId("editor-pane")).toBeVisible();
-      await expect(page.getByTestId("preview-toggle")).toHaveCSS("--elea-color-primary-600", seed);
+      await expect(page.getByTestId("preview-toggle")).toHaveCSS("--elea-color-primary-500", seed);
       expect(parseFloat((await appearance(page.getByTestId("preview-toggle"))).radius)).toBeCloseTo(radius, 2);
       const reader = page.getByTestId("viewer-pane").getByRole("article");
       await expect(reader).toHaveCSS("background-color", background);
@@ -123,10 +226,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       const gallery = page.locator(".catalog");
       const primary = gallery.getByRole("button", { name: "Primary", exact: true });
       const secondary = gallery.getByRole("button", { name: "Secondary", exact: true });
-      await expect(primary).toHaveCSS("--elea-color-primary-600", seed);
-      await expect(secondary).toHaveCSS("--elea-color-secondary-700", accent);
-      expect(await textContrast(primary)).toBeGreaterThanOrEqual(4.5);
-      expect(await textContrast(secondary)).toBeGreaterThanOrEqual(4.5);
+      await expectButtonFills(gallery, seed, accent);
       await primary.press("Tab");
       await expect(secondary).toBeFocused();
       await expect(secondary).toHaveCSS("outline-width", "2px");
@@ -136,7 +236,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       await expect(dialog.locator("..")).toHaveAttribute("data-elea-theme", "brand");
       await expect(dialog).toHaveCSS("background-color", background);
       const action = dialog.getByRole("button", { name: "Share", exact: true });
-      await expect(action).toHaveCSS("--elea-color-primary-600", seed);
+      await expect(action).toHaveCSS("--elea-color-primary-500", seed);
       expect(parseFloat((await appearance(action)).radius)).toBeCloseTo(radius, 2);
       expect(await textContrast(action.locator(".elea-button__label"))).toBeGreaterThanOrEqual(4.5);
       await page.keyboard.press("Escape");
@@ -159,14 +259,15 @@ for (const colorScheme of ["light", "dark"] as const) {
       for (const tone of ["Success", "Info", "Warning", "Danger"]) {
         const button = gallery.getByRole("button", { name: tone, exact: true });
         await expect(button.locator(".elea-button__icon svg")).toBeVisible();
-        buttonFills.add((await appearance(button)).background);
+        const restingFill = (await appearance(button)).background;
+        buttonFills.add(restingFill);
         expect(await textContrast(button), tone).toBeGreaterThanOrEqual(4.5);
         await button.click();
         const toast = notifications.locator(`.elea-toast--${tone.toLowerCase()}`);
         await expect(toast).toHaveCSS("border-width", "0px");
         const icon = toast.locator(".elea-toast__icon");
         await expect(icon.locator("svg")).toBeVisible();
-        await expect(icon).toHaveCSS("color", (await appearance(button)).background);
+        await expect(icon).toHaveCSS("color", restingFill);
         surfacesByTone.add((await appearance(toast)).background);
         for (const text of await toast.locator(".elea-toast__title, .elea-toast__description").all()) {
           expect(await textContrast(text), tone).toBeGreaterThanOrEqual(4.5);
@@ -213,24 +314,16 @@ test("one theme token supplies the warning colour to actions, badges, alerts and
 for (const colorScheme of ["light", "dark"] as const) {
   test(`brand settings are scoped and the exported CSS reproduces the ${colorScheme} preview`, async ({ page }) => {
     await page.emulateMedia({ colorScheme });
-    await page.goto(studioPath);
+    await page.goto(studioPath + "?edition=obsidian");
     await expect(page.getByRole("heading", { level: 1, name: "Theme studio" })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
     await page.addStyleTag({ content: "* { transition: none !important; }" });
 
     const preview = page.getByRole("region", { name: "Publication preview" });
     const article = preview.getByRole("article");
-    const presets = page.getByRole("group", { name: "Theme presets" });
     const marker = page.getByRole("button", { name: /Switch to the .* theme/ });
     const outside = await appearance(marker);
-    await expect(presets.getByRole("button", { name: "Precision" })).toHaveAttribute("aria-pressed", "true");
-    const picker = page.getByLabel("Brand colour", { exact: true });
-    for (const [name, colour] of [["Editorial", "#2945c7"], ["Obsidian", "#a15f3e"]] as const) {
-      const preset = presets.getByRole("button", { name, exact: true });
-      await preset.click();
-      await expect(preset).toHaveAttribute("aria-pressed", "true");
-      await expect(picker).toHaveValue(colour);
-    }
+    await expect(preview).toHaveCSS("--elea-color-primary-500", "#a15f3e");
     const reading = article.locator(".elea-paragraph").first();
     await expect(reading).toHaveCSS("font-size", "16px");
     await expect(reading).toHaveCSS("font-family", /^"ELEA Sans"/);
@@ -241,9 +334,8 @@ for (const colorScheme of ["light", "dark"] as const) {
     await expect(reading).toHaveCSS("font-size", "20px");
     await expect(reading).toHaveCSS("line-height", "36px");
     const typography = await readingStyle(reading);
-    await picker.fill("#757575");
+    await setThemeColours(page, { primary: "#757575" });
     await page.getByRole("textbox", { name: "Interface font" }).fill("Georgia, serif");
-    await expect(presets.getByRole("button", { pressed: true })).toHaveCount(0);
     expect(await textContrast(reading)).toBeGreaterThanOrEqual(4.5);
     expect(await textContrast(preview.locator(".elea-badge"))).toBeGreaterThanOrEqual(4.5);
 
@@ -310,13 +402,11 @@ for (const colorScheme of ["light", "dark"] as const) {
 for (const colorScheme of ["light", "dark"] as const) {
   test(`a customized ${colorScheme} theme follows all component guides, reloads and the return to Studio`, async ({ page }) => {
     await page.emulateMedia({ colorScheme });
-    await page.goto(studioPath);
+    await page.goto(studioPath + "?edition=editorial");
     const header = page.getByRole("navigation", { name: "Main", exact: true });
     const themeSwitch = page.getByTestId("theme-toggle");
     const siteStyle = await appearance(themeSwitch);
-    await page.getByRole("button", { name: "Editorial", exact: true }).click();
-    await page.getByLabel("Brand colour", { exact: true }).fill("#6750a4");
-    await page.getByLabel("Second colour", { exact: true }).fill("#386641");
+    await setThemeColours(page, { primary: "#6750a4", secondary: "#386641" });
     await page.getByRole("radio", { name: "Round", exact: true }).check();
     await page.getByRole("combobox", { name: "Reading density" }).click();
     await page.getByRole("option", { name: "Balanced", exact: true }).click();
@@ -336,13 +426,14 @@ for (const colorScheme of ["light", "dark"] as const) {
     await open.press("Enter");
     await expect(page.getByRole("heading", { name: "Components", exact: true })).toBeVisible();
     const previews = page.locator(".gallery__preview");
-    await expect(previews).toHaveCount(27);
-    await expect(previews.first()).toHaveCSS("--elea-color-primary-600", "#6750a4");
+    await expect(previews).toHaveCount(29);
+    const guideCount = await previews.count();
+    await expect(previews.first()).toHaveCSS("--elea-color-primary-500", "#6750a4");
     await page.getByRole("link", { name: "Button", exact: true }).click();
     const index = page.getByRole("navigation", { name: "Component index" });
     const demos = page.locator(".catalog-demos");
     const links = index.getByRole("link", { name: /.+/ });
-    await expect(links).toHaveCount(28);
+    await expect(links).toHaveCount(guideCount + 1);
     const guides = (await links.allTextContents()).filter((name) => name !== "All components");
     for (const name of guides) {
       const guide = index.getByRole("link", { name, exact: true });
@@ -350,11 +441,11 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(target?.split("?")[1]).toBe(query);
       await guide.click();
       await expect(guide).toHaveAttribute("aria-current", "page");
-      await expect(demos).toHaveCSS("--elea-color-primary-600", "#6750a4");
+      await expect(demos).toHaveCSS("--elea-color-primary-500", "#6750a4");
       await expect(demos).toHaveCSS("font-family", "Georgia, serif");
     }
     await page.reload();
-    await expect(demos).toHaveCSS("--elea-color-primary-600", "#6750a4");
+    await expect(demos).toHaveCSS("--elea-color-primary-500", "#6750a4");
     expect(await appearance(themeSwitch)).toEqual(siteStyle);
 
     await index.getByRole("link", { name: "Card", exact: true }).click();
@@ -388,7 +479,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await demos.getByRole("link", { name: "ConfirmField", exact: true }).click();
     await demos.getByRole("button", { name: "Invite", exact: true }).click();
     const popover = page.getByRole("dialog", { name: "Invite a reader" });
-    await expect(popover).toHaveCSS("--elea-color-primary-600", "#6750a4");
+    await expect(popover).toHaveCSS("--elea-color-primary-500", "#6750a4");
     await expect(popover.getByRole("textbox", { name: "Email" })).toBeFocused();
     await page.keyboard.press("Escape");
 
@@ -396,12 +487,12 @@ for (const colorScheme of ["light", "dark"] as const) {
     await demos.getByRole("button", { name: "Success", exact: true }).click();
     const notifications = page.getByRole("region", { name: "Notifications" });
     await expect(notifications).toHaveAttribute("data-elea-theme", "brand");
-    await expect(notifications).toHaveCSS("--elea-color-primary-600", "#6750a4");
+    await expect(notifications).toHaveCSS("--elea-color-primary-500", "#6750a4");
     await expect(notifications).toContainText("Article published");
 
     await page.getByRole("link", { name: "Edit theme", exact: true }).click();
     await expect(page).toHaveURL(studioUrl);
-    await expect(page.getByLabel("Brand colour", { exact: true })).toHaveValue("#6750a4");
+    await expect(page.getByRole("region", { name: "Publication preview" })).toHaveCSS("--elea-color-primary-500", "#6750a4");
     await expect(radius).toHaveValue("10px");
     await expect(page.getByRole("textbox", { name: "Interface font" })).toHaveValue("Georgia, serif");
     await expect(page.getByRole("combobox", { name: "Reading density" })).toHaveText("Balanced");
@@ -410,36 +501,29 @@ for (const colorScheme of ["light", "dark"] as const) {
 
 test("an old Precision preset opens in emerald and keeps explicitly customized blue links", async ({ page }) => {
   const oldPrecision = "brand=2854b8&corners=Soft&type=Sans&rhythm=Balanced&accent=40536b&edition=precision";
-  const colour = page.getByLabel("Brand colour", { exact: true });
-  const accent = page.getByLabel("Second colour", { exact: true });
-  const precision = page.getByRole("button", { name: "Precision", exact: true });
   const preview = page.getByRole("region", { name: "Publication preview" });
   const gallery = page.getByRole("link", { name: "Open themed gallery" });
   const darkMode = page.getByRole("button", { name: /Switch to the dark theme/ });
 
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto(`${studioPath}?${oldPrecision}`);
-  await expect(precision).toHaveAttribute("aria-pressed", "true");
-  await expect(colour).toHaveValue("#08745e");
-  await expect(accent).toHaveValue("#465451");
-  await expect(preview).toHaveCSS("--elea-color-primary-600", "#08745e");
+  await expect(preview).toHaveCSS("--elea-color-secondary-500", "#465451");
+  await expect(preview).toHaveCSS("--elea-color-primary-500", "#08745e");
   await darkMode.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(preview).toHaveCSS("--elea-color-primary-600", "#08745e");
+  await expect(preview).toHaveCSS("--elea-color-primary-500", "#08745e");
   await expect(gallery).toHaveAttribute("href", "#/ui?edition=precision");
   await gallery.click();
   await page.getByRole("link", { name: "Button", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Primary", exact: true })).toHaveCSS("--elea-color-primary-600", "#08745e");
+  await expect(page.getByRole("button", { name: "Primary", exact: true })).toHaveCSS("--elea-color-primary-500", "#08745e");
   await page.getByRole("link", { name: "Edit theme", exact: true }).click();
   await expect(page).toHaveURL(/#\/theme\?edition=precision$/);
   await page.reload();
-  await expect(colour).toHaveValue("#08745e");
+  await expect(preview).toHaveCSS("--elea-color-primary-500", "#08745e");
 
   await page.goto(`${studioPath}?${oldPrecision}&radius=10px`);
-  await expect(precision).toHaveAttribute("aria-pressed", "false");
-  await expect(colour).toHaveValue("#2854b8");
-  await expect(accent).toHaveValue("#40536b");
-  await expect(preview).toHaveCSS("--elea-color-primary-600", "#2854b8");
+  await expect(preview).toHaveCSS("--elea-color-secondary-500", "#40536b");
+  await expect(preview).toHaveCSS("--elea-color-primary-500", "#2854b8");
   await expect(gallery).toHaveAttribute("href", /brand=2854b8.*radius=10px/);
 });
 
@@ -461,7 +545,7 @@ test("settings, preview and expanded CSS fit a 320px viewport", async ({ page })
   }
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await expect(preview).toBeHidden();
-  await expect(page.getByLabel("Brand colour", { exact: true })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Reading typeface" })).toBeVisible();
   await page.getByRole("combobox", { name: "Reading density" }).click();
   await page.getByRole("option", { name: "Compact", exact: true }).click();
   await page.getByRole("button", { name: "Preview", exact: true }).click();
@@ -479,19 +563,16 @@ test("settings, preview and expanded CSS fit a 320px viewport", async ({ page })
 });
 
 test("a shared theme carries into the editorial workspace and back", async ({ page }) => {
-  await page.goto(studioPath);
-  const editorial = page.getByRole("button", { name: "Editorial", exact: true });
-  await editorial.click();
+  await page.goto(studioPath + "?edition=editorial");
   await page.getByRole("navigation", { name: "Main", exact: true }).getByRole("link", { name: "Theme studio", exact: true }).click();
-  await expect(page).toHaveURL(/#\/theme$/);
-  await expect(page.getByRole("button", { name: "Precision", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await editorial.click();
+  await expect(page).toHaveURL(/#\/theme\?edition=editorial$/);
+  await expect(page.getByRole("combobox", { name: "Theme", exact: true })).toHaveText("Custom theme");
   await page.getByRole("radio", { name: "Round", exact: true }).check();
   await expect(page).toHaveURL(/#\/theme\?brand=2945c7&corners=Round&type=Serif&rhythm=Airy&accent=454a70&edition=editorial$/);
   await page.getByRole("link", { name: "Open themed workspace" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Editorial workspace" })).toBeVisible();
   const previewControl = page.getByTestId("preview-toggle");
-  const brand = () => previewControl.evaluate((element) => getComputedStyle(element).getPropertyValue("--elea-color-primary-600").trim());
+  const brand = () => previewControl.evaluate((element) => getComputedStyle(element).getPropertyValue("--elea-color-primary-500").trim());
   await expect.poll(brand).toBe("#2945c7");
   const readerText = page.getByTestId("viewer-pane").locator(".elea-paragraph").first();
   await expect(readerText).toHaveCSS("font-size", "20px");
@@ -499,17 +580,15 @@ test("a shared theme carries into the editorial workspace and back", async ({ pa
   await page.reload();
   await expect.poll(brand).toBe("#2945c7");
   await page.getByRole("link", { name: "Edit theme", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Editorial", exact: true })).toHaveAttribute("aria-pressed", "false");
   await expect(page).toHaveURL(/edition=editorial$/);
   await expect(page.getByRole("radio", { name: "Round", exact: true })).toBeChecked();
 
   await page.goto(`${studioPath}?brand=19634e&corners=Soft`);
-  await expect(page.getByLabel("Brand colour", { exact: true })).toHaveValue("#19634e");
+  await expect(page.getByRole("region", { name: "Publication preview" })).toHaveCSS("--elea-color-primary-500", "#19634e");
   await expect(page.getByRole("combobox", { name: "Reading typeface" })).toHaveText("Serif");
   await expect(page.getByRole("combobox", { name: "Reading density" })).toHaveText("Balanced");
   await page.goto(`${studioPath}?brand=not-a-colour&corners=Round`);
-  await expect(page.getByRole("button", { name: "Precision", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByRole("radio", { name: "Soft", exact: true })).toBeChecked();
+  await expect(page.getByRole("combobox", { name: "Theme", exact: true })).toHaveText("Réserve");
 });
 
 test("the Studio previews the reference article while the Playground keeps the editable draft", async ({ page }) => {
@@ -540,7 +619,7 @@ test("the Studio previews the reference article while the Playground keeps the e
 });
 
 test("a product brings its own second colour, radius and font, shared through the URL", async ({ page }) => {
-  await page.goto(studioPath);
+  await page.goto(studioPath + "?edition=precision");
   const preview = page.getByRole("region", { name: "Publication preview" });
   const article = preview.getByRole("article");
   const badge = article.getByText("Members", { exact: true });
@@ -561,30 +640,27 @@ test("a product brings its own second colour, radius and font, shared through th
   });
   await radius.focus();
   await expect(radius).toHaveCSS("outline-color", errorBorder);
-  await expect(page).toHaveURL(/#\/theme$/);
+  await expect(page).toHaveURL(/#\/theme\?edition=precision$/);
   await radius.fill("10px");
   await expect(radiusError).toHaveCount(0);
   await expect(radius).not.toHaveCSS("outline-color", errorBorder);
   await expect(article).toHaveCSS("border-radius", "5px");
   await page.getByRole("textbox", { name: "Interface font" }).fill("Georgia, serif");
   await expect(badge).toHaveCSS("font-family", "Georgia, serif");
-  await page.getByLabel("Second colour").fill("#0f766e");
-  await expect(article).toHaveCSS("--elea-color-secondary-700", "#0f766e");
-  await expect(page.getByRole("button", { name: "Precision", exact: true })).toHaveAttribute("aria-pressed", "false");
+  await setThemeColours(page, { secondary: "#0f766e" });
+  await expect(article).toHaveCSS("--elea-color-secondary-500", "#0f766e");
   await expect(page).toHaveURL(/rhythm=Balanced&accent=0f766e&radius=10px&font=Georgia%2C\+serif&edition=precision$/);
   await page.reload();
   await expect(article).toHaveCSS("border-radius", "5px");
-  await expect(article).toHaveCSS("--elea-color-secondary-700", "#0f766e");
+  await expect(article).toHaveCSS("--elea-color-secondary-500", "#0f766e");
   await expect(radius).toHaveValue("10px");
   await page.getByRole("link", { name: "Open themed workspace" }).click();
   const editorControl = page.getByTestId("preview-toggle");
   await expect(editorControl).toHaveCSS("font-family", "Georgia, serif");
   await expect(editorControl).toHaveCSS("border-radius", "7.5px");
-  await expect(editorControl).toHaveCSS("--elea-color-secondary-700", "#0f766e");
+  await expect(editorControl).toHaveCSS("--elea-color-secondary-500", "#0f766e");
   await page.getByRole("link", { name: "Edit theme", exact: true }).click();
-  await page.getByRole("button", { name: "Remove" }).click();
-  await page.getByRole("button", { name: "Precision", exact: true }).click();
-  await expect(page).toHaveURL(/#\/theme\?edition=precision$/);
+  await page.goto(studioPath + "?edition=precision");
   await expect(radius).toHaveValue("");
   await expect(article).toHaveCSS("border-radius", "4px");
 });
@@ -655,10 +731,8 @@ for (const colorScheme of ["light", "dark"] as const) {
       ["Editorial", [26, 34, 42, 50, 58]],
       ["Obsidian", [24, 30, 38, 46, 54]],
     ] as const) {
-      await page.goto(studioPath);
-      await page.getByRole("button", { name: edition, exact: true }).click();
-      await page.getByLabel("Brand colour", { exact: true }).fill("#364f75");
-      await page.getByLabel("Second colour", { exact: true }).fill("#535a66");
+      await page.goto(studioPath + "?edition=" + edition.toLowerCase());
+      await setThemeColours(page, { primary: "#364f75", secondary: "#535a66" });
       await page.getByRole("textbox", { name: "Interface font" }).fill("Arial, sans-serif");
       await page.getByRole("combobox", { name: "Reading typeface" }).click();
       await page.getByRole("option", { name: "Sans", exact: true }).click();
@@ -675,7 +749,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       exports.set(edition, css);
       if (edition === "Precision") {
         // Use Precision’s entire palette for this separate consumer, including
-        // neutral and semantic colors unavailable in the Studio controls.
+        // its neutral surfaces and feedback colours.
         fixedPalette = css.replace(/^\s*--elea-(?!color-|brand-)[^;]+;$/gm, "");
       }
 

@@ -2,7 +2,7 @@ import type { EleaBlock } from "@alien6-studio/elea-content";
 import { ContentView } from "@alien6-studio/elea-content-viewer";
 import { Badge, Button, Tabs } from "@alien6-studio/elea-ui";
 import { alien6ContactUrl, repositoryUrl, sitePath } from "../src/links.js";
-import { brandRoute, editions } from "../src/pages/brandTheme.js";
+import { brandRoute, defaultSiteTheme } from "../src/pages/brandTheme.js";
 import { glacierImage, notebookSummary, notebookTitle } from "../src/notebook.js";
 
 const interactive = `${sitePath}playground/#/`;
@@ -35,7 +35,7 @@ function NotebookPreview() {
       </div>
       <div className="notebook__foot">
         <span>Rendered with <code>ContentView</code></span>
-        <a href={`${sitePath}playground/${brandRoute("playground", editions.Precision)}`}>Edit this notebook <span aria-hidden="true">→</span></a>
+        <a href={`${sitePath}playground/${brandRoute("playground", defaultSiteTheme)}`}>Edit this notebook <span aria-hidden="true">→</span></a>
       </div>
     </fieldset>
   );
@@ -73,7 +73,7 @@ export function SiteHome() {
         <div className="home-editions__heading">
           <div>
             <h2 id="home-theme">Publication themes</h2>
-            <p>Start with an edition, then tune its colour, type and reading density in the studio.</p>
+            <p>Explore four themes, then tune their colours, type and reading density in the studio.</p>
           </div>
           <a href={`${interactive}theme`}>Open theme studio <span aria-hidden="true">→</span></a>
         </div>

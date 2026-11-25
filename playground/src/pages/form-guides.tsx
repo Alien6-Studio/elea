@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, Calendar, Combobox, Field } from "@alien6-studio/elea-ui";
+import { brandPalettes, type BrandTheme } from "@alien6-studio/elea-tokens/brand";
+import { Button, Calendar, ColorPicker, Combobox, Field } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
 
 export const monthLabels = { previousMonth: "Previous month", nextMonth: "Next month" };
@@ -80,6 +81,32 @@ const options = [
         { name: "placeholder", type: "string", defaultValue: "label", description: "Hint shown while the field is empty. Pass a localized search prompt." },
         { name: "name", type: "string", description: "Form field name for the selected value." },
         { name: "disabled", type: "boolean", description: "Disable input and selection." },
+      ]} />
+    </>
+  );
+}
+
+export function ColorPickerPage({ brand }: { brand?: BrandTheme }) {
+  const [ink, setInk] = useState<string>(brand?.seed ?? brandPalettes.Emerald.seed);
+  return (
+    <>
+      <h1>ColorPicker</h1>
+      <p className="lead">Choose a colour from the system picker or enter an exact hex value.</p>
+      <Demo title="Cover ink" code={`const [ink, setInk] = useState<string>(brandPalettes.Emerald.seed);
+
+<ColorPicker label="Ink colour" hexLabel="Ink hex" value={ink} onChange={setInk}
+  invalidMessage="Enter a six-digit hex colour." />`}>
+        <div className="catalog-card-demo">
+          <ColorPicker label="Ink colour" hexLabel="Ink hex" value={ink} onChange={setInk}
+            invalidMessage="Enter a six-digit hex colour." />
+        </div>
+      </Demo>
+      <h2>Props</h2>
+      <PropsTable rows={[
+        { name: "value, onChange", type: "string, (hex: string) => void", description: "Controlled sRGB colour. A confirmed edit returns six lowercase hex digits prefixed with #." },
+        { name: "label, hexLabel", type: "string", description: "Names for the colour swatch and its text input." },
+        { name: "invalidMessage", type: "string", description: "Feedback for an incomplete or invalid hex value." },
+        { name: "disabled", type: "boolean", description: "Disable both inputs." },
       ]} />
     </>
   );

@@ -5,10 +5,10 @@ const catalog = "/elea/playground/#/ui";
 test("the catalogue combines category and search and recovers from an empty result", async ({ page }) => {
   await page.goto(catalog);
   const main = page.getByRole("main");
-  const results = main.getByRole("status");
-  await expect(results).toHaveText("27 component guides");
+  const results = main.getByRole("status").filter({ hasText: /component guide/ });
+  await expect(results).toHaveText("29 component guides");
   await main.getByRole("button", { name: "Forms" }).click();
-  await expect(results).toHaveText("7 component guides");
+  await expect(results).toHaveText("8 component guides");
   const search = main.getByRole("searchbox", { name: "Search components" });
   await search.fill("radio");
   await expect(results).toHaveText("1 component guide");
@@ -18,7 +18,33 @@ test("the catalogue combines category and search and recovers from an empty resu
   await main.getByRole("button", { name: "Clear filters" }).press("Enter");
   await expect(search).toBeFocused();
   await expect(search).toHaveValue("");
-  await expect(results).toHaveText("27 component guides");
+  await expect(results).toHaveText("29 component guides");
+});
+
+test("the mobile catalogue opens the Carousel guide and its three layouts fit the screen", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(catalog);
+  await page.getByRole("button", { name: "Navigation", exact: true }).click();
+  await page.getByRole("link", { name: "Carousel", exact: true }).click();
+  const plates = page.getByRole("region", { name: "Single plate", exact: true });
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const [name, count] of [["Single plate", 1], ["Contact sheet", 2], ["Filmstrip", 3]] as const) {
+      const carousel = page.getByRole("region", { name, exact: true });
+      const images = carousel.getByRole("img");
+      await expect(images).toHaveCount(count);
+      const bounds = await images.evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().toJSON()));
+      expect(bounds[0].left).toBeGreaterThanOrEqual(0);
+      expect(bounds[count - 1].right).toBeLessThanOrEqual(width);
+      expect(bounds[count - 1].top).toBe(bounds[0].top);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  }
+  const first = await plates.getByRole("img").getAttribute("src");
+  await plates.getByRole("button", { name: "Next plate" }).click();
+  await expect(plates.getByRole("img")).not.toHaveAttribute("src", first!);
+  await plates.getByRole("button", { name: "Previous plate" }).click();
+  await expect(plates.getByRole("img")).toHaveAttribute("src", first!);
 });
 
 test("retired study links open the catalogue without adding a history entry", async ({ page }) => {

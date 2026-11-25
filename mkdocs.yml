@@ -19,6 +19,7 @@ not_in_nav: |
 extra_css:
   - assets/elea.css
   - assets/editions.css
+  - assets/site-profile.css
   - assets/elea-viewer.css
   - assets/elea-ui.css
   - assets/brand.css

@@ -157,14 +157,13 @@ a { text-underline-offset: 0.18em; }
 }
 .type-cover__title em { display: block; font-weight: 300; }
 #glyph-carousel { grid-area: plate; min-width: 0; }
-.type-plate__header, .type-plate__controls { display: flex; align-items: center; }
-.type-plate__header { justify-content: space-between; gap: .4rem; min-height: 2.75rem; margin-block-end: 1rem; }
-.type-plate__header h2 { margin: 0; }
-.type-plate__controls { gap: .25rem; color: var(--elea-color-text-muted); font-size: .875rem; font-variant-numeric: tabular-nums; }
-.type-plate__controls > span { min-width: 4em; text-align: center; }
-.type-plate__drawing { touch-action: pan-y pinch-zoom; }
-.type-plate__controls button { min-width: 2.75rem; min-height: 2.75rem; }
-.type-plate svg { display: block; width: 100%; height: auto; aspect-ratio: 810 / 720; }
+.type-plate .elea-carousel__header { min-height: 2.75rem; margin-block-end: 1rem; }
+.type-plate .elea-carousel__header h2 { margin: 0; }
+.type-plate .elea-carousel__position { min-width: 4em; text-align: center; }
+.type-plate__sets { display: flex; gap: .25rem; }
+.type-plate__sets [aria-pressed="true"] { background: var(--elea-color-surface-muted); color: var(--elea-color-text-default); }
+.type-plate .elea-carousel__controls button { min-width: 2.75rem; min-height: 2.75rem; }
+.type-plate #glyph-diagram { display: block; width: 100%; height: auto; aspect-ratio: 810 / 720; }
 .type-plate__guide line, .type-plate__measure, .type-plate__outline, .type-plate__handles {
   fill: none;
   vector-effect: non-scaling-stroke;
@@ -229,8 +228,8 @@ a { text-underline-offset: 0.18em; }
   .type-cover__title { font-size: 56pt; }
   .type-cover__title em { display: block; }
   .type-plate { margin: 0; break-inside: avoid; }
-  .type-plate__controls, .type-cover__download { display: none; }
-  .type-plate svg { max-height: 62mm; }
+  .type-plate .elea-carousel__controls, .type-plate__sets, .type-cover__download { display: none; }
+  .type-plate #glyph-diagram { max-height: 62mm; }
   .type-book :is(figcaption, th, .type-cover__details) { color: inherit; }
   .type-spread { grid-template-columns: 1fr 1fr; gap: 2rem; }
   .type-glyphs > p { font-size: 22pt; }
@@ -374,11 +373,13 @@ a { text-underline-offset: 0.18em; }
   .home-lead { max-width: 45ch; }
   .notebook__document .elea-content { min-height: clamp(16rem, 39vw, 22rem); }
 }
-@media (max-width: 52rem) {
+@media (max-width: 60rem) {
   .docs-guidebar__inner { display: block; }
   .docs-guidebar__label { display: none; }
   .docs-guidebar__links { justify-content: flex-start; gap: 1rem; }
   .docs-guidebar__links a { font-size: .8125rem; }
+}
+@media (max-width: 52rem) {
   .docs-layout { grid-template-columns: minmax(0, 1fr); }
   .docs-article { grid-column: 1; grid-row: 1; }
   .docs-toc { display: none; }

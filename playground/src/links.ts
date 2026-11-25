@@ -8,6 +8,7 @@ export const siteNavigation = [
   { id: "docs", label: "Docs", href: `${sitePath}getting-started/` },
   { id: "catalog", route: "ui", label: "Components", href: `${sitePath}playground/#/ui` },
   { id: "typography", label: "Typography", href: `${sitePath}typography/` },
+  { id: "colours", route: "colours", label: "Colours", href: `${sitePath}playground/#/colours` },
   { id: "studio", route: "theme", label: "Theme studio", href: `${sitePath}playground/#/theme` },
   { id: "workspace", route: "playground", label: "Editorial workspace", href: `${sitePath}playground/#/playground` },
 ] as const;

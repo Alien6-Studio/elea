@@ -104,6 +104,24 @@
 .catalog-row { display: flex; align-items: center; gap: .75rem; }
 .catalog-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr)); gap: 1rem; inline-size: 100%; }
 .catalog-card-demo { inline-size: min(24rem, 100%); }
+.catalog-plate-carousel { inline-size: min(100%, 30rem); }
+.catalog-plate-carousel img { display: block; width: 100%; height: auto; }
+.gallery__preview .catalog-plate-carousel { max-inline-size: 8.5rem; }
+.carousel-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--elea-space-6);
+  align-items: start;
+}
+.carousel-gallery > .demo { min-inline-size: 0; }
+.carousel-gallery > .demo:last-child { grid-column: 1 / -1; }
+.carousel-gallery .demo__title { margin: 0 0 var(--elea-space-2); }
+.carousel-gallery .demo__stage { padding: 0; border: 0; background: transparent; }
+.carousel-gallery .catalog-plate-carousel { inline-size: 100%; }
+.carousel-gallery .catalog-source { border: 0; }
+.carousel-gallery .catalog-source summary { padding-inline: 0; }
+.carousel-gallery img { object-fit: cover; }
+.carousel-gallery > .demo:nth-child(2) img { aspect-ratio: 3 / 4; }
 .catalog-table-scroll { max-block-size: 14rem; }
 .catalog-note { margin: 0; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
 .catalog-measure { margin: 0; padding: .75rem 1rem; border-inline-start: 2px solid var(--elea-color-border-default); color: var(--elea-color-text-muted); }

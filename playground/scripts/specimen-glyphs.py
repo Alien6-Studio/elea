@@ -2,7 +2,7 @@
 import argparse
 import json
 from pathlib import Path
-from string import ascii_letters
+from string import ascii_letters, digits
 from unicodedata import category, name
 
 from fontTools.pens.areaPen import AreaPen
@@ -71,7 +71,8 @@ def extract(font):
     extra = [chr(cp) for cp in sorted(cmap) if chr(cp) not in ascii_letters
              and category(chr(cp)).startswith("L") and "LATIN" in name(chr(cp), "")]
     entries = []
-    for letter in [*ascii_letters, *extra]:
+    signs = [chr(cp) for cp in sorted(cmap) if category(chr(cp))[0] in {"P", "S"}]
+    for letter in [*ascii_letters, *extra, *digits, *signs]:
         glyph = glyphs[cmap[ord(letter)]]
         outline = DecomposingRecordingPen(glyphs)
         glyph.draw(outline)
@@ -87,7 +88,8 @@ def extract(font):
         }
         # Keep the four fields legible in a generated file without splitting coordinate pairs.
         lines = [f'    "{key}": {json.dumps(value, ensure_ascii=False)}' for key, value in fields.items()]
-        entries.append(f'  "{letter}": {{\n' + ",\n".join(lines) + "\n  }")
+        key = json.dumps(letter, ensure_ascii=False)
+        entries.append(f'  {key}: {{\n' + ",\n".join(lines) + "\n  }")
     return "{\n" + ",\n".join(entries) + "\n}\n"
 
 

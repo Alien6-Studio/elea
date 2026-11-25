@@ -9,8 +9,8 @@ const blocks: EleaBlock[] = [
 
 const consumerStyles = `
   .client-app {
-    --elea-color-primary-600: #365235;
-    --elea-color-primary-700: #273c26;
+    --elea-color-action-primary: #365235;
+    --elea-color-action-primary-hover: #273c26;
     --elea-font-family-sans: Georgia, serif;
     color: #243520;
     font: 15px Georgia, serif;

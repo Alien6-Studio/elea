@@ -139,7 +139,7 @@
 }
 .site-footer__signature:is(:hover, :focus-visible) img { opacity: 0.8; }
 
-@media (max-width: 52rem) {
+@media (max-width: 60rem) {
   .site__masthead-inner {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 0;

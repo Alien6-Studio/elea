@@ -6,6 +6,7 @@
 @import "@fontsource-variable/roboto/wght-italic.css";
 @import "@alien6-studio/elea-ui/bundle.css";
 @import "@alien6-studio/elea-tokens/editions.css";
+@import "../../docs/assets/site-profile.css";
 @import "../../docs/assets/brand.css";
 
 @layer site {

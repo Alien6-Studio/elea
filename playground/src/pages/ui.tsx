@@ -7,6 +7,13 @@ import { brandRoute, type BrandTheme } from "./brandTheme.js";
 const TrashIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>;
 const PlusIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>;
 
+const tealInfo = {
+  "--elea-color-action-info": "light-dark(#0e7490, #67e8f9)",
+  "--elea-color-action-info-text": "light-dark(white, black)",
+  "--elea-color-action-info-hover": "color-mix(in srgb, var(--elea-color-action-info) 90%, light-dark(black, white))",
+  "--elea-color-action-info-pressed": "color-mix(in srgb, var(--elea-color-action-info) 80%, light-dark(black, white))",
+} as CSSProperties;
+
 export function ButtonsPage() {
   const [loading, setLoading] = useState(false);
   return (
@@ -15,6 +22,7 @@ export function ButtonsPage() {
       <p className="lead">Give a form or toolbar a clear primary action. Choose a variant for each action and use a loading state while work is in progress.</p>
       <Demo title="Variants" code={`<Button>Primary</Button>
 <Button variant="secondary">Secondary</Button>
+<Button variant="tertiary">Tertiary</Button>
 <Button variant="outline">Outline</Button>
 <Button variant="ghost">Ghost</Button>
 <Button variant="danger">Danger</Button>
@@ -23,6 +31,7 @@ export function ButtonsPage() {
 <Button variant="warning">Warning</Button>`}>
         <Button>Primary</Button>
         <Button variant="secondary">Secondary</Button>
+        <Button variant="tertiary">Tertiary</Button>
         <Button variant="outline">Outline</Button>
         <Button variant="ghost">Ghost</Button>
         <Button variant="danger">Danger</Button>
@@ -30,12 +39,13 @@ export function ButtonsPage() {
         <Button variant="info">Info</Button>
         <Button variant="warning">Warning</Button>
       </Demo>
-      <Demo title="An info colour of its own" description="The info variant reads the info colour, like the info tone of an alert, a badge, a toast or a progress bar. It starts as the link colour and follows the theme, until a host sets it." code={`<div style={{ "--elea-color-info": "light-dark(#0e7490, #67e8f9)" }}>
-  <Button variant="info">Teal info</Button>
-</div>`}>
-        <div style={{ "--elea-color-info": "light-dark(#0e7490, #67e8f9)" } as CSSProperties}>
-          <Button variant="info">Teal info</Button>
-        </div>
+      <Demo title="An info colour of its own" description="The Info button above uses the active theme. This example gives one button a teal fill and defines its text, hover and pressed colours for light and dark appearances." code={`import type { CSSProperties } from "react";
+import { Button } from "@alien6-studio/elea-ui";
+
+const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
+
+<Button variant="info" style={tealInfo}>Teal info</Button>`}>
+        <Button variant="info" style={tealInfo}>Teal info</Button>
       </Demo>
       <Demo title="Sizes and icons" description="Five sizes, from a compact toolbar action to a landing page call to action." code={`<Button size="xs">Extra small</Button>
 <Button size="sm" icon={<PlusIcon />}>Small</Button>
@@ -111,7 +121,7 @@ export function ButtonsPage() {
       </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
-        { name: "variant", type: '"primary" | "secondary" | "outline" | "ghost" | "danger" | "success" | "info" | "warning"', defaultValue: '"primary"', description: "Visual weight or status colour of the action." },
+        { name: "variant", type: '"primary" | "secondary" | "tertiary" | "outline" | "ghost" | "danger" | "success" | "info" | "warning"', defaultValue: '"primary"', description: "Visual weight or status colour of the action." },
         { name: "size", type: '"xs" | "sm" | "md" | "lg" | "xl"', defaultValue: '"md"', description: "Height and type size." },
         { name: "radius", type: '"none" | "sm" | "md" | "lg" | "full"', defaultValue: '"md"', description: "Corner rounding, from square to pill." },
         { name: "shadow", type: '"none" | "sm" | "md"', defaultValue: '"none"', description: "A resting shadow that lifts the button off the surface." },

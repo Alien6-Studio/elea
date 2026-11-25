@@ -21,9 +21,9 @@ For a checkout, [build the npm archives](https://github.com/Alien6-Studio/elea/b
 
 ## Theme
 
-Use [Theme Studio](/elea/playground/#/theme) to preview and download a theme for your brand.
+Explore Rasance, Réserve, Braise and Hors champ in the [colour atlas](/elea/colours/). Each theme sets the palette, typography, spacing and control shapes. All four use white and light grey for reading surfaces, with neutral greys in dark mode. Adjust the theme and download its CSS in [Theme Studio](/elea/playground/#/theme).
 
-For a built-in theme, import `@alien6-studio/elea-tokens/editions.css` after the UI bundle and set `data-elea-theme="editorial"` on your app container. The other presets are `precision` and `obsidian`. See [how themes reach dialogs, sheets and toasts](https://github.com/Alien6-Studio/elea/tree/main/packages/ui#themes-and-surfaces-outside-their-container).
+Load the downloaded stylesheet after the UI bundle, then set `data-elea-theme="brand"` on your app container. See [how themes reach dialogs, sheets and toasts](https://github.com/Alien6-Studio/elea/tree/main/packages/ui#themes-and-surfaces-outside-their-container).
 
 ## Tailwind and shadcn/ui
 

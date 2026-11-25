@@ -63,13 +63,13 @@ test("buttons take a size, a radius, a shadow and an effect that follows the poi
   await page.addStyleTag({ content: "* { transition: none !important; }" });
   const named = (name: string) => page.getByRole("button", { name, exact: true });
   const style = (name: string, property: string) => named(name).evaluate((element, key) => getComputedStyle(element).getPropertyValue(key), property);
-  expect([await style("Extra small", "min-height"), await style("Extra large", "min-height")]).toEqual(["24px", "56px"]);
+  expect([await style("Extra small", "min-height"), await style("Extra large", "min-height")]).toEqual(["26px", "58px"]);
   expect([await style("None", "border-radius"), await style("Full", "border-radius")]).toEqual(["0px", "9999px"]);
   const resting = await style("Theme default", "box-shadow");
   const elevated = await style("Medium shadow", "box-shadow");
-  expect(resting).toContain("1px 2px");
+  expect(resting).toBe("none");
   expect(elevated).not.toBe(resting);
-  expect(elevated).toContain("8px 22px -10px");
+  expect(elevated).toContain("7px 12px -9px");
   const hoverAt = async (name: string, x: number, y: number) => {
     const box = (await named(name).boundingBox())!;
     await page.mouse.move(box.x + box.width * x, box.y + box.height * y);
@@ -260,8 +260,10 @@ test("a theme choice and the site navigation carry from the home page into the t
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
   await page.getByRole("main").getByRole("link", { name: "Open theme studio" }).click();
-  await page.getByRole("button", { name: "Editorial", exact: true }).press("Enter");
-  await expect(page.getByRole("button", { name: "Editorial", exact: true })).toHaveAttribute("aria-pressed", "true");
+  const theme = page.getByRole("combobox", { name: "Theme", exact: true });
+  await theme.press("Enter");
+  await page.getByRole("option", { name: "Braise", exact: true }).click();
+  await expect(theme).toHaveText("Braise");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   const nav = page.getByRole("navigation", { name: "Main", exact: true });
   await nav.getByRole("link", { name: "Docs", exact: true }).click();
@@ -287,7 +289,7 @@ test("quote attributions are legible on both sides of the editorial workspace", 
   }
 });
 
-test("the static notebook links to the same edition in the editor", async ({ page }) => {
+test("the static notebook links to the same theme in the editor", async ({ page }) => {
   await page.goto("/elea/");
   await expect(page.locator("#home-title span")).toHaveCSS("font-style", "normal");
   const main = page.getByRole("main");
@@ -298,7 +300,7 @@ test("the static notebook links to the same edition in the editor", async ({ pag
   expect(faces).toBe(1);
   const open = main.getByRole("link", { name: "Edit this notebook" });
   expect(await textContrast(open)).toBeGreaterThanOrEqual(4.5);
-  await expect(open).toHaveAttribute("href", /#\/playground\?edition=precision$/);
+  await expect(open).toHaveAttribute("href", /#\/playground\?scheme=reserve$/);
   await open.press("Enter");
   await expect(page.getByTestId("viewer-pane").getByRole("heading", { name: "The glacier notebook" })).toBeVisible();
 });
@@ -310,7 +312,7 @@ test("the notebook and links to the studio and editor remain visible without Jav
     await page.goto("/elea/#home-theme");
     const main = page.getByRole("main");
     await expect(main.getByRole("link", { name: "Open theme studio" })).toHaveAttribute("href", "/elea/playground/#/theme");
-    await expect(main.getByRole("link", { name: "Edit this notebook" })).toHaveAttribute("href", /#\/playground\?edition=precision$/);
+    await expect(main.getByRole("link", { name: "Edit this notebook" })).toHaveAttribute("href", /#\/playground\?scheme=reserve$/);
     await expect(main.getByRole("heading", { name: "The glacier notebook" })).toBeVisible();
     await expect(main.getByRole("heading", { name: "Publication themes" })).toHaveAttribute("id", "home-theme");
   } finally {
@@ -322,11 +324,11 @@ test("a host utility and a plain host rule win over a component default without 
   await page.goto("/elea/playground/#/ui/button");
   const button = page.getByRole("button", { name: "Primary", exact: true });
   await expect(button).toBeVisible();
-  expect(await button.evaluate((element) => getComputedStyle(element).borderTopLeftRadius)).not.toBe("0px");
+  await expect(button).toHaveCSS("border-top-left-radius", "0px");
   // Tailwind v4 keeps its utilities in a layer; one class there, and one outside any layer.
-  await page.addStyleTag({ content: "@layer utilities { .rounded-none { border-radius: 0; } } .host-wide { letter-spacing: 0.2em; }" });
-  await button.evaluate((element) => element.classList.add("rounded-none", "host-wide"));
-  await expect.poll(() => button.evaluate((element) => getComputedStyle(element).borderTopLeftRadius)).toBe("0px");
+  await page.addStyleTag({ content: "@layer utilities { .rounded-xl { border-radius: 12px; } } .host-wide { letter-spacing: 0.2em; }" });
+  await button.evaluate((element) => element.classList.add("rounded-xl", "host-wide"));
+  await expect(button).toHaveCSS("border-top-left-radius", "12px");
   expect(await button.evaluate((element) => getComputedStyle(element).letterSpacing)).not.toBe("normal");
 });
 
@@ -350,6 +352,6 @@ test("the info variant reads the info colour, which a host can set apart from it
   await page.goto("/elea/playground/#/ui/button");
   const fill = (name: string) => page.getByRole("button", { name, exact: true }).evaluate((element) => getComputedStyle(element).backgroundColor);
   await expect(page.getByRole("button", { name: "Teal info", exact: true })).toBeVisible();
-  expect(await fill("Info")).toBe("rgb(7, 96, 78)");
+  expect(await fill("Info")).toBe("rgb(71, 101, 164)");
   expect(await fill("Teal info")).toBe("rgb(14, 116, 144)");
 });

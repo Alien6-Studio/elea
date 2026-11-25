@@ -1,15 +1,16 @@
 import { lazy, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
-import { Accordion, Alert, Avatar, AvatarGroup, Badge, Button, Calendar, Combobox, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
+import { brandPalettes } from "@alien6-studio/elea-tokens/brand";
+import { Accordion, Alert, Avatar, AvatarGroup, Badge, Button, Calendar, ColorPicker, Combobox, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
 import { glacierImage, notebookTitle } from "../notebook.js";
 import { brandRoute, makeBrandTheme, type BrandTheme } from "./brandTheme.js";
 import {
   BadgePage, ButtonsPage, ChoicesPage, DialogPage, FieldsPage, FooterPage,
   MenuPage, PaginationPage, RadiosPage, SelectPage, TabsPage, TooltipPage,
 } from "./ui.js";
-import { AlertPage, AvatarPage, CardPage, ProgressPage, SeparatorPage, SkeletonPage } from "./display.js";
+import { AlertPage, AvatarPage, CardPage, CarouselPage, PlateCarousel, ProgressPage, SeparatorPage, SkeletonPage } from "./display.js";
 import { AccordionPage, SliderPage, TablePage, ToastExampleIcon, ToastPage } from "./data.js";
 import { PopoverPage, SheetPage } from "./overlay.js";
-import { CalendarPage, collections, ComboboxPage, monthLabels } from "./form-guides.js";
+import { CalendarPage, collections, ColorPickerPage, ComboboxPage, monthLabels } from "./form-guides.js";
 import "./catalog.css";
 
 const MediaPage = lazy(async () => ({ default: (await import("./media.js")).MediaPage }));
@@ -62,6 +63,12 @@ const entries: Entry[] = [
     summary: "Search a long list and choose a matching option.",
     interaction: <>Type to filter and use the arrow keys to explore matches. <kbd>Enter</kbd> selects an option. <kbd>Escape</kbd> restores the previous choice.</>,
     preview: <Combobox options={collections} value={null} onChange={() => {}} label="Collection" placeholder="Search collections…" emptyMessage="No matching collections" />,
+  },
+  {
+    slug: "color-picker", name: "ColorPicker", category: "Forms", page: ColorPickerPage,
+    summary: "Choose a colour visually or enter its hex code.",
+    interaction: <>Use <kbd>Tab</kbd> to reach the swatch or the hex input. Press <kbd>Enter</kbd> to apply a typed value, or <kbd>Escape</kbd> to restore the last colour.</>,
+    preview: <ColorPicker label="Ink colour" hexLabel="Ink hex" invalidMessage="Enter a six-digit hex colour." value={brandPalettes.Emerald.seed} onChange={() => {}} />,
   },
   {
     slug: "media", name: "Image upload and crop", category: "Media", page: MediaPage,
@@ -164,6 +171,12 @@ const entries: Entry[] = [
     summary: "Lay out records in rows and columns people can scan and sort.",
     interaction: <>A table with a <code>label</code> scrolls inside a named region that <kbd>Tab</kbd> reaches, then the arrow keys scroll it. A sortable heading is a button, and its column states the direction with <code>aria-sort</code>.</>,
     preview: <Table density="sm" className="catalog-fill"><TableHead><TableRow><TableHeaderCell>Article</TableHeaderCell><TableHeaderCell align="end">Words</TableHeaderCell></TableRow></TableHead><TableBody><TableRow><TableCell>Field notes</TableCell><TableCell numeric>1,240</TableCell></TableRow><TableRow><TableCell>Herbarium</TableCell><TableCell numeric>2,105</TableCell></TableRow></TableBody></Table>,
+  },
+  {
+    slug: "carousel", name: "Carousel", category: "Navigation", page: CarouselPage,
+    summary: "Browse a sequence of images or cards.",
+    interaction: <>Use the arrow keys to browse. <kbd>Home</kbd> and <kbd>End</kbd> reach the ends. On a touch screen, swipe horizontally.</>,
+    preview: <PlateCarousel />,
   },
   {
     slug: "pagination", name: "Pagination", category: "Navigation", page: PaginationPage,
