@@ -1,9 +1,10 @@
 import { useState } from "react";
 import {
-  Alert, Avatar, AvatarGroup, Badge, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
+  Alert, Avatar, AvatarGroup, Badge, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardImage, CardTitle,
   AvatarSkeleton, BadgeSkeleton, ButtonSkeleton, CardSkeleton, Field, FieldSkeleton, Input, Progress, Separator, Skeleton, SkeletonRegion,
   Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, TableSkeleton, Toggle,
 } from "@alien6-studio/elea-ui";
+import { glacierImage, notebookSummary, notebookTitle } from "../notebook.js";
 import { Demo, PropsTable } from "../components/Demo.js";
 import { brandRoute, type BrandTheme } from "./brandTheme.js";
 // A local portrait, so the guide loads no remote image.
@@ -15,7 +16,31 @@ export function CardPage({ brand }: { brand?: BrandTheme }) {
   return (
     <>
       <h1>Card</h1>
-      <p className="lead">Group related content on one surface. Compose a card from its header, title, description, content and footer, and keep only the parts you need.</p>
+      <p className="lead">Group related content on one surface. Use an image, a heading and a footer action when they help someone decide what to open.</p>
+      <Demo title="Editorial card" code={`<Card>
+  <CardImage src={coverUrl} alt="Blue crevasses and white ridges seen from above a glacier"
+    width={1050} height={525} />
+  <CardHeader>
+    <CardTitle>The glacier notebook</CardTitle>
+    <CardDescription>Field notes on the shapes that ice leaves behind.</CardDescription>
+  </CardHeader>
+  <CardContent><Badge tone="warning">In review</Badge></CardContent>
+  <CardFooter>
+    <Button href={notebookUrl} size="sm">Open notebook</Button>
+  </CardFooter>
+</Card>`}>
+        <Card className="catalog-card-demo">
+          <CardImage src={glacierImage.data.file.url} alt={glacierImage.data.alt} width={1050} height={525} />
+          <CardHeader>
+            <CardTitle>{notebookTitle}</CardTitle>
+            <CardDescription>{notebookSummary}</CardDescription>
+          </CardHeader>
+          <CardContent><Badge tone="warning">In review</Badge></CardContent>
+          <CardFooter>
+            <Button href={brandRoute("playground", brand)} size="sm">Open notebook</Button>
+          </CardFooter>
+        </Card>
+      </Demo>
       <Demo title="Variants" description="An outline for lists, an elevation for content that floats, a subtle fill for secondary information." code={`<Card>
   <CardHeader>
     <CardTitle>Outline</CardTitle>
@@ -35,35 +60,6 @@ export function CardPage({ brand }: { brand?: BrandTheme }) {
             <CardHeader><CardTitle>Subtle</CardTitle><CardDescription>A quiet fill, without a border.</CardDescription></CardHeader>
           </Card>
         </div>
-      </Demo>
-      <Demo title="Composed card" description="The footer holds the actions; the title takes the heading level that fits the page." code={`<Card variant="elevated">
-  <CardHeader>
-    <CardTitle as="h3">Autumn field notes</CardTitle>
-    <CardDescription>Edited two hours ago by Ada Lovelace</CardDescription>
-  </CardHeader>
-  <CardContent>
-    <Badge tone="warning">In review</Badge>
-    <p>Twelve pages on the migration of cranes over the valley.</p>
-  </CardContent>
-  <CardFooter>
-    <Button size="sm">Publish</Button>
-    <Button size="sm" variant="ghost">Preview</Button>
-  </CardFooter>
-</Card>`}>
-        <Card variant="elevated" className="catalog-card-demo">
-          <CardHeader>
-            <CardTitle as="h3">Autumn field notes</CardTitle>
-            <CardDescription>Edited two hours ago by Ada Lovelace</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Badge tone="warning">In review</Badge>
-            <p>Twelve pages on the migration of cranes over the valley.</p>
-          </CardContent>
-          <CardFooter>
-            <Button size="sm">Publish</Button>
-            <Button size="sm" variant="ghost">Preview</Button>
-          </CardFooter>
-        </Card>
       </Demo>
       <Demo title="Interactive card" description="The link in the title covers the whole card. Under expressive motion the card lifts on hover." code={`<Card interactive>
   <CardHeader>
@@ -93,6 +89,8 @@ export function CardPage({ brand }: { brand?: BrandTheme }) {
         { name: "variant", type: '"outline" | "elevated" | "subtle"', defaultValue: '"outline"', description: "How the surface stands out from the page." },
         { name: "padding", type: '"none" | "sm" | "md" | "lg"', defaultValue: '"md"', description: "Space around the parts; none lets an image reach the edges." },
         { name: "interactive", type: "boolean", defaultValue: "false", description: "The link in CardTitle covers the card, which answers hover and focus." },
+        { name: "CardImage", type: "Native image props", description: "Set alt and the intrinsic width and height. Use srcSet and sizes for responsive sources." },
+        { name: "CardHeader, CardContent, CardFooter", type: "children", description: "Group the heading, body and actions. Each part is optional." },
         { name: "CardTitle as", type: '"h2" … "h6"', defaultValue: '"h3"', description: "Heading level that fits the outline of the page." },
         { name: "className, ref", type: "string, Ref<HTMLDivElement>", description: "Every part takes className; Card forwards its ref." },
       ]} />

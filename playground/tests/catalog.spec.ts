@@ -6,9 +6,9 @@ test("the catalogue combines category and search and recovers from an empty resu
   await page.goto(catalog);
   const main = page.getByRole("main");
   const results = main.getByRole("status");
-  await expect(results).toHaveText("24 component guides");
+  await expect(results).toHaveText("27 component guides");
   await main.getByRole("button", { name: "Forms" }).click();
-  await expect(results).toHaveText("5 component guides");
+  await expect(results).toHaveText("7 component guides");
   const search = main.getByRole("searchbox", { name: "Search components" });
   await search.fill("radio");
   await expect(results).toHaveText("1 component guide");
@@ -18,7 +18,7 @@ test("the catalogue combines category and search and recovers from an empty resu
   await main.getByRole("button", { name: "Clear filters" }).press("Enter");
   await expect(search).toBeFocused();
   await expect(search).toHaveValue("");
-  await expect(results).toHaveText("24 component guides");
+  await expect(results).toHaveText("27 component guides");
 });
 
 test("retired study links open the catalogue without adding a history entry", async ({ page }) => {
@@ -192,7 +192,11 @@ test("the display guides show cards, avatars and separators with their fallbacks
   await main.getByRole("button", { name: "Display" }).click();
   await expect(main.getByRole("status")).toHaveText("3 component guides");
   await main.getByRole("link", { name: "Card", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Autumn field notes", level: 3 })).toBeVisible();
+  const notebook = page.locator(".elea-card").filter({ has: page.getByRole("heading", { name: "The glacier notebook", level: 3 }) });
+  const cover = notebook.getByRole("img", { name: /crevasses/ });
+  await expect.poll(() => cover.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+  await expect(notebook.locator(".elea-card__header")).toContainText("The glacier notebook");
+  await expect(notebook.locator(".elea-card__footer").getByRole("link", { name: "Open notebook" })).toHaveAttribute("href", /#\/playground/);
   const interactive = page.locator(".elea-card--interactive").first();
   await page.keyboard.press("Tab");
   await interactive.getByRole("link").focus();

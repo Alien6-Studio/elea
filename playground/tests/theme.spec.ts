@@ -241,7 +241,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 }
 
 for (const colorScheme of ["light", "dark"] as const) {
-  test(`a customized ${colorScheme} theme follows all 24 guides, reloads and the return to Studio`, async ({ page }) => {
+  test(`a customized ${colorScheme} theme follows all component guides, reloads and the return to Studio`, async ({ page }) => {
     await page.emulateMedia({ colorScheme });
     await page.goto(studioPath);
     const header = page.getByRole("navigation", { name: "Main", exact: true });
@@ -269,13 +269,13 @@ for (const colorScheme of ["light", "dark"] as const) {
     await open.press("Enter");
     await expect(page.getByRole("heading", { name: "Components", exact: true })).toBeVisible();
     const previews = page.locator(".gallery__preview");
-    await expect(previews).toHaveCount(24);
+    await expect(previews).toHaveCount(27);
     await expect(previews.first()).toHaveCSS("--elea-color-primary-600", "#6750a4");
     await page.getByRole("link", { name: "Button", exact: true }).click();
     const index = page.getByRole("navigation", { name: "Component index" });
     const demos = page.locator(".catalog-demos");
     const links = index.getByRole("link", { name: /.+/ });
-    await expect(links).toHaveCount(25);
+    await expect(links).toHaveCount(28);
     const guides = (await links.allTextContents()).filter((name) => name !== "All components");
     for (const name of guides) {
       const guide = index.getByRole("link", { name, exact: true });

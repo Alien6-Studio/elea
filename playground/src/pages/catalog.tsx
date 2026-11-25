@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
-import { Accordion, Alert, Avatar, AvatarGroup, Badge, Button, Card, CardDescription, CardHeader, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
-import { notebookTitle } from "../notebook.js";
+import { lazy, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
+import { Accordion, Alert, Avatar, AvatarGroup, Badge, Button, Calendar, Combobox, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
+import { glacierImage, notebookTitle } from "../notebook.js";
 import { brandRoute, makeBrandTheme, type BrandTheme } from "./brandTheme.js";
 import {
   BadgePage, ButtonsPage, ChoicesPage, DialogPage, FieldsPage, FooterPage,
@@ -9,9 +9,11 @@ import {
 import { AlertPage, AvatarPage, CardPage, ProgressPage, SeparatorPage, SkeletonPage } from "./display.js";
 import { AccordionPage, SliderPage, TablePage, ToastExampleIcon, ToastPage } from "./data.js";
 import { PopoverPage, SheetPage } from "./overlay.js";
+import { CalendarPage, collections, ComboboxPage, monthLabels } from "./form-guides.js";
 import "./catalog.css";
 
-const categories = ["Actions", "Forms", "Display", "Feedback", "Navigation", "Layout"] as const;
+const MediaPage = lazy(async () => ({ default: (await import("./media.js")).MediaPage }));
+const categories = ["Actions", "Forms", "Display", "Feedback", "Navigation", "Layout", "Media"] as const;
 type Category = typeof categories[number];
 interface Entry {
   slug: string;
@@ -48,6 +50,24 @@ const entries: Entry[] = [
     summary: "Choose one or several values from a compact list.",
     interaction: <>Open the list and move with the arrow keys. Type a letter to jump to a matching option, choose with <kbd>Enter</kbd> or <kbd>Space</kbd>, and close with <kbd>Escape</kbd>.</>,
     preview: <Select label="Language" value="en" onChange={() => {}} options={[{ value: "en", label: "English" }, { value: "fr", label: "Français" }]} />,
+  },
+  {
+    slug: "calendar", name: "Calendar", category: "Forms", page: CalendarPage,
+    summary: "Choose a date in a monthly calendar with optional booking limits.",
+    interaction: <>Arrow keys move by day or week. <kbd>Page Up</kbd> and <kbd>Page Down</kbd> change the month. Press <kbd>Enter</kbd> or <kbd>Space</kbd> to select the focused date.</>,
+    preview: <Calendar className="gallery__calendar" label="Publication date" labels={monthLabels} locale="en-GB" value="2028-02-29" onChange={() => {}} />,
+  },
+  {
+    slug: "combobox", name: "Combobox", category: "Forms", page: ComboboxPage,
+    summary: "Search a long list and choose a matching option.",
+    interaction: <>Type to filter and use the arrow keys to explore matches. <kbd>Enter</kbd> selects an option. <kbd>Escape</kbd> restores the previous choice.</>,
+    preview: <Combobox options={collections} value={null} onChange={() => {}} label="Collection" placeholder="Search collections…" emptyMessage="No matching collections" />,
+  },
+  {
+    slug: "media", name: "Image upload and crop", category: "Media", page: MediaPage,
+    summary: "Combine DropZone and ImageCropper to choose, frame and export an image.",
+    interaction: <>Use <kbd>Enter</kbd> on the drop zone to choose a file. Adjust zoom and rotation with the slider arrow keys, then confirm the crop.</>,
+    preview: <img className="gallery__crop" src={glacierImage.data.file.url} alt="" loading="lazy" />,
   },
   {
     slug: "choice", name: "Checkbox and Toggle", category: "Forms", page: ChoicesPage,
@@ -131,7 +151,7 @@ const entries: Entry[] = [
     slug: "card", name: "Card", category: "Display", page: CardPage,
     summary: "Group related content and actions on one surface.",
     interaction: <>Give the title the heading level that fits the page. In an interactive card the title link is the only tab stop and covers the whole surface.</>,
-    preview: <Card variant="elevated" padding="sm"><CardHeader><CardTitle as="h3">Autumn field notes</CardTitle><CardDescription>Edited two hours ago</CardDescription></CardHeader></Card>,
+    preview: <Card padding="sm" className="gallery__notebook"><CardImage src={glacierImage.data.file.url} alt="" width={1050} height={525} loading="lazy" /><CardHeader><CardTitle>{notebookTitle}</CardTitle></CardHeader></Card>,
   },
   {
     slug: "avatar", name: "Avatar", category: "Display", page: AvatarPage,

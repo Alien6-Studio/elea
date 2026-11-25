@@ -76,6 +76,9 @@
   background-size: 12px 12px;
   overflow: hidden;
 }
+.gallery__notebook { inline-size: 11rem; }
+.gallery__calendar { zoom: .56; }
+.gallery__crop { inline-size: 11rem; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--elea-radius-md); }
 .gallery__preview > * { max-inline-size: 100%; }
 .catalog-card__body { padding: .9rem .8rem 1rem; }
 .catalog-card__body h2 { margin: .2rem 0 .3rem; font-size: clamp(1.1rem, 1.9vw, 1.34rem); }
