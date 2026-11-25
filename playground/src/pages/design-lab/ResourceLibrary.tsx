@@ -4,7 +4,7 @@ import {
   Button, Card, CardDescription, CardFooter, CardHeader, CardTitle, Dialog,
   Field, Input, Pagination, Select, Tooltip,
 } from "@alien6-studio/elea-ui";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { sitePath } from "../../links.js";
 import "./resource-library.css";
 
@@ -38,12 +38,20 @@ export default function ResourceLibrary() {
   const [category, setCategory] = useState("all");
   const [page, setPage] = useState(1);
   const [reading, setReading] = useState<Resource | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const needle = query.trim().toLowerCase();
   const results = resources.filter(({ title, kind, summary }) =>
     (category === "all" || category === kind) && (title + " " + summary).toLowerCase().includes(needle),
   );
   const visible = results.slice((page - 1) * pageSize, page * pageSize);
+
+  function clearFilters() {
+    setQuery("");
+    setCategory("all");
+    setPage(1);
+    searchRef.current?.focus();
+  }
 
   return (
     <section className="resource-study" data-elea-theme="editorial" data-elea-appearance={appearance} data-treatment={treatment}>
@@ -57,7 +65,7 @@ export default function ResourceLibrary() {
                   aria-pressed={value === treatment} onClick={() => setTreatment(value)}>{label}</Button>
               ))}
             </div>
-            <Select label="Appearance" size="sm" value={appearance} options={appearances}
+            <Select className="resource-study__appearance" label="Appearance" size="sm" value={appearance} options={appearances}
               onChange={(value) => setAppearance(value === "dark" ? "dark" : "light")} />
           </div>
         </div>
@@ -76,7 +84,7 @@ export default function ResourceLibrary() {
         <section className="resource-study__browse" aria-label="Browse resources">
           <div className="resource-study__filters">
             <Field label="Find a resource">{(control) => (
-              <Input {...control} type="search" value={query} onChange={(event) => { setQuery(event.currentTarget.value); setPage(1); }} />
+              <Input {...control} ref={searchRef} type="search" value={query} onChange={(event) => { setQuery(event.currentTarget.value); setPage(1); }} />
             )}</Field>
             <Field label="Resource type">{({ id }) => (
               <Select id={id} value={category} options={categories}
@@ -108,7 +116,7 @@ export default function ResourceLibrary() {
           ) : (
             <div className="resource-study__empty">
               <p>No matching resources.</p>
-              <Button size="sm" variant="outline" onClick={() => { setQuery(""); setCategory("all"); setPage(1); }}>Clear filters</Button>
+              <Button size="sm" variant="outline" onClick={clearFilters}>Clear filters</Button>
             </div>
           )}
           <Pagination page={page} pageCount={Math.ceil(results.length / pageSize)} onPageChange={setPage} labels={paginationLabels} showLabels />

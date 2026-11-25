@@ -15,7 +15,8 @@ test("the catalogue combines category and search and recovers from an empty resu
   await expect(main.getByRole("link", { name: "RadioGroup", exact: true })).toBeVisible();
   await main.getByRole("button", { name: "Navigation" }).click();
   await expect(main.getByRole("heading", { name: "No components found" })).toBeVisible();
-  await main.getByRole("button", { name: "Clear filters" }).click();
+  await main.getByRole("button", { name: "Clear filters" }).press("Enter");
+  await expect(search).toBeFocused();
   await expect(search).toHaveValue("");
   await expect(results).toHaveText("24 component guides");
 });

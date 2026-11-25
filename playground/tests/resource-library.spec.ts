@@ -42,9 +42,17 @@ test("resource treatments share a controlled list and filters", async ({ page })
   await expect(results.getByRole("heading", { name: "Recording the snow line" })).toBeVisible();
   const category = study.getByRole("combobox", { name: "Resource type" });
   await category.press("ArrowDown");
-  await page.getByRole("option", { name: "Reports" }).click();
+  await page.keyboard.press("Home");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(category).toHaveText("Reports");
   await expect(study.getByText("No matching resources.")).toBeVisible();
-  await study.getByRole("button", { name: "Clear filters" }).press("Enter");
+  await page.keyboard.press("Tab");
+  await expect(study.getByRole("button", { name: "Clear filters" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(search).toBeFocused();
+  await expect(search).toHaveValue("");
+  await expect(category).toHaveText("All types");
   await expect(study.getByRole("status")).toHaveText("7 resources");
   await expect(pagination.getByRole("button", { name: "Page 1" })).toHaveAttribute("aria-current", "page");
 });
@@ -82,8 +90,14 @@ test("keyboard overlays and token overrides stay local to the narrow preview", a
   expect(await page.locator("html").evaluate((element) => element.scrollWidth)).toBeLessThanOrEqual(391);
 
   await study.evaluate((element) => (element as HTMLElement).style.setProperty("--elea-color-surface-inverse", "rgb(31, 46, 63)"));
+  const search = study.getByRole("searchbox", { name: "Find a resource" });
+  const category = study.getByRole("combobox", { name: "Resource type" });
   const read = study.getByRole("button", { name: "Read resource, Reading a changing glacier" });
-  await focusInView(read);
+  for (const control of [search, category, read]) {
+    await expect(control).toBeInViewport({ ratio: 1 });
+    await page.keyboard.press("Tab");
+    await expect(control).toBeFocused();
+  }
   await expect(hint).toHaveText("Read without leaving the library");
   await expect(read).toHaveAccessibleDescription("Read without leaving the library");
   expect(await hint.evaluate((element) => element.matches(":popover-open"))).toBe(true);

@@ -30,6 +30,15 @@ for (const width of [1440, 320]) {
     await expect(page.getByRole("heading", { level: 1, name: "UI integration" })).toBeVisible();
     await expect(integration).toHaveAttribute("aria-current", "page");
 
+    const guide = page.getByRole("main").getByRole("article");
+    const example = guide.locator("pre").first();
+    await expect(example).toContainText("<Button");
+    await expect(example).toBeInViewport({ ratio: 0.9 });
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    await guide.getByRole("link", { name: "Try Button states" }).press("Enter");
+    await expect(page).toHaveURL(/#\/ui\/button$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Button", exact: true })).toBeVisible();
+
     const components = main.getByRole("link", { name: "Components", exact: true });
     await components.click();
     await expect(page).toHaveURL(/#\/ui$/);

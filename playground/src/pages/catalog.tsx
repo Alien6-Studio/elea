@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { Accordion, Alert, Avatar, AvatarGroup, Badge, Button, Card, CardDescription, CardHeader, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
 import { notebookTitle } from "../notebook.js";
 import { brandRoute, makeBrandTheme, type BrandTheme } from "./brandTheme.js";
@@ -199,11 +199,19 @@ function ExampleLinks({ brand }: { brand?: BrandTheme }) {
 function Overview({ brand, motionSwitch }: { brand?: BrandTheme; motionSwitch: ReactNode }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | "All">("All");
+  const searchRef = useRef<HTMLInputElement>(null);
   const terms = query.trim().toLowerCase().split(/\s+/u);
   const filtered = entries.filter((entry) => {
     const text = `${entry.name} ${entry.category} ${entry.summary} ${entry.slug}`.toLowerCase();
     return (category === "All" || entry.category === category) && terms.every((term) => text.includes(term));
   });
+
+  function clearFilters() {
+    setQuery("");
+    setCategory("All");
+    searchRef.current?.focus();
+  }
+
   return (
     <>
       <header className="catalog-hero">
@@ -217,7 +225,7 @@ function Overview({ brand, motionSwitch }: { brand?: BrandTheme; motionSwitch: R
         <label className="catalog-search">
           <span className="site__visually-hidden">Search components</span>
           <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></svg>
-          <Input type="search" placeholder="Search components" value={query} onChange={(event) => setQuery(event.currentTarget.value)} />
+          <Input ref={searchRef} type="search" placeholder="Search components" value={query} onChange={(event) => setQuery(event.currentTarget.value)} />
         </label>
         <div className="catalog-filters" role="group" aria-label="Filter by category">
           {(["All", ...categories] as const).map((item) =>
@@ -239,7 +247,7 @@ function Overview({ brand, motionSwitch }: { brand?: BrandTheme; motionSwitch: R
       </div> : <section className="catalog-empty">
         <h2>No components found</h2>
         <p>Try another name or choose a different category.</p>
-        <Button variant="outline" size="sm" onClick={() => { setQuery(""); setCategory("All"); }}>Clear filters</Button>
+        <Button variant="outline" size="sm" onClick={clearFilters}>Clear filters</Button>
       </section>}
     </>
   );
