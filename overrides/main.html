@@ -19,12 +19,20 @@
     <link rel="stylesheet" href="{{ path | url }}">
   {% endfor %}
 </head>
-<body>
+{% set typography_page = page.file.src_uri == 'typography.md' %}
+<body{% if typography_page %} class="typography-page"{% endif %}>
   {% if page.is_homepage %}
     {% include "header-home.html" %}
     <main id="main" tabindex="-1">
       {% include "site-home.html" %}
     </main>
+  {% elif typography_page %}
+    {% include "header-typography.html" %}
+    <main id="main" class="site-container type-book" tabindex="-1">
+      {% include "typography-cover.html" %}
+      {{ page.content }}
+    </main>
+    <script type="module" src="{{ 'playground/glyph-carousel.js' | url }}"></script>
   {% else %}
     {% include "header-docs.html" %}
     <div class="docs-guidebar">

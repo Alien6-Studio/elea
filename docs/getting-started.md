@@ -21,7 +21,7 @@ import "@alien6-studio/elea-content-viewer/bundle.css";
 
 ## Fit the host page
 
-By default the reader sets Elea's typography. Inside a page that already has its own, `typography="inherit"` takes that page's family, size, leading and colour, and sizes the headings in proportion to its text.
+The reader bundle loads ELEA Sans by default. Inside a page that already has its own typography, `typography="inherit"` takes that page's family, size, leading and colour, and sizes the headings in proportion to its text.
 
 ```tsx
 <ContentView data={storedDocument} typography="inherit" />;

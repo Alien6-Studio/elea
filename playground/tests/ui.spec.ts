@@ -293,7 +293,9 @@ test("the static notebook links to the same edition in the editor", async ({ pag
   const main = page.getByRole("main");
   await expect(main.getByRole("group", { name: "Preview a publication theme" })).toHaveCount(0);
   const sampleTitle = main.getByRole("heading", { name: "The glacier notebook" });
-  await expect(sampleTitle).toHaveCSS("font-family", /Instrument Sans/);
+  await expect(sampleTitle).toHaveCSS("font-family", /^"ELEA Sans"/);
+  const faces = await page.evaluate(async () => (await document.fonts.load('400 1em "ELEA Sans"')).length);
+  expect(faces).toBe(1);
   const open = main.getByRole("link", { name: "Edit this notebook" });
   expect(await textContrast(open)).toBeGreaterThanOrEqual(4.5);
   await expect(open).toHaveAttribute("href", /#\/playground\?edition=precision$/);

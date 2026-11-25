@@ -1,12 +1,19 @@
 :root {
-  --elea-font-family-sans: "Instrument Sans Variable", system-ui, sans-serif;
-  --elea-font-family-serif: "Source Serif 4 Variable", "Iowan Old Style", Georgia, serif;
+  --elea-font-family-serif: "Iowan Old Style", Georgia, serif;
   --site-width: 74rem;
   --site-nav-rail: clamp(9rem, 17vw, 14rem);
   --site-nav-gap: clamp(1rem, 2.4vw, 2.25rem);
   --site-page-title: clamp(2.75rem, 6vw, 4.75rem);
   --site-page-inset: clamp(2.5rem, 5vw, 4.5rem);
   --site-gutter: clamp(1.25rem, 4.4vw, 3.25rem);
+}
+
+:root[data-site-font="instrument"] {
+  --elea-font-family-sans: "Instrument Sans Variable", system-ui, sans-serif;
+}
+
+:root[data-site-font="roboto"] {
+  --elea-font-family-sans: "Roboto Variable", Roboto, system-ui, sans-serif;
 }
 
 .site-page-title {
@@ -63,8 +70,12 @@
   align-items: center;
   justify-self: start;
   min-height: 2.75rem;
+  color: var(--elea-color-text-default);
+  font: 400 clamp(2.5rem, 5vw, 3rem)/.9 var(--elea-font-family-sans);
+  font-synthesis: none;
+  letter-spacing: normal;
+  text-decoration: none;
 }
-.site__wordmark img { display: block; flex: none; }
 .site__nav-links, .site__masthead-tools { display: flex; align-items: center; }
 .site__nav-links { gap: clamp(.875rem, 2vw, 1.875rem); }
 .site__masthead-tools { justify-self: end; gap: .375rem; }
@@ -108,7 +119,6 @@
   --elea-footer-max-width: calc(var(--site-width) + var(--site-gutter) * 2);
   --elea-footer-padding: var(--site-gutter);
 }
-.site-footer .site__wordmark { color-scheme: dark; }
 .site-footer .elea-footer__brand p { margin: var(--elea-space-3) 0 0; }
 .site-footer .elea-footer__main {
   padding-block: clamp(var(--elea-space-8), 5vw, var(--elea-space-12));
@@ -136,7 +146,7 @@
     padding-top: .5rem;
   }
   .site__masthead-tools { grid-column: 2; grid-row: 1; }
-  .site__masthead-links { grid-column: 1 / -1; grid-row: 2; }
+  .site__masthead-links { grid-column: 1 / -1; grid-row: 2; flex-wrap: wrap; }
   .site__nav-links {
     gap: 1.25rem;
     overflow-x: auto;
@@ -159,4 +169,13 @@
 @media (max-width: 22rem) {
   .site__nav-links { padding-inline: .5rem; gap: .3rem; }
   .site__nav-links a { font-size: .75rem; letter-spacing: -.01em; }
+}
+@media (max-width: 30rem) {
+  .site__masthead-links {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    justify-items: start;
+    gap: 0 .9rem;
+  }
 }

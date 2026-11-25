@@ -40,3 +40,75 @@
     }
   });
 })();
+
+(() => {
+  const key = "elea-site-font";
+  const sessionKey = "elea-site-font-session";
+  const options = [
+    { value: "elea", label: "ELEA Sans" },
+    { value: "instrument", label: "Instrument Sans" },
+    { value: "roboto", label: "Roboto" },
+  ];
+  const listeners = new Set();
+  let current = options[0];
+
+  function storedFont(storage, storageKey) {
+    const value = storage.getItem(storageKey);
+    if (value !== "source-serif") return value;
+    try { storage.setItem(storageKey, "roboto"); } catch { /* The stored preference may be read-only. */ }
+    return "roboto";
+  }
+
+  function readFont() {
+    // A tab can retain its choice when a persistent write was denied.
+    try {
+      const fallback = storedFont(sessionStorage, sessionKey);
+      if (fallback !== null) return fallback;
+    } catch { /* Session storage can be disabled. */ }
+    try {
+      return storedFont(localStorage, key);
+    } catch {
+      return current.value;
+    }
+  }
+
+  function applyFont(value) {
+    const font = options.find((option) => option.value === value) ?? options[0];
+    if (document.documentElement.dataset.siteFont === font.value) return;
+    current = font;
+    document.documentElement.dataset.siteFont = current.value;
+    for (const listener of listeners) listener();
+  }
+
+  function usePersistentChoice() {
+    try { sessionStorage.removeItem(sessionKey); } catch { /* Storage is optional. */ }
+  }
+
+  window.eleaSiteFont = {
+    options,
+    get: () => current.value,
+    set(value) {
+      applyFont(value);
+      try {
+        localStorage.setItem(key, current.value);
+        usePersistentChoice();
+      } catch {
+        try { sessionStorage.setItem(sessionKey, current.value); } catch { /* Keep the in-memory selection. */ }
+      }
+    },
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+  applyFont(readFont());
+  window.addEventListener("storage", (event) => {
+    if (event.key === key || event.key === null) {
+      usePersistentChoice();
+      applyFont(readFont());
+    }
+  });
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) applyFont(readFont());
+  });
+})();

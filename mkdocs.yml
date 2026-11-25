@@ -7,11 +7,15 @@ theme:
   name: null
   custom_dir: overrides
 plugins: []
+hooks:
+  - scripts/package_typeface.py
 nav:
   - Overview: index.md
   - Getting started: getting-started.md
   - Content: content.md
   - UI integration: components.md
+not_in_nav: |
+  /typography.md
 extra_css:
   - assets/elea.css
   - assets/editions.css

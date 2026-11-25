@@ -4,6 +4,73 @@ import { textContrast } from "./contrast.js";
 
 const studioPath = "/elea/playground/#/theme";
 
+test("Typography shows ELEA Sans and preserves the Studio typeface preference", async ({ page }) => {
+  await page.goto(studioPath);
+  const siteTypeface = page.getByRole("combobox", { name: "Site typeface", exact: true });
+  const readingTypeface = page.getByRole("combobox", { name: "Reading typeface", exact: true });
+  const root = page.locator("html");
+  const mainNav = page.getByRole("navigation", { name: "Main", exact: true });
+  await expect(siteTypeface).toHaveText("ELEA Sans");
+  await page.getByRole("button", { name: "Editorial", exact: true }).click();
+  const editionUrl = page.url();
+  const download = page.getByRole("link", { name: "Download CSS" });
+  const editionCss = await download.getAttribute("href");
+  await expect(readingTypeface).toHaveText("Serif");
+
+  const docs = mainNav.getByRole("link", { name: "Docs", exact: true });
+  for (const [label, value] of [["Instrument Sans", "instrument"], ["Roboto", "roboto"]] as const) {
+    const family = new RegExp(`^"${label} Variable"`);
+    await siteTypeface.click();
+    await expect(page.getByRole("option", { name: "Source Serif 4", exact: true })).toHaveCount(0);
+    await page.getByRole("option", { name: label, exact: true }).click();
+    await expect(siteTypeface).toHaveText(label);
+    await expect(root).toHaveAttribute("data-site-font", value);
+    await expect(docs).toHaveCSS("font-family", family);
+    await expect(page).toHaveURL(editionUrl);
+    await expect(readingTypeface).toHaveText("Serif");
+    expect(await download.getAttribute("href")).toBe(editionCss);
+
+    await page.getByRole("link", { name: "View type specimen" }).click();
+    await expect(page).toHaveURL(/\/typography\/$/);
+    await expect(docs).toHaveCSS("font-family", /^"ELEA Sans"/);
+    await page.reload();
+    for (const element of [
+      docs,
+      page.getByRole("contentinfo").getByRole("link", { name: "Elea", exact: true }),
+      page.locator(".type-reading"),
+      page.locator(".type-small-caps"),
+      page.locator(".type-glyphs").getByText("0123456789", { exact: true }),
+      page.getByRole("table", { name: "Weights in roman and italic" }).getByRole("cell").last(),
+    ]) await expect(element).toHaveCSS("font-family", /^"ELEA Sans"/);
+
+    await page.goBack();
+    await expect(page).toHaveURL(editionUrl);
+    await expect(siteTypeface).toHaveText(label);
+    await expect(root).toHaveAttribute("data-site-font", value);
+    await expect(docs).toHaveCSS("font-family", family);
+  }
+  await siteTypeface.click();
+  await page.getByRole("option", { name: "ELEA Sans", exact: true }).click();
+  await expect(root).toHaveAttribute("data-site-font", "elea");
+});
+
+test("a saved Source Serif 4 site preference migrates to Roboto", async ({ page }) => {
+  await page.goto(studioPath);
+  const siteTypeface = page.getByRole("combobox", { name: "Site typeface", exact: true });
+  for (const storage of ["local", "session"] as const) {
+    await page.evaluate(storage => {
+      localStorage.removeItem("elea-site-font");
+      sessionStorage.removeItem("elea-site-font-session");
+      if (storage === "local") localStorage.setItem("elea-site-font", "source-serif");
+      else sessionStorage.setItem("elea-site-font-session", "source-serif");
+    }, storage);
+    await page.reload();
+    await expect(siteTypeface).toHaveText("Roboto");
+    await expect(page.locator("html")).toHaveAttribute("data-site-font", "roboto");
+    expect(await page.evaluate(() => sessionStorage.getItem("elea-site-font-session") ?? localStorage.getItem("elea-site-font"))).toBe("roboto");
+  }
+});
+
 async function appearance(locator: Locator) {
   return locator.evaluate((element) => {
     const style = getComputedStyle(element);
@@ -166,7 +233,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     }
     const reading = article.locator(".elea-paragraph").first();
     await expect(reading).toHaveCSS("font-size", "16px");
-    await expect(reading).toHaveCSS("font-family", /Instrument Sans/i);
+    await expect(reading).toHaveCSS("font-family", /^"ELEA Sans"/);
     await page.getByRole("combobox", { name: "Reading typeface" }).click();
     await page.getByRole("option", { name: "Serif", exact: true }).click();
     await page.getByRole("combobox", { name: "Reading density" }).click();

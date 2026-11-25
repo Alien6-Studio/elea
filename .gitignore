@@ -6,6 +6,9 @@
 /docs/assets/fonts/
 /overrides/header-home.html
 /overrides/header-docs.html
+/overrides/header-typography.html
+/overrides/typography-cover.html
+/scripts/__pycache__/
 /overrides/site-footer.html
 /overrides/site-home.html
 /playground/public/favicon.svg

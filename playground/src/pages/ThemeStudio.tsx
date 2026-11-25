@@ -1,6 +1,7 @@
 import { Button, Field, Input, RadioGroup, Select } from "@alien6-studio/elea-ui";
 import { useEffect, useState } from "react";
 import { createDocument, en } from "@alien6-studio/elea-content";
+import { SiteTypefaceField } from "../components/SiteTypefaceField.js";
 import { notebookBlocks, notebookSummary, notebookTitle } from "../samples.js";
 import { ReaderEdition } from "./ReaderEdition.js";
 import { corners, editions, makeBrandTheme, rhythms, typefaces, typeFamilies, type BrandTheme, type Corners } from "@alien6-studio/elea-tokens/brand";
@@ -83,6 +84,7 @@ export function ThemeStudioPage({ replaceRoute }: { replaceRoute: (route: string
       </div>
       <div className="studio-workbench" data-view={mobileView}>
         <div id="studio-controls" className="studio-controls">
+          <SiteTypefaceField />
           <h2>Brand settings</h2>
           <Field label="Brand colour">{({ id }) => <div className="studio-colour">
             <input id={id} type="color" value={seed} onChange={(event) => changeBrand({ ...brand, seed: event.currentTarget.value })} /><code>{seed.toUpperCase()}</code>

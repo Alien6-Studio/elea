@@ -14,7 +14,7 @@ export function SiteFooter({ navigation = siteNavigation }: { navigation?: SiteN
   return (
     <Footer role="contentinfo" className="site-footer" groups={[{ label: "Explore Elea", links: navigation }, project]} brand={
       <>
-        <a className="site__wordmark" href={sitePath}><Logo /></a>
+        <Logo />
         <p>Open-source React components for products built around rich content.</p>
       </>
     }>

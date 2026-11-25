@@ -1,5 +1,5 @@
 import { Button } from "@alien6-studio/elea-ui";
-import { repositoryUrl, siteNavigation, sitePath, type SiteNavigation, type SiteSection } from "../links.js";
+import { repositoryUrl, siteNavigation, type SiteNavigation, type SiteSection } from "../links.js";
 import { Logo } from "./Logo.js";
 
 export function SiteHeader({ section, navigation = siteNavigation }: { section?: SiteSection; navigation?: SiteNavigation }) {
@@ -11,7 +11,7 @@ export function SiteHeader({ section, navigation = siteNavigation }: { section?:
       }}>Skip to content</a>
       <header className="site__masthead">
         <div className="site-container site__masthead-inner">
-          <a className="site__wordmark" href={sitePath}><Logo height={36} /></a>
+          <Logo />
           <nav className="site__nav-links site__masthead-links" aria-label="Main">
             {navigation.map((link) => (
               <a key={link.id} href={link.href} aria-current={section === link.id ? "true" : undefined}>{link.label}</a>

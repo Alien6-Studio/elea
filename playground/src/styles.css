@@ -1,7 +1,9 @@
 /* The page's own element rules sit under Elea; everything else here is unlayered and wins over it. */
 @layer site, elea;
 @import "@fontsource-variable/instrument-sans";
-@import "@fontsource-variable/source-serif-4";
+@import "@fontsource-variable/instrument-sans/wght-italic.css";
+@import "@fontsource-variable/roboto";
+@import "@fontsource-variable/roboto/wght-italic.css";
 @import "@alien6-studio/elea-ui/bundle.css";
 @import "@alien6-studio/elea-tokens/editions.css";
 @import "../../docs/assets/brand.css";
