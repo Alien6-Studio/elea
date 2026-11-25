@@ -546,11 +546,18 @@ test("Markdown edits the document and accepts a dropped image with cropping", as
   expect(existing).toContain("Quarterly report");
   const revised = existing.replace("## Every block type", "### Revised heading") + "\n";
   await source.fill(revised);
+  const sourceFrame = editor.locator(".elea-markdown-editor__source");
+  await expect(sourceFrame).toHaveCSS("outline-offset", "-2px");
+  await expect(sourceFrame).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
   await expect(viewer.getByRole("heading", { name: "Revised heading", level: 3 })).toBeVisible();
   await expect(viewer.locator(".elea-attachment__title")).toHaveText("Quarterly report");
 
   await editor.getByText("Add an image", { exact: true }).click();
   const dropZone = editor.locator(".elea-dropzone");
+  await page.keyboard.press("Tab");
+  await dropZone.locator("label").focus();
+  await expect(dropZone).toHaveCSS("outline-offset", "-2px");
+  await expect(dropZone).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
   const file = (await readFile(PIXEL)).toString("base64");
   const dataTransfer = await page.evaluateHandle((encoded) => {
     const bytes = Uint8Array.from(atob(encoded), (character) => character.charCodeAt(0));
@@ -564,7 +571,11 @@ test("Markdown edits the document and accepts a dropped image with cropping", as
   await dataTransfer.dispose();
   await expect(editor.getByRole("img", { name: "Picture to frame" })).toBeVisible();
   await editor.getByRole("slider", { name: "Zoom" }).press("ArrowRight");
-  await editor.getByRole("button", { name: "Use this image" }).click();
+  const confirmImage = editor.getByRole("button", { name: "Use this image" });
+  await confirmImage.focus();
+  await expect(confirmImage).toHaveCSS("outline-width", "2px");
+  await expect(confirmImage).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
+  await confirmImage.click();
   await expect(viewer.locator('img[src^="data:image/png"]')).toHaveCount(1);
   expect((await source.inputValue()).startsWith(revised)).toBe(true);
 
@@ -860,6 +871,9 @@ test("the classic mode shows a fixed bar above a continuous document, nothing ar
   await expect(bar.locator(".elea-doc-toolbar__group--idle")).toHaveCount(1);
   const paragraph = firstParagraph(page);
   await paragraph.click({ position: { x: 10, y: 10 } });
+  const frame = editorPane(page).locator(".elea-classic-editor");
+  await expect(frame).toHaveCSS("outline-offset", "-2px");
+  await expect(frame).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
   await expect(bar.locator(".elea-doc-toolbar__group--idle")).toHaveCount(0);
   await selectInEditable(page, paragraph, 0, "Elea renders".length);
   await expect(page.locator("[data-elea-bubble]")).toHaveCount(0);

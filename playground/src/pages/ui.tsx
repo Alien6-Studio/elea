@@ -19,7 +19,8 @@ export function ButtonsPage() {
 <Button variant="ghost">Ghost</Button>
 <Button variant="danger">Danger</Button>
 <Button variant="success">Success</Button>
-<Button variant="info">Info</Button>`}>
+<Button variant="info">Info</Button>
+<Button variant="warning">Warning</Button>`}>
         <Button>Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="outline">Outline</Button>
@@ -27,6 +28,7 @@ export function ButtonsPage() {
         <Button variant="danger">Danger</Button>
         <Button variant="success">Success</Button>
         <Button variant="info">Info</Button>
+        <Button variant="warning">Warning</Button>
       </Demo>
       <Demo title="An info colour of its own" description="The info variant reads the info colour, like the info tone of an alert, a badge, a toast or a progress bar. It starts as the link colour and follows the theme, until a host sets it." code={`<div style={{ "--elea-color-info": "light-dark(#0e7490, #67e8f9)" }}>
   <Button variant="info">Teal info</Button>
@@ -72,10 +74,12 @@ export function ButtonsPage() {
       </Demo>
       <Demo title="Loading and disabled" description="Save shows a pending state for two seconds." code={`<Button loading={loading} loadingLabel="Saving" onClick={save}>Save</Button>
 <Button disabled>Disabled</Button>
-<Button href="https://example.org" variant="outline">A link</Button>`}>
+<Button href="https://example.org" variant="outline">A link</Button>
+<Button href="https://example.org" variant="outline" disabled>Unavailable link</Button>`}>
         <Button loading={loading} loadingLabel="Saving" onClick={() => { setLoading(true); setTimeout(() => setLoading(false), 2000); }}>Save</Button>
         <Button disabled>Disabled</Button>
         <Button href="https://example.org" variant="outline">A link</Button>
+        <Button href="https://example.org" variant="outline" disabled>Unavailable link</Button>
       </Demo>
       <Demo title="Motion" description="Once the page or a container opts in, a button moves on a damped spring: it lifts on hover, its icons lean in and a press compresses it before it bounces back. The Expressive motion switch of this gallery sets it on the page. Motion stays off by default and never runs when the visitor prefers reduced motion." code={`<html data-elea-motion="on">
 
@@ -107,7 +111,7 @@ export function ButtonsPage() {
       </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
-        { name: "variant", type: '"primary" | "secondary" | "outline" | "ghost" | "danger" | "success" | "info"', defaultValue: '"primary"', description: "Visual weight of the action." },
+        { name: "variant", type: '"primary" | "secondary" | "outline" | "ghost" | "danger" | "success" | "info" | "warning"', defaultValue: '"primary"', description: "Visual weight or status colour of the action." },
         { name: "size", type: '"xs" | "sm" | "md" | "lg" | "xl"', defaultValue: '"md"', description: "Height and type size." },
         { name: "radius", type: '"none" | "sm" | "md" | "lg" | "full"', defaultValue: '"md"', description: "Corner rounding, from square to pill." },
         { name: "shadow", type: '"none" | "sm" | "md"', defaultValue: '"none"', description: "A resting shadow that lifts the button off the surface." },
@@ -480,6 +484,7 @@ export function PaginationPage() {
 export function SelectPage() {
   const [language, setLanguage] = useState<string | null>("fr");
   const [days, setDays] = useState<string[]>(["mon", "wed"]);
+  const [fieldLanguage, setFieldLanguage] = useState<string | null>(null);
   const languages = [{ value: "fr", label: "Français" }, { value: "en", label: "English" }, { value: "de", label: "Deutsch", disabled: true }, { value: "es", label: "Español" }];
   const week = [{ value: "mon", label: "Monday" }, { value: "tue", label: "Tuesday" }, { value: "wed", label: "Wednesday" }, { value: "thu", label: "Thursday" }, { value: "fri", label: "Friday" }];
   return (
@@ -497,9 +502,23 @@ export function SelectPage() {
         <Select multiple label="Days" value={days} onChange={setDays} placeholder="Pick days" summary={(values) => `${values.length} day(s)`} options={week} />
         <Select multiple label="Days, labels joined" value={days} onChange={setDays} placeholder="Pick days" options={week} />
       </Demo>
-      <Demo title="In a field" code={`<Field label="Language">{(control) => <Select id={control.id} triggerProps={{ "aria-describedby": control["aria-describedby"] }} value={language} onChange={setLanguage} options={languages} />}</Field>`}>
+      <Demo title="In a field" code={`const [fieldLanguage, setFieldLanguage] = useState<string | null>(null);
+
+<Field label="Publication language" required help="Used for publication labels."
+  error={fieldLanguage === null ? "Choose a language." : undefined}>
+  {({ id, required, ...accessibility }) => (
+    <Select id={id} triggerProps={{ ...accessibility, "aria-required": required }}
+      value={fieldLanguage} onChange={setFieldLanguage} placeholder="Pick a language" options={languages} />
+  )}
+</Field>`}>
         <div style={{ width: "16rem" }}>
-          <Field label="Language" help="Used for every label of the editor.">{(control) => <Select id={control.id} triggerProps={{ "aria-describedby": control["aria-describedby"] }} value={language} onChange={setLanguage} options={languages} />}</Field>
+          <Field label="Publication language" required help="Used for publication labels."
+            error={fieldLanguage === null ? "Choose a language." : undefined}>
+            {({ id, required, ...accessibility }) => (
+              <Select id={id} triggerProps={{ ...accessibility, "aria-required": required }}
+                value={fieldLanguage} onChange={setFieldLanguage} placeholder="Pick a language" options={languages} />
+            )}
+          </Field>
         </div>
       </Demo>
       <h2>Props</h2>

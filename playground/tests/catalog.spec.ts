@@ -21,10 +21,81 @@ test("the catalogue combines category and search and recovers from an empty resu
   await expect(results).toHaveText("24 component guides");
 });
 
+test("retired study links open the catalogue without adding a history entry", async ({ page }) => {
+  await page.goto("/elea/playground/#/theme");
+  const studio = page.getByRole("heading", { name: "Theme studio", exact: true });
+  await expect(studio).toBeVisible();
+  for (const route of ["design-lab", "design-lab/components/obsidian/dark", "design-lab/resource-library?edition=precision"]) {
+    await page.goto(`/elea/playground/#/${route}`);
+    await expect(page).toHaveURL(/#\/ui$/);
+    await expect(page.getByRole("heading", { name: "Components", exact: true })).toBeVisible();
+    await page.goBack();
+    await expect(studio).toBeVisible();
+  }
+});
+
+for (const colorScheme of ["light", "dark"] as const) {
+  test(`a disabled button link keeps its fill on hover in ${colorScheme}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+    await page.goto(`${catalog}/button?edition=precision`);
+    const unavailable = page.getByRole("link", { name: "Unavailable link", exact: true });
+    const available = page.getByRole("link", { name: "A link", exact: true });
+    await expect(unavailable).toHaveAttribute("aria-disabled", "true");
+    const restingFill = await unavailable.evaluate(element => getComputedStyle(element).backgroundColor);
+    await unavailable.hover();
+    const hoveredFill = await unavailable.evaluate(async (element) => {
+      const style = getComputedStyle(element);
+      await Promise.all(element.getAnimations().map(animation => animation.finished));
+      return style.backgroundColor;
+    });
+    expect(hoveredFill).toBe(restingFill);
+
+    const availableFill = await available.evaluate(element => getComputedStyle(element).backgroundColor);
+    await available.hover();
+    await expect(available).not.toHaveCSS("background-color", availableFill);
+  });
+
+  test(`an invalid Select has one error-coloured focus outline in ${colorScheme}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.goto(`${catalog}/select?edition=precision`);
+    const language = page.getByRole("combobox", { name: "Publication language", exact: true });
+    const error = page.getByRole("alert");
+    await expect(error).toHaveText("Choose a language.");
+    await expect(language).toHaveAttribute("aria-invalid", "true");
+    const errorBorder = await language.evaluate(element => getComputedStyle(element).borderTopColor);
+    await page.keyboard.press("Tab");
+    await language.focus();
+    await expect(language).toBeFocused();
+    await expect(language).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
+    await expect(language).toHaveCSS("outline-color", errorBorder);
+    await expect(language).toHaveCSS("outline-width", "2px");
+    await expect(language).toHaveCSS("outline-style", "solid");
+    await expect(language).toHaveCSS("outline-offset", "-2px");
+    await expect(language).toHaveCSS("box-shadow", "none");
+
+    const demos = page.locator(".catalog-demos");
+    await demos.evaluate((element: HTMLElement) => {
+      element.style.setProperty("--elea-control-focus-outline", "3px dashed #258343");
+    });
+    await expect(language).toHaveCSS("outline-width", "3px");
+    await expect(language).toHaveCSS("outline-style", "dashed");
+    await demos.evaluate((element: HTMLElement) => element.style.removeProperty("--elea-control-focus-outline"));
+    await language.press("ArrowDown");
+    await page.keyboard.press("Enter");
+    await expect(language).toHaveText("Français");
+    await expect(language).not.toHaveAttribute("aria-invalid", "true");
+    await expect(language).toBeFocused();
+    await expect(language).toHaveCSS("outline-width", "2px");
+    await expect(language).not.toHaveCSS("outline-color", errorBorder);
+    await expect(error).toHaveCount(0);
+  });
+}
+
 test("keyboard focus belongs to the catalogue navigation and to each button’s consumer styles", async ({ page }) => {
   await page.goto(`${catalog}/button`);
   const index = page.getByRole("navigation", { name: "Component index" }).getByRole("link", { name: "All components" });
   const primary = page.getByRole("button", { name: "Primary", exact: true });
+  const outline = page.getByRole("button", { name: "Outline", exact: true });
   const disc = page.getByRole("button", { name: "Add", exact: true }).and(page.locator(".elea-button--disc"));
   await page.keyboard.press("Tab");
   await index.focus();
@@ -41,13 +112,14 @@ test("keyboard focus belongs to the catalogue navigation and to each button’s 
   await page.locator(".catalog-guide").evaluate((element) => {
     (element as HTMLElement).style.setProperty("--elea-control-focus-outline", "3px dashed #258343");
   });
-  for (const button of [primary, disc]) {
+  for (const [button, offset] of [[primary, "2px"], [disc, "2px"], [outline, "-2px"]] as const) {
     await button.focus();
     await expect(button).toHaveCSS("outline-color", "rgb(37, 131, 67)");
     await expect(button).toHaveCSS("outline-width", "3px");
     await expect(button).toHaveCSS("outline-style", "dashed");
-    await expect(button).toHaveCSS("outline-offset", "2px");
+    await expect(button).toHaveCSS("outline-offset", offset);
   }
+  await expect(outline).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
 });
 
 test("the tab guide demonstrates keyboard navigation and exposes its example code", async ({ page }) => {
@@ -85,8 +157,13 @@ test("the tab guide demonstrates keyboard navigation and exposes its example cod
 test("the radio guide submits the selected value with native form behaviour", async ({ page }) => {
   await page.goto(`${catalog}/radio-group`);
   const group = page.getByRole("group", { name: "Email delivery" });
-  await expect(group.getByRole("radio", { name: "Weekly digest" })).toBeChecked();
-  await group.getByRole("radio", { name: "Weekly digest" }).focus();
+  const weekly = group.getByRole("radio", { name: "Weekly digest" });
+  await expect(weekly).toBeChecked();
+  await weekly.focus();
+  await expect(weekly).toHaveCSS("outline-style", "none");
+  const choice = group.locator(".elea-radio").filter({ has: page.getByRole("radio", { name: "Weekly digest" }) });
+  await expect(choice).toHaveCSS("outline-width", "2px");
+  await expect(choice).toHaveCSS("outline-offset", "-2px");
   await page.keyboard.press("ArrowUp");
   await expect(group.getByRole("radio", { name: "Daily digest" })).toBeChecked();
   await expect(group.getByRole("radio", { name: "Every update" })).toBeDisabled();
@@ -117,6 +194,10 @@ test("the display guides show cards, avatars and separators with their fallbacks
   await main.getByRole("link", { name: "Card", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Autumn field notes", level: 3 })).toBeVisible();
   const interactive = page.locator(".elea-card--interactive").first();
+  await page.keyboard.press("Tab");
+  await interactive.getByRole("link").focus();
+  await expect(interactive).toHaveCSS("outline-offset", "-2px");
+  await expect(interactive).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
   const box = (await interactive.boundingBox())!;
   await interactive.click({ position: { x: box.width - 6, y: box.height - 6 } });
   await expect(page).toHaveURL(/#\/ui\/button$/);
@@ -282,12 +363,14 @@ test("the toast guide shows, replaces and dismisses toasts without taking the fo
   const success = page.getByRole("button", { name: "Success", exact: true });
   await success.click();
   await expect(success).toBeFocused();
-  await expect(region.locator(".elea-toast--success")).toContainText("Article published");
+  const toast = region.locator(".elea-toast--success");
+  await expect(toast).toContainText("Article published");
   await page.getByRole("button", { name: "Danger", exact: true }).click();
   await expect(region.getByRole("alert")).toContainText("The article could not be saved");
   await region.getByRole("alert").getByRole("button", { name: "Dismiss" }).click();
   await expect(region.getByRole("alert")).toHaveCount(0);
   await page.getByRole("button", { name: "Archive the article" }).click();
+  await expect(region.locator(".elea-toast--neutral .elea-toast__icon svg")).toBeVisible();
   await region.getByRole("button", { name: "Undo" }).click();
   await expect(region.getByText("Article restored")).toBeVisible();
   await expect(region.getByText("Article moved to the archive")).toHaveCount(0);
@@ -302,6 +385,16 @@ test("the toast guide shows, replaces and dismisses toasts without taking the fo
   expect((await region.locator(".elea-toast").first().boundingBox())!.y).toBeLessThan(200);
 });
 
+test("a toast stays distinguishable with system colours", async ({ page }) => {
+  await page.emulateMedia({ forcedColors: "active" });
+  await page.goto(`${catalog}/toast?edition=editorial`);
+  await page.getByRole("button", { name: "Danger", exact: true }).click();
+  const toast = page.getByRole("region", { name: "Notifications" }).getByRole("alert");
+  await expect(toast).toHaveCSS("outline-style", "solid");
+  await expect(toast).toHaveCSS("outline-width", "1px");
+  await expect(toast.getByRole("button", { name: "Dismiss" })).toBeVisible();
+});
+
 test("the popover guide opens a form, keeps the page usable and returns the focus", async ({ page }) => {
   await page.goto(`${catalog}/popover`);
   const invite = page.getByRole("button", { name: "Invite" });
@@ -309,6 +402,10 @@ test("the popover guide opens a form, keeps the page usable and returns the focu
   const panel = page.getByRole("dialog", { name: "Invite a reader" });
   const email = panel.getByRole("textbox", { name: "Email" });
   await expect(email).toBeFocused();
+  await expect(email).toHaveCSS("outline-width", "2px");
+  await expect(email).toHaveCSS("outline-offset", "-2px");
+  await expect(email).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
+  await expect(email).toHaveCSS("box-shadow", "none");
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
   await expect(invite).toBeFocused();

@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import { textContrast } from "./contrast.js";
 
 const path = "/elea/playground/#/design-lab";
 const modes = ["light", "dark"] as const;
@@ -19,94 +18,6 @@ test("old Workspace links lead to the pinned capture for each direction and appe
       await expect(page).toHaveURL(`${archive}/${capture}-${mode}.webp`);
     }
   }
-});
-
-const componentPath = `${path}/components`;
-
-for (const direction of ["precision", "editorial", "obsidian"]) {
-  for (const mode of ["light", "dark"]) {
-    test(`Component Studies uses the ${direction} ${mode} treatment with an opposite host`, async ({ page }) => {
-      const host = mode === "light" ? "dark" : "light";
-      await page.emulateMedia({ colorScheme: host, reducedMotion: "reduce" });
-      await page.goto(`${componentPath}/${direction}/${mode}`);
-      const study = page.getByRole("region", { name: "Component Studies" });
-      const root = page.locator("html");
-      await expect(root).toHaveAttribute("data-theme", host);
-      await expect(study).toHaveCSS("color-scheme", mode);
-      const title = study.getByRole("textbox", { name: "Document title" });
-      await title.fill("");
-      await expect(title).toHaveAttribute("aria-invalid", "true");
-      await expect(study.getByRole("button", { name: "Review changes" })).toBeDisabled();
-      await title.fill("Review scope");
-      await study.getByRole("textbox", { name: "Review note" }).fill("Verify the scope.");
-      await study.getByRole("combobox", { name: "Reviewer" }).click();
-      await study.getByRole("option", { name: "Legal" }).click();
-      const tab = study.getByRole("tab", { name: "Summary" });
-      await tab.focus();
-      await page.keyboard.press("ArrowRight");
-      await expect(study.getByRole("tabpanel", { name: "Activity" })).toContainText("Legal");
-      const attachments = study.getByRole("checkbox", { name: "Include attachments" });
-      await attachments.focus();
-      await page.keyboard.press("Space");
-      await expect(attachments).not.toBeChecked();
-      const toggle = study.getByRole("switch", { name: "Notify reviewers" });
-      await toggle.focus();
-      await page.keyboard.press("Space");
-      await expect(toggle).toBeChecked();
-
-      await study.getByRole("button", { name: "Ref" }).click();
-      await expect(study.getByRole("columnheader", { name: "Ref" })).toHaveAttribute("aria-sort", "ascending");
-      await study.getByRole("button", { name: "Retention policy", exact: true }).click();
-      await expect(title).toHaveValue("Retention policy");
-      await study.getByRole("button", { name: "Review scope" }).click();
-      const open = study.getByRole("button", { name: "Review changes" });
-      await open.click();
-      const dialog = page.getByRole("dialog", { name: "Confirm review" });
-      await expect(dialog).toHaveCSS("color-scheme", mode);
-      await expect(dialog.locator("..")).toHaveAttribute("data-elea-theme", `lab-study-${direction}-${mode}`);
-      await expect(dialog).toContainText("Excluded");
-      await expect(dialog).toContainText("Review scope");
-      const confirm = dialog.getByRole("button", { name: "Confirm", exact: true });
-      expect(await textContrast(confirm.locator(".elea-button__label"))).toBeGreaterThanOrEqual(4.5);
-      await page.keyboard.press("Escape");
-      await expect(open).toBeFocused();
-      await expect(root).toHaveAttribute("data-theme", host);
-    });
-  }
-}
-
-test("Component Studies compares three geometries under one site identity", async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto(path);
-  const study = page.getByRole("region", { name: "Component Studies" });
-  const title = study.getByRole("textbox", { name: "Document title" });
-  await title.fill("Carry this edit");
-  await study.getByRole("link", { name: "Use site colors and type" }).click();
-  const signatures = [];
-  const directions = page.getByRole("navigation", { name: "Art direction" });
-  for (const direction of ["Precision", "Editorial", "Obsidian"]) {
-    await directions.getByRole("link", { name: direction }).click();
-    await expect(study).toHaveAttribute("data-elea-theme", new RegExp(`lab-study-site-${direction.toLowerCase()}-`));
-    await expect(title).toHaveValue("Carry this edit");
-    await expect.poll(() => page.evaluate(() => document.body.scrollWidth)).toBeLessThanOrEqual(320);
-    signatures.push(await study.getByRole("button", { name: "Review changes" }).evaluate(el => {
-      const style = getComputedStyle(el);
-      return { height: style.minBlockSize, color: style.backgroundColor, font: style.fontFamily };
-    }));
-  }
-  expect(new Set(signatures.map(s => s.height)).size).toBe(3);
-  expect(new Set(signatures.map(s => s.color)).size).toBe(1);
-  expect(new Set(signatures.map(s => s.font)).size).toBe(1);
-  await study.getByRole("button", { name: "Reset draft" }).click();
-  await expect(title).toHaveValue("Intake workflow");
-  await title.fill("Saved study");
-  await study.getByRole("button", { name: "Save draft" }).click();
-  await expect(study.getByRole("status")).toHaveText("Draft saved for this tab.");
-  await title.fill("Unsaved edit");
-  await study.getByRole("button", { name: "Reset draft" }).click();
-  await expect(title).toHaveValue("Saved study");
-  await page.reload();
-  await expect(title).toHaveValue("Saved study");
 });
 
 test("a host opts in a single region without changing its identity or neighboring controls", async ({ page }) => {

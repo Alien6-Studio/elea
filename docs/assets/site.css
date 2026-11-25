@@ -33,10 +33,11 @@ body {
   line-height: var(--elea-font-leading-normal);
 }
 main { flex: 1; }
-/* In the base layer, so that a component rendered as a link keeps its own colour. */
-@layer elea.base { a { color: var(--elea-color-text-link); } }
+@layer elea.base {
+  a { color: var(--elea-color-text-link); }
+  :where(:focus-visible) { outline: 2px solid var(--elea-color-focus); outline-offset: 3px; }
+}
 a { text-underline-offset: 0.18em; }
-:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 3px; }
 
 .docs-guidebar {
   border-block-end: 1px solid var(--elea-color-border-default);
@@ -135,10 +136,9 @@ a { text-underline-offset: 0.18em; }
   min-width: 0;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--elea-color-border-default);
+  border: 0;
   border-radius: var(--elea-radius-xl);
   overflow: hidden;
-  background: var(--elea-color-neutral-950);
 }
 .notebook__bar {
   display: flex;
@@ -150,7 +150,7 @@ a { text-underline-offset: 0.18em; }
   color: white;
 }
 .notebook__bar > span { white-space: nowrap; font: 520 1.12rem / 1.1 var(--elea-font-family-content); }
-.notebook__switch { display: flex; gap: .15rem; padding: .18rem; border: 1px solid var(--elea-color-neutral-700); border-radius: var(--elea-radius-md); }
+.notebook__switch { display: flex; gap: .15rem; padding: .18rem; }
 .notebook__switch label { white-space: nowrap; padding: .25rem .55rem; border-radius: var(--elea-radius-sm); font-size: .73rem; font-weight: 600; cursor: pointer; }
 #show-document:checked ~ .notebook__bar [for="show-document"], #show-blocks:checked ~ .notebook__bar [for="show-blocks"] {
   background: var(--elea-color-neutral-100); color: var(--elea-color-neutral-950);
@@ -186,11 +186,11 @@ a { text-underline-offset: 0.18em; }
 }
 .notebook__document .elea-block--paragraph { margin-top: .45rem; }
 .notebook__document .elea-paragraph { font: 450 calc(var(--elea-font-size-lg) * .86) / var(--elea-font-leading-relaxed) var(--elea-font-family-content); color: white; }
-.notebook__blocks { position: absolute; inset: 0; visibility: hidden; }
+.notebook__blocks { position: absolute; inset: 0; visibility: hidden; background: var(--elea-color-neutral-950); }
 #show-blocks:checked ~ .notebook__panes .notebook__document { visibility: hidden; }
 #show-blocks:checked ~ .notebook__panes .notebook__blocks { visibility: visible; }
 .notebook__blocks pre {
-  height: 100%; margin: 0; padding: 1.25rem; overflow: auto; border-block: 1px solid var(--elea-color-neutral-700);
+  height: 100%; margin: 0; padding: 1.25rem; overflow: auto;
   color: var(--elea-color-primary-200); font: .8rem / 1.6 var(--elea-font-family-mono);
 }
 .notebook__blocks pre:focus-visible { outline-offset: -3px; }
@@ -225,7 +225,8 @@ a { text-underline-offset: 0.18em; }
 .home-specimen__demo .elea-tabs__panel { padding: 0; }
 .home-specimen a { width: fit-content; color: inherit; text-decoration: none; }
 .home-specimen a::after { content: ""; position: absolute; inset: 0; }
-.home-specimen:focus-within { outline: 2px solid var(--elea-color-focus); outline-offset: 3px; }
+.home-specimen:has(a:focus-visible) { outline: 2px solid var(--elea-color-focus); outline-offset: 3px; }
+.home-specimen a:focus-visible { outline: none; }
 .home-specimen a:hover { color: var(--elea-color-text-link); text-decoration: underline; }
 .home-services .elea-button { margin-top: .1rem; }
 

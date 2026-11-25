@@ -59,7 +59,8 @@
 .catalog-results { margin: 0 0 .9rem; }
 .gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(.85rem, 2vw, 1.5rem); }
 .gallery__card { position: relative; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-xl); padding: .4rem; }
-.gallery__card:hover, .gallery__card:focus-within { border-color: var(--elea-color-text-link); }
+.gallery__card:hover { border-color: var(--elea-color-text-link); }
+.gallery__card:has(.gallery__name:focus-visible) { border-color: transparent; outline: 2px solid var(--elea-color-focus); outline-offset: -2px; }
 .gallery__preview {
   display: flex;
   align-items: center;
@@ -83,7 +84,6 @@
 .gallery__name { color: inherit; text-decoration: none; }
 .gallery__name::after { content: ""; position: absolute; inset: 0; border-radius: var(--elea-radius-xl); }
 .gallery__name:focus-visible { outline: none; }
-.gallery__name:focus-visible::after { outline: 2px solid var(--elea-color-focus); outline-offset: 3px; }
 .gallery__dialog, .catalog-footer-preview {
   display: grid;
   gap: .35rem;
@@ -111,7 +111,7 @@
 .catalog-popover-row:hover { background: var(--elea-color-surface-muted); }
 .catalog-skeleton-brand { background-color: color-mix(in srgb, var(--elea-color-primary-500) 30%, transparent); border-radius: var(--elea-radius-full); }
 .catalog-popover-zone { inline-size: 100%; min-block-size: 6rem; border: 1px dashed var(--elea-color-border-default); border-radius: var(--elea-radius-md); background: var(--elea-color-surface-muted); color: var(--elea-color-text-muted); font: inherit; cursor: crosshair; }
-.catalog-popover-zone:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+.catalog-popover-zone:focus-visible { border-color: transparent; outline: 2px solid var(--elea-color-focus); outline-offset: -2px; }
 .catalog-popover-preview { display: grid; justify-items: start; gap: .4rem; }
 .gallery__preview .catalog-popover-preview .elea-popover__panel { position: static; display: grid; gap: .15rem; padding: .6rem .8rem; animation: none; }
 .catalog-popover-preview .elea-popover__panel span { color: var(--elea-color-text-muted); font-size: .75rem; }

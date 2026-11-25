@@ -241,48 +241,102 @@ export function SliderPage() {
   );
 }
 
-const CheckIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m8.5 12.5 2.5 2.5 4.5-5.5" /></svg>;
+const toastIconShapes = {
+  archive: <path d="M4 4h16v5H4zM6 9v11h12V9m-8 4h4" />,
+  neutral: <path d="M6 3h8l4 4v14H6zM14 3v5h4M9 13h6m-6 4h6" />,
+  success: <><circle cx="12" cy="12" r="9" /><path d="m8.5 12.5 2.5 2.5 4.5-5.5" /></>,
+  info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5m0-8.5v.5" /></>,
+  warning: <path d="M12 3 22 20H2zM12 9v4m0 3v.5" />,
+  danger: <><circle cx="12" cy="12" r="9" /><path d="m9 9 6 6m0-6-6 6" /></>,
+};
+
+export function ToastExampleIcon({ name }: { name: keyof typeof toastIconShapes }) {
+  return (
+    <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {toastIconShapes[name]}
+    </svg>
+  );
+}
+
+const toastExamples = [
+  { label: "Neutral", tone: "neutral", title: "Draft saved" },
+  { label: "Success", tone: "success", title: "Article published", description: "It is now visible to everyone." },
+  { label: "Info", tone: "info", title: "Maintenance is planned for Sunday" },
+  { label: "Warning", tone: "warning", title: "Your session ends in five minutes" },
+  { label: "Danger", tone: "danger", title: "The article could not be saved", description: "Check your connection and try again." },
+] as const;
 
 function ToastDemos({ position, onPosition }: { position: ToastPosition; onPosition: (position: ToastPosition) => void }) {
   const { toast, dismiss } = useToast();
   return (
     <>
       <Demo title="Tones" description="A toast confirms what just happened and leaves by itself. Errors are announced at once, the others politely." code={`const { toast } = useToast();
+const icon = <ToastExampleIcon name="success" />;
 
-<Button onClick={() => toast({ title: "Draft saved" })}>Neutral</Button>
-<Button onClick={() => toast({ tone: "success", icon: <CheckIcon />, title: "Article published", description: "It is now visible to everyone." })}>Success</Button>
-<Button onClick={() => toast({ tone: "info", title: "Maintenance is planned for Sunday" })}>Info</Button>
-<Button onClick={() => toast({ tone: "warning", title: "Your session ends in five minutes" })}>Warning</Button>
-<Button onClick={() => toast({ tone: "danger", title: "The article could not be saved", description: "Check your connection and try again." })}>Danger</Button>`}>
-        <Button size="sm" variant="outline" onClick={() => toast({ title: "Draft saved" })}>Neutral</Button>
-        <Button size="sm" variant="outline" onClick={() => toast({ tone: "success", icon: <CheckIcon />, title: "Article published", description: "It is now visible to everyone." })}>Success</Button>
-        <Button size="sm" variant="outline" onClick={() => toast({ tone: "info", title: "Maintenance is planned for Sunday" })}>Info</Button>
-        <Button size="sm" variant="outline" onClick={() => toast({ tone: "warning", title: "Your session ends in five minutes" })}>Warning</Button>
-        <Button size="sm" variant="outline" onClick={() => toast({ tone: "danger", title: "The article could not be saved", description: "Check your connection and try again." })}>Danger</Button>
+<Button
+  size="sm"
+  variant="success"
+  icon={icon}
+  onClick={() => toast({
+    tone: "success",
+    title: "Article published",
+    description: "It is now visible to everyone.",
+    icon,
+  })}
+>
+  Success
+</Button>`}>
+        {toastExamples.map(({ label, ...message }) => {
+          const icon = <ToastExampleIcon name={message.tone} />;
+          return (
+            <Button
+              key={message.tone}
+              size="sm"
+              variant={message.tone === "neutral" ? "outline" : message.tone}
+              icon={icon}
+              onClick={() => toast({ ...message, icon })}
+            >
+              {label}
+            </Button>
+          );
+        })}
       </Demo>
       <Demo title="An action, and a toast that stays" description="A lifetime of Infinity keeps the toast until it is dismissed. Its timer also waits while the pointer or the focus is on the toasts." code={`const id = toast({
   title: "Article moved to the archive",
+  icon: <ToastExampleIcon name="archive" />,
   duration: Infinity,
   action: <Button size="sm" variant="ghost" onClick={() => { restore(); dismiss(id); }}>Undo</Button>,
 });`}>
-        <Button size="sm" variant="outline" onClick={() => {
-          const id = toast({ id: "archive", title: "Article moved to the archive", duration: Infinity, action: <Button size="sm" variant="ghost" onClick={() => { dismiss(id); toast({ tone: "success", title: "Article restored" }); }}>Undo</Button> });
+        <Button size="sm" variant="secondary" onClick={() => {
+          const id = toast({
+            id: "archive",
+            title: "Article moved to the archive",
+            icon: <ToastExampleIcon name="archive" />,
+            duration: Infinity,
+            action: <Button size="sm" variant="ghost" onClick={() => {
+              dismiss(id);
+              toast({ tone: "success", icon: <ToastExampleIcon name="success" />, title: "Article restored" });
+            }}>Undo</Button>,
+          });
         }}>Archive the article</Button>
         <Button size="sm" variant="ghost" onClick={() => dismiss()}>Dismiss all</Button>
       </Demo>
       <Demo title="Replace a toast" description="A toast shown under the id of a visible one takes its place, to follow a task from start to end." code={`toast({ id: "export", title: "Preparing the export…", duration: Infinity });
 await exportArticles();
-toast({ id: "export", tone: "success", title: "Export ready" });`}>
-        <Button size="sm" variant="outline" onClick={() => {
+toast({ id: "export", tone: "success", icon: <ToastExampleIcon name="success" />, title: "Export ready" });`}>
+        <Button size="sm" variant="secondary" onClick={() => {
           toast({ id: "export", title: "Preparing the export…", duration: Infinity });
-          setTimeout(() => toast({ id: "export", tone: "success", icon: <CheckIcon />, title: "Export ready", description: "42 articles as Markdown." }), 1500);
+          setTimeout(() => toast({ id: "export", tone: "success", icon: <ToastExampleIcon name="success" />, title: "Export ready", description: "42 articles as Markdown." }), 1500);
         }}>Export the articles</Button>
       </Demo>
       <Demo title="Position" description="The provider places the stack in a corner or the middle of an edge; it follows the reading direction." code={`<ToastProvider label="Notifications" dismissLabel="Dismiss" position="top-center">
   <App />
 </ToastProvider>`}>
         {(["top-start", "top-center", "top-end", "bottom-start", "bottom-center", "bottom-end"] as const).map((item) => (
-          <Button key={item} size="sm" variant={item === position ? "primary" : "outline"} aria-pressed={item === position} onClick={() => { onPosition(item); toast({ id: "position", title: `Toasts appear ${item.replace("-", " ")}` }); }}>{item}</Button>
+          <Button key={item} size="sm" variant={item === position ? "primary" : "outline"} aria-pressed={item === position} onClick={() => {
+            onPosition(item);
+            toast({ id: "position", tone: "info", icon: <ToastExampleIcon name="info" />, title: `Toasts appear ${item.replace("-", " ")}` });
+          }}>{item}</Button>
         ))}
       </Demo>
     </>

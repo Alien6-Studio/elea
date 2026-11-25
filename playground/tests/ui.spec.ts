@@ -8,7 +8,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await page.goto("/elea/playground/#/ui/button");
     await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
     await page.addStyleTag({ content: "* { transition: none !important; }" });
-    for (const name of ["Primary", "Secondary", "Outline", "Ghost", "Danger"]) {
+    for (const name of ["Primary", "Secondary", "Outline", "Ghost", "Danger", "Success", "Info", "Warning"]) {
       const button = page.getByRole("button", { name, exact: true });
       expect(await textContrast(button), name).toBeGreaterThanOrEqual(4.5);
       await button.hover();
@@ -189,12 +189,15 @@ test("the gallery opens component examples without focusing their static preview
   await expect(page.getByRole("heading", { name: "Badge", exact: true })).toBeVisible();
 });
 
-test("the Elea overview shows a rendered document, its blocks, and the studio signature", async ({ page }) => {
+test("the Elea overview shows a rendered document, its blocks, and the Alien6 contact link", async ({ page }) => {
   await page.goto("/elea/");
   const main = page.getByRole("main");
   await expect(main.getByRole("heading", { name: "A design system for rich content." })).toBeVisible();
   const documentTitle = main.getByRole("heading", { name: "The glacier notebook" });
   await expect(documentTitle).toBeVisible();
+  const notebook = main.getByRole("group", { name: "Document view" });
+  await expect(notebook).toHaveCSS("border-top-width", "0px");
+  await expect(notebook.locator(".notebook__switch")).toHaveCSS("border-top-width", "0px");
   const photo = main.getByRole("img", { name: "Blue crevasses and white ridges seen from above a glacier" });
   await expect.poll(() => photo.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
   const preview = main.getByRole("radio", { name: "Preview" });
@@ -202,17 +205,25 @@ test("the Elea overview shows a rendered document, its blocks, and the studio si
   await preview.press("ArrowRight");
   const json = main.getByRole("radio", { name: "Block JSON" });
   await expect(json).toBeChecked();
+  await expect(notebook.locator('label[for="show-blocks"]')).toHaveCSS("outline-width", "2px");
   const source = main.locator('pre[aria-label="Document block data"]');
   await expect(source).toBeVisible();
   await expect(source).toContainText('"blocks"');
   await expect(documentTitle).toBeHidden();
   await json.press("ArrowLeft");
   await expect(documentTitle).toBeVisible();
-  await expect(main.getByRole("link", { name: "Talk to Alien6 Studio" })).toHaveAttribute("href", "https://alien6.com/en/contact/");
+  await expect(main.getByRole("heading", { name: "Integrate Elea with Alien6", exact: true })).toBeVisible();
+  const contact = main.getByRole("link", { name: "Contact Alien6", exact: true });
+  await expect(contact).toHaveAttribute("href", "https://alien6.com/en/contact/");
+  await page.keyboard.press("Tab");
+  await contact.focus();
+  await expect(contact).toHaveCSS("outline-offset", "-2px");
+  await expect(contact).toHaveCSS("outline-width", "2px");
   const footer = page.getByRole("contentinfo");
-  const studio = footer.getByRole("link", { name: "Built by Alien6" });
-  await expect(studio).toHaveAttribute("href", "https://alien6.com");
-  const logo = studio.getByRole("img", { name: "Alien6" });
+  await expect(footer.getByRole("link", { name: "Contact Alien6", exact: true })).toHaveCount(0);
+  const signature = footer.getByRole("link", { name: "Built by Alien6" });
+  await expect(signature).toHaveAttribute("href", "https://alien6.com");
+  const logo = signature.getByRole("img", { name: "Alien6" });
   await logo.scrollIntoViewIfNeeded();
   await expect.poll(() => logo.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
   await expect(logo).toHaveCSS("filter", "brightness(0) invert(1)");

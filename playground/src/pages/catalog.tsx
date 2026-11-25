@@ -7,7 +7,7 @@ import {
   MenuPage, PaginationPage, RadiosPage, SelectPage, TabsPage, TooltipPage,
 } from "./ui.js";
 import { AlertPage, AvatarPage, CardPage, ProgressPage, SeparatorPage, SkeletonPage } from "./display.js";
-import { AccordionPage, SliderPage, TablePage, ToastPage } from "./data.js";
+import { AccordionPage, SliderPage, TablePage, ToastExampleIcon, ToastPage } from "./data.js";
 import { PopoverPage, SheetPage } from "./overlay.js";
 import "./catalog.css";
 
@@ -107,7 +107,13 @@ const entries: Entry[] = [
     slug: "toast", name: "Toast", category: "Feedback", page: ToastPage,
     summary: "Confirm an action with a brief message above the page.",
     interaction: <>Toasts sit in a named region that is announced politely, and an error at once. They never take the focus; <kbd>Tab</kbd> reaches their action and close button, and their timer waits while the pointer or the focus is on them. Keep anything people must act on in the page.</>,
-    preview: <div className="elea-toast elea-toast--success catalog-fill"><div className="elea-toast__body"><p className="elea-toast__title">Article published</p><p className="elea-toast__description">Visible to everyone.</p></div></div>,
+    preview: <div className="elea-toast elea-toast--success catalog-fill">
+      <span className="elea-toast__icon" aria-hidden="true"><ToastExampleIcon name="success" /></span>
+      <div className="elea-toast__body">
+        <p className="elea-toast__title">Article published</p>
+        <p className="elea-toast__description">Visible to everyone.</p>
+      </div>
+    </div>,
   },
   {
     slug: "progress", name: "Progress", category: "Feedback", page: ProgressPage,

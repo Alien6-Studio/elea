@@ -1,7 +1,7 @@
 import type { EleaBlock } from "@alien6-studio/elea-content";
 import { ContentView } from "@alien6-studio/elea-content-viewer";
 import { Badge, Button, Tabs } from "@alien6-studio/elea-ui";
-import { repositoryUrl, sitePath, studioContactUrl } from "../src/links.js";
+import { alien6ContactUrl, repositoryUrl, sitePath } from "../src/links.js";
 import { brandRoute, editions } from "../src/pages/brandTheme.js";
 import { glacierImage, notebookSummary, notebookTitle } from "../src/notebook.js";
 
@@ -92,9 +92,9 @@ export function SiteHome() {
           </div>
         </section>
         <section className="home-tool home-services" aria-labelledby="services-title">
-          <h2 id="services-title">Integrate Elea with Alien6 Studio.</h2>
+          <h2 id="services-title">Integrate Elea with Alien6</h2>
           <p>Get help migrating an existing editor, building custom blocks or adapting the system to your brand.</p>
-          <Button href={studioContactUrl} variant="outline" trailingIcon="↗">Talk to Alien6 Studio</Button>
+          <Button href={alien6ContactUrl} variant="outline" trailingIcon="↗">Contact Alien6</Button>
         </section>
       </div>
     </>

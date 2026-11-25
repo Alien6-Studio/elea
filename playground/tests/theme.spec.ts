@@ -73,9 +73,75 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(parseFloat((await appearance(action)).radius)).toBeCloseTo(radius, 2);
       expect(await textContrast(action.locator(".elea-button__label"))).toBeGreaterThanOrEqual(4.5);
       await page.keyboard.press("Escape");
+
+      await page.getByRole("navigation", { name: "Component index" }).getByRole("link", { name: "Toast", exact: true }).click();
+      const notifications = page.getByRole("region", { name: "Notifications" });
+      await expect(notifications).toHaveAttribute("data-elea-theme", "brand");
+      const neutralButton = gallery.getByRole("button", { name: "Neutral", exact: true });
+      const buttonFills = new Set([(await appearance(neutralButton)).background]);
+      await neutralButton.click();
+      const neutral = notifications.locator(".elea-toast--neutral");
+      await expect(neutral).toHaveCSS("background-color", background);
+      await expect(neutral).toHaveCSS("border-width", "0px");
+      await expect(neutral).toHaveCSS("outline-style", "none");
+      // An inset or unblurred shadow can paint a frame even with a zero-width border.
+      const shadow = await neutral.evaluate(element => getComputedStyle(element).boxShadow);
+      expect(shadow).not.toBe("none");
+      expect(shadow).not.toMatch(/inset| 0px -?[\d.]+px(?:,|$)/);
+      const surfacesByTone = new Set<string>([background]);
+      for (const tone of ["Success", "Info", "Warning", "Danger"]) {
+        const button = gallery.getByRole("button", { name: tone, exact: true });
+        await expect(button.locator(".elea-button__icon svg")).toBeVisible();
+        buttonFills.add((await appearance(button)).background);
+        expect(await textContrast(button), tone).toBeGreaterThanOrEqual(4.5);
+        await button.click();
+        const toast = notifications.locator(`.elea-toast--${tone.toLowerCase()}`);
+        await expect(toast).toHaveCSS("border-width", "0px");
+        const icon = toast.locator(".elea-toast__icon");
+        await expect(icon.locator("svg")).toBeVisible();
+        await expect(icon).toHaveCSS("color", (await appearance(button)).background);
+        surfacesByTone.add((await appearance(toast)).background);
+        for (const text of await toast.locator(".elea-toast__title, .elea-toast__description").all()) {
+          expect(await textContrast(text), tone).toBeGreaterThanOrEqual(4.5);
+        }
+        expect(await textContrast(icon), tone).toBeGreaterThanOrEqual(3);
+      }
+      expect(buttonFills.size).toBe(5);
+      expect(surfacesByTone.size).toBe(5);
+
+      await page.getByRole("navigation", { name: "Component index" }).getByRole("link", { name: "Field, Input, Textarea" }).click();
+      const textarea = gallery.getByRole("textbox", { name: "A longer text" });
+      await gallery.getByRole("textbox", { name: "Large", exact: true }).press("Tab");
+      await expect(textarea).toBeFocused();
+      await expect(textarea).toHaveCSS("outline-style", "solid");
+      await expect(textarea).toHaveCSS("outline-width", "2px");
+      await expect(textarea).toHaveCSS("outline-offset", "-2px");
+      await expect(textarea).toHaveCSS("border-color", "rgba(0, 0, 0, 0)");
+      await expect(textarea).toHaveCSS("box-shadow", "none");
     }
   });
 }
+
+test("one theme token supplies the warning colour to actions, badges, alerts and portaled toasts", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/elea/playground/#/ui/toast?edition=precision");
+  await page.addStyleTag({ content: '[data-elea-theme="brand"] { --elea-color-warning: #984914; }' });
+  const warningColour = "rgb(152, 73, 20)";
+  const warning = page.getByRole("button", { name: "Warning", exact: true });
+  await expect(warning).toHaveCSS("background-color", warningColour);
+  await warning.click();
+  const notifications = page.getByRole("region", { name: "Notifications" });
+  await expect(notifications).toHaveAttribute("data-elea-theme", "brand");
+  const toast = notifications.locator(".elea-toast--warning");
+  await expect(toast.locator(".elea-toast__icon")).toHaveCSS("color", warningColour);
+  const tint = (await appearance(toast)).background;
+
+  const index = page.getByRole("navigation", { name: "Component index" });
+  await index.getByRole("link", { name: "Card", exact: true }).click();
+  await expect(page.locator(".elea-badge--warning", { hasText: "In review" })).toHaveCSS("color", warningColour);
+  await index.getByRole("link", { name: "Alert", exact: true }).click();
+  await expect(page.locator(".elea-alert--warning")).toHaveCSS("background-color", tint);
+});
 
 for (const colorScheme of ["light", "dark"] as const) {
   test(`brand settings are scoped and the exported CSS reproduces the ${colorScheme} preview`, async ({ page }) => {
@@ -412,10 +478,26 @@ test("a product brings its own second colour, radius and font, shared through th
   const article = preview.getByRole("article");
   const badge = article.getByText("Members", { exact: true });
   const radius = page.getByRole("textbox", { name: "Corner radius" });
+  const radiusError = page.getByText("Use a length such as 10px or 0.625rem.");
   await radius.fill("10");
-  await expect(page.getByText("Use a length such as 10px or 0.625rem.")).toBeVisible();
+  await expect(radiusError).toBeVisible();
+  await expect(radius).toBeFocused();
+  await expect(radius).toHaveCSS("outline-width", "2px");
+  await expect(radius).toHaveCSS("outline-style", "solid");
+  await expect(radius).toHaveCSS("outline-offset", "-2px");
+  await expect(radius).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
+  await radius.blur();
+  const errorBorder = await radius.evaluate(async (element) => {
+    const style = getComputedStyle(element);
+    await Promise.all(element.getAnimations().map(animation => animation.finished));
+    return style.borderTopColor;
+  });
+  await radius.focus();
+  await expect(radius).toHaveCSS("outline-color", errorBorder);
   await expect(page).toHaveURL(/#\/theme$/);
   await radius.fill("10px");
+  await expect(radiusError).toHaveCount(0);
+  await expect(radius).not.toHaveCSS("outline-color", errorBorder);
   await expect(article).toHaveCSS("border-radius", "5px");
   await page.getByRole("textbox", { name: "Interface font" }).fill("Georgia, serif");
   await expect(badge).toHaveCSS("font-family", "Georgia, serif");

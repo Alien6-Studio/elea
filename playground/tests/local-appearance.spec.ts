@@ -65,7 +65,7 @@ for (const host of ["light", "dark"] as const) {
 
     const variants = page.locator(".demo").first();
     await scope(variants, local);
-    for (const name of ["Primary", "Secondary", "Outline", "Ghost", "Danger", "Success", "Info"]) {
+    for (const name of ["Primary", "Secondary", "Outline", "Ghost", "Danger", "Success", "Info", "Warning"]) {
       const button = variants.getByRole("button", { name, exact: true });
       const label = button.locator(".elea-button__label");
       expect(await textContrast(label), name).toBeGreaterThanOrEqual(4.5);
