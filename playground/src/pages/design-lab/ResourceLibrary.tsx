@@ -20,7 +20,7 @@ const resources = [
 
 type Resource = (typeof resources)[number];
 
-const treatments = [{ value: "current", label: "Current" }, { value: "proposal", label: "Proposal" }] as const;
+const treatments = [{ value: "current", label: "Default composition" }, { value: "proposal", label: "Proposal" }] as const;
 const appearances = [{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }] as const;
 const categories = [
   { value: "all", label: "All types" },

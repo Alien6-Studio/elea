@@ -23,8 +23,9 @@ test("resource treatments share a controlled list and filters", async ({ page })
   const proposedSize = await heading.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
   const titles = await results.getByRole("heading").allTextContents();
 
-  await treatment.getByRole("button", { name: "Current" }).press("Enter");
-  await expect(treatment.getByRole("button", { name: "Current" })).toHaveAttribute("aria-pressed", "true");
+  const defaultComposition = treatment.getByRole("button", { name: "Default composition", exact: true });
+  await defaultComposition.press("Enter");
+  await expect(defaultComposition).toHaveAttribute("aria-pressed", "true");
   expect(await heading.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeLessThan(proposedSize);
   expect(await results.getByRole("heading").allTextContents()).toEqual(titles);
 
