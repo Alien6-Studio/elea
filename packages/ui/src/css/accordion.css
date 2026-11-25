@@ -1,0 +1,45 @@
+/* Accordion */
+.elea-accordion { min-width: 0; color: var(--elea-color-text-default); }
+.elea-accordion__item { border-block-end: 1px solid var(--elea-color-border-default); }
+.elea-accordion--contained { border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-lg); overflow: hidden; background: var(--elea-color-surface-default); }
+.elea-accordion--contained .elea-accordion__item:last-child { border-block-end: 0; }
+.elea-accordion--contained :is(.elea-accordion__trigger, .elea-accordion__content) { padding-inline: var(--elea-space-4); }
+.elea-accordion__heading { margin: 0; font: inherit; }
+.elea-accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--elea-space-3);
+  inline-size: 100%;
+  padding: var(--elea-space-3) 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--elea-font-size-base);
+  font-weight: var(--elea-font-weight-medium);
+  text-align: start;
+  cursor: pointer;
+}
+.elea-accordion__trigger:hover:enabled { color: var(--elea-color-text-link); }
+.elea-accordion__trigger:disabled { opacity: 0.55; cursor: default; }
+.elea-accordion__trigger:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: -2px; }
+.elea-accordion__trigger svg { flex: none; color: var(--elea-color-text-subtle); transition: rotate var(--elea-motion-duration-slow) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }
+.elea-accordion__trigger[aria-expanded="true"] svg { rotate: 180deg; }
+/*
+ * A closed panel is a zero-height grid row hidden from everyone; the row grows to its content.
+ * The duration scales with the motion factor, so a section opens at once without it.
+ */
+.elea-accordion__panel {
+  --elea-accordion-duration: calc(var(--elea-motion-duration-slow) * var(--elea-motion, 0));
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows var(--elea-accordion-duration) var(--elea-motion-easing-standard), visibility var(--elea-accordion-duration);
+}
+.elea-accordion__item[data-open] > .elea-accordion__panel { grid-template-rows: 1fr; visibility: visible; }
+.elea-accordion__content { min-block-size: 0; overflow: hidden; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); line-height: var(--elea-font-leading-normal); opacity: 0; transition: opacity var(--elea-accordion-duration) var(--elea-motion-easing-standard); }
+.elea-accordion__item[data-open] > * > .elea-accordion__content { opacity: 1; }
+/* The space under the text belongs to the content, so it folds away with it. */
+.elea-accordion__content::after { content: ""; display: block; block-size: var(--elea-space-4); }
+@media (prefers-reduced-motion: reduce) { .elea-accordion__trigger svg { transition: none; } }

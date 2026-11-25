@@ -1,0 +1,61 @@
+/* Select: a button and a listbox on the tokens; a checklist when multiple */
+.elea-ui-select { position: relative; display: inline-block; min-width: 8rem; font-family: var(--elea-font-family-sans); }
+.elea-ui-select__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--elea-space-2);
+  width: 100%;
+  min-height: var(--elea-control-height, calc(2.5rem + var(--elea-_density, 0px)));
+  padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-3));
+  border: solid var(--elea-control-border, var(--elea-color-border-strong));
+  border-width: var(--elea-field-border-width, var(--elea-_field-border-width, 1px));
+  border-radius: var(--elea-control-radius, var(--elea-radius-md));
+  background: var(--elea-control-surface, color-mix(in srgb, var(--elea-color-surface-default) var(--elea-_control-fill, 100%), var(--elea-color-surface-subtle)));
+  color: var(--elea-color-text-default);
+  font: inherit;
+  font-size: var(--elea-control-font-size, var(--elea-font-size-base));
+  line-height: var(--elea-font-leading-tight);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--elea-control-edge, var(--elea-_control-edge, none));
+}
+.elea-ui-select--sm .elea-ui-select__trigger { min-height: var(--elea-control-height, calc(2rem + var(--elea-_density, 0px))); padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-2)); font-size: var(--elea-control-font-size, var(--elea-font-size-sm)); }
+.elea-ui-select__trigger:hover:enabled { background: var(--elea-control-hover-surface, var(--elea-color-surface-subtle)); }
+.elea-ui-select__trigger:focus-visible { outline: var(--elea-control-focus-outline, solid var(--elea-color-focus) var(--elea-_field-focus-size, 0px)); outline-offset: 2px; border-color: var(--elea-color-focus); box-shadow: var(--elea-control-focus-shadow, var(--elea-_control-focus-shadow, 0 0 0 3px color-mix(in srgb, var(--elea-color-focus) 25%, transparent))); }
+.elea-ui-select__trigger:disabled { background: var(--elea-color-surface-subtle); color: var(--elea-color-text-muted); cursor: not-allowed; }
+.elea-ui-select__trigger--invalid { border-color: var(--elea-color-danger); }
+.elea-ui-select__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.elea-ui-select__value--placeholder { color: var(--elea-color-text-subtle); }
+.elea-ui-select__chevron { display: inline-flex; color: var(--elea-color-text-subtle); transition: transform var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }
+.elea-ui-select--open .elea-ui-select__chevron { transform: rotate(180deg); }
+.elea-ui-select__list {
+  position: absolute;
+  box-sizing: border-box;
+  top: calc(100% + var(--elea-space-1));
+  left: 0;
+  z-index: 40;
+  min-width: 100%;
+  max-height: min(16rem, var(--elea-list-room, 16rem));
+  overflow: auto;
+  margin: 0;
+  padding: var(--elea-space-1);
+  list-style: none;
+  background: var(--elea-color-surface-default);
+  border: 1px solid var(--elea-color-border-default);
+  border-radius: var(--elea-radius-lg);
+  box-shadow: var(--elea-shadow-md);
+  --elea-enter-shrink: 0.04;
+  transform-origin: top;
+  animation: elea-enter var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
+}
+.elea-ui-select__list[data-above] { top: auto; bottom: calc(100% + var(--elea-space-1)); --elea-enter-y: 0.25rem; transform-origin: bottom; }
+.elea-ui-select__option { display: flex; align-items: center; gap: var(--elea-space-2); padding: calc(var(--elea-space-2) + var(--elea-_density, 0px)) var(--elea-space-3); border-radius: var(--elea-radius-md); font-size: var(--elea-font-size-sm); color: var(--elea-color-text-default); cursor: pointer; white-space: nowrap; }
+.elea-ui-select__option--active { background: var(--elea-color-surface-muted); }
+.elea-ui-select__option--selected { font-weight: var(--elea-font-weight-semibold); color: var(--elea-color-text-link); }
+.elea-ui-select__option--disabled { opacity: 0.5; cursor: not-allowed; }
+.elea-ui-select__label { flex: 1; }
+.elea-ui-select__mark { display: inline-flex; color: currentColor; }
+.elea-ui-select__check { display: inline-flex; align-items: center; justify-content: center; width: 1rem; height: 1rem; border: 1px solid var(--elea-color-border-strong); border-radius: var(--elea-radius-sm); background: var(--elea-color-surface-default); color: var(--elea-color-text-on-brand); font-size: 0.75rem; }
+.elea-ui-select__check--on { background: var(--elea-color-primary-600); border-color: var(--elea-color-primary-600); }
+.elea-ui-select__check > *, .elea-ui-select__mark { animation: elea-pop var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }

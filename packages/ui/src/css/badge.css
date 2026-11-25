@@ -1,0 +1,27 @@
+/* Badge */
+.elea-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--elea-space-1);
+  border: 1px solid transparent;
+  border-radius: var(--elea-radius-full);
+  font-size: var(--elea-font-size-xs);
+  font-weight: var(--elea-font-weight-medium);
+  line-height: 1.2;
+  padding: 2px var(--elea-space-2);
+  --elea-badge-color: var(--elea-color-text-muted);
+  --elea-badge-soft: var(--elea-color-surface-muted);
+}
+.elea-badge--md { font-size: var(--elea-font-size-sm); padding: var(--elea-space-1) var(--elea-space-3); }
+.elea-badge--primary { --elea-badge-color: var(--elea-color-text-link); }
+.elea-badge--secondary { --elea-badge-color: var(--elea-color-text-accent); }
+.elea-badge--success { --elea-badge-color: var(--elea-color-success); }
+.elea-badge--info { --elea-badge-color: var(--elea-color-info); }
+.elea-badge--warning { --elea-badge-color: var(--elea-color-warning); }
+.elea-badge--danger { --elea-badge-color: var(--elea-color-danger); }
+.elea-badge:not(.elea-badge--neutral) {
+  --elea-badge-soft: color-mix(in srgb, var(--elea-badge-color) 15%, var(--elea-color-surface-default));
+}
+.elea-badge--subtle { background: var(--elea-badge-soft); color: var(--elea-badge-color); }
+.elea-badge--solid { background: var(--elea-badge-color); color: var(--elea-color-text-inverse); }
+.elea-badge--outline { border-color: var(--elea-badge-color); color: var(--elea-badge-color); }

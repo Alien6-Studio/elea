@@ -1,0 +1,43 @@
+/* Sheet: a modal panel docked to an edge of the viewport */
+.elea-sheet-backdrop { position: fixed; inset: 0; z-index: 100; display: flex; background: color-mix(in srgb, var(--elea-color-neutral-950) 50%, transparent); animation: elea-fade var(--elea-motion-duration-slow) var(--elea-motion-easing-standard); }
+.elea-sheet-backdrop--start { justify-content: flex-start; }
+.elea-sheet-backdrop--end { justify-content: flex-end; }
+.elea-sheet-backdrop--top { align-items: flex-start; }
+.elea-sheet-backdrop--bottom { align-items: flex-end; }
+/* The sheet slides in from its edge by a distance the motion factor scales, so without it the first frame is the resting state. */
+@keyframes elea-sheet { from { translate: calc(var(--elea-sheet-x, 0%) * var(--elea-motion, 0)) calc(var(--elea-sheet-y, 0%) * var(--elea-motion, 0)); } }
+.elea-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--elea-space-4);
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  padding: var(--elea-space-6);
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+  box-shadow: var(--elea-shadow-md);
+  outline: none;
+  animation: elea-sheet var(--elea-motion-duration-slow) var(--elea-motion-easing-standard);
+}
+.elea-sheet--start { --elea-sheet-x: -100%; border-inline-end: 1px solid var(--elea-color-border-default); }
+.elea-sheet--end { --elea-sheet-x: 100%; border-inline-start: 1px solid var(--elea-color-border-default); }
+.elea-sheet--top { --elea-sheet-y: -100%; border-block-end: 1px solid var(--elea-color-border-default); }
+.elea-sheet--bottom { --elea-sheet-y: 100%; border-block-start: 1px solid var(--elea-color-border-default); border-start-start-radius: var(--elea-radius-xl); border-start-end-radius: var(--elea-radius-xl); }
+:is(.elea-sheet--start, .elea-sheet--end) { inline-size: var(--elea-sheet-size); block-size: 100%; }
+:is(.elea-sheet--top, .elea-sheet--bottom) { inline-size: 100%; max-block-size: var(--elea-sheet-size); }
+.elea-sheet--sm { --elea-sheet-size: 20rem; }
+.elea-sheet--md { --elea-sheet-size: 26rem; }
+.elea-sheet--lg { --elea-sheet-size: 36rem; }
+:is(.elea-sheet--top, .elea-sheet--bottom).elea-sheet--sm { --elea-sheet-size: 40%; }
+:is(.elea-sheet--top, .elea-sheet--bottom).elea-sheet--md { --elea-sheet-size: 60%; }
+:is(.elea-sheet--top, .elea-sheet--bottom).elea-sheet--lg { --elea-sheet-size: 85%; }
+.elea-sheet__header { display: flex; align-items: flex-start; gap: var(--elea-space-4); }
+.elea-sheet__title { flex: 1; margin: 0; font-size: var(--elea-font-size-xl); font-weight: var(--elea-font-weight-semibold); }
+.elea-sheet__close { display: inline-flex; padding: var(--elea-space-1); border: 0; border-radius: var(--elea-radius-md); background: transparent; color: var(--elea-color-text-subtle); cursor: pointer; transition: rotate var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }
+.elea-sheet__close:hover { background: var(--elea-color-surface-muted); color: var(--elea-color-text-default); rotate: calc(90deg * var(--elea-motion, 0)); }
+.elea-sheet__close:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+.elea-sheet__description { margin: calc(var(--elea-space-2) * -1) 0 0; color: var(--elea-color-text-muted); }
+/* The body takes the room left and scrolls, so the header and the actions stay in place. */
+.elea-sheet__body { flex: 1; min-block-size: 0; overflow: auto; }
+.elea-sheet__actions { display: flex; justify-content: flex-end; gap: var(--elea-space-2); padding-block-start: var(--elea-space-4); border-block-start: 1px solid var(--elea-color-border-default); }
+@media (prefers-reduced-motion: reduce) { .elea-sheet__close { transition: none; } }

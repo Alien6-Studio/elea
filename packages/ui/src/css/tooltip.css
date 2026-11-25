@@ -1,0 +1,27 @@
+/* Tooltip: the wrapper generates no box, so the trigger keeps its own layout */
+.elea-tooltip { display: contents; }
+.elea-tooltip__bubble {
+  position: fixed;
+  inset: auto;
+  z-index: 110;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 2 * var(--elea-space-2)));
+  margin: 0;
+  padding: var(--elea-space-1) var(--elea-space-2);
+  overflow: visible;
+  background: var(--elea-color-surface-inverse);
+  color: var(--elea-color-text-inverse);
+  border: 0;
+  border-radius: var(--elea-radius-md);
+  font-size: var(--elea-font-size-xs);
+  line-height: var(--elea-font-leading-normal);
+  white-space: normal;
+  --elea-enter-shrink: 0.12;
+  --elea-enter-y: -0.375rem;
+  transform-origin: top;
+  animation: elea-enter var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
+}
+/* The pointer crosses from the trigger to the hint without leaving it */
+.elea-tooltip__bubble::before { content: ""; position: absolute; inset: -4px 0; z-index: -1; }
+.elea-tooltip__bubble[data-side="top"] { --elea-enter-y: 0.375rem; transform-origin: bottom; }

@@ -1,0 +1,53 @@
+/*
+ * Skeleton: a placeholder that pulses while content loads. Under expressive motion the pulse
+ * gives way to a light that sweeps across; the factor fades one into the other.
+ */
+.elea-skeleton, .elea-skeleton-wrap {
+  --elea-skeleton-light: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--elea-color-surface-default) calc(80% * var(--elea-motion, 0)), transparent) 50%, transparent 70%);
+}
+.elea-skeleton {
+  display: block;
+  border-radius: var(--elea-radius-sm);
+  background-color: var(--elea-color-border-default);
+  background-image: var(--elea-skeleton-light);
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  animation: elea-skeleton-pulse 1.6s ease-in-out infinite, elea-skeleton-sweep 1.6s linear infinite;
+}
+.elea-skeleton--text { block-size: 0.75em; margin-block: calc((1lh - 0.75em) / 2); }
+.elea-skeleton--rect { block-size: 6rem; border-radius: var(--elea-radius-md); }
+.elea-skeleton--circle { inline-size: 2.5rem; aspect-ratio: 1; border-radius: var(--elea-radius-full); }
+/* A column of flex items: their margins do not collapse, so every line holds a full line of text. */
+.elea-skeleton-lines { display: flex; flex-direction: column; }
+.elea-skeleton-lines > :last-child { inline-size: 60%; }
+.elea-skeleton-stack { display: flex; flex-direction: column; gap: var(--elea-space-3); }
+/*
+ * Around children the wrapper generates no box. Each child keeps its own box, which is painted as
+ * the placeholder, and what it holds is hidden: the size is the size of the real content.
+ */
+.elea-skeleton-wrap { display: contents; }
+:where(.elea-skeleton-wrap--loading > *) { border-radius: var(--elea-radius-sm); }
+.elea-skeleton-wrap--loading > * {
+  border-color: transparent !important;
+  background-color: var(--elea-color-border-default) !important;
+  background-image: var(--elea-skeleton-light) !important;
+  background-size: 300% 100% !important;
+  background-repeat: no-repeat !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  animation: elea-skeleton-pulse 1.6s ease-in-out infinite, elea-skeleton-sweep 1.6s linear infinite !important;
+  pointer-events: none;
+  user-select: none;
+}
+.elea-skeleton-wrap--loading > * > *, .elea-skeleton-wrap--loading > *::before, .elea-skeleton-wrap--loading > *::after { visibility: hidden !important; }
+.elea-skeleton-wrap--loading > *::placeholder { color: transparent !important; }
+.elea-skeleton-wrap--loading > :is(img, video, canvas) { object-fit: none !important; object-position: 100vmax 100vmax !important; }
+/* A region that loads: its label is for assistive technology, and its placeholders wait out the delay unseen. */
+.elea-skeleton-region__label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.elea-skeleton-region--waiting :is(.elea-skeleton, .elea-skeleton-wrap--loading > *) { visibility: hidden !important; }
+@keyframes elea-skeleton-pulse { 50% { opacity: calc(0.5 + 0.5 * var(--elea-motion, 0)); } }
+@keyframes elea-skeleton-sweep { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .elea-skeleton { animation: none; }
+  .elea-skeleton-wrap--loading > * { animation: none !important; }
+}

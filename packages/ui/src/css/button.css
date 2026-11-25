@@ -1,0 +1,86 @@
+/* Buttons */
+.elea-button {
+  --_elea-button-size: 2.5rem;
+  --_elea-button-height: var(--elea-control-height, max(1.5rem, calc(var(--_elea-button-size) + var(--elea-_density, 0px))));
+  box-sizing: border-box;
+  min-height: var(--_elea-button-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--elea-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--elea-control-radius, var(--elea-radius-md));
+  font-family: var(--elea-font-family-sans);
+  font-weight: var(--elea-font-weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  --_elea-button-rest: var(--elea-button-shadow, var(--elea-control-edge, var(--elea-_control-edge, none)));
+  box-shadow: var(--_elea-button-rest);
+  /* Movement and colour alternate, so each two-value list below gives them their own pace. */
+  transition-property: translate, background-color, scale, border-color, transform, color, box-shadow, filter;
+  transition-duration: calc(var(--elea-motion-duration-base) + 450ms * var(--elea-motion, 0)), var(--elea-motion-duration-base);
+  transition-timing-function: var(--elea-motion-rebound, var(--elea-motion-easing-standard)), var(--elea-motion-easing-standard);
+  position: relative;
+}
+.elea-button--xs { font-size: var(--elea-control-font-size, var(--elea-font-size-xs)); padding: 0 var(--elea-control-padding-inline, var(--elea-space-2)); --_elea-button-size: 1.5rem; gap: var(--elea-space-1); }
+.elea-button--sm { font-size: var(--elea-control-font-size, var(--elea-font-size-sm)); padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-3)); --_elea-button-size: 2rem; }
+.elea-button--md { font-size: var(--elea-control-font-size, var(--elea-font-size-base)); padding: var(--elea-space-2) var(--elea-control-padding-inline, var(--elea-space-4)); }
+.elea-button--lg { font-size: var(--elea-control-font-size, clamp(calc(var(--elea-font-size-base) + 1px), var(--elea-font-size-lg), calc(var(--elea-font-size-xl) - 1px))); padding: var(--elea-space-3) var(--elea-control-padding-inline, var(--elea-space-5)); --_elea-button-size: 3rem; }
+.elea-button--xl { font-size: var(--elea-control-font-size, var(--elea-font-size-xl)); padding: var(--elea-space-4) var(--elea-control-padding-inline, var(--elea-space-6)); --_elea-button-size: 3.5rem; }
+.elea-button--radius-none { border-radius: 0; }
+.elea-button--radius-sm { border-radius: var(--elea-radius-sm); }
+.elea-button--radius-lg { border-radius: var(--elea-radius-xl); }
+.elea-button--radius-full { border-radius: var(--elea-radius-full); }
+.elea-button--shadow-sm { --elea-button-shadow: var(--elea-shadow-sm); }
+.elea-button--shadow-md { --elea-button-shadow: var(--elea-shadow-md); }
+.elea-button--full { width: 100%; }
+.elea-button--primary { background: var(--elea-color-primary-600); color: var(--elea-color-text-on-brand); }
+.elea-button--primary:hover:not(:disabled) { background-color: var(--elea-color-primary-700); }
+.elea-button--secondary { background: var(--elea-color-secondary-700); color: var(--elea-color-text-on-brand); }
+.elea-button--secondary:hover:not(:disabled) { background-color: var(--elea-color-secondary-800); }
+.elea-button--outline { background: var(--elea-control-outline-surface, color-mix(in srgb, var(--elea-color-surface-muted) var(--elea-_outline-tint, 0%), transparent)); border-color: var(--elea-control-border, var(--elea-color-border-strong)); color: var(--elea-color-text-default); }
+.elea-button--outline:hover:not(:disabled) { background-color: var(--elea-control-hover-surface, var(--elea-color-surface-subtle)); }
+.elea-button--ghost { --elea-_control-edge: none; background: transparent; color: var(--elea-color-text-muted); }
+.elea-button--ghost:hover:not(:disabled) { background-color: var(--elea-color-surface-muted); color: var(--elea-color-text-default); }
+.elea-button--danger, .elea-button--success, .elea-button--info { background: var(--elea-color-danger); color: var(--elea-color-text-inverse); }
+.elea-button--success { background: var(--elea-color-success); }
+.elea-button--info { background: var(--elea-color-info); }
+:is(.elea-button--danger, .elea-button--success, .elea-button--info):hover:not(:disabled) { filter: brightness(0.9); }
+.elea-button:is(.elea-button--primary, .elea-button--secondary, .elea-button--outline) {
+  --_elea-button-press: var(--elea-control-press-shadow, var(--elea-_control-press-shadow, var(--_elea-button-rest)));
+}
+.elea-button:active:enabled {
+  box-shadow: var(--_elea-button-press, var(--_elea-button-rest));
+}
+.elea-button:disabled, .elea-button[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+.elea-button:focus-visible { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: 2px; }
+.elea-button--icon { padding: 0; width: var(--_elea-button-height); }
+.elea-button--disc {
+  flex: none;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  background: var(--elea-color-neutral-100);
+  color: var(--elea-color-neutral-800);
+}
+.elea-button--disc.elea-button--md { --_elea-button-height: var(--elea-control-height, 2.75rem); }
+.elea-button--disc:enabled:is(:hover, :focus-visible) { background: var(--elea-color-neutral-200); }
+.elea-button--disc:focus-visible { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-neutral-600)); }
+.elea-button--disc:disabled { opacity: 1; color: var(--elea-color-neutral-500); }
+.elea-button--disc .elea-button__icon { font-size: 1.125rem; }
+.elea-button__icon { display: inline-flex; font-size: 1.1em; }
+.elea-button--loading .elea-button__label, .elea-button--loading .elea-button__icon { opacity: 0; }
+.elea-button__spinner {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--elea-radius-full);
+  animation: elea-spin 0.8s linear infinite;
+}
+@keyframes elea-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .elea-button__spinner { animation-duration: 2s; }
+}

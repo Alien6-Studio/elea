@@ -1,0 +1,58 @@
+{
+  "name": "@alien6-studio/elea-media",
+  "version": "0.0.0",
+  "description": "Elea media components for React: a drop zone for files and an image cropper with zoom and rotation, styled with Elea tokens only",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alien6-Studio/elea.git",
+    "directory": "packages/media"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./bundle.css": "./dist/bundle.css",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node ../../scripts/build-styles.mjs src/styles.css dist @alien6-studio/elea-tokens/elea.css",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@alien6-studio/elea-tokens": "^0.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "elea",
+    "design-system",
+    "react",
+    "image",
+    "crop",
+    "dropzone"
+  ]
+}

@@ -1,0 +1,30 @@
+/* Fields */
+.elea-field { display: flex; flex-direction: column; gap: var(--elea-space-1); }
+.elea-field__label { font-size: var(--elea-font-size-sm); font-weight: var(--elea-font-weight-medium); color: var(--elea-color-text-default); }
+.elea-field__required { color: var(--elea-color-danger); margin-left: var(--elea-space-1); }
+.elea-field__help { margin: 0; font-size: var(--elea-font-size-xs); color: var(--elea-color-text-subtle); }
+.elea-field__error { margin: 0; font-size: var(--elea-font-size-xs); color: var(--elea-color-danger); animation: elea-enter var(--elea-motion-duration-base) var(--elea-motion-easing-standard); }
+.elea-ui-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--elea-control-height, calc(2.5rem + var(--elea-_density, 0px)));
+  font: inherit;
+  line-height: var(--elea-font-leading-tight);
+  font-size: var(--elea-control-font-size, var(--elea-font-size-base));
+  color: var(--elea-color-text-default);
+  background: var(--elea-control-surface, color-mix(in srgb, var(--elea-color-surface-default) var(--elea-_control-fill, 100%), var(--elea-color-surface-subtle)));
+  border: solid var(--elea-control-border, var(--elea-color-border-strong));
+  border-width: var(--elea-field-border-width, var(--elea-_field-border-width, 1px));
+  border-radius: var(--elea-control-radius, var(--elea-radius-md));
+  padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-3));
+  transition: border-color var(--elea-motion-duration-base) var(--elea-motion-easing-standard), box-shadow var(--elea-motion-duration-base) var(--elea-motion-easing-standard);
+  box-shadow: var(--elea-control-edge, var(--elea-_control-edge, none));
+}
+.elea-ui-input--sm { min-height: var(--elea-control-height, calc(2rem + var(--elea-_density, 0px))); font-size: var(--elea-control-font-size, var(--elea-font-size-sm)); padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-2)); }
+.elea-ui-input--lg { min-height: var(--elea-control-height, calc(3rem + var(--elea-_density, 0px))); font-size: var(--elea-control-font-size, clamp(calc(var(--elea-font-size-base) + 1px), var(--elea-font-size-lg), calc(var(--elea-font-size-xl) - 1px))); padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-4)); }
+.elea-ui-input:hover:enabled { background: var(--elea-control-hover-surface, var(--elea-control-surface, color-mix(in srgb, var(--elea-color-surface-default) var(--elea-_control-fill, 100%), var(--elea-color-surface-subtle)))); }
+.elea-ui-input::placeholder { color: var(--elea-color-text-subtle); }
+.elea-ui-input:focus { outline: var(--elea-control-focus-outline, solid var(--elea-color-focus) var(--elea-_field-focus-size, 0px)); outline-offset: 2px; border-color: var(--elea-color-focus); box-shadow: var(--elea-control-focus-shadow, var(--elea-_control-focus-shadow, 0 0 0 3px color-mix(in srgb, var(--elea-color-focus) 25%, transparent))); }
+.elea-ui-input:disabled { background: var(--elea-color-surface-subtle); color: var(--elea-color-text-muted); cursor: not-allowed; }
+.elea-ui-input--invalid, .elea-ui-input[aria-invalid="true"] { border-color: var(--elea-color-danger); animation: elea-shake var(--elea-motion-duration-slow) var(--elea-motion-easing-standard); }
+.elea-ui-input.elea-ui-textarea { padding-block: var(--elea-space-2); line-height: var(--elea-font-leading-normal); min-height: var(--elea-textarea-min-height, 6rem); resize: vertical; }

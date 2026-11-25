@@ -1,0 +1,38 @@
+/* Popover: a panel placed against its anchor, above every clipping container */
+.elea-popover { position: relative; display: inline-block; }
+/* The script gives the panel its top and left; without the top layer the fixed position escapes most containers. */
+.elea-popover__panel {
+  position: fixed;
+  inset: auto;
+  z-index: 110;
+  box-sizing: border-box;
+  inline-size: max-content;
+  max-inline-size: min(20rem, calc(100vw - 2 * var(--elea-space-4)));
+  max-block-size: calc(100vh - 2 * var(--elea-space-2));
+  margin: 0;
+  padding: var(--elea-space-4);
+  overflow: auto;
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+  border: 1px solid var(--elea-color-border-default);
+  border-radius: var(--elea-radius-lg);
+  box-shadow: var(--elea-shadow-md);
+  font-size: var(--elea-font-size-sm);
+  line-height: var(--elea-font-leading-normal);
+  --elea-enter-shrink: 0.08;
+  transform-origin: top;
+  animation: elea-enter var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
+}
+.elea-popover__panel:focus { outline: none; }
+.elea-popover__panel:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+/* The side the panel really took, which is the other one when the preferred side lacks room. */
+.elea-popover__panel[data-side="top"] { transform-origin: bottom; --elea-enter-y: 0.25rem; }
+/* ConfirmPopover */
+.elea-popover__title { display: flex; align-items: flex-start; gap: var(--elea-space-2); margin: 0; font-weight: var(--elea-font-weight-semibold); }
+.elea-popover__icon { display: inline-flex; flex: none; padding-block-start: 0.15em; color: var(--elea-color-text-link); }
+.elea-popover__icon--danger { color: var(--elea-color-danger); }
+.elea-popover__icon--success { color: var(--elea-color-success); }
+.elea-popover__icon--info { color: var(--elea-color-info); }
+.elea-popover__description { margin: var(--elea-space-1) 0 0; color: var(--elea-color-text-muted); }
+.elea-popover__panel > .elea-field { margin-block-start: var(--elea-space-3); }
+.elea-popover__actions { display: flex; justify-content: flex-end; gap: var(--elea-space-2); margin-block-start: var(--elea-space-3); }

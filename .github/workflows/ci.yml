@@ -1,0 +1,61 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request: null
+  workflow_dispatch: null
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact source ref selected by a release workflow
+        type: string
+        required: false
+        default: ""
+permissions:
+  contents: read
+concurrency:
+  group: elea-${{ github.workflow }}-${{ inputs.ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  typescript:
+    name: TypeScript Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node:
+          - "22"
+          - "24"
+          - "26"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.ref || github.ref }}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm audit --omit=dev --audit-level=high
+  e2e:
+    name: Playground end to end
+    uses: Alien6-Studio/elea/.github/workflows/check-pages.yml@gh-pages
+    with:
+      source-ref: ${{ inputs.ref || github.sha }}
+  checks:
+    name: Elea checks
+    if: always()
+    needs:
+      - typescript
+      - e2e
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - env:
+          TYPESCRIPT_RESULT: ${{ needs.typescript.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+        run: test "$TYPESCRIPT_RESULT" = success && test "$E2E_RESULT" = success

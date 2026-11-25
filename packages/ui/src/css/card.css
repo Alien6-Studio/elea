@@ -1,0 +1,34 @@
+/* Card */
+.elea-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--elea-space-4);
+  min-width: 0;
+  padding: var(--elea-space-5);
+  border: 1px solid var(--elea-color-border-default);
+  border-radius: var(--elea-radius-xl);
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+}
+.elea-card--elevated { border-color: transparent; box-shadow: var(--elea-shadow-md); }
+.elea-card--subtle { border-color: transparent; background: var(--elea-color-surface-subtle); }
+.elea-card--pad-none { padding: 0; }
+.elea-card--pad-sm { padding: var(--elea-space-3); gap: var(--elea-space-3); }
+.elea-card--pad-lg { padding: var(--elea-space-8); gap: var(--elea-space-5); }
+.elea-card__header { display: flex; flex-direction: column; gap: var(--elea-space-1); }
+.elea-card__title { margin: 0; font-size: var(--elea-font-size-lg); font-weight: var(--elea-font-weight-semibold); line-height: var(--elea-font-leading-tight); }
+.elea-card__description { margin: 0; font-size: var(--elea-font-size-sm); color: var(--elea-color-text-muted); }
+.elea-card__content { min-width: 0; }
+.elea-card__footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--elea-space-2); margin-top: auto; }
+/* The title's link stretches over an interactive card: one link to read, the whole surface to press. */
+.elea-card--interactive {
+  position: relative;
+  transition: var(--elea-motion-duration-base) var(--elea-motion-easing-standard);
+  transition-property: border-color, box-shadow, translate;
+  transition-timing-function: var(--elea-motion-easing-standard), var(--elea-motion-easing-standard), var(--elea-motion-bounce, var(--elea-motion-easing-standard));
+}
+.elea-card--interactive .elea-card__title a { color: inherit; text-decoration: none; outline: none; }
+.elea-card--interactive .elea-card__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.elea-card--interactive:hover { border-color: var(--elea-color-border-strong); box-shadow: var(--elea-shadow-md); translate: 0 calc(-3px * var(--elea-motion, 0)); }
+.elea-card--interactive:hover .elea-card__title a { color: var(--elea-color-text-link); }
+.elea-card--interactive:has(.elea-card__title a:focus-visible) { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: 2px; }

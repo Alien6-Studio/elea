@@ -1,0 +1,75 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "color": {
+    "success": { "$type": "color", "$value": "#79d1a2" },
+    "warning": { "$type": "color", "$value": "#f1c271" },
+    "danger": { "$type": "color", "$value": "#ff9b93" },
+    "info": { "$type": "color", "$value": "{color.primary.300}" },
+    "text": {
+      "default": {
+        "$type": "color",
+        "$value": "{color.neutral.100}"
+      },
+      "muted": {
+        "$type": "color",
+        "$value": "{color.neutral.300}"
+      },
+      "subtle": {
+        "$type": "color",
+        "$value": "{color.neutral.400}"
+      },
+      "inverse": {
+        "$type": "color",
+        "$value": "{color.neutral.950}"
+      },
+      "accent": {
+        "$type": "color",
+        "$value": "{color.secondary.300}"
+      },
+      "link": {
+        "$type": "color",
+        "$value": "{color.primary.300}"
+      },
+      "link-hover": {
+        "$type": "color",
+        "$value": "{color.primary.200}"
+      }
+    },
+    "surface": {
+      "default": {
+        "$type": "color",
+        "$value": "{color.neutral.950}"
+      },
+      "subtle": {
+        "$type": "color",
+        "$value": "{color.neutral.900}"
+      },
+      "muted": {
+        "$type": "color",
+        "$value": "{color.neutral.800}"
+      },
+      "inverse": {
+        "$type": "color",
+        "$value": "{color.neutral.100}"
+      }
+    },
+    "border": {
+      "default": {
+        "$type": "color",
+        "$value": "{color.neutral.800}"
+      },
+      "strong": {
+        "$type": "color",
+        "$value": "{color.neutral.700}"
+      },
+      "accent": {
+        "$type": "color",
+        "$value": "{color.secondary.400}"
+      }
+    },
+    "focus": {
+      "$type": "color",
+      "$value": "{color.primary.400}"
+    }
+  }
+}

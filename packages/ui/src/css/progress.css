@@ -1,0 +1,25 @@
+/* Progress */
+.elea-progress { --elea-progress-color: var(--elea-color-primary-600); display: flex; flex-direction: column; gap: var(--elea-space-1); min-width: 0; }
+.elea-progress--success { --elea-progress-color: var(--elea-color-success); }
+.elea-progress--info { --elea-progress-color: var(--elea-color-info); }
+.elea-progress--warning { --elea-progress-color: var(--elea-color-warning); }
+.elea-progress--danger { --elea-progress-color: var(--elea-color-danger); }
+.elea-progress__header { display: flex; justify-content: space-between; gap: var(--elea-space-3); font-size: var(--elea-font-size-sm); }
+.elea-progress__label { font-weight: var(--elea-font-weight-medium); color: var(--elea-color-text-default); }
+.elea-progress__value { margin-inline-start: auto; color: var(--elea-color-text-muted); font-variant-numeric: tabular-nums; }
+.elea-progress__track { block-size: 0.5rem; overflow: hidden; border-radius: var(--elea-radius-full); background: var(--elea-color-surface-muted); }
+.elea-progress--sm .elea-progress__track { block-size: 0.25rem; }
+.elea-progress--lg .elea-progress__track { block-size: 0.75rem; }
+.elea-progress__bar {
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--elea-progress-color);
+  transition: inline-size var(--elea-motion-duration-slow) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
+}
+/* Without a value the bar travels the track, since the amount of work is unknown. */
+.elea-progress__bar--indeterminate { inline-size: 40%; animation: elea-progress 1.4s var(--elea-motion-easing-standard) infinite; }
+@keyframes elea-progress { from { translate: -100%; } to { translate: 250%; } }
+@media (prefers-reduced-motion: reduce) {
+  .elea-progress__bar { transition: none; }
+  .elea-progress__bar--indeterminate { animation-duration: 4s; }
+}

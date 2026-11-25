@@ -1,0 +1,41 @@
+/*
+ * Expressive motion is opt-in: data-elea-motion="on" on a component or any ancestor turns it on,
+ * "off" excludes a subtree. The switch is an inherited factor, so the nearest one wins and
+ * each effect scales to nothing without it: distances and durations are multiplied by the
+ * factor, and the spring easing only replaces the standard one where it is on.
+ * Colour transitions are feedback and always run.
+ */
+[data-elea-motion="on"] {
+  --elea-motion: 1;
+  --elea-motion-bounce: var(--elea-motion-easing-spring);
+  /* A damped spring that overshoots and settles, for movements long enough to show it. */
+  --elea-motion-rebound: linear(0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+}
+[data-elea-motion="off"] { --elea-motion: 0; --elea-motion-bounce: var(--elea-motion-easing-standard); --elea-motion-rebound: var(--elea-motion-easing-standard); }
+/*
+ * Entrances start from an offset that the factor scales, so without it the first frame is the
+ * resting state. elea-enter fades, slides and grows a surface, elea-item cascades its children,
+ * elea-pop springs a mark into place, elea-shake refuses an entry.
+ */
+@keyframes elea-fade { from { opacity: calc(1 - var(--elea-motion, 0)); } }
+@keyframes elea-enter {
+  from {
+    opacity: calc(1 - var(--elea-motion, 0));
+    translate: 0 calc(var(--elea-enter-y, -0.25rem) * var(--elea-motion, 0));
+    scale: calc(1 - var(--elea-enter-shrink, 0) * var(--elea-motion, 0));
+  }
+}
+@keyframes elea-item { from { filter: opacity(calc(1 - var(--elea-motion, 0))); translate: 0 calc(-0.375rem * var(--elea-motion, 0)); } }
+@keyframes elea-pop { from { scale: calc(1 - var(--elea-pop, 1) * var(--elea-motion, 0)); } }
+@keyframes elea-shake {
+  25% { translate: calc(-0.25rem * var(--elea-motion, 0)); }
+  75% { translate: calc(0.25rem * var(--elea-motion, 0)); }
+}
+:is(.elea-menu__item, .elea-ui-select__option, .elea-dialog > *, .elea-sheet > *) { animation: elea-item var(--elea-motion-duration-base) var(--elea-motion-easing-standard) backwards; }
+:is(.elea-menu__item, .elea-ui-select__option, .elea-dialog > *, .elea-sheet > *):nth-child(n+2) { animation-delay: calc(30ms * var(--elea-motion, 0)); }
+:is(.elea-menu__item, .elea-ui-select__option, .elea-dialog > *, .elea-sheet > *):nth-child(n+3) { animation-delay: calc(60ms * var(--elea-motion, 0)); }
+:is(.elea-menu__item, .elea-ui-select__option, .elea-dialog > *, .elea-sheet > *):nth-child(n+4) { animation-delay: calc(90ms * var(--elea-motion, 0)); }
+:is(.elea-menu__item, .elea-ui-select__option, .elea-dialog > *, .elea-sheet > *):nth-child(n+5) { animation-delay: calc(120ms * var(--elea-motion, 0)); }
+@media (prefers-reduced-motion: reduce) {
+  [data-elea-motion] { --elea-motion: 0; --elea-motion-bounce: var(--elea-motion-easing-standard); --elea-motion-rebound: var(--elea-motion-easing-standard); }
+}

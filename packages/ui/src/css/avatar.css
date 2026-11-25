@@ -1,0 +1,31 @@
+/* Avatar */
+.elea-avatar {
+  --elea-avatar-size: 2.5rem;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--elea-avatar-size);
+  block-size: var(--elea-avatar-size);
+  overflow: hidden;
+  border-radius: var(--elea-radius-full);
+  background: var(--elea-color-surface-muted);
+  color: var(--elea-color-text-muted);
+  font-family: var(--elea-font-family-sans);
+  font-size: calc(var(--elea-avatar-size) * 0.36);
+  font-weight: var(--elea-font-weight-semibold);
+  line-height: 1;
+  user-select: none;
+}
+.elea-avatar--xs { --elea-avatar-size: 1.5rem; }
+.elea-avatar--sm { --elea-avatar-size: 2rem; }
+.elea-avatar--lg { --elea-avatar-size: 3rem; }
+.elea-avatar--xl { --elea-avatar-size: 4rem; }
+.elea-avatar--square { border-radius: var(--elea-radius-md); }
+.elea-avatar--primary { background: var(--elea-color-primary-100); color: var(--elea-color-primary-800); }
+.elea-avatar--secondary { background: var(--elea-color-secondary-100); color: var(--elea-color-secondary-800); }
+.elea-avatar img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.elea-avatar-group { display: inline-flex; align-items: center; }
+.elea-avatar-group > .elea-avatar { box-shadow: 0 0 0 2px var(--elea-color-surface-default); transition: translate var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }
+.elea-avatar-group > .elea-avatar + .elea-avatar { margin-inline-start: calc(var(--elea-avatar-size) * -0.18); }
+.elea-avatar-group > .elea-avatar:hover { translate: 0 calc(-3px * var(--elea-motion, 0)); }

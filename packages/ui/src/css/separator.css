@@ -1,0 +1,13 @@
+/* Separator: a line, or a label between two lines */
+.elea-separator {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--elea-space-3);
+  color: var(--elea-color-text-subtle);
+  font-size: var(--elea-font-size-xs);
+}
+.elea-separator::before, .elea-separator::after { content: ""; flex: 1; border: 0 solid var(--elea-color-border-default); border-block-start-width: 1px; }
+.elea-separator:empty::after { display: none; }
+.elea-separator--vertical { display: inline-flex; flex-direction: column; align-self: stretch; min-block-size: 1em; }
+.elea-separator--vertical::before, .elea-separator--vertical::after { border-block-start-width: 0; border-inline-start-width: 1px; }

@@ -1,0 +1,3 @@
+# SSH keys allowed to sign release tags. One key per line; "*" accepts any tagger identity,
+# the key alone decides. Adding a key is a reviewed change to this file.
+* namespaces="git" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFCKQcfmxpme749UHMDo6bndwPyyWXZt6rtHajPJvrw3
