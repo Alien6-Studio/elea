@@ -1,0 +1,42 @@
+/* The page's own element rules sit under Elea; everything else here is unlayered and wins over it. */
+@layer site, elea;
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/source-serif-4";
+@import "@alien6-studio/elea-ui/bundle.css";
+@import "@alien6-studio/elea-tokens/editions.css";
+@import "../../docs/assets/brand.css";
+
+@layer site {
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; color-scheme: light dark; }
+html[data-theme="light"] { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+  font-family: var(--elea-font-family-sans);
+  line-height: var(--elea-font-leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+/* In the base layer, so that a component rendered as a link keeps its own colour. */
+@layer elea.base { a { color: var(--elea-color-text-link); } }
+a { text-underline-offset: 0.15em; }
+code { font-family: var(--elea-font-family-mono); font-size: 0.875em; background: var(--elea-color-surface-muted); padding: 0.1em 0.35em; border-radius: var(--elea-radius-sm); }
+pre { margin: 0; font-family: var(--elea-font-family-mono); font-size: var(--elea-font-size-sm); line-height: var(--elea-font-leading-relaxed); background: var(--elea-color-surface-inverse); color: var(--elea-color-text-inverse); border-radius: var(--elea-radius-lg); padding: var(--elea-space-4) var(--elea-space-5); overflow: auto; }
+pre code { background: transparent; padding: 0; font-size: inherit; color: inherit; }
+}
+/* Site frame */
+.site { display: flex; flex-direction: column; min-height: 100vh; }
+.site__masthead :focus-visible, .site__skip:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+.site__content {
+  flex: 1;
+  width: min(100%, 62rem);
+  margin-inline: auto;
+  padding: var(--elea-space-8) var(--site-gutter);
+}
+.site__content--full { width: 100%; padding: 0; }
+.site__content > h1 { font-size: clamp(2.25rem, 5vw, 3.75rem); font-weight: 650; line-height: 1.06; letter-spacing: -0.042em; margin: var(--elea-space-4) 0 var(--elea-space-3); }
+.site__content > h2 { font-size: var(--elea-font-size-2xl); margin: var(--elea-space-10) 0 var(--elea-space-3); }
+.lead { font-size: var(--elea-font-size-lg); color: var(--elea-color-text-muted); margin: 0 0 var(--elea-space-6); }

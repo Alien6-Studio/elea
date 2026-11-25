@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-elea-theme="precision">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ page.meta.description | default(config.site_description) | e }}">
+  <link rel="canonical" href="{{ page.canonical_url }}">
+  <link rel="icon" type="image/svg+xml" href="{{ 'assets/elea-mark.svg' | url }}">
+  <title>{% if not page.is_homepage %}{{ page.title | e }} · {% endif %}{{ config.site_name }}</title>
+  {% if page and page.is_homepage %}
+    <link rel="preload" as="image" href="{{ 'assets/glacier.webp' | url }}" fetchpriority="high">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Elea — A design system for rich content">
+    <meta property="og:description" content="{{ config.site_description | e }}">
+    <meta property="og:url" content="{{ page.canonical_url }}">
+  {% endif %}
+  <script src="{{ 'assets/site-theme.js' | url }}"></script>
+  {% for path in config.extra_css %}
+    <link rel="stylesheet" href="{{ path | url }}">
+  {% endfor %}
+</head>
+<body>
+  {% if page.is_homepage %}
+    {% include "header-home.html" %}
+    <main id="main" tabindex="-1">
+      {% include "site-home.html" %}
+    </main>
+  {% else %}
+    {% include "header-docs.html" %}
+    <div class="docs-guidebar">
+      <div class="site-container docs-guidebar__inner">
+        <span class="docs-guidebar__label">Guides</span>
+        <nav class="site__nav-links docs-guidebar__links" aria-label="Documentation">
+          {% for item in nav if not item.is_homepage %}
+            <a href="{{ item.url | url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.title | e }}</a>
+          {% endfor %}
+        </nav>
+      </div>
+    </div>
+    <main id="main" class="site-container docs-layout" tabindex="-1">
+      {% if page.toc.items and page.toc.items[0].children %}
+        <nav class="docs-toc" aria-label="On this page">
+          <p>On this page</p>
+          {% for item in page.toc.items[0].children %}
+            <a href="{{ item.url }}">{{ item.title | e }}</a>
+          {% endfor %}
+        </nav>
+      {% endif %}
+      <article class="docs-article">
+        {{ page.content }}
+      </article>
+    </main>
+  {% endif %}
+  {% include "site-footer.html" %}
+</body>
+</html>

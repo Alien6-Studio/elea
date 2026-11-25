@@ -1,0 +1,14 @@
+.workspace-edition { --edition-inset: clamp(1rem, 2.5vw, 2rem); padding: var(--edition-inset); border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-sm); background: var(--elea-color-surface-default); color: var(--elea-color-text-default); overflow-wrap: anywhere; }
+.workspace-edition__cover.elea-content { margin: calc(-1 * var(--edition-inset)) calc(-1 * var(--edition-inset)) 1rem; max-width: none; }
+.workspace-edition__cover .elea-block, .workspace-edition__cover .elea-figure { margin: 0; }
+.workspace-edition__cover .elea-image { display: block; width: 100%; max-height: clamp(7rem, 12vw, 10rem); object-fit: cover; object-position: 50% 42%; border-radius: var(--elea-radius-sm) var(--elea-radius-sm) 0 0; }
+.workspace-edition__cover .elea-caption { margin: .4rem var(--edition-inset) 0; text-align: end; font-size: var(--elea-font-size-xs); }
+.workspace-edition > header { margin-block-end: 1.4rem; }
+.workspace-edition__masthead { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: 0 0 1.3rem; padding-bottom: .5rem; border-bottom: 2px solid var(--elea-color-text-link); color: var(--elea-color-text-link); font-family: var(--elea-font-family-content); font-weight: 550; font-size: 1.1rem; }
+.workspace-edition__masthead .elea-badge { font-family: var(--elea-font-family-sans); font-style: normal; }
+.workspace-edition > header h3 { margin: 0 0 .65rem; font: 500 clamp(1.7rem, 3.8vw, 3.1rem)/1.05 var(--elea-font-family-content); letter-spacing: -.045em; }
+.workspace-edition > header div { color: var(--elea-color-text-muted); }
+
+@media (max-width: 55rem) {
+  .workspace-edition { --edition-inset: 1rem; }
+}

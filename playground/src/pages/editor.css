@@ -1,0 +1,130 @@
+.workspace { margin-block-end: clamp(3rem, 7vw, 6rem); }
+.workspace-intro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding-block: var(--site-page-inset, clamp(2rem, 5vw, 4.5rem)) 2rem;
+}
+.workspace-intro h1 { margin: 0; }
+.workspace-intro p { max-width: 52ch; margin: .85rem 0 0; color: var(--elea-color-text-muted); font-size: clamp(1rem, 1.8vw, 1.2rem); line-height: 1.5; }
+.workspace-theme { display: inline-flex; flex: none; align-items: center; gap: .6rem; padding-block: .3rem; font-weight: 600; text-decoration: none; }
+.workspace-theme:hover { text-decoration: underline; }
+.workspace-desk { color: var(--elea-color-text-default); border: 1px solid var(--elea-color-border-strong); border-radius: var(--elea-radius-xl); background: var(--elea-color-surface-default); }
+.workspace-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .9rem 1.5rem;
+  padding: .9rem clamp(.85rem, 2.2vw, 1.5rem);
+  border-radius: var(--elea-radius-xl) var(--elea-radius-xl) 0 0;
+  border-bottom: 1px solid var(--elea-color-border-strong);
+  background: var(--elea-color-surface-subtle);
+}
+.workspace-document, .workspace-settings, .workspace-switch, .workspace-draft__actions { display: flex; align-items: center; gap: .45rem; }
+.workspace-document { gap: .75rem; min-width: 0; max-width: 100%; }
+.workspace-document > span, .workspace-draft__bar > div:first-child > span, .workspace-import summary, .workspace-import label { font-size: var(--elea-font-size-sm); }
+.workspace-document > span { color: var(--elea-color-text-muted); font-weight: 550; }
+.workspace-document .elea-ui-select { min-width: 10rem; max-width: min(20rem, 100%); }
+.workspace-document .elea-ui-select__option { white-space: normal; overflow-wrap: anywhere; }
+.workspace-settings { flex-wrap: wrap; }
+.workspace-desk .elea-button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--elea-color-text-link); }
+.workspace-switch { padding: .85rem; border-bottom: 1px solid var(--elea-color-border-default); }
+.workspace-panes { display: grid; align-items: start; grid-template-columns: minmax(0, 1fr); }
+.workspace-panes--split { grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr); }
+.workspace-draft, .workspace-output { min-width: 0; }
+.workspace-draft__bar, .workspace-output__heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .55rem 1rem;
+  min-height: 4.3rem;
+  padding: .85rem clamp(.85rem, 2.2vw, 1.5rem);
+  border-bottom: 1px solid var(--elea-color-border-default);
+}
+.workspace-draft__bar h2, .workspace-output__heading h2 { margin: 0; font-size: 1rem; letter-spacing: -.025em; font-weight: 600; }
+.workspace-draft__bar > div:first-child > span { font-size: var(--elea-font-size-xs); color: var(--elea-color-text-muted); }
+.workspace-paper { padding: clamp(1.8rem, 4vw, 3rem) clamp(1rem, 3vw, 2.4rem) 3rem .35rem; }
+.workspace-paper .elea-content-editor { margin-inline: auto; }
+.workspace-paper .elea-content-editor--classic, .workspace-paper .elea-content-editor--markdown, .workspace-paper .elea-content-editor--preview { padding-inline-start: clamp(1rem, 3vw, 2.4rem); }
+.workspace-output {
+  position: sticky;
+  top: .65rem;
+  max-height: calc(100dvh - 1.3rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--elea-color-surface-subtle);
+  border-inline-start: 1px solid var(--elea-color-border-default);
+  border-bottom-right-radius: var(--elea-radius-xl);
+}
+.workspace-output__heading { background: var(--elea-color-surface-default); }
+.workspace-import { position: relative; margin-inline-start: auto; }
+.workspace-import summary { color: var(--elea-color-text-link); cursor: pointer; }
+.workspace-import__form {
+  position: absolute;
+  z-index: 4;
+  inset: calc(100% + .6rem) 0 auto auto;
+  display: grid;
+  justify-items: start;
+  gap: .65rem;
+  width: min(18rem, calc(100vw - 4rem));
+  padding: .9rem;
+  border: 1px solid var(--elea-color-border-strong);
+  border-radius: var(--elea-radius-md);
+  background: var(--elea-color-surface-default);
+  box-shadow: var(--elea-shadow-md);
+}
+.workspace-import__form textarea {
+  width: 100%;
+  font: .875rem/1.5 var(--elea-font-family-mono);
+  padding: .5rem;
+  border: 1px solid var(--elea-color-border-strong);
+  border-radius: var(--elea-radius-sm);
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+}
+.workspace-output .elea-tabs { display: flex; flex-direction: column; min-height: 0; }
+.workspace-output .elea-tabs__list { flex: none; flex-wrap: wrap; background: var(--elea-color-surface-default); padding-inline: .65rem; }
+.workspace-output .elea-tabs__panel { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: clamp(.65rem, 1.7vw, 1.25rem); }
+.workspace-output .elea-tabs__panel[hidden] { display: none; }
+.workspace-source { display: grid; gap: .65rem; justify-items: start; }
+.workspace-source .elea-code { width: 100%; font-size: var(--elea-font-size-xs); }
+.workspace-source .elea-code > code { white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 2; }
+.workspace :is(summary, pre, .workspace-theme):focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+.picker { display: flex; flex-direction: column; }
+.picker button { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: var(--elea-space-3) var(--elea-space-4); border: 0; border-bottom: 1px solid var(--elea-color-border-default); background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.picker button:last-child { border-bottom: 0; }
+.picker button small { color: var(--elea-color-text-muted); }
+.picker button:hover { background: var(--elea-color-surface-subtle); }
+
+@media (max-width: 55rem) {
+  .workspace-intro { align-items: start; flex-direction: column; }
+  .workspace-draft__bar { min-height: 0; }
+  .workspace-output { position: static; max-height: none; border-inline-start: 0; border-end-start-radius: var(--elea-radius-xl); }
+  .workspace-output .elea-tabs__panel { overflow: visible; }
+  .workspace-output .elea-tabs__tab { padding-inline: .55rem; }
+  .workspace-settings-menu { position: relative; margin-inline-start: auto; }
+  .workspace-settings-menu summary { cursor: pointer; color: var(--elea-color-text-link); font-size: .875rem; }
+  .workspace-settings-menu .workspace-settings {
+    position: absolute; z-index: 4; top: calc(100% + .65rem); inset-inline-end: 0;
+    width: 12rem; padding: .75rem;
+    border: 1px solid var(--elea-color-border-strong); border-radius: var(--elea-radius-md);
+    background: var(--elea-color-surface-default); box-shadow: var(--elea-shadow-md);
+  }
+  .workspace-settings-menu .elea-ui-select { width: 100%; }
+}
+@media (max-width: 32rem) {
+  .workspace-desk { margin-inline: calc(-.55 * var(--site-gutter)); }
+  .workspace-paper .elea-content-editor { --elea-editor-gutter: 3rem; }
+  .workspace-paper { padding-inline: .25rem .9rem; }
+  .workspace-intro { padding-block: 1.65rem 1.35rem; gap: .45rem; }
+  .workspace-document > span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+  .workspace-tools { gap: .25rem; padding: .75rem .65rem; }
+  .workspace-document .elea-ui-select { min-width: 0; max-width: min(11.25rem, 56vw); }
+  .workspace-switch { padding: .6rem .65rem; }
+  .workspace-draft__bar > div:first-child h2 { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+  .workspace-draft__bar { gap: .6rem; }
+  .workspace-draft__actions { flex-wrap: wrap; gap: .15rem; }
+}
