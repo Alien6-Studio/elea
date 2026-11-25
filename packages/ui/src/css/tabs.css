@@ -1,5 +1,5 @@
 /* Tabs */
-.elea-tabs { min-width: 0; }
+.elea-tabs { font-family: var(--elea-font-family-sans); min-width: 0; }
 .elea-tabs__list { display: flex; gap: var(--elea-space-1); overflow-x: auto; border-block-end: 1px solid var(--elea-color-border-default); }
 .elea-tabs__tab {
   flex: none;

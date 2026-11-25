@@ -1,5 +1,5 @@
 /* Pagination */
-.elea-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: var(--elea-space-3); font-size: var(--elea-font-size-sm); }
+.elea-pagination { font-family: var(--elea-font-family-sans); display: flex; flex-wrap: wrap; align-items: center; gap: var(--elea-space-3); font-size: var(--elea-font-size-sm); }
 .elea-pagination__summary { color: var(--elea-color-text-muted); margin-right: auto; }
 .elea-pagination__list { display: flex; align-items: center; gap: var(--elea-space-1); list-style: none; margin: 0; padding: 0; }
 .elea-pagination__button {

@@ -1,4 +1,5 @@
 /* Fields */
+.elea-field, .elea-field__label { font-family: var(--elea-font-family-sans); }
 .elea-field { display: flex; flex-direction: column; gap: var(--elea-space-1); }
 .elea-field__label { font-size: var(--elea-font-size-sm); font-weight: var(--elea-font-weight-medium); color: var(--elea-color-text-default); }
 .elea-field__required { color: var(--elea-color-danger); margin-left: var(--elea-space-1); }
@@ -9,6 +10,7 @@
   width: 100%;
   min-height: var(--elea-control-height, calc(2.5rem + var(--elea-_density, 0px)));
   font: inherit;
+  font-family: var(--elea-font-family-sans);
   line-height: var(--elea-font-leading-tight);
   font-size: var(--elea-control-font-size, var(--elea-font-size-base));
   color: var(--elea-color-text-default);

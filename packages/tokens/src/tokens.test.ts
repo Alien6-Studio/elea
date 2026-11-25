@@ -105,6 +105,13 @@ test("the info colour starts as the link colour, in both schemes", () => {
   }
 });
 
+test("the default reading and interface stacks start with ELEA Sans", () => {
+  const sans = tokens.find((token) => token.path === "font.family.sans");
+  assert.ok(sans);
+  assert.match(cssValue(sans), /^"ELEA Sans", system-ui,/);
+  assert.deepEqual(tokens.find((token) => token.path === "font.family.content")?.value, sans.value);
+});
+
 test("the Tailwind v3 preset names utilities like the v4 theme and keeps opacity modifiers", () => {
   const { extend } = toTailwindPreset([
     { path: "color.text.default", type: "color", value: "#000" }, { path: "font.family.sans", type: "fontFamily", value: ["Arial"] },

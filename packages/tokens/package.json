@@ -32,6 +32,9 @@
       "default": "./dist/src/brand.js"
     },
     "./elea.css": "./dist/elea.css",
+    "./fonts/elea-sans.css": "./dist/fonts/elea-sans.css",
+    "./fonts/ELEASans-Variable.woff2": "./dist/fonts/ELEASans-Variable.woff2",
+    "./fonts/ELEASans-Italic-Variable.woff2": "./dist/fonts/ELEASans-Italic-Variable.woff2",
     "./editions.css": "./dist/editions.css",
     "./theme.css": "./dist/theme.css",
     "./tailwind": {

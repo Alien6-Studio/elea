@@ -1,5 +1,5 @@
 /* Accordion */
-.elea-accordion { min-width: 0; color: var(--elea-color-text-default); }
+.elea-accordion { font-family: var(--elea-font-family-sans); min-width: 0; color: var(--elea-color-text-default); }
 .elea-accordion__item { border-block-end: 1px solid var(--elea-color-border-default); }
 .elea-accordion--contained { border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-lg); overflow: hidden; background: var(--elea-color-surface-default); }
 .elea-accordion--contained .elea-accordion__item:last-child { border-block-end: 0; }

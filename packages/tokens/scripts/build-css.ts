@@ -1,13 +1,20 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { editions, makeBrandTheme } from "../src/brand.js";
+import { LAYER_ORDER } from "../src/css.js";
 import { darkTokens, inLayer, toShadcnAliases, toShadcnPreset, toStylesheet, toTailwindPreset, toTailwindTheme, tokens } from "../src/index.js";
 
 // Emits the runtime stylesheet and the Tailwind theme next to the compiled package
 const dist = join(dirname(dirname(fileURLToPath(import.meta.url))), "dist");
 mkdirSync(dist, { recursive: true });
-writeFileSync(join(dist, "elea.css"), toStylesheet(tokens, { dark: darkTokens, layer: "elea.tokens", localAppearance: true }));
+cpSync(new URL("../fonts/", import.meta.url), join(dist, "fonts"), { recursive: true });
+const runtimeTokens = toStylesheet(tokens, { dark: darkTokens, localAppearance: true });
+writeFileSync(join(dist, "elea.css"), [
+  LAYER_ORDER,
+  '@import "./fonts/elea-sans.css";',
+  `@layer elea.tokens {\n${runtimeTokens}}\n`,
+].join("\n"));
 writeFileSync(join(dist, "theme.css"), toTailwindTheme(tokens));
 const editionStyles = Object.entries(editions).map(([name, theme]) =>
   makeBrandTheme(theme, `elea-${name.toLowerCase()}`).css

@@ -1,6 +1,7 @@
 /* Tooltip: the wrapper generates no box, so the trigger keeps its own layout */
 .elea-tooltip { display: contents; }
 .elea-tooltip__bubble {
+  font-family: var(--elea-font-family-sans);
   position: fixed;
   inset: auto;
   z-index: 110;

@@ -1,5 +1,5 @@
 /* Table: the wrapper scrolls, so a wide table never widens the page */
-.elea-table { --elea-table-pad: var(--elea-space-3); max-inline-size: 100%; overflow: auto; color: var(--elea-color-text-default); font-size: var(--elea-font-size-sm); }
+.elea-table { font-family: var(--elea-font-family-sans); --elea-table-pad: var(--elea-space-3); max-inline-size: 100%; overflow: auto; color: var(--elea-color-text-default); font-size: var(--elea-font-size-sm); }
 .elea-table:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
 .elea-table--sm { --elea-table-pad: var(--elea-space-2); }
 .elea-table table { inline-size: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }

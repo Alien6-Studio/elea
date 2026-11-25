@@ -2,6 +2,7 @@
 .elea-popover { position: relative; display: inline-block; }
 /* The script gives the panel its top and left; without the top layer the fixed position escapes most containers. */
 .elea-popover__panel {
+  font-family: var(--elea-font-family-sans);
   position: fixed;
   inset: auto;
   z-index: 110;

@@ -136,21 +136,44 @@ const VITE = "8.3.8";
 const EDITOR_FIRST_LOAD = 59_000;
 
 /**
- * A host that bundles the editor, built by Vite itself: the parts the editor loads on demand must
- * land in chunks of their own, outside what the page downloads to show it, and that first load is
- * budgeted. It prints the size of each part, which is what the README states.
+ * Vite must emit the UI stylesheet and its fonts at the host's base URL. The editor's first load is
+ * budgeted independently of the parts it loads on demand.
  */
 const BUNDLER_SCRIPT = String.raw`
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
+import { JSDOM } from "jsdom";
+import { createElement } from "react";
+import { renderToString } from "react-dom/server";
+import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
+import { Button, Input } from "@alien6-studio/elea-ui";
 import { build } from "vite";
 
 const [limit] = process.argv.slice(2).map(Number);
 const { output } = await build({
   logLevel: "error",
   configFile: false,
+  base: "/portal/",
   build: { write: false, rollupOptions: { input: "entry.js", external: ["react", "react-dom", "react/jsx-runtime"], preserveEntrySignatures: "strict" } },
 });
+const css = output.find(file => file.fileName.endsWith(".css")).source;
+for (const name of ["ELEASans-Variable.woff2", "ELEASans-Italic-Variable.woff2"]) {
+  const original = readFileSync(new URL(import.meta.resolve("@alien6-studio/elea-tokens/fonts/" + name)));
+  const font = output.find(file => file.fileName.endsWith(".woff2") && original.equals(file.source));
+  assert.ok(font && css.includes("/portal/" + font.fileName), "the deployed UI stylesheet must resolve " + name);
+}
+const controls = renderToString(createElement("div", null, createElement(Input), createElement(Button, null, "Save")));
+const brand = makeBrandTheme({ ...editions.Precision, font: "Georgia, serif" }, "journal");
+const { window } = new JSDOM("<style>" + css + brand.css + "</style><body style='font-family: serif'>" +
+  controls + '<section data-elea-theme="journal">' + controls + "</section></body>");
+const family = node => window.getComputedStyle(node).fontFamily;
+assert.equal(family(window.document.body), "serif");
+for (const tag of ["input", "button"]) {
+  const [standard, branded] = window.document.querySelectorAll(tag);
+  assert.match(family(standard), /^["']?ELEA Sans["']?,/);
+  assert.equal(family(branded), "Georgia, serif");
+}
 const chunks = new Map(output.filter((file) => file.type === "chunk").map((chunk) => [chunk.fileName, chunk]));
 const first = new Set();
 const reach = (name) => {
@@ -175,7 +198,7 @@ for (const [part, module] of Object.entries(parts)) {
 }
 const total = size([...first]);
 assert.ok(total <= limit, "the first load of the editor is " + total + " gzip bytes, over its budget of " + limit);
-console.log("bundler host verified: first load of the editor " + total + " of " + limit + " gzip bytes; on demand: " + sizes.join(", "));
+console.log("bundler host verified: UI fonts and brand override; first load of the editor " + total + " of " + limit + " gzip bytes; on demand: " + sizes.join(", "));
 `;
 
 const CONSUMER_SCRIPT = String.raw`
@@ -351,8 +374,8 @@ try {
   mkdirSync(bundler);
   writeFileSync(join(bundler, "package.json"), JSON.stringify({ private: true, type: "module" }));
   console.log(`\n== Vite ${VITE}`);
-  run("npm", [...install, `vite@${VITE}`, "react@19.3.1", "react-dom@19.3.1", ...archives], bundler);
-  writeFileSync(join(bundler, "entry.js"), 'export { ContentEditor, ContentProvider } from "@alien6-studio/elea-content-editor";\n');
+  run("npm", [...install, `vite@${VITE}`, `jsdom@${devDependencies.jsdom}`, "react@19.3.1", "react-dom@19.3.1", ...archives], bundler);
+  writeFileSync(join(bundler, "entry.js"), 'import "@alien6-studio/elea-ui/bundle.css";\nexport { ContentEditor, ContentProvider } from "@alien6-studio/elea-content-editor";\n');
   writeFileSync(join(bundler, "build.mjs"), BUNDLER_SCRIPT);
   run("node", ["build.mjs", String(EDITOR_FIRST_LOAD)], bundler);
 

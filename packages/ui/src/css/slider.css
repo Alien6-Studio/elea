@@ -1,5 +1,5 @@
 /* Slider: a native range input, its track filled up to the thumb */
-.elea-slider { display: flex; flex-direction: column; gap: var(--elea-space-1); min-width: 0; --elea-slider-thumb: 1.25rem; --elea-slider-track: 0.375rem; }
+.elea-slider { font-family: var(--elea-font-family-sans); display: flex; flex-direction: column; gap: var(--elea-space-1); min-width: 0; --elea-slider-thumb: 1.25rem; --elea-slider-track: 0.375rem; }
 .elea-slider--sm { --elea-slider-thumb: 1rem; --elea-slider-track: 0.25rem; }
 .elea-slider__header { display: flex; justify-content: space-between; gap: var(--elea-space-3); font-size: var(--elea-font-size-sm); }
 .elea-slider__label { font-weight: var(--elea-font-weight-medium); color: var(--elea-color-text-default); }

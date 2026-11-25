@@ -1,5 +1,5 @@
 /* Progress */
-.elea-progress { --elea-progress-color: var(--elea-color-primary-600); display: flex; flex-direction: column; gap: var(--elea-space-1); min-width: 0; }
+.elea-progress { font-family: var(--elea-font-family-sans); --elea-progress-color: var(--elea-color-primary-600); display: flex; flex-direction: column; gap: var(--elea-space-1); min-width: 0; }
 .elea-progress--success { --elea-progress-color: var(--elea-color-success); }
 .elea-progress--info { --elea-progress-color: var(--elea-color-info); }
 .elea-progress--warning { --elea-progress-color: var(--elea-color-warning); }

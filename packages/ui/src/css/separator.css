@@ -1,5 +1,6 @@
 /* Separator: a line, or a label between two lines */
 .elea-separator {
+  font-family: var(--elea-font-family-sans);
   display: flex;
   flex: none;
   align-items: center;

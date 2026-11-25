@@ -1,5 +1,6 @@
 /* Alert */
 .elea-alert {
+  font-family: var(--elea-font-family-sans);
   --elea-alert-color: var(--elea-color-text-muted);
   display: flex;
   align-items: flex-start;

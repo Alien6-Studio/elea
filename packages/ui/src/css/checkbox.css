@@ -1,4 +1,5 @@
 /* Checkbox and toggle */
+.elea-checkbox, .elea-toggle { font-family: var(--elea-font-family-sans); }
 .elea-checkbox { display: inline-flex; align-items: flex-start; gap: var(--elea-space-2); cursor: pointer; position: relative; }
 .elea-checkbox--disabled { cursor: not-allowed; opacity: 0.5; }
 .elea-checkbox__input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }

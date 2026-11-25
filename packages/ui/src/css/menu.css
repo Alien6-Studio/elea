@@ -1,6 +1,7 @@
 /* Menu */
 .elea-menu { position: relative; display: inline-block; }
 .elea-menu__list {
+  font-family: var(--elea-font-family-sans);
   position: absolute;
   top: calc(100% + var(--elea-space-1));
   z-index: 50;

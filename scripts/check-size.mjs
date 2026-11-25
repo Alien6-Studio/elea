@@ -4,7 +4,7 @@ import { gzipSync } from "node:zlib";
 
 // Size budget of every package, gzip bytes of the compiled JavaScript and CSS.
 // Raising a budget is a deliberate decision made in the same change as the growth.
-// tokens: 14.95 KB including the optional brand generator with a free font, accent and radius, three
+// tokens: 15.15 KB including the ELEA Sans declarations and the optional brand generator, three
 // prebuilt CSS editions with paired palettes and control proportions and depth, motion tokens, the Tailwind v3 presets, the shadcn/ui aliases and the
 // cascade layer every sheet states, with scoped appearance color pairs and portal-compatible brand classes.
 // content: 28.1 KB including multiline Markdown lists, checklists with the state of their tasks, media links, the shared image URL policy
@@ -19,8 +19,8 @@ import { gzipSync } from "node:zlib";
 // load has its own budget where a bundler measures it, in check-package.
 // ui is budgeted per component instead: each one answers for its own script and stylesheet, so
 // the package can grow by components without any of them growing unnoticed. This includes scoped
-// control tokens for buttons, fields and choices, plus the optional Tabs presentations.
-const BUDGETS = { tokens: 14_950, content: 28_100, "content-viewer": 12_750, media: 8_000, "content-editor": 75_500 };
+// control tokens, the font on standalone controls and surfaces, and the optional Tabs presentations.
+const BUDGETS = { tokens: 15_150, content: 28_100, "content-viewer": 12_750, media: 8_000, "content-editor": 75_500 };
 // The interactive mask and format picker have their own budget. The base cropper keeps its
 // original limit, and the packed-consumer check verifies that the new controls load on demand.
 const cropAdjustmentFiles = new Set(["AdjustableCrop.js", "CropFormatControls.js", "CropMask.js", "createCropFormats.js", "crop-adjustments.css"]);
@@ -30,9 +30,9 @@ const cropAdjustmentFiles = new Set(["AdjustableCrop.js", "CropFormatControls.js
 // holds alone: it states the layer order and carries the shared keyframes it names.
 const UI_BUDGETS = {
   calendar: 3_600, combobox: 4_200,
-  accordion: 2_500, alert: 1_500, avatar: 1_500, badge: 1_000, button: 3_300, "button-effects": 1_500, card: 1_500, checkbox: 1_750, "confirm-field": 1_000, cx: 250,
-  dialog: 3_700, field: 2_000, footer: 1_250, index: 600, menu: 2_700, motion: 1_250, pagination: 2_000, popover: 4_100, progress: 1_500,
-  "radio-group": 1_750, select: 4_875, separator: 750, sheet: 1_750, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, table: 2_250, tabs: 3_100, toast: 3_250, tooltip: 2_250,
+  accordion: 2_500, alert: 1_525, avatar: 1_500, badge: 1_000, button: 3_300, "button-effects": 1_500, card: 1_525, checkbox: 1_750, "confirm-field": 1_000, cx: 250,
+  dialog: 3_700, field: 2_000, footer: 1_250, index: 600, menu: 2_700, motion: 1_250, pagination: 2_025, popover: 4_125, progress: 1_500,
+  "radio-group": 1_750, select: 4_875, separator: 750, sheet: 1_775, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, table: 2_250, tabs: 3_100, toast: 3_250, tooltip: 2_275,
 };
 
 function files(dir) {

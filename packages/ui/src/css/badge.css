@@ -1,5 +1,6 @@
 /* Badge */
 .elea-badge {
+  font-family: var(--elea-font-family-sans);
   display: inline-flex;
   align-items: center;
   gap: var(--elea-space-1);

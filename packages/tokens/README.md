@@ -33,6 +33,15 @@ JSON file; the package resolves its aliases and emits every form a project needs
 @import "@alien6-studio/elea-tokens/theme.css";
 ```
 
+`elea.css` loads ELEA Sans from the package. Its upright and italic faces support
+weights 100–900. To use your own typeface, override `--elea-font-family-sans`
+for controls and `--elea-font-family-content` for reading. To load the faces
+independently, import `@alien6-studio/elea-tokens/fonts/elea-sans.css`.
+
+Vite emits the WOFF2 assets when it builds the stylesheet. With the standalone
+Tailwind CLI, copy the two `.woff2` files from
+`node_modules/@alien6-studio/elea-tokens/dist/fonts/` beside your compiled CSS.
+
 Override tokens on `:root` or within a container, anywhere in your own styles: a rule outside
 any cascade layer wins over the `elea.tokens` layer whatever the import order. Use
 `--elea-color-text-on-brand` for the foreground on filled primary and secondary

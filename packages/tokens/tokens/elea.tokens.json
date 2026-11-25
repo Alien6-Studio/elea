@@ -71,7 +71,7 @@
   },
   "font": {
     "family": {
-      "sans": { "$type": "fontFamily", "$value": ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"] },
+      "sans": { "$type": "fontFamily", "$value": ["ELEA Sans", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"] },
       "serif": { "$type": "fontFamily", "$value": ["Iowan Old Style", "Palatino Linotype", "Charter", "Georgia", "serif"] },
       "mono": { "$type": "fontFamily", "$value": ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"] },
       "content": { "$type": "fontFamily", "$value": "{font.family.sans}", "$description": "Reading and writing text of block documents; hosts may point it at the serif family" }
