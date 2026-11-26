@@ -1,8 +1,9 @@
-import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type PointerEvent, type ReactNode } from "react";
+import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes, type PointerEvent, type ReactElement, type ReactNode } from "react";
 import { cx } from "./cx.js";
 import { Skeleton } from "./Skeleton.js";
 
-export type ButtonVariant = "primary" | "secondary" | "tertiary" | "outline" | "ghost" | "danger" | "success" | "info" | "warning";
+export type ButtonTone = "primary" | "secondary" | "tertiary" | "neutral" | "danger" | "success" | "info" | "warning";
+export type ButtonVariant = Exclude<ButtonTone, "neutral"> | "solid" | "outline" | "ghost";
 export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 export type ButtonRadius = "none" | "sm" | "md" | "lg" | "full";
 export type ButtonShadow = "none" | "sm" | "md";
@@ -25,6 +26,8 @@ interface ButtonLookProps {
 }
 
 interface ButtonBaseProps extends ButtonLookProps {
+  /** Colour role for solid, outline or ghost. An explicit tone overrides a colour shorthand. */
+  tone?: ButtonTone | undefined;
   variant?: ButtonVariant | undefined;
   /** Icon before the label. */
   icon?: ReactNode;
@@ -46,14 +49,26 @@ export function motionAttribute(motion: boolean | undefined): "on" | "off" | und
 }
 
 export type ButtonProps = ButtonBaseProps & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className"> & { className?: string | undefined; href?: undefined };
-export type LinkButtonProps = ButtonBaseProps & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className"> & { className?: string | undefined; href: string; disabled?: boolean | undefined };
+export type ButtonLinkRenderProps = AnchorHTMLAttributes<HTMLAnchorElement> & { href: string; children: ReactNode };
+export type LinkButtonProps = ButtonBaseProps & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className"> & {
+  className?: string | undefined;
+  href: string;
+  disabled?: boolean | undefined;
+  /** Renders an enabled router link. Inactive links use a native anchor without a destination. */
+  render?: (props: ButtonLinkRenderProps) => ReactElement;
+};
 
 function look({ size = "md", radius, shadow = "none", effect = "lift" }: ButtonLookProps): string {
   return cx(`elea-button--${size}`, radius && `elea-button--radius-${radius}`, shadow !== "none" && `elea-button--shadow-${shadow}`, effect !== "lift" && `elea-button--fx-${effect}`);
 }
 
-function classes({ variant = "primary", loading, fullWidth, className, ...rest }: ButtonBaseProps & { className?: string | undefined }): string {
-  return cx("elea-button", `elea-button--${variant}`, look(rest), loading && "elea-button--loading", fullWidth && "elea-button--full", className);
+function surface(variant: ButtonVariant | "disc", tone?: ButtonTone) {
+  if (variant === "outline" || variant === "ghost" || variant === "disc") return variant;
+  return tone ?? (variant === "solid" ? "primary" : variant);
+}
+
+function classes({ variant = "primary", tone, loading, fullWidth, className, ...rest }: ButtonBaseProps & { className?: string | undefined }): string {
+  return cx("elea-button", `elea-button--${surface(variant, tone)}`, look(rest), loading && "elea-button--loading", fullWidth && "elea-button--full", className);
 }
 
 type Pointer<T extends HTMLElement> = ((event: PointerEvent<T>) => void) | undefined;
@@ -87,7 +102,7 @@ function pointerProps<T extends HTMLElement>(effect: ButtonEffect | undefined, d
 
 /** A button, or a link styled as one when `href` is given. Labels come from `children`. */
 export function Button(props: ButtonProps | LinkButtonProps) {
-  const { variant, size, radius, shadow, effect, icon, trailingIcon, loading = false, loadingLabel, fullWidth, motion, className, children, ...rest } = props;
+  const { variant, tone, size, radius, shadow, effect, icon, trailingIcon, loading = false, loadingLabel, fullWidth, motion, className, children, ...rest } = props;
   const content = (
     <>
       {loading && <span className="elea-button__spinner" aria-hidden="true" />}
@@ -97,29 +112,25 @@ export function Button(props: ButtonProps | LinkButtonProps) {
     </>
   );
   const shared = {
-    className: classes({ variant, size, radius, shadow, effect, loading, fullWidth, className }),
+    className: classes({ variant, tone, size, radius, shadow, effect, loading, fullWidth, className }),
+    "data-elea-tone": tone,
     "data-elea-motion": motionAttribute(motion),
     "aria-busy": loading || rest["aria-busy"],
     "aria-label": loading && loadingLabel ? loadingLabel : rest["aria-label"],
   };
   if ("href" in rest && rest.href !== undefined) {
-    const { href, disabled, ...anchor } = rest as LinkButtonProps;
+    const { href, disabled, render, ...anchor } = rest as LinkButtonProps;
     const inactive = disabled || loading;
-    return (
-      <a
-        {...anchor}
-        {...shared}
-        href={inactive ? undefined : href}
-        aria-disabled={inactive || anchor["aria-disabled"]}
-        role={anchor.role ?? (inactive ? "link" : undefined)}
-        tabIndex={inactive ? -1 : anchor.tabIndex}
-        onClick={inactive ? undefined : anchor.onClick}
-        onAuxClick={inactive ? undefined : anchor.onAuxClick}
-        {...pointerProps(effect, anchor.onPointerDown, anchor.onPointerMove, anchor.onPointerLeave)}
-      >
-        {content}
-      </a>
-    );
+    const link = {
+      ...anchor,
+      ...shared,
+      ...pointerProps(effect, anchor.onPointerDown, anchor.onPointerMove, anchor.onPointerLeave),
+      children: content,
+    };
+    if (inactive) {
+      return <a {...link} role={anchor.role ?? "link"} aria-disabled tabIndex={-1} onClick={undefined} onAuxClick={undefined} />;
+    }
+    return render ? render({ ...link, href }) : <a {...link} href={href} />;
   }
   const { disabled, type = "button", ...button } = rest as ButtonProps;
   return (
@@ -135,15 +146,16 @@ export interface IconButtonProps extends ButtonLookProps, Omit<ButtonHTMLAttribu
   children: ReactNode;
   /** A disc is a neutral circular action, suitable for toolbars and media overlays. */
   variant?: ButtonVariant | "disc" | undefined;
+  tone?: ButtonTone | undefined;
   /** Expressive motion for this button; by default it follows the nearest `data-elea-motion` ancestor. */
   motion?: boolean | undefined;
   className?: string | undefined;
 }
 
 /** An icon-only button, named for assistive technology by `label`. */
-export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton({ label, children, variant = "ghost", size, radius, shadow, effect, motion, className, type = "button", title = label, ...rest }, ref) {
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton({ label, children, variant = "ghost", tone, size, radius, shadow, effect, motion, className, type = "button", title = label, ...rest }, ref) {
   return (
-    <button ref={ref} {...rest} {...pointerProps(effect, rest.onPointerDown, rest.onPointerMove, rest.onPointerLeave)} type={type} data-elea-motion={motionAttribute(motion)} className={cx("elea-button", "elea-button--icon", `elea-button--${variant}`, look({ size, radius, shadow, effect }), className)} aria-label={label} title={title}>
+    <button ref={ref} {...rest} {...pointerProps(effect, rest.onPointerDown, rest.onPointerMove, rest.onPointerLeave)} type={type} data-elea-tone={tone} data-elea-motion={motionAttribute(motion)} className={cx("elea-button", "elea-button--icon", `elea-button--${surface(variant, tone)}`, look({ size, radius, shadow, effect }), className)} aria-label={label} title={title}>
       <span className="elea-button__icon" aria-hidden="true">{children}</span>
     </button>
   );

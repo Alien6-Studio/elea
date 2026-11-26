@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { defaultRegistry } from "./blocks/builtin.js";
 import { createDocument } from "./document.js";
-import { blockToMarkdown, documentToMarkdown, inlineHtmlToMarkdown, looksLikeMarkdown, markdownInlineToHtml, markdownToBlocks } from "./markdown.js";
+import { looksLikeMarkdown, markdownInlineToHtml, markdownToBlocks } from "./markdown.js";
+import { blockToMarkdown, documentToMarkdown, inlineHtmlToMarkdown } from "./markdownExport.js";
 import { documentToHtml } from "./serialize.js";
 
 const block = (id: string, type: string, data: Record<string, unknown>) => ({ id, type, data });

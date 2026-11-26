@@ -2,6 +2,8 @@
 
 Headless core of Elea: block document model compatible with EditorJS output, versioned schema, block registry, HTML sanitization, link policy and text extraction. No React, no DOM.
 
+This package ships ES modules only. For Jest with `next/jest`, add `@alien6-studio/elea-content` to `transpilePackages`.
+
 ## What it gives you
 
 - `parseDocument(value)`: reads a document object, its JSON string, plain text or HTML and
@@ -16,12 +18,13 @@ Headless core of Elea: block document model compatible with EditorJS output, ver
 - `createSanitizer(purify)`: binds the rich HTML policy (allowed tags and attributes, http(s)
   and site-relative URIs only, external links in a new tab with opener protection) to a
   DOMPurify instance, browser or jsdom.
-- `documentToText`, `documentExcerpt`, `htmlToText`, `annotateHierarchy`, `getVideoEmbedUrl`,
+- `documentToText(doc, defaultRegistry)`, `documentExcerpt`, `htmlToText`, `annotateHierarchy`, `getVideoEmbedUrl`,
   `fileKind`, `resolveLinkUrl`.
 - `en` and `fr` messages for the viewer and editor, `withDefaultMessages` to translate partially.
 - `documentToMarkdown`, `markdownToBlocks`, `looksLikeMarkdown`: Markdown as an interchange format,
   for export and for pasted text; `documentToHtml`: static HTML with the viewer's classes, for
-  e-mails, feeds and search indexes, every URL checked.
+  e-mails, feeds and search indexes, every URL checked. To preserve inline formatting, pass
+  `{ sanitize: html => sanitizer.sanitize(html) }` to `documentToHtml`. The default serializes rich text as plain text.
 
 Normalization retains the first occurrence of each non-empty stored block id.
 If an id is missing or repeated, a generated id is assigned without reusing

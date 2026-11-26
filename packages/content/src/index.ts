@@ -74,5 +74,6 @@ export { createSanitizer, type HtmlPurifier, type HtmlSanitizer, type SanitizerO
 export { getVideoEmbedUrl, isDirectVideoFile, isVideoUrl } from "./media/video.js";
 export { fileKind, type FileKind } from "./media/file.js";
 export { en, fr, formatMessage, withDefaultMessages, type DeepPartial, type EleaMessages } from "./messages/index.js";
-export { blockToMarkdown, documentToMarkdown, inlineHtmlToMarkdown, looksLikeMarkdown, markdownInlineToHtml, markdownToBlocks, type MarkdownParseOptions, type MarkdownExportOptions } from "./markdown.js";
+export { looksLikeMarkdown, markdownInlineToHtml, markdownToBlocks, type MarkdownParseOptions } from "./markdown.js";
+export { blockToMarkdown, documentToMarkdown, inlineHtmlToMarkdown, type MarkdownExportOptions } from "./markdownExport.js";
 export { documentToHtml, type HtmlSerializerOptions } from "./serialize.js";

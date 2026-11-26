@@ -3,6 +3,8 @@
 Design tokens of the Elea design system. The source is a [DTCG](https://tr.designtokens.org/format/)
 JSON file; the package resolves its aliases and emits every form a project needs.
 
+The JavaScript entry points are ES modules. For Jest with `next/jest`, add `@alien6-studio/elea-tokens` to `transpilePackages` when testing a JavaScript import such as `@alien6-studio/elea-tokens/brand`.
+
 ## What you get
 
 - `tokens/elea.tokens.json` and `tokens/elea.dark.tokens.json`: the light and dark source files
@@ -66,8 +68,9 @@ import elea from "@alien6-studio/elea-tokens/tailwind";
 export default { content: ["./src/**/*.{ts,tsx}"], presets: [elea] };
 ```
 
-A CommonJS config loads it with `require("@alien6-studio/elea-tokens/tailwind")`. Tailwind v3
-utilities are in no cascade layer, so a utility on an Elea component wins wherever `elea.css` is
+On Node.js versions that support loading ES modules with `require()`, a CommonJS config can use
+`const { eleaPreset } = require("@alien6-studio/elea-tokens/tailwind")` and `presets: [eleaPreset]`.
+Tailwind v3 utilities are in no cascade layer, so a utility on an Elea component wins wherever `elea.css` is
 imported.
 
 ## Projects built on shadcn/ui

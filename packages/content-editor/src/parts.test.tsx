@@ -1,11 +1,12 @@
-import "./test/dom.js";
+import { window } from "./test/dom.js";
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
+import { useState } from "react";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { en, type EleaBlock } from "@alien6-studio/elea-content";
+import { en, fr, type EleaBlock } from "@alien6-studio/elea-content";
 import { ContentEditor, type ContentEditorProps } from "./ContentEditor.js";
 import { cropperPart, loadEditorParts, part, previewPart, sourcePart, usePart, type Part } from "./parts.js";
-import { ContentProvider } from "./provider.js";
+import { ContentProvider, type ImageUploadOptions } from "./provider.js";
 
 afterEach(cleanup);
 
@@ -101,9 +102,10 @@ test("the editor stays until the preview has loaded", async () => {
   assert.equal(editing(), false);
 });
 
-test("a picked picture waits for the cropper, which then frames it", async () => {
+test("the optional format picker loads with the cropper after a picture is picked", async () => {
+  const { cropFormats, cropCorners, ...legacyMessages } = en;
   render(
-    <ContentProvider uploadImage={async () => ({ url: "/up.png", id: "" })}>
+    <ContentProvider messages={legacyMessages} imageCrop={{ formats: true }} uploadImage={async () => ({ url: "/up.png", id: "" })}>
       <Editor blocks={[{ id: "i", type: "image", data: { file: {}, caption: "" } }]} />
     </ContentProvider>,
   );
@@ -114,7 +116,106 @@ test("a picked picture waits for the cropper, which then frames it", async () =>
   assert.notEqual(document.querySelectorAll("[data-elea-block-id='i'] [aria-busy=true], [data-elea-block-id='i'] :disabled").length, 0);
 
   await act(async () => { await loadEditorParts("cropper"); });
-  assert.equal(screen.getAllByRole("button", { name: en.image.cropConfirm }).length, 1);
+  const picker = await screen.findByRole("combobox", { name: cropFormats.format });
+  assert.equal(picker.textContent, cropFormats.original);
+  for (const name of Object.values(cropCorners)) assert.ok(screen.getByRole("button", { name }));
+  assert.ok(screen.getByRole<HTMLButtonElement>("button", { name: en.image.cropConfirm }).disabled);
+});
+
+test("an image block uses the host's crop preset and dimensions with the active editor language", async () => {
+  const labels = fr.cropFormats;
+  assert.ok(labels && fr.cropCorners);
+  const { container } = render(
+    <ContentProvider messages={fr} imageCrop={{
+      formats: { defaultValue: "cover", presets: [{ value: "cover", label: "Couverture", aspect: 16 / 9 }] },
+      outputSize: { width: 600, height: 400 },
+    }}
+      uploadImage={async () => ({ url: "/photo.png", id: "" })}>
+      <Editor blocks={[{ id: "i", type: "image", data: {} }]} />
+    </ContentProvider>,
+  );
+  const input = container.querySelector<HTMLInputElement>("input[type=file]")!;
+  fireEvent.change(input, { target: { files: [new File(["x"], "photo.png", { type: "image/png" })] } });
+  const picker = await screen.findByRole("combobox", { name: labels.format });
+  assert.equal(picker.textContent, "Couverture");
+  assert.ok(screen.getByRole("button", { name: labels.move }));
+  for (const name of Object.values(fr.cropCorners)) assert.ok(screen.getByRole("button", { name }));
+  const confirm = screen.getByRole<HTMLButtonElement>("button", { name: fr.image.cropConfirm });
+  assert.ok(confirm.disabled);
+  fireEvent.load(screen.getByRole("group", { name: fr.image.cropImage }).querySelector("img")!);
+  assert.equal(confirm.disabled, false);
+
+  fireEvent.click(picker);
+  assert.ok(screen.getByRole("option", { name: labels.original }));
+  assert.ok(screen.getByRole("option", { name: labels.free }));
+  fireEvent.click(screen.getByRole("option", { name: labels.custom }));
+  const width = screen.getByRole<HTMLInputElement>("spinbutton", { name: labels.width });
+  assert.equal(width.value, "600");
+  assert.equal(screen.getByRole<HTMLInputElement>("spinbutton", { name: labels.height }).value, "400");
+  fireEvent.change(width, { target: { value: "0" } });
+  assert.equal(screen.getByRole("alert").textContent, labels.invalidSize);
+  assert.ok(confirm.disabled);
+});
+
+test("a host can reopen the original and saved framing, cancel edits, and upload a new rendition", async (t) => {
+  const canvas = window.HTMLCanvasElement.prototype;
+  const noop = () => {};
+  t.mock.method(canvas, "getContext", () => ({ translate: noop, scale: noop, rotate: noop, drawImage: noop }));
+  t.mock.method(canvas, "toBlob", (done: BlobCallback) => done(new Blob(["rendition"], { type: "image/png" })));
+  const original = new File(["original"], "cover.png", { type: "image/png" });
+  const uploads: ImageUploadOptions[] = [];
+  function Host() {
+    const [value, change] = useState<EleaBlock[]>([{ id: "i", type: "image", data: { caption: "Glacier" } }]);
+    return <ContentProvider imageCrop={{
+      formats: true, resolveOriginal: file => uploads[Number(file.id) - 1]?.crop,
+    }} uploadImage={async (_file, _context, options) => {
+      uploads.push(options);
+      return { id: String(uploads.length), url: `/rendition-${uploads.length}.png` };
+    }}><Editor blocks={value} onBlocksChange={change} /></ContentProvider>;
+  }
+  const { container } = render(<Host />);
+  const button = (name: string) => screen.getByRole("button", { name });
+  async function loadOriginal() {
+    const frame = await screen.findByRole("group", { name: en.image.cropImage });
+    const image = frame.querySelector("img")!;
+    Object.defineProperties(image, { naturalWidth: { value: 960 }, naturalHeight: { value: 640 } });
+    fireEvent.load(image);
+  }
+
+  const input = container.querySelector<HTMLInputElement>("input[type=file]")!;
+  fireEvent.change(input, { target: { files: [original] } });
+  await screen.findByRole("combobox", { name: en.cropFormats.format });
+  await loadOriginal();
+  const move = button(en.cropFormats.move);
+  fireEvent.keyDown(move, { key: "ArrowLeft", shiftKey: true });
+  fireEvent.change(screen.getByLabelText(en.image.cropZoom), { target: { value: "1.5" } });
+  fireEvent.click(button(en.image.cropConfirm));
+  await screen.findByRole("img", { name: "Glacier" });
+  assert.equal(uploads.length, 1);
+  const saved = uploads[0]!.crop!;
+  assert.equal(saved.source, original);
+  assert.ok(saved.recipe.mask);
+  assert.equal(saved.recipe.zoom, 1.5);
+  assert.equal(saved.recipe.format, "original");
+
+  fireEvent.click(button(en.image.adjustCrop));
+  await loadOriginal();
+  assert.equal(screen.getByLabelText<HTMLInputElement>(en.image.cropZoom).value, "1.5");
+  fireEvent.change(screen.getByLabelText(en.image.cropZoom), { target: { value: "2" } });
+  fireEvent.click(button(en.image.cropCancel));
+  assert.equal(button(en.image.adjustCrop), document.activeElement);
+  assert.equal(screen.getByRole("img", { name: "Glacier" }).getAttribute("src"), "/rendition-1.png");
+  assert.equal(uploads.length, 1);
+
+  fireEvent.click(button(en.image.adjustCrop));
+  await loadOriginal();
+  assert.equal(screen.getByLabelText<HTMLInputElement>(en.image.cropZoom).value, "1.5");
+  fireEvent.keyDown(button(en.cropCorners.bottomRight), { key: "ArrowLeft", shiftKey: true });
+  fireEvent.click(button(en.image.cropConfirm));
+  const rendition = await screen.findByRole("img", { name: "Glacier" });
+  assert.equal(rendition.getAttribute("src"), "/rendition-2.png");
+  assert.equal(uploads[1]?.crop?.source, original);
+  assert.notDeepEqual(uploads[1]?.crop?.recipe.mask, saved.recipe.mask);
 });
 
 test("loadEditorParts brings every part when none is named", async () => {

@@ -1,6 +1,6 @@
 export { cx } from "./cx.js";
 export { scopeOf, useSurfaceScope, type Appearance, type SurfaceScope } from "./scope.js";
-export { Button, ButtonSkeleton, IconButton, type ButtonSkeletonProps, type ButtonEffect, type ButtonProps, type ButtonRadius, type ButtonShadow, type ButtonSize, type ButtonVariant, type IconButtonProps, type LinkButtonProps } from "./Button.js";
+export { Button, ButtonSkeleton, IconButton, type ButtonSkeletonProps, type ButtonEffect, type ButtonLinkRenderProps, type ButtonTone, type ButtonProps, type ButtonRadius, type ButtonShadow, type ButtonSize, type ButtonVariant, type IconButtonProps, type LinkButtonProps } from "./Button.js";
 export { Badge, BadgeSkeleton, type BadgeProps, type BadgeSkeletonProps, type BadgeTone, type BadgeVariant } from "./Badge.js";
 export { Field, FieldSkeleton, Input, Label, Textarea, type FieldProps, type FieldSkeletonProps, type InputProps, type LabelProps, type TextareaProps } from "./Field.js";
 export { Calendar, type CalendarProps } from "./Calendar.js";

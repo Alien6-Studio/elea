@@ -3,6 +3,8 @@
 React primitives of the Elea design system, styled with Elea tokens only. Every label comes
 through props, nothing is hard-coded, so any language and any product fits.
 
+This package ships ES modules only. For Jest with `next/jest`, add `@alien6-studio/elea-ui` to `transpilePackages`.
+
 ## Use
 
 ```tsx
@@ -42,8 +44,7 @@ A sheet is named after its component in kebab case (`radio-group.css`); `Toggle`
 the tokens and nothing else, in any order. Without `motion.css` a component stays still, which is
 also what it does while motion is off.
 
-Every component takes `className`, and the form controls (`Input`, `Textarea`, `Checkbox`,
-`Toggle`) and buttons forward their `ref` to the native element, as form libraries expect.
+`Input`, `Textarea`, `Checkbox`, `Toggle` and `IconButton` forward their `ref` to the native element.
 
 ### Overriding
 
@@ -116,6 +117,78 @@ dialog or a sheet reads the place it is rendered at, marked by an empty `<templa
 read the place of their `ToastProvider`, which also takes a `theme` when it sits above the themed
 container. Tooltips, popovers and menus stay inside their container and inherit from it.
 `scopeOf(element)` and `useSurfaceScope()` give the same to a surface of your own.
+
+## Buttons
+
+Use `variant` for emphasis and `tone` for the colour role. A solid surface fills with
+the theme colour. Outline and ghost use the tone for text and interaction states.
+A plain `Button` is solid primary. Existing colour variants are solid shorthands, so
+`variant="danger"` and `variant="solid" tone="danger"` give the same result.
+
+```tsx
+import { Button } from "@alien6-studio/elea-ui";
+
+const tones = ["primary", "secondary", "tertiary", "neutral", "danger", "warning", "success", "info"] as const;
+const variants = ["solid", "outline", "ghost"] as const;
+
+export function ActionPalette() {
+  return variants.map(variant => (
+    <fieldset key={variant}>
+      <legend>{variant}</legend>
+      {tones.map(tone => <Button key={tone} variant={variant} tone={tone}>{tone}</Button>)}
+    </fieldset>
+  ));
+}
+```
+
+### Router links
+
+Pass an `href` and a `render` callback to use the host router. Forward the button's
+props, including its children and event handlers, and map `href` to the router's
+destination. When disabled or loading, ELEA supplies an unfocusable anchor with
+`aria-disabled="true"` and no destination. It skips the callback for that state.
+
+```tsx
+import { Button, type ButtonLinkRenderProps } from "@alien6-studio/elea-ui";
+import { Link } from "react-router";
+
+const routeLink = ({ href, ...props }: ButtonLinkRenderProps) => <Link {...props} to={href} />;
+
+export function ArticleLinks() {
+  return <>
+    <Button href="/articles" render={routeLink}>Browse articles</Button>
+    <Button href="/drafts" render={routeLink} disabled>Drafts unavailable</Button>
+  </>;
+}
+```
+
+### Asymmetric corners
+
+Set `--elea-shape-action` for the theme's action silhouette. On a closer container,
+`--elea-control-radius` takes precedence for an inherited or medium button radius.
+Supply four CSS lengths in clockwise order, starting at the top left. The
+`--elea-button-radius-sm`, `-md` and `-lg` tokens apply when the matching
+`radius` prop is explicit. The `size` prop controls the button's dimensions independently.
+
+```css
+.publication {
+  --elea-shape-action: 1.5rem 0.25rem 1rem 0.5rem;
+}
+.publication .elea-button--sm {
+  --elea-button-radius-sm: 0.75rem 0.125rem 0.5rem 0.25rem;
+}
+.publication .toolbar {
+  --elea-control-radius: 0.25rem 1rem 0.5rem 0;
+}
+```
+
+```tsx
+<section className="publication">
+  <Button>Publish</Button>
+  <Button size="sm" radius="sm">Save draft</Button>
+  <div className="toolbar"><Button>Filter</Button></div>
+</section>
+```
 
 ## Components
 

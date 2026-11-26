@@ -16,7 +16,7 @@ import "@alien6-studio/elea-content-editor/bundle.css";
 <ContentProvider
   messages={fr}
   siteHostnames={["members.example.org"]}
-  resolveAssetUrl={(file) => `/assets/${file.id}`}
+  resolveAssetUrl={(file) => file.id ? `/assets/${file.id}` : file.url}
   uploadImage={async (file, context) => api.upload(file, context.kind)}
   renderAttachmentPicker={({ onSelect, context }) => <MyLibrary ownerId={context.ownerId} onPick={onSelect} />}
 >
@@ -28,10 +28,11 @@ Give the editor a `key` that names the document it edits. Its undo history belon
 document: without the key, an editor that stays mounted while the host moves to another article
 would undo into what the previous one held.
 
-`bundle.css` loads, in order, the tokens and the `styles.css` of the viewer, of the media
-components, of the UI components and of the editor. To load them one by one, or the tokens from
-elsewhere, import those five files instead. Every rule sits in a cascade layer: a rule of yours
-outside any layer overrides it, and with Tailwind v4 the host declares
+`bundle.css` loads the tokens, viewer styles, media styles and crop adjustments, UI styles,
+then the editor styles. When importing styles individually, include
+`@alien6-studio/elea-media/crop-adjustments.css` for the movable crop area.
+Every rule sits in a cascade layer. A host rule outside any layer overrides it.
+With Tailwind v4, declare
 `@layer theme, base, elea, components, utilities;` before its imports.
 
 The slash menu, the selection bubble and the link field are rendered at the end of the body. They
@@ -43,6 +44,23 @@ document in Elea's schema, or use the host's save adapter for existing records.
 `showPreview` renders the blocks with the viewer. Pass the same `siteHostnames`
 to the provider and the viewer to keep the default link policy consistent, and the `renderers`
 the published page gives to `ContentView`, so a block of your own previews as it will be read.
+
+## Jest in Next.js
+
+This package ships ES modules only. For Jest with `next/jest`, include the editor and the Elea packages it loads in your Next.js config. Browser tests can use the viewer’s [Jest setup for the sanitizer](../content-viewer/README.md#jest-in-nextjs).
+
+```js
+// next.config.mjs
+export default {
+  transpilePackages: [
+    "@alien6-studio/elea-content-editor",
+    "@alien6-studio/elea-content-viewer",
+    "@alien6-studio/elea-content",
+    "@alien6-studio/elea-media",
+    "@alien6-studio/elea-ui",
+  ],
+};
+```
 
 ## Writing modes
 
@@ -71,6 +89,44 @@ Use a visual mode for settings that Markdown cannot express.
 For images, insert an image block in a visual mode or open **Add an image** in Markdown.
 Both paths accept a dropped file or a file from the picker and use the same cropper and host
 upload service. Set `imageCrop` on the provider to customize the frame and export options.
+
+To let authors move and resize the crop area, set `imageCrop={{ formats: true }}`.
+The picker starts at the original ratio. This example opens it in portrait format.
+
+```tsx
+<ContentProvider messages={fr} uploadImage={uploadImage}
+  imageCrop={{ formats: { defaultValue: "portrait" } }}>
+  <ContentEditor blocks={blocks} onBlocksChange={setBlocks} />
+</ContentProvider>
+```
+
+The available formats are `original`, `free`, `square`, `landscape`, `portrait` and `custom`.
+For editable dimensions, use `imageCrop={{ formats: true, outputSize: { width: 1200, height: 800 } }}`.
+This opens the custom format at 1200 × 800 pixels. Set `outputSize` alone for a fixed export size.
+The picker loads on demand and uses `messages.cropFormats` from the editor’s English or French locale.
+
+Supply `formats.presets` to offer your own publishing formats. A preset can specify an
+exact export size or an aspect ratio that keeps the selected pixels at source resolution.
+
+```tsx
+const imageCrop: ImageCropOptions = {
+  formats: {
+    defaultValue: "cover",
+    presets: [
+      { value: "cover", label: "Article cover", outputSize: { width: 1600, height: 900 } },
+      { value: "portrait-card", label: "Portrait card", aspect: 4 / 5 },
+    ],
+  },
+  resolveOriginal: file => originals.get(file.id),
+};
+```
+
+To offer **Adjust crop** on an existing image, have `resolveOriginal` return its source
+file or a same-origin image URL and its saved `recipe`. In the example, `originals` is
+a host-owned `Map<string, ImageCropSource>`. When `uploadImage` receives `options.crop`,
+save it with the ID of the resulting asset. To support later sessions, store the original
+in your media library and persist the recipe with it. Each edit exports from that original.
+Cancelling keeps the current image. The document still stores its usual file reference.
 
 An SVG file can carry scripts, which run when the file is opened as a page from the origin
 that serves it. The editor therefore sends an SVG only as the raster picture the cropper

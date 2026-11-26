@@ -5,8 +5,8 @@ type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
 
 /** Every label of the viewer and editor. Consumers pass a full object or merge over `en`. */
 type DefaultMessages = Widen<typeof en>;
-export type EleaMessages = Omit<DefaultMessages, "source" | "list" | "image" | "video" | "attachment"> & Partial<Pick<DefaultMessages, "list">> & {
-  image: Omit<DefaultMessages["image"], "errorSvg"> & { errorSvg?: string };
+export type EleaMessages = Omit<DefaultMessages, "source" | "list" | "cropFormats" | "cropCorners" | "image" | "video" | "attachment"> & Partial<Pick<DefaultMessages, "list" | "cropFormats" | "cropCorners">> & {
+  image: Omit<DefaultMessages["image"], "errorSvg" | "adjustCrop"> & { errorSvg?: string; adjustCrop?: string };
   source?: DefaultMessages["source"] & { /** @deprecated */ blockComments?: string };
   video: Omit<DefaultMessages["video"], "remove"> & { remove?: string };
   attachment: Omit<DefaultMessages["attachment"], "replace"> & { replace?: string };

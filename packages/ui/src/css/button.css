@@ -82,7 +82,13 @@
   --_elea-button-hover: var(--elea-color-action-danger-hover);
   --_elea-button-pressed: var(--elea-color-action-danger-pressed);
 }
-:is(.elea-button--primary, .elea-button--secondary, .elea-button--tertiary, .elea-button--success, .elea-button--info, .elea-button--warning, .elea-button--danger):not(:disabled, [aria-disabled="true"]) {
+.elea-button--neutral {
+  background: var(--elea-color-surface-inverse);
+  color: var(--elea-color-text-inverse);
+  --_elea-button-hover: color-mix(in srgb, var(--elea-color-surface-inverse) 92%, var(--elea-color-text-inverse));
+  --_elea-button-pressed: color-mix(in srgb, var(--elea-color-surface-inverse) 84%, var(--elea-color-text-inverse));
+}
+:is(.elea-button--neutral, .elea-button--primary, .elea-button--secondary, .elea-button--tertiary, .elea-button--success, .elea-button--info, .elea-button--warning, .elea-button--danger):not(:disabled, [aria-disabled="true"]) {
   &:hover { background-color: var(--_elea-button-hover, color-mix(in srgb, var(--_elea-button-status) 90%, var(--elea-_status-edge))); }
   &:active { background-color: var(--_elea-button-pressed, color-mix(in srgb, var(--_elea-button-status) 80%, var(--elea-_status-edge))); }
 }
@@ -90,6 +96,57 @@
 .elea-button--outline:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-control-hover-surface, var(--elea-color-surface-subtle)); }
 .elea-button--ghost { --elea-_control-edge: none; background: transparent; color: var(--elea-color-text-muted); }
 .elea-button--ghost:hover:not(:disabled, [aria-disabled="true"]) { background-color: var(--elea-color-surface-muted); color: var(--elea-color-text-default); }
+.elea-button[data-elea-tone="primary"] {
+  --_elea-button-ink: var(--elea-color-action-primary-ink);
+  --_elea-button-tint: var(--elea-color-action-primary-container);
+  --_elea-button-on-tint: var(--elea-color-action-primary-on-container);
+}
+.elea-button[data-elea-tone="secondary"] {
+  --_elea-button-ink: var(--elea-color-action-secondary-ink);
+  --_elea-button-tint: var(--elea-color-action-secondary-container);
+  --_elea-button-on-tint: var(--elea-color-action-secondary-on-container);
+}
+.elea-button[data-elea-tone="tertiary"] {
+  --_elea-button-ink: var(--elea-color-action-tertiary-ink);
+  --_elea-button-tint: var(--elea-color-action-tertiary-container);
+  --_elea-button-on-tint: var(--elea-color-action-tertiary-on-container);
+}
+.elea-button[data-elea-tone="danger"] {
+  --_elea-button-ink: var(--elea-color-action-danger-ink, var(--elea-color-danger));
+  --_elea-button-tint: var(--elea-color-action-danger-container);
+  --_elea-button-on-tint: var(--elea-color-action-danger-on-container);
+}
+.elea-button[data-elea-tone="success"] {
+  --_elea-button-ink: var(--elea-color-action-success-ink, var(--elea-color-success));
+  --_elea-button-tint: var(--elea-color-action-success-container);
+  --_elea-button-on-tint: var(--elea-color-action-success-on-container);
+}
+.elea-button[data-elea-tone="info"] {
+  --_elea-button-ink: var(--elea-color-action-info-ink, var(--elea-color-info));
+  --_elea-button-tint: var(--elea-color-action-info-container);
+  --_elea-button-on-tint: var(--elea-color-action-info-on-container);
+}
+.elea-button[data-elea-tone="warning"] {
+  --_elea-button-ink: var(--elea-color-action-warning-ink, var(--elea-color-warning));
+  --_elea-button-tint: var(--elea-color-action-warning-container);
+  --_elea-button-on-tint: var(--elea-color-action-warning-on-container);
+}
+.elea-button[data-elea-tone="neutral"] {
+  --_elea-button-ink: var(--elea-color-text-default);
+  --_elea-button-tint: var(--elea-color-surface-muted);
+  --_elea-button-on-tint: var(--elea-color-text-default);
+}
+.elea-button--outline[data-elea-tone] { border-color: currentColor; }
+:is(.elea-button--outline, .elea-button--ghost)[data-elea-tone] {
+  color: var(--_elea-button-ink);
+  &:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
+    color: var(--_elea-button-on-tint, var(--_elea-button-ink));
+    background-color: var(--_elea-button-tint, color-mix(in srgb, var(--_elea-button-ink) 9%, var(--elea-color-surface-default)));
+  }
+  &:active:not(:disabled, [aria-disabled="true"]) {
+    background-color: color-mix(in srgb, var(--_elea-button-ink) 9%, var(--_elea-button-tint, var(--elea-color-surface-default)));
+  }
+}
 .elea-button:is(.elea-button--primary, .elea-button--secondary, .elea-button--tertiary, .elea-button--outline) {
   --_elea-button-press: var(--elea-control-press-shadow, var(--elea-_control-press-shadow, var(--_elea-button-rest)));
 }

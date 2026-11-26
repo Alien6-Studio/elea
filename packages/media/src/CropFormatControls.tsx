@@ -2,14 +2,19 @@
 
 import { useId, useState, type ReactNode } from "react";
 import { Field, Input, Select } from "@alien6-studio/elea-ui";
-import { isValidOutputSize, MAX_OUTPUT_DIMENSION, type Size } from "./crop.js";
+import { isValidOutputSize, MAX_OUTPUT_DIMENSION, type CropRecipe, type Size } from "./crop.js";
+import type { CropCornerLabels } from "./CropMask.js";
 
-const presets = {
-  square: { ratio: "1:1", size: { width: 1080, height: 1080 } },
-  landscape: { ratio: "16:9", size: { width: 1600, height: 900 } },
-  portrait: { ratio: "4:5", size: { width: 1080, height: 1350 } },
-} as const;
-type Format = keyof typeof presets | "original" | "custom" | "free";
+/** Give a publication format an exact output size or lock just its proportions. */
+export type CropPreset = { value: string; label: string } & (
+  { outputSize: Size; aspect?: never } | { aspect: number; outputSize?: never }
+);
+const square = { width: 1080, height: 1080 };
+const defaultPresets: readonly CropPreset[] = [
+  { value: "square", label: "1:1 · 1080 × 1080", outputSize: square },
+  { value: "landscape", label: "16:9 · 1600 × 900", outputSize: { width: 1600, height: 900 } },
+  { value: "portrait", label: "4:5 · 1080 × 1350", outputSize: { width: 1080, height: 1350 } },
+];
 
 export interface CropFormatOptions {
   labels: {
@@ -19,12 +24,15 @@ export interface CropFormatOptions {
     custom: string;
     move: string;
     resize: string;
+    corners?: CropCornerLabels | undefined;
     width: string;
     height: string;
     invalidSize: string;
   };
   /** Defaults to the supplied output size in custom mode, otherwise to the original aspect. */
-  defaultValue?: Format | undefined;
+  defaultValue?: string | undefined;
+  /** Replaces the supplied square, landscape and portrait presets. Original, free and custom remain available. */
+  presets?: readonly CropPreset[] | undefined;
 }
 
 interface Draft {
@@ -34,26 +42,32 @@ interface Draft {
   lastValid: Size | undefined;
 }
 
-export function useCropFormat(formats: CropFormatOptions | undefined, initialSize?: Size, natural?: Size | null, disabled = false): {
+export function useCropFormat(formats: CropFormatOptions | undefined, initialSize?: Size, natural?: Size | null, disabled = false, initialCrop?: CropRecipe): {
   controls: ReactNode;
   outputSize: Size | undefined;
+  aspect?: number | undefined;
+  format?: string | undefined;
   invalid: boolean;
   free: boolean;
 } {
   const errorId = useId();
-  const [choice, setChoice] = useState<Format>();
+  const [choice, setChoice] = useState<string>();
   const [draft, setDraft] = useState<Draft>();
   if (!formats) return { controls: null, outputSize: initialSize, invalid: false, free: false };
 
-  const format = choice ?? formats.defaultValue ?? (initialSize ? "custom" : "original");
-  const initial = initialSize ?? (isValidOutputSize(natural) ? natural : presets.square.size);
+  const presets = formats.presets ?? defaultPresets;
+  // An older ratio-only preset can still be edited after the host removes it.
+  const sourceMode = initialCrop?.mask ? "free" : "original";
+  const fallback = initialSize ? "custom" : sourceMode;
+  const requested = choice ?? initialCrop?.format ?? formats.defaultValue ?? fallback;
+  const preset = presets.find(item => item.value === requested);
+  const format = preset || ["original", "free", "custom"].includes(requested) ? requested : fallback;
+  const initial = initialSize ?? (isValidOutputSize(natural) ? natural : square);
   const custom = draft ?? { width: String(initial.width), height: String(initial.height), lastValid: isValidOutputSize(initial) ? initial : undefined };
   const size = { width: Number(custom.width), height: Number(custom.height) };
   const invalid = format === "custom" && !isValidOutputSize(size);
   const free = format === "free";
-  let outputSize: Size | undefined;
-  if (format === "custom") outputSize = custom.lastValid;
-  else if (!free && format !== "original") outputSize = presets[format].size;
+  const outputSize = format === "custom" ? custom.lastValid : preset?.outputSize;
   const { labels } = formats;
 
   function edit(axis: keyof Size, text: string) {
@@ -77,14 +91,14 @@ export function useCropFormat(formats: CropFormatOptions | undefined, initialSiz
   const options = [
     { value: "original", label: labels.original },
     { value: "free", label: labels.free },
-    ...Object.entries(presets).map(([value, { ratio, size }]) => ({ value, label: `${ratio} · ${size.width} × ${size.height}` })),
+    ...presets,
     { value: "custom", label: labels.custom },
   ];
   const controls = (
     <div className="elea-cropper__formats">
       <Field label={labels.format} className="elea-cropper__format-field">
         {control => <Select id={control.id} label={labels.format} options={options} value={format}
-          disabled={disabled} onChange={next => setChoice(next as Format)} />}
+          disabled={disabled} onChange={setChoice} />}
       </Field>
       {format === "custom" && <div className="elea-cropper__dimensions">
         {dimension("width", badWidth || badArea)}
@@ -93,5 +107,5 @@ export function useCropFormat(formats: CropFormatOptions | undefined, initialSiz
       {invalid && <p id={errorId} className="elea-field__error elea-cropper__format-error" role="alert">{labels.invalidSize}</p>}
     </div>
   );
-  return { controls, outputSize, invalid, free };
+  return { controls, outputSize, aspect: preset?.aspect, format, invalid, free };
 }

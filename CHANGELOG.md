@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.1.1 - 2026-11-26
+
+- The content editor’s image block now accepts `imageCrop.formats` for an on-demand format picker and movable crop area. Set `imageCrop.outputSize` for exact export dimensions. English and French labels are included.
+- The media cropper accepts named ratio and pixel-size presets. Provide corner labels for four resize handles and a rule-of-thirds guide. Save the recipe returned by `onConfirm` and pass it as `initialCrop` to reopen the original image. The editor exposes this through `imageCrop.resolveOriginal` and the upload callback.
+- Button and IconButton accept a `tone` for solid, outline and ghost treatments, including a neutral solid. Existing colour variants remain available as shorthands. Button links accept a `render` callback for client-side routing and use an inactive anchor when disabled or loading.
+- The package guides include Jest setup for Next.js applications consuming ELEA’s ES modules. The UI guide shows how to retain asymmetric corners at different button sizes.
+
+Upgrade the ELEA packages your application uses together. The new button and cropper options are opt-in and existing image blocks need no migration.
+
 ## 0.1.0 - 2026-11-26
 
 Initial public release of the six ELEA packages under one version.

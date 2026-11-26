@@ -2,6 +2,7 @@
 
 import type { FileRef, LinkPolicyOptions } from "@alien6-studio/elea-content";
 import { createContentViewContext, type BlockRendererMap, type ContentViewContext, type ContentViewOptions } from "@alien6-studio/elea-content-viewer";
+import type { CropFormatOptions, CropRecipe, ExportOptions } from "@alien6-studio/elea-media";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 /** Free-form information the host passes along to its own services (an owner id, an upload kind...). */
@@ -27,15 +28,22 @@ export interface AttachmentPickerProps {
   context: EditorContextInfo;
 }
 
+/** Original media and, after the first edit, the framing to restore. */
+export interface ImageCropSource {
+  source: File | string;
+  name?: string | undefined;
+  recipe?: CropRecipe | undefined;
+}
+
 /** How pictures are framed before upload; `false` sends the file as picked. */
-export interface ImageCropOptions {
+export interface ImageCropOptions extends ExportOptions {
   /** Width over height; the picture's own ratio when absent. */
   aspect?: number | undefined;
   shape?: "rect" | "round" | undefined;
-  /** Output scaled down to this width when wider. */
-  maxWidth?: number | undefined;
-  type?: string | undefined;
-  quality?: number | undefined;
+  /** Show the format picker and movable crop area, optionally starting with a preset. */
+  formats?: boolean | Pick<CropFormatOptions, "defaultValue" | "presets"> | undefined;
+  /** Opt in to re-editing. Return the original file or a same-origin image URL for a published rendition. */
+  resolveOriginal?: (file: FileRef) => ImageCropSource | undefined;
 }
 
 /** What an upload is doing right now, in the host's words. */
@@ -47,6 +55,8 @@ export interface ImageUploadStatus {
 }
 
 export interface ImageUploadOptions {
+  /** When resolveOriginal is configured, store this with the returned asset to reopen its framing. */
+  crop?: ImageCropSource & { recipe: CropRecipe };
   /** Tells the block what is happening; the last status stays until the upload settles. */
   report: (status: ImageUploadStatus) => void;
   /** Aborted when the block is removed or its picture replaced before the upload settles. */

@@ -36,6 +36,38 @@
   border-block-end: 3px solid currentColor;
   border-inline-end: 3px solid currentColor;
 }
+.elea-cropper__resize[data-corner] {
+  inset: auto;
+  width: min(2.75rem, 33.333%);
+  height: min(2.75rem, 33.333%);
+}
+.elea-cropper__resize[data-corner^="top"] { top: 0; }
+.elea-cropper__resize[data-corner^="bottom"] { bottom: 0; }
+.elea-cropper__resize[data-corner$="Left"] { left: 0; }
+.elea-cropper__resize[data-corner$="Right"] { right: 0; }
+.elea-cropper__resize[data-corner="topLeft"] { transform: rotate(180deg); cursor: nwse-resize; }
+.elea-cropper__resize[data-corner="topRight"] { transform: scaleY(-1); cursor: nesw-resize; }
+.elea-cropper__resize[data-corner="bottomLeft"] { transform: scaleX(-1); cursor: nesw-resize; }
+.elea-cropper__resize[data-corner="bottomRight"] { cursor: nwse-resize; }
+.elea-cropper__resize[data-corner]::after {
+  inset: auto 0 0 auto;
+  width: min(1rem, 100%);
+  height: min(1rem, 100%);
+  border: 0;
+  border-right: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  filter: drop-shadow(0 0 1px var(--elea-color-neutral-950));
+}
+.elea-cropper__crop-window[data-guides]:is([data-dragging], :has(:focus-visible)) .elea-cropper__move::before,
+.elea-cropper__crop-window[data-guides]:is([data-dragging], :has(:focus-visible)) .elea-cropper__move::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 1px var(--elea-color-neutral-950));
+}
+.elea-cropper__move::before { inset: 0 calc(100% / 3); border-inline: 1px solid currentColor; }
+.elea-cropper__move::after { inset: calc(100% / 3) 0; border-block: 1px solid currentColor; }
 .elea-cropper__crop-window button:focus-visible { border-color: transparent; outline: 2px solid var(--elea-color-focus); outline-offset: -2px; }
 @media (forced-colors: active) {
   .elea-cropper__crop-window { forced-color-adjust: none; box-shadow: 0 0 0 100vmax color-mix(in srgb, Canvas 70%, transparent); }

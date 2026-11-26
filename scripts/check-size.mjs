@@ -7,11 +7,11 @@ import { gzipSync } from "node:zlib";
 // tokens: 23.9 KB including the scoped shapes and opt-in profile Button radius scale, the ELEA Sans declarations, scoped colour roles, local feedback aliases and the optional brand generator, three
 // prebuilt CSS editions with paired palettes and control proportions and depth, motion tokens, the Tailwind v3 presets, the shadcn/ui aliases and the
 // cascade layer every sheet states, with scoped appearance color pairs and portal-compatible brand classes.
-// content: 28.1 KB including multiline Markdown lists, checklists with the state of their tasks, media links, the shared image URL policy
-// and a Markdown inline scanner that escapes on export and stays linear on hostile input.
+// content: 29.3 KB including the English and French crop format and corner labels. The Markdown parser and
+// serializer compress separately so the editor can load the serializer with its Markdown mode.
 // content-viewer: 12.75 KB including checklists, the core entry, the viewer without a bundled sanitizer and the
 // one-import bundle beside the layered sheet.
-// content-editor: 75.5 KB including checklists that tick, the animated mode picker and add menu, direct toolbar insertion,
+// content-editor: 76.3 KB including original-image editing, the lazy crop format adapter, checklists that tick, the animated mode picker and add menu, direct toolbar insertion,
 // inline media editing, upload status reported by the host and sanitized clipboard blocks trimmed
 // without backtracking, in small modules that each compress alone, the one-import bundle and the
 // theme its open body surfaces track from the editor. It also holds the parts loaded on demand and what
@@ -21,22 +21,22 @@ import { gzipSync } from "node:zlib";
 // the package can grow by components without any of them growing unnoticed. This includes scoped
 // control tokens, independent feedback fills and foregrounds with local host fallbacks,
 // the font on standalone controls and surfaces, and the optional Tabs presentations.
-const BUDGETS = { tokens: 23_900, content: 28_150, "content-viewer": 12_800, media: 8_000, "content-editor": 75_750 };
+const BUDGETS = { tokens: 23_900, content: 29_300, "content-viewer": 12_800, media: 8_200, "content-editor": 76_300 };
 const referencePaletteFiles = new Set(["palette.js", "palette.css", "color-themes.js"]);
 // The optional atlas includes nine sets of component shapes, thirteen colour schemes and five surface scales.
 const referencePaletteBudget = 6_225;
-// The interactive mask and format picker have their own budget. The base cropper keeps its
-// original limit, and the packed-consumer check verifies that the new controls load on demand.
+// The interactive mask and format picker have their own budget. The base includes portable framing; adjustable presets, handles
+// and guides load on demand, which the packed-consumer check verifies.
 const cropAdjustmentFiles = new Set(["AdjustableCrop.js", "CropFormatControls.js", "CropMask.js", "createCropFormats.js", "crop-adjustments.css"]);
 
 // Gzip bytes of dist/<Component>.js plus dist/css/<component>.css. A sheet without a script
 // (motion, button-effects) or a script without a sheet (cx, index, scope) answers alone. A sheet
 // holds alone: it states the layer order and carries the shared keyframes it names.
 // The surface and control sheets include optional profile shapes and scalar fallbacks.
-// Carousel also ships the standalone Button sheet, including its explicit corner scale.
+// Carousel also ships the standalone Button sheet, including its explicit corner scale and semantic tones.
 const UI_BUDGETS = {
-  calendar: 3_600, carousel: 5_275, "color-picker": 2_400, combobox: 4_200,
-  accordion: 2_500, alert: 1_700, avatar: 1_500, badge: 1_125, button: 3_475, "button-effects": 1_500, card: 1_560, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
+  calendar: 3_600, carousel: 5_575, "color-picker": 2_400, combobox: 4_200,
+  accordion: 2_500, alert: 1_700, avatar: 1_500, badge: 1_125, button: 3_950, "button-effects": 1_500, card: 1_560, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
   dialog: 3_750, field: 2_025, footer: 1_250, index: 600, menu: 2_700, motion: 1_250, pagination: 2_050, popover: 4_175, progress: 1_500,
   "radio-group": 1_750, select: 4_900, separator: 750, sheet: 1_775, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, table: 2_250, tabs: 3_100, toast: 3_400, tooltip: 2_300,
 };
@@ -62,7 +62,7 @@ for (const [pkg, budget] of Object.entries(BUDGETS)) {
     checkBudget("tokens/palette", paths.filter(file => referencePaletteFiles.has(basename(file))), referencePaletteBudget);
   } else if (pkg === "media") {
     checkBudget(pkg, paths.filter(file => !cropAdjustmentFiles.has(basename(file))), budget);
-    checkBudget("media/crop-adjustments", paths.filter(file => cropAdjustmentFiles.has(basename(file))), 4_800);
+    checkBudget("media/crop-adjustments", paths.filter(file => cropAdjustmentFiles.has(basename(file))), 5_900);
   } else {
     checkBudget(pkg, paths, budget);
   }

@@ -132,8 +132,8 @@ function checkTailwindHost(consumer) {
 }
 
 const VITE = "8.3.8";
-// Gzip bytes of what a host downloads to show the editor, React aside
-const EDITOR_FIRST_LOAD = 59_000;
+// Includes the image's Adjust crop entry point. Framing and format controls load on demand.
+const EDITOR_FIRST_LOAD = 59_100;
 
 /**
  * Vite must emit the UI stylesheet and its fonts at the host's base URL. The editor's first load is
@@ -175,25 +175,34 @@ for (const tag of ["input", "button"]) {
   assert.equal(family(branded), "Georgia, serif");
 }
 const chunks = new Map(output.filter((file) => file.type === "chunk").map((chunk) => [chunk.fileName, chunk]));
-const first = new Set();
-const reach = (name) => {
-  if (first.has(name) || !chunks.has(name)) return;
-  first.add(name);
-  for (const imported of chunks.get(name).imports) reach(imported);
-};
-reach([...chunks.values()].find((chunk) => chunk.isEntry).fileName);
+function staticImports(entry) {
+  const files = new Set([entry.fileName]);
+  for (const file of files) {
+    for (const imported of chunks.get(file).imports) {
+      if (chunks.has(imported)) files.add(imported);
+    }
+  }
+  return files;
+}
+function chunkFor(module) {
+  const chunk = [...chunks.values()].find(file => file.moduleIds.some(id => id.replaceAll("\\", "/").endsWith(module)));
+  assert.ok(chunk, "the bundle holds " + module);
+  return chunk;
+}
+const first = staticImports([...chunks.values()].find(chunk => chunk.isEntry));
 const size = (names) => names.reduce((total, name) => total + gzipSync(chunks.get(name).code).length, 0);
 
-const parts = { source: "elea-content-editor/dist/MarkdownEditor.js", preview: "elea-content-editor/dist/EditorPreview.js", cropper: "elea-media/dist/ImageCropper.js" };
+const parts = {
+  source: chunkFor("elea-content-editor/dist/MarkdownEditor.js"),
+  preview: chunkFor("elea-content-editor/dist/EditorPreview.js"),
+  cropper: chunkFor("elea-media/dist/ImageCropper.js"),
+  formats: chunkFor("elea-media/dist/AdjustableCrop.js"),
+};
+assert.ok(!first.has(chunkFor("elea-media/dist/createCropFormats.js").fileName), "the crop format factory loads with the editor");
+assert.ok(!staticImports(parts.cropper).has(parts.formats.fileName), "the base cropper loads the opt-in crop format controls");
 const sizes = [];
-for (const [part, module] of Object.entries(parts)) {
-  const holder = [...chunks.values()].find((chunk) => chunk.moduleIds.some((id) => id.replaceAll("\\", "/").endsWith(module)));
-  assert.ok(holder, "the bundle holds " + module);
+for (const [part, holder] of Object.entries(parts)) {
   assert.ok(!first.has(holder.fileName), "the " + part + " part is downloaded with the editor instead of on demand");
-  if (part === "cropper") {
-    const adjustable = [...chunks.values()].find(chunk => chunk.moduleIds.some(id => id.endsWith("/AdjustableCrop.js")));
-    assert.ok(!adjustable, "the editor should omit the optional crop controls from its bundle");
-  }
   sizes.push(part + " " + size([holder.fileName]));
 }
 const total = size([...first]);
@@ -325,15 +334,16 @@ console.log("core verified: viewer rendered on the server without DOMPurify or j
 `;
 
 const CONSUMER_TYPES = `
+import { createElement } from "react";
 import { ContentView as CoreContentView, type ContentViewProps as CoreContentViewProps } from "@alien6-studio/elea-content-viewer/core";
 import type { EleaDocument, EleaBlock, BlockRegistry } from "@alien6-studio/elea-content";
 import { parseDocument, defaultRegistry } from "@alien6-studio/elea-content";
 import { ContentView, type ContentViewProps } from "@alien6-studio/elea-content-viewer";
-import { ContentEditor, ContentProvider, type ContentEditorProps } from "@alien6-studio/elea-content-editor";
+import { ContentEditor, ContentProvider, type ContentEditorProps, type ImageCropOptions } from "@alien6-studio/elea-content-editor";
 import { tokens, type FlatToken } from "@alien6-studio/elea-tokens";
 import { createThemeProfile, editions, makeBrandTheme, type BrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ImageCropper, type CropState, type DropZoneProps } from "@alien6-studio/elea-media";
-import { Button, type ButtonProps } from "@alien6-studio/elea-ui";
+import { Button, type ButtonProps, type LinkButtonProps } from "@alien6-studio/elea-ui";
 
 const registry: BlockRegistry = defaultRegistry;
 const document: EleaDocument = parseDocument("text", { registry });
@@ -342,6 +352,10 @@ const viewerProps: ContentViewProps = { data: document, siteHostnames: ["members
 // @ts-expect-error the core entry has no sanitizer of its own
 const withoutSanitizer: CoreContentViewProps = { data: document };
 const editorProps: ContentEditorProps = { blocks: document.blocks, onBlocksChange: () => {} };
+const imageCrop: ImageCropOptions = {
+  formats: { defaultValue: "cover", presets: [{ value: "cover", label: "Cover", aspect: 16 / 9 }] },
+  resolveOriginal: file => file.url ? { source: file.url } : undefined,
+};
 const first: FlatToken | undefined = tokens[0];
 const brand: BrandTheme = editions.Obsidian;
 const stylesheet: string = makeBrandTheme(brand).css;
@@ -349,7 +363,12 @@ const profileStylesheet = makeBrandTheme({ ...createThemeProfile("reserve"), but
 const zone: DropZoneProps = { label: "Add", onFiles: () => {} };
 const crop: CropState = { zoom: 1, rotation: 0, offset: { x: 0, y: 0 } };
 const buttonProps: ButtonProps = { children: "Save", variant: "primary" };
-export { CoreContentView, withoutSanitizer, ContentView, ContentEditor, ContentProvider, ImageCropper, Button, viewerProps, editorProps, block, first, stylesheet, profileStylesheet, zone, crop, buttonProps };
+const routerButton: LinkButtonProps = {
+  children: "Review", href: "/review", variant: "outline", tone: "danger",
+  render: props => createElement("a", props),
+};
+export { routerButton };
+export { CoreContentView, withoutSanitizer, ContentView, ContentEditor, ContentProvider, ImageCropper, Button, viewerProps, editorProps, imageCrop, block, first, stylesheet, profileStylesheet, zone, crop, buttonProps };
 `;
 
 try {

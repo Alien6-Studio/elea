@@ -19,6 +19,29 @@ outside any layer overrides it without raising its specificity.
 
 `data` is whatever the store returns: a document object, its JSON string, plain text or HTML.
 
+## Jest in Next.js
+
+The viewer ships ES modules only. For `next/jest`, include both packages in your Next.js config, whether you import the default viewer or `/core`.
+
+```js
+// next.config.mjs
+export default {
+  transpilePackages: ["@alien6-studio/elea-content-viewer", "@alien6-studio/elea-content"],
+};
+```
+
+If a browser test reports `Must use import to load ES Module` for `@exodus/bytes` through jsdom, Jest has selected the sanitizer’s server entry. Install `dompurify` as a dev dependency and map the sanitizer to it in the browser test project. This runs DOMPurify against the test document.
+
+```js
+// jest.config.cjs
+const nextJest = require("next/jest");
+
+module.exports = nextJest({ dir: "./" })({
+  testEnvironment: "jsdom",
+  moduleNameMapper: { "^isomorphic-dompurify$": "dompurify" },
+});
+```
+
 ## Options
 
 - `resolveAssetUrl={(file) => string}`: turns a stored file reference (`{ url, id }`) into a URL,

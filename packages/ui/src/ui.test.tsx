@@ -10,7 +10,7 @@ import { createThemeProfile, makeBrandTheme } from "@alien6-studio/elea-tokens/b
 import axe from "axe-core";
 import { Badge } from "./Badge.js";
 import { Select } from "./Select.js";
-import { Button, IconButton } from "./Button.js";
+import { Button, IconButton, type ButtonLinkRenderProps } from "./Button.js";
 import { Card, CardImage } from "./Card.js";
 import { Checkbox, Toggle } from "./Checkbox.js";
 import { cx } from "./cx.js";
@@ -68,6 +68,34 @@ test("Button takes five sizes, a radius, a shadow and an effect", () => {
   assert.equal(screen.getByRole("button", { name: "Go" }).className, "elea-button elea-button--primary elea-button--xl elea-button--radius-md");
   rerender(<IconButton label="Close" size="xl" radius="none" shadow="sm" effect="push"><span>x</span></IconButton>);
   assert.equal(screen.getByRole("button", { name: "Close" }).className, "elea-button elea-button--icon elea-button--ghost elea-button--xl elea-button--radius-none elea-button--shadow-sm elea-button--fx-push");
+});
+
+test("Button uses the same tone across solid, outline and ghost treatments and keeps colour shorthands", () => {
+  const sheet = readFileSync(new URL("css/button.css", import.meta.url), "utf8");
+  const { container } = render(<>
+    <style>{sheet}</style>
+    <Button tone="danger" variant="solid">Solid</Button>
+    <Button tone="danger" variant="outline">Outline</Button>
+    <IconButton tone="danger" variant="ghost" label="Ghost">×</IconButton>
+    <Button variant="danger">Shorthand</Button>
+    <Button variant="primary" tone="danger">Override</Button>
+    <Button tone="neutral">Neutral</Button>
+  </>);
+  container.style.setProperty("--elea-color-action-danger", "#9f1020");
+  container.style.setProperty("--elea-color-action-danger-text", "#ffffff");
+  container.style.setProperty("--elea-color-action-danger-ink", "#781224");
+  container.style.setProperty("--elea-color-surface-inverse", "#282830");
+  container.style.setProperty("--elea-color-text-inverse", "#fbfbff");
+  const style = (name: string) => getComputedStyle(screen.getByRole("button", { name }));
+  for (const name of ["Solid", "Shorthand", "Override"]) {
+    assert.equal(style(name).backgroundColor, "rgb(159, 16, 32)");
+    assert.equal(style(name).color, "rgb(255, 255, 255)");
+  }
+  assert.equal(style("Outline").color, "rgb(120, 18, 36)");
+  assert.equal(style("Ghost").color, "rgb(120, 18, 36)");
+  assert.equal(style("Ghost").backgroundColor, "rgba(0, 0, 0, 0)");
+  assert.equal(style("Neutral").backgroundColor, "rgb(40, 40, 48)");
+  assert.equal(style("Neutral").color, "rgb(251, 251, 255)");
 });
 
 test("scoped shapes distinguish actions, controls, surfaces and selections", () => {
@@ -214,6 +242,49 @@ test("Button preserves host accessibility attributes and blocks disabled links",
   fireEvent(loadingLink, new window.MouseEvent("auxclick", { bubbles: true, button: 1 }));
   fireEvent.click(loadingLink);
   assert.deepEqual(clicks, ["auxclick", "click"]);
+});
+
+test("Button passes the link contract to a router and bypasses it for loading and disabled destinations", () => {
+  const visited: string[] = [];
+  let renders = 0;
+  const router = ({ href, onClick, ...anchor }: ButtonLinkRenderProps) => {
+    renders++;
+    return <a {...anchor} href={href} onClick={event => {
+      onClick?.(event);
+      if (!event.defaultPrevented) visited.push(href);
+      event.preventDefault();
+    }} />;
+  };
+  const clicks: string[] = [];
+  const props = {
+    href: "/articles",
+    render: router,
+    onClick: () => { clicks.push("click"); },
+    onAuxClick: () => { clicks.push("auxclick"); },
+    "aria-label": "Read article",
+  };
+  const { rerender } = render(<Button {...props} variant="ghost" tone="info" className="nav-action">Read</Button>);
+  const link = screen.getByRole("link", { name: "Read article" });
+  assert.equal(link.getAttribute("href"), props.href);
+  assert.ok(link.classList.contains("nav-action") && link.classList.contains("elea-button--ghost"));
+  assert.equal(link.dataset.eleaTone, "info");
+  assert.equal(link.textContent, "Read");
+  fireEvent.click(link);
+  assert.deepEqual(clicks, ["click"]);
+  assert.deepEqual(visited, [props.href]);
+
+  for (const state of [{ disabled: true }, { loading: true }]) {
+    rerender(<Button {...props} {...state}>Read</Button>);
+    const inactive = screen.getByRole("link", { name: "Read article" });
+    assert.equal(inactive.hasAttribute("href"), false);
+    assert.equal(inactive.getAttribute("aria-disabled"), "true");
+    assert.equal(inactive.tabIndex, -1);
+    fireEvent.click(inactive);
+    fireEvent(inactive, new window.MouseEvent("auxclick", { bubbles: true, button: 1 }));
+  }
+  assert.equal(renders, 1);
+  assert.deepEqual(clicks, ["click"]);
+  assert.deepEqual(visited, [props.href]);
 });
 
 test("Badge tones and variants", () => {

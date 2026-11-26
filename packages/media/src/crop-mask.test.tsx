@@ -8,20 +8,29 @@ import type { CropRect, Size } from "./crop.js";
 afterEach(cleanup);
 const stage = { width: 600, height: 400 };
 const labels = { move: "Move crop", resize: "Resize crop" };
-function Mask({ size = stage, ratio, disabled = false, enabled = true, onPan }: {
-  size?: Size; ratio?: number; disabled?: boolean; enabled?: boolean; onPan?: () => void;
+const corners = { topLeft: "Top left", topRight: "Top right", bottomLeft: "Bottom left", bottomRight: "Bottom right" };
+function Mask({ size = stage, ratio, disabled = false, enabled = true, handles = false, initialMask, onPan }: {
+  size?: Size; ratio?: number; disabled?: boolean; enabled?: boolean; handles?: boolean; initialMask?: CropRect; onPan?: () => void;
 }) {
-  const { rect, overlay } = useCropMask(size, ratio, enabled ? labels : undefined, disabled);
+  const { rect, overlay } = useCropMask(size, ratio, enabled ? { ...labels, corners: handles ? corners : undefined } : undefined, disabled, initialMask);
   return <div onPointerDown={onPan}>{overlay}<output>{JSON.stringify(rect)}</output></div>;
 }
 function rect(): CropRect {
   return JSON.parse(screen.getByRole("status").textContent!);
 }
+function expectRect(expected: CropRect) {
+  const actual = rect();
+  for (const axis of ["x", "y", "width", "height"] as const) {
+    assert.ok(Math.abs(actual[axis] - expected[axis]) < 1e-8, `${axis}: ${actual[axis]} vs ${expected[axis]}`);
+  }
+}
 function key(action: keyof typeof labels, key: string, shiftKey = false) {
   return fireEvent.keyDown(screen.getByRole("button", { name: labels[action] }), { key, shiftKey });
 }
 function drag(action: keyof typeof labels, x: number, y: number) {
-  const control = screen.getByRole("button", { name: labels[action] });
+  dragHandle(screen.getByRole("button", { name: labels[action] }), x, y);
+}
+function dragHandle(control: HTMLElement, x: number, y: number) {
   fireEvent.pointerDown(control, { pointerId: 1, isPrimary: true, button: 0, clientX: 100, clientY: 100 });
   fireEvent.pointerMove(control, { pointerId: 1, clientX: 100 + x, clientY: 100 + y });
   fireEvent.pointerUp(control, { pointerId: 1 });
@@ -37,6 +46,48 @@ test("each crop handle describes its own current position or size", () => {
   assert.equal(screen.getByRole("button", { description: "321 × 321" }), firstResize);
   assert.equal(screen.getByRole("button", { description: "x: 140, y: 40" }), secondMove);
   assert.equal(screen.getByRole("button", { description: "320 × 320" }), secondResize);
+});
+
+test("each corner resizes from the opposite anchor in both writing directions", () => {
+  for (const direction of ["ltr", "rtl"]) {
+    for (const [corner, name] of Object.entries(corners)) {
+      const view = render(<div dir={direction}><Mask handles /></div>);
+      const handle = screen.getByRole("button", { name });
+      const left = corner.endsWith("Left");
+      const top = corner.startsWith("top");
+      dragHandle(handle, left ? 10 : -10, top ? 20 : -20);
+      expectRect({ x: left ? 70 : 60, y: top ? 60 : 40, width: 470, height: 300 });
+      fireEvent.keyDown(handle, { key: "ArrowRight", shiftKey: true });
+      expectRect({ x: left ? 80 : 60, y: top ? 60 : 40, width: left ? 460 : 480, height: 300 });
+      view.unmount();
+    }
+  }
+});
+
+test("locked corner drag keeps the ratio, stays in bounds, and clears guides on cancellation", () => {
+  render(<Mask ratio={2} handles />);
+  const handle = screen.getByRole("button", { name: corners.topLeft });
+  const window = handle.parentElement!;
+  assert.equal(window.hasAttribute("data-dragging"), false);
+  fireEvent.pointerDown(handle, { pointerId: 7, isPrimary: true, button: 0, clientX: 50, clientY: 50 });
+  assert.ok(window.hasAttribute("data-dragging"));
+  fireEvent.pointerMove(handle, { pointerId: 7, clientX: -200, clientY: -200 });
+  assert.deepEqual(rect(), { x: 0, y: 50, width: 540, height: 270 });
+  fireEvent.pointerCancel(handle, { pointerId: 7 });
+  assert.equal(window.hasAttribute("data-dragging"), false);
+  fireEvent.pointerMove(handle, { pointerId: 7, clientX: 100, clientY: 100 });
+  assert.deepEqual(rect(), { x: 0, y: 50, width: 540, height: 270 });
+});
+
+test("restored masks use normalized stage coordinates, including at another display size", () => {
+  const initialMask = { x: 0.25, y: 0.125, width: 0.5, height: 0.75 };
+  const view = render(<Mask initialMask={initialMask} size={{ width: 300, height: 200 }} ratio={1} />);
+  assert.deepEqual(rect(), { x: 75, y: 25, width: 150, height: 150 });
+  view.rerender(<Mask initialMask={initialMask} size={stage} ratio={1} />);
+  assert.deepEqual(rect(), { x: 150, y: 50, width: 300, height: 300 });
+  view.unmount();
+  render(<Mask initialMask={{ ...initialMask, width: NaN }} />);
+  assert.deepEqual(rect(), { x: 60, y: 40, width: 480, height: 320 });
 });
 
 test("locked and free masks share the same rectangle when unlocking; resizing free axes is independent", () => {

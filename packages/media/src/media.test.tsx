@@ -1,11 +1,12 @@
 import "./test/dom.js";
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axe from "axe-core";
 import { useState } from "react";
 import { DropZone, acceptsFile } from "./DropZone.js";
 import { ImageCropper } from "./ImageCropper.js";
+import type { CropRecipe, CropRect } from "./crop.js";
 import { useObjectUrl } from "./useObjectUrl.js";
 
 const png = (name = "pixel.png") => new File([new Uint8Array([137, 80, 78, 71])], name, { type: "image/png" });
@@ -118,6 +119,37 @@ test("exact output dimensions set the frame and invalid dimensions cannot be con
   rerender(<ImageCropper {...props} export={{ outputSize: { width: 0, height: 320 } }} />);
   assert.ok(screen.getByRole<HTMLButtonElement>("button", { name: labels.confirm }).disabled);
   cleanup();
+});
+
+test("fixed-frame crops restore their original aspect, pan and zoom at a different size", async () => {
+  const saved: Array<{ rect: CropRect; recipe: CropRecipe }> = [];
+  const onConfirm = (_blob: Blob | null, rect: CropRect, _view: unknown, recipe?: CropRecipe) => {
+    assert.ok(recipe);
+    saved.push({ rect, recipe });
+  };
+  function loadImage(container: HTMLElement) {
+    const image = container.querySelector("img")!;
+    Object.defineProperties(image, { naturalWidth: { value: 1000 }, naturalHeight: { value: 500 } });
+    fireEvent.load(image);
+  }
+  const props = { src: "original.jpg", labels, onConfirm };
+  const first = render(<ImageCropper {...props} aspect={1.5} maxHeight={320} />);
+  loadImage(first.container);
+  fireEvent.change(screen.getByLabelText(labels.zoom), { target: { value: "2" } });
+  const frame = screen.getByRole("img", { name: labels.image });
+  fireEvent.pointerDown(frame, { clientX: 0, clientY: 0, pointerId: 1 });
+  fireEvent.pointerMove(frame, { clientX: 48, clientY: 32, pointerId: 1 });
+  fireEvent.pointerUp(frame, { pointerId: 1 });
+  fireEvent.click(screen.getByRole("button", { name: labels.confirm }));
+  await waitFor(() => assert.equal(saved.length, 1));
+  const { recipe, rect } = saved[0]!;
+  assert.deepEqual(recipe.offset, { x: 0.1, y: 0.1 });
+  first.unmount();
+  const second = render(<ImageCropper {...props} initialCrop={recipe} maxHeight={160} />);
+  loadImage(second.container);
+  assert.equal(screen.getByRole("img", { name: labels.image }).style.width, "240px");
+  fireEvent.click(screen.getByRole("button", { name: labels.confirm }));
+  await waitFor(() => assert.deepEqual(saved[1]?.rect, rect));
 });
 
 test("the cropper preserves image sources and leaves other data URLs unloaded", () => {

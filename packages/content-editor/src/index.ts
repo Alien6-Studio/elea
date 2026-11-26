@@ -19,6 +19,8 @@ export {
   type ContentEditorServices,
   type ContentContextValue,
   type ContentProviderProps,
+  type ImageCropOptions,
+  type ImageCropSource,
   type ImageUploadOptions,
   type ImageUploadStatus,
   type PickedAttachment,

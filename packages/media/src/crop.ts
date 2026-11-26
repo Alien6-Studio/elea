@@ -25,6 +25,19 @@ export interface CropState {
   offset: Point;
 }
 
+/** A confirmed framing to reopen with the original image. Offset and mask coordinates
+ * are fractions of the frame dimensions, so they survive a change of viewport. */
+export interface CropRecipe {
+  zoom: number;
+  rotation: number;
+  offset: Point;
+  /** Ratio of the entire crop stage (before the selection). */
+  aspect: number;
+  mask?: CropRect | undefined;
+  format?: string | undefined;
+  outputSize?: Size | undefined;
+}
+
 const RADIANS = Math.PI / 180;
 
 function rotationAxes(rotation: number) {

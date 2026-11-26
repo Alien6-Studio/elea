@@ -1,12 +1,13 @@
 "use client";
 
-import { imageBlock, type EleaBlock, type FileRef } from "@alien6-studio/elea-content";
+import { en, imageBlock, type EleaBlock, type FileRef } from "@alien6-studio/elea-content";
 import { safeImageSource } from "@alien6-studio/elea-content-viewer";
 import { DropZone } from "@alien6-studio/elea-media";
+import { IconButton } from "@alien6-studio/elea-ui";
 import { useEffect, useRef, useState } from "react";
-import { UploadIcon } from "../icons.js";
+import { CropIcon, UploadIcon } from "../icons.js";
 import { cropperPart, usePart } from "../parts.js";
-import { useContentServices, type EditorContextInfo, type ImageUploadStatus } from "../provider.js";
+import { useContentServices, type EditorContextInfo, type ImageCropSource, type ImageUploadOptions, type ImageUploadStatus } from "../provider.js";
 import { MediaActions } from "./MediaActions.js";
 
 export interface MediaBlockProps {
@@ -44,26 +45,28 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: Readonly<Media
   const { messages, uploadImage, resolveAssetUrl, imageCrop, allowSvgUpload } = useContentServices();
   const data = block.data;
   const { file, caption, alt } = imageBlock.normalize(data);
-  const [isUploading, setIsUploading] = useState(false);
-  const [reported, setReported] = useState<ImageUploadStatus | null>(null);
+  const [activity, setActivity] = useState<ImageUploadStatus | "uploading" | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState<File | null>(null);
+  const [pending, setPending] = useState<{ input: ImageCropSource; fallback?: File } | null>(null);
+  const nextFocus = useRef<"adjust" | "picker" | null>(null);
+  function closeCrop() {
+    if (pending && !pending.fallback) nextFocus.current = "adjust";
+    setPending(null);
+  }
   const replaceInput = useRef<HTMLInputElement>(null);
-  const focusAfterRemove = useRef(false);
   const active = useRef<AbortController | null>(null);
   const latest = useRef({ data, onUpdate });
   useEffect(() => { latest.current = { data, onUpdate }; }, [data, onUpdate]);
 
   // A picture that changes under a running upload, or a block that goes away, cancels it
   useEffect(() => () => {
-    if (!active.current) return;
-    active.current.abort();
+    active.current?.abort();
     active.current = null;
     setPending(null);
-    setIsUploading(false);
+    setActivity(null);
   }, [file.id, file.url]);
 
-  const upload = async (file: File) => {
+  const upload = async (file: File, crop?: ImageUploadOptions["crop"]) => {
     if (!uploadImage) {
       setError(messages.image.errorUpload);
       return;
@@ -71,7 +74,7 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: Readonly<Media
     // An SVG can carry scripts: it goes up as the raster picture the cropper exports, or not at all
     if (file.type === "image/svg+xml" && !allowSvgUpload) {
       setError(messages.image.errorSvg ?? messages.image.errorInvalidType);
-      setPending(null);
+      closeCrop();
       return;
     }
     if (active.current) return;
@@ -79,10 +82,9 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: Readonly<Media
     const live = () => active.current === controller;
     active.current = controller;
     setError(null);
-    setReported(null);
-    setIsUploading(true);
+    setActivity("uploading");
     try {
-      const result = await uploadImage(file, context, { signal: controller.signal, report: (status) => { if (live()) setReported(status); } });
+      const result = await uploadImage(file, context, { ...(crop && { crop }), signal: controller.signal, report: (status) => { if (live()) setActivity(status); } });
       if (!live()) return;
       active.current = null;
       const current = latest.current;
@@ -93,8 +95,8 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: Readonly<Media
       // Back to the drop zone, the host's reason beside it, so the picture can be picked again
       setError((error_ instanceof Error && error_.message) || messages.image.errorUpload);
     }
-    setPending(null);
-    setIsUploading(false);
+    closeCrop();
+    setActivity(null);
   };
 
   const pick = (file: File | undefined) => {
@@ -110,80 +112,58 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: Readonly<Media
     setError(null);
     // Framing needs a previewable URL; where the runtime has none, the file goes up as picked
     if (imageCrop === false || typeof URL.createObjectURL !== "function") void upload(file);
-    else setPending(file);
-  };
-
-  const confirmCrop = (blob: Blob | null) => {
-    if (!pending) return;
-    // Without a drawable canvas the picture goes up as picked
-    const file = blob ? new File([blob], pending.name, { type: blob.type || pending.type }) : pending;
-    void upload(file);
+    else setPending({ input: { source: file, name: file.name }, fallback: file });
   };
 
   const source = file.url || file.id ? safeImageSource(resolveAssetUrl(file)) : null;
   const cropOptions = imageCrop === false ? undefined : imageCrop ?? {};
-  const status = isUploading ? reported ?? { label: messages.image.uploading } : null;
+  const original = source ? cropOptions?.resolveOriginal?.(file) : undefined;
+  const status = activity === "uploading" ? { label: messages.image.uploading } : activity;
   // The cropper loads with the first picture to frame; one it cannot reach goes up as picked
-  const [cropper, cropperWaiting] = usePart(cropperPart, Boolean(pending && cropOptions), () => { if (pending) void upload(pending); });
-  const busy = isUploading || cropperWaiting;
+  const cropFailed = () => {
+    if (pending?.fallback) void upload(pending.fallback);
+    else {
+      setError(messages.image.errorUpload);
+      closeCrop();
+    }
+  };
+  const [cropper, cropperWaiting] = usePart(cropperPart, Boolean(pending && cropOptions), cropFailed);
+  const busy = Boolean(status) || cropperWaiting;
 
-  if (cropper && pending && cropOptions) {
-    const exportOptions = { type: cropOptions.type, quality: cropOptions.quality, maxWidth: cropOptions.maxWidth };
-    return (
-      <div className="elea-media-block" onClick={onFocus}>
-        <cropper.ImageCropper
-          file={pending}
-          aspect={cropOptions.aspect}
-          shape={cropOptions.shape}
-          export={exportOptions}
-          busy={isUploading}
-          labels={{ zoom: messages.image.cropZoom, rotation: messages.image.cropRotation, confirm: status?.label ?? messages.image.cropConfirm, cancel: messages.image.cropCancel, image: messages.image.cropImage }}
-          onConfirm={confirmCrop}
-          onCancel={() => setPending(null)}
-        />
-        <UploadStatus status={status} quiet />
-        {error && <p className="elea-field-error" role="alert">{error}</p>}
+  const framing = cropper && pending && cropOptions;
+  const showPicture = source && !framing;
+  let control;
+  if (framing) {
+    control = <cropper.ImageFrame input={pending.input} options={cropOptions} messages={messages} defaults={en}
+      status={status} allowSvg={allowSvgUpload} onConfirm={upload} onCancel={closeCrop} onFailure={cropFailed} />;
+  } else if (source) {
+    control = (
+      <div className="elea-media-block__frame">
+        <img src={source} alt={alt ?? (caption || messages.viewer.imageAlt)} className="elea-media-block__image" />
+        <MediaActions
+          icon={<UploadIcon />} replace={status?.label ?? messages.image.replace} remove={messages.image.remove}
+          busy={busy} canReplace={Boolean(uploadImage)} onReplace={() => replaceInput.current?.click()}
+          onRemove={() => {
+            nextFocus.current = "picker";
+            onUpdate(withImageFile(data, { url: "", id: "" }));
+          }}
+        >
+          {original && uploadImage && <IconButton ref={button => {
+            if (button && nextFocus.current === "adjust") {
+              nextFocus.current = null;
+              button.focus();
+            }
+          }} variant="disc" label={messages.image.adjustCrop ?? en.image.adjustCrop}
+            disabled={busy} onClick={() => {
+              setError(null);
+              setPending({ input: original });
+            }}><CropIcon /></IconButton>}
+          <input ref={replaceInput} type="file" accept="image/*" hidden onChange={(event) => { pick(event.target.files?.[0]); event.target.value = ""; }} />
+        </MediaActions>
       </div>
     );
-  }
-
-  if (source) {
-    return (
-      <div className="elea-media-block" onClick={onFocus}>
-        <div className="elea-media-block__frame">
-          <img src={source} alt={alt ?? (caption || messages.viewer.imageAlt)} className="elea-media-block__image" />
-          <MediaActions
-            icon={<UploadIcon />} replace={status?.label ?? messages.image.replace} remove={messages.image.remove}
-            busy={busy} canReplace={Boolean(uploadImage)} onReplace={() => replaceInput.current?.click()}
-            onRemove={() => {
-              focusAfterRemove.current = true;
-              onUpdate(withImageFile(data, { url: "", id: "" }));
-            }}
-          >
-            <input ref={replaceInput} type="file" accept="image/*" hidden onChange={(event) => { pick(event.target.files?.[0]); event.target.value = ""; }} />
-          </MediaActions>
-        </div>
-        <UploadStatus status={status} />
-        <input
-          type="text"
-          className="elea-media-block__caption"
-          placeholder={messages.image.captionPlaceholder}
-          aria-label={messages.image.captionPlaceholder}
-          value={caption}
-          onChange={(event) => onUpdate({ ...data, caption: event.target.value })}
-        />
-        {error && <p className="elea-field-error" role="alert">{error}</p>}
-      </div>
-    );
-  }
-
-  return (
-    <div className="elea-media-block" onClick={onFocus} ref={zone => {
-      if (zone && focusAfterRemove.current) {
-        focusAfterRemove.current = false;
-        zone.querySelector<HTMLElement>('label[tabindex="0"]')?.focus();
-      }
-    }}>
+  } else {
+    control = (
       <DropZone
         accept="image/*"
         disabled={!uploadImage}
@@ -196,7 +176,27 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: Readonly<Media
         onFiles={([file]) => pick(file)}
         onRejected={() => setError(messages.image.errorInvalidType)}
       />
-      <UploadStatus status={status} quiet />
+    );
+  }
+
+  return (
+    <div className="elea-media-block" onClick={source || framing ? onFocus : undefined} ref={zone => {
+      if (zone && nextFocus.current === "picker") {
+        nextFocus.current = null;
+        zone.querySelector<HTMLElement>('label[tabindex="0"]')?.focus();
+      }
+    }}>
+      {control}
+      <UploadStatus status={status} quiet={!showPicture} />
+      {showPicture && <input
+        type="text"
+        className="elea-media-block__caption"
+        placeholder={messages.image.captionPlaceholder}
+        aria-label={messages.image.captionPlaceholder}
+        value={caption}
+        onChange={(event) => onUpdate({ ...data, caption: event.target.value })}
+      />}
+      {error && (framing || source) && <p className="elea-field-error" role="alert">{error}</p>}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-content-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Elea editor: React block editor with rich text, toolbar and injectable services",
   "type": "module",
   "sideEffects": [
@@ -32,15 +32,15 @@
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node ../../scripts/build-styles.mjs src/styles.css dist @alien6-studio/elea-tokens/elea.css @alien6-studio/elea-content-viewer/styles.css @alien6-studio/elea-media/styles.css @alien6-studio/elea-ui/styles.css",
+    "build": "tsc -p tsconfig.build.json && node ../../scripts/build-styles.mjs src/styles.css dist @alien6-studio/elea-tokens/elea.css @alien6-studio/elea-content-viewer/styles.css @alien6-studio/elea-media/styles.css @alien6-studio/elea-media/crop-adjustments.css @alien6-studio/elea-ui/styles.css",
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-content": "^0.1.0",
-    "@alien6-studio/elea-content-viewer": "^0.1.0",
-    "@alien6-studio/elea-media": "^0.1.0",
-    "@alien6-studio/elea-tokens": "^0.1.0",
-    "@alien6-studio/elea-ui": "^0.1.0",
+    "@alien6-studio/elea-content": "^0.1.1",
+    "@alien6-studio/elea-content-viewer": "^0.1.1",
+    "@alien6-studio/elea-media": "^0.1.1",
+    "@alien6-studio/elea-tokens": "^0.1.1",
+    "@alien6-studio/elea-ui": "^0.1.1",
     "isomorphic-dompurify": "^4.8.0"
   },
   "peerDependencies": {

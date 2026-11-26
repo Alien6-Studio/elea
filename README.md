@@ -25,6 +25,8 @@ The packages share one version and one `vX.Y.Z` release tag. Install the package
 you use when a version is published. See the [release instructions](docs/release.md)
 to build and qualify archives from a checkout.
 
+Elea ships ES modules only. For Jest tests using `next/jest`, add the full names of the Elea packages your tests load, including transitive imports, to [`transpilePackages`](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages) in your Next.js config.
+
 With Tailwind v4, one line is required before every import, or Preflight resets the components:
 
 ```css

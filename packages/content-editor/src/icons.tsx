@@ -32,6 +32,7 @@ export const ScissorsIcon = (props: IconProps) => <Icon {...props}><circle cx="6
 export const GripIcon = (props: IconProps) => <Icon {...props}><circle cx="9" cy="6" r="1.2" /><circle cx="15" cy="6" r="1.2" /><circle cx="9" cy="12" r="1.2" /><circle cx="15" cy="12" r="1.2" /><circle cx="9" cy="18" r="1.2" /><circle cx="15" cy="18" r="1.2" /></Icon>;
 export const UndoIcon = (props: IconProps) => <Icon {...props}><path d="m9 4-5 5 5 5M4 9h10a6 6 0 0 1 0 12h-2" /></Icon>;
 export const RedoIcon = (props: IconProps) => <Icon {...props}><path d="m15 4 5 5-5 5m5-5H10a6 6 0 0 0 0 12h2" /></Icon>;
+export const CropIcon = (props: IconProps) => <Icon {...props}><path d="M6 3v13a2 2 0 0 0 2 2h13M3 6h13a2 2 0 0 1 2 2v13" /></Icon>;
 export const UploadIcon = (props: IconProps) => <Icon {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" /></Icon>;
 
 export const blockTypeIcons: Record<string, (props: IconProps) => React.JSX.Element> = {

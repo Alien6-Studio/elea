@@ -32,3 +32,8 @@ test("formatMessage replaces named placeholders and leaves unknown ones", () => 
   assert.equal(formatMessage("{a} {b}", { a: "x" }), "x {b}");
   assert.equal(formatMessage("plain"), "plain");
 });
+
+test("a partial crop format translation inherits the remaining labels from its locale", () => {
+  const messages = withDefaultMessages({ cropFormats: { format: "Cadrage" } }, fr);
+  assert.deepEqual(messages.cropFormats, { ...fr.cropFormats, format: "Cadrage" });
+});

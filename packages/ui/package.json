@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Elea UI primitives for React: buttons, fields, cards, tables, alerts, toasts, dialogs, sheets, popovers, menus, tabs and more, styled with Elea tokens only",
   "type": "module",
   "sideEffects": [
@@ -66,7 +66,7 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-tokens": "^0.1.0"
+    "@alien6-studio/elea-tokens": "^0.1.1"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",

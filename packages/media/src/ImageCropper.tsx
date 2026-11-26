@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import { useObjectUrl } from "./useObjectUrl.js";
 import type { CropFormats } from "./createCropFormats.js";
 import type { CropButtonProps, CropLayout, CropSliderProps } from "./AdjustableCrop.js";
-import { clampOffset, cropRect, displayScale, exportCrop, frameSize, isValidOutputSize, measureCropRect, type CropRect, type CropState, type ExportOptions, type Point, type Size } from "./crop.js";
+import { clampOffset, cropRect, displayScale, exportCrop, frameSize, isValidOutputSize, measureCropRect, type CropRecipe, type CropRect, type CropState, type ExportOptions, type Point, type Size } from "./crop.js";
 
 export interface ImageCropperLabels {
   zoom: string;
@@ -31,11 +31,13 @@ export interface ImageCropperProps {
   export?: ExportOptions | undefined;
   /** Show an editable output format picker. A selected format sets both the frame and the export. */
   formats?: CropFormats | undefined;
+  /** Reopen a confirmed framing with its original file or source. Mount a fresh cropper for each edit. */
+  initialCrop?: CropRecipe | undefined;
   /** Keeps the confirm and cancel controls unavailable while the host saves the image. */
   busy?: boolean | undefined;
   labels: ImageCropperLabels;
-  /** The exported picture, or `null` where canvases cannot draw; the crop window in rotated image pixels. */
-  onConfirm: (blob: Blob | null, rect: CropRect, state: CropState) => void;
+  /** The exported picture, the crop in rotated source pixels, the display state and a portable framing of the loaded image. */
+  onConfirm: (blob: Blob | null, rect: CropRect, state: CropState, recipe?: CropRecipe) => void;
   onCancel?: (() => void) | undefined;
   /** Extra actions beside confirm and cancel. */
   actions?: ReactNode | undefined;
@@ -76,12 +78,12 @@ function cropImageSource(src: string): string | undefined {
  * Frames an image: drag to move it, zoom with the wheel or the slider, rotate with the slider.
  * The frame always stays covered, so the export never has empty corners.
  */
-export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, maxHeight = 480, export: exportOptions, formats, busy: saving = false, labels, onConfirm, onCancel, actions, className, onChange }: Readonly<ImageCropperProps>) {
+export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, maxHeight = 480, export: exportOptions, formats, initialCrop, busy: saving = false, labels, onConfirm, onCancel, actions, className, onChange }: Readonly<ImageCropperProps>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [natural, setNatural] = useState<Size | null>(null);
   const [containerWidth, setContainerWidth] = useState(FALLBACK_WIDTH);
-  const [state, setState] = useState<CropState>(INITIAL);
+  const [edited, setEdited] = useState<CropState>();
   const [exporting, setExporting] = useState(false);
   const preview = useObjectUrl(file);
   const imageSource = useMemo(() => cropImageSource(preview ?? src ?? ""), [preview, src]);
@@ -100,28 +102,33 @@ export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, m
   }, []);
 
   useEffect(() => {
-    setState(INITIAL);
+    setEdited(undefined);
     setNatural(null);
   }, [src, file]);
 
   const image = natural ?? { width: 1, height: 1 };
-  const sourceRatio = natural ? natural.width / natural.height : 4 / 3;
-  const requestedSize = exportOptions?.outputSize;
+  const sourceRatio = natural ? natural.width / natural.height : initialCrop?.aspect ?? 4 / 3;
+  const requestedSize = initialCrop?.outputSize ?? exportOptions?.outputSize;
   const validSize = isValidOutputSize(requestedSize);
-  const ratio = validSize ? requestedSize.width / requestedSize.height : aspect ?? sourceRatio;
+  const ratio = validSize ? requestedSize.width / requestedSize.height : initialCrop?.aspect ?? aspect ?? sourceRatio;
   const frame = frameSize(containerWidth, formats ? sourceRatio : ratio, maxHeight);
+  const state = edited ?? (initialCrop ? {
+    zoom: initialCrop.zoom,
+    rotation: initialCrop.rotation,
+    offset: { x: initialCrop.offset.x * frame.width, y: initialCrop.offset.y * frame.height },
+  } : INITIAL);
   const scale = displayScale(image, frame, state);
   const offset = clampOffset(state.offset, image, frame, scale, state.rotation);
 
   const update = useCallback((next: Partial<CropState>) => {
-    setState((previous) => {
-      const merged = { ...previous, ...next };
+    setEdited((previous) => {
+      const merged = { ...(previous ?? state), ...next };
       const nextScale = displayScale(image, frame, merged);
       const result = { ...merged, offset: clampOffset(merged.offset, image, frame, nextScale, merged.rotation) };
       onChange?.(result);
       return result;
     });
-  }, [image, frame, onChange]);
+  }, [image, frame, state, onChange]);
 
   const onLoad = () => {
     const element = imageRef.current;
@@ -147,7 +154,7 @@ export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, m
     update({ zoom: Math.min(maxZoom, Math.max(1, state.zoom - event.deltaY / 500)) });
   };
 
-  const confirm = async ({ outputSize, mask }: CropLayout) => {
+  const confirm = async ({ outputSize, mask, format }: CropLayout) => {
     const element = imageRef.current;
     const current = { ...state, offset };
     let rect = outputSize || formats ? measureCropRect(image, frame, current) : cropRect(image, frame, current);
@@ -166,7 +173,12 @@ export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, m
     setExporting(true);
     try {
       const blob = await exportCrop(Object.assign(element, { width: natural.width, height: natural.height }), rect, current.rotation, { ...exportOptions, outputSize });
-      onConfirm(blob, rect, current);
+      onConfirm(blob, rect, current, {
+        zoom: current.zoom, rotation: current.rotation, aspect: frame.width / frame.height,
+        offset: { x: offset.x / frame.width, y: offset.y / frame.height },
+        mask: mask && { x: mask.x / frame.width, y: mask.y / frame.height, width: mask.width / frame.width, height: mask.height / frame.height },
+        format, outputSize,
+      });
     } finally {
       setExporting(false);
     }
@@ -209,7 +221,7 @@ export function ImageCropper({ src, file, aspect, shape = "rect", maxZoom = 3, m
     <div className={["elea-cropper", shape === "round" ? "elea-cropper--round" : "", className ?? ""].filter(Boolean).join(" ")} ref={containerRef}>
       {formats ? (
         <Suspense fallback={render({ invalid: true })}>
-          {formats({ frame, natural, initialSize: requestedSize, disabled: busy, children: render })}
+          {formats({ frame, natural, initialSize: requestedSize, initialCrop, disabled: busy, children: render })}
         </Suspense>
       ) : render({ outputSize: requestedSize, invalid: requestedSize !== undefined && !validSize })}
     </div>
