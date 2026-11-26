@@ -190,6 +190,143 @@ Supply four CSS lengths in clockwise order, starting at the top left. The
 </section>
 ```
 
+## Searchable selections and dates
+
+Use `MultiSelect` for several values from a searchable list. Store its `value` as a string array and update it from `onChange`. Supply `labels.empty` and `labels.remove(label)`. Set `creatable` to accept free tags and `max` to cap the selection. Give options a `group` and supply `labels.selectGroup(group)` to enable bulk selection. Customize a row through `renderOption(option, { selected, disabled })`.
+
+```tsx
+<Field label="Regions">
+  {control => <MultiSelect {...control} label="Regions" options={regions} value={selected}
+    onChange={setSelected} labels={{ empty: "No regions found", remove: label => "Remove " + label }} />}
+</Field>
+```
+
+`DateField` accepts a controlled Gregorian date in `YYYY-MM-DD` form or `null`. The segments follow `locale`. The calendar and typed entry share inclusive ISO `min` and `max` bounds. Set `name` to submit the ISO value with a native form.
+
+```tsx
+<DateField label="Publication date" locale="en-GB" name="publishedOn" value={date} onChange={setDate}
+  labels={{ day: "Day", month: "Month", year: "Year", openCalendar: "Choose date",
+    previousMonth: "Previous month", nextMonth: "Next month" }} />
+```
+
+## Text length and grouped identifiers
+
+Use `<Textarea counter={{ max: 350 }} />` or the same prop on `Input` to display and announce a soft limit. Users can paste longer text and edit it down. Add native `maxLength` to enforce a hard limit. The count uses the same UTF-16 units as `maxLength`. Override the text with `counter.format(count, max)`.
+
+Use `<Input mask="### ### ###" inputMode="numeric" />` for grouped identifiers. Each `#` consumes one digit. The native change event and submitted value include the separators. The host validates the identifier.
+
+### Segmented identifiers
+
+Import these controls from `@alien6-studio/elea-ui`. They support typing across blocks, correcting a single block and pasting a whole identifier. For standalone styles, import `@alien6-studio/elea-ui/css/identifier-input.css` alongside the tokens.
+
+| Control | Editing blocks |
+| --- | --- |
+| `SirenInput` | Three groups of three digits. |
+| `SiretInput` | Three groups of three SIREN digits followed by the five-digit establishment identifier. |
+| `IbanInput` | Groups of four uppercase characters. The country prefix determines the length of the last block. An unknown prefix gains blocks as needed, up to 34 characters. |
+| `CardNumberInput` | Groups of four digits, or 4–6–5 for American Express. The card illustration recognizes Visa, Mastercard and American Express and has a generic fallback. |
+
+Supply the group’s `label` and localize `segmentLabel(index, total)`. The index starts at zero. The controlled `value`, `onValueChange(raw)` and the named form field all carry the compact string, including leading zeros. Use `defaultValue` for an uncontrolled field. The host validates completeness, checksums and business rules.
+
+```tsx
+"use client";
+
+import { Field, IbanInput } from "@alien6-studio/elea-ui";
+
+export function BankAccountField() {
+  return <Field label="IBAN">
+    {control => <IbanInput {...control} name="iban" label="IBAN"
+      segmentLabel={(index, total) => `IBAN block ${index + 1} of ${total}`} />}
+  </Field>;
+}
+```
+
+For a single text box, pass `ibanFormat`, `paymentCardFormat`, `sirenFormat` or `siretFormat` from `@alien6-studio/elea-ui/formats` to `<Input format={…} />` in a Client Component. The native change event and form submission carry the displayed string with spaces. Call the preset’s `parse(display)` for the compact value or `segments(raw)` for its block sizes.
+
+### Telephone numbers by country
+
+Install the optional phone dependency in applications that use `@alien6-studio/elea-ui/phone`.
+
+```sh
+npm install libphonenumber-js@^1.13.17
+```
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Field } from "@alien6-studio/elea-ui";
+import { PhoneInput, type CountryCode } from "@alien6-studio/elea-ui/phone";
+
+export function ContactNumber() {
+  const [country, setCountry] = useState<CountryCode>("FR");
+  const [number, setNumber] = useState("");
+  return <Field label="Phone number">
+    {control => <PhoneInput {...control} name="phone" locale="en" country={country}
+      onCountryChange={setCountry} value={number} onValueChange={setNumber}
+      labels={{ country: "Country or region", empty: "No matching countries" }} />}
+  </Field>;
+}
+```
+
+`PhoneInput` includes a searchable country selector with localized names and calling codes. It formats national input for the selected country and recognizes a leading `+` for international input. `onValueChange` supplies editable digits, including a leading `+` when entered. A named control submits the normalized E.164 value when the number has a possible length. A partial number remains editable and prevents native form submission. Import `@alien6-studio/elea-ui/css/phone-input.css` for standalone styles.
+
+The same entry exports `getCountries`, `getCountryCallingCode`, `phoneFormat(country)` and `phoneToE164(value, country)` for custom controls. `phoneToE164` returns `undefined` for an incomplete number. Reachability requires separate verification.
+
+## Breadcrumbs
+
+Provide an ordered trail with stable IDs. The last item identifies the current page. Longer trails keep the first and nearest ancestors visible. The disclosure opens the intervening links in order. Use the same `render` adapter as a Button link for client-side navigation.
+
+```tsx
+<Breadcrumb label="Location" overflowLabel="Earlier pages" maxItems={4}
+  items={[{ id: "library", label: "Library", href: "/library" }, { id: "proof", label: "Proof" }]}
+  render={({ href, ...props }) => <Link to={href} {...props} />} />
+```
+
+## Multi-step forms
+
+`Stepper` renders a labelled navigation landmark with numbered steps. Set `current` to a step ID or a zero-based index. A selection calls `onSelect` with the step object. The host owns the current step and any form validation.
+
+```tsx
+import { useState } from "react";
+import { Button, Stepper, StepperPanel } from "@alien6-studio/elea-ui";
+
+const steps = [
+  { id: "details", label: "Details" },
+  { id: "images", label: "Images", description: "Choose a cover", badge: 2, badgeLabel: "2 images" },
+  { id: "review", label: "Review" },
+];
+
+export function PublicationSteps({ onPublish }: { onPublish: () => void }) {
+  const [current, setCurrent] = useState("details");
+  const navigation = { steps, current, onSelect: (step: { id: string }) => setCurrent(step.id) };
+  return (
+    <>
+      <Stepper {...navigation} label="Publication stages" orientation="vertical" linear />
+      <StepperPanel {...navigation} previousLabel="Previous" nextLabel="Next"
+        finish={<Button onClick={onPublish}>Publish</Button>} />
+    </>
+  );
+}
+```
+
+The default layout is horizontal. Steps can be opened in any order unless `linear` is set.
+In linear mode, users can revisit previous steps and use the footer to advance. Set
+`disabled: true` to remove a step from navigation. Use a meaningful `badgeLabel` for
+counts or artwork, such as `"2 errors"`. Arrow keys move focus between available steps
+in the layout direction. Home and End reach the first and last available steps.
+Enter or Space selects the focused step. The filled marker follows the current step,
+and the underlined label follows keyboard focus.
+
+Render `<StepperSkeleton steps={3} orientation="vertical" />` while the steps load.
+The standalone sheet is `@alien6-studio/elea-ui/css/stepper.css`.
+
+Set `--elea-stepper-indicator-size` and `--elea-stepper-connector-thickness` on a
+container to scale its markers and lines. The current marker and completed sections
+of the line use `--elea-stepper-active`. The check uses `--elea-stepper-done`,
+and future markers use `--elea-stepper-upcoming`. Set `--elea-stepper-on-active`
+for text on the active fill and `--elea-stepper-track` for the upcoming line.
+
 ## Components
 
 - `Button` supports links, loading states and leading or trailing icons, in five sizes from `xs` to `xl`,
@@ -319,7 +456,7 @@ companion, built from its own markup so the two cannot drift apart, and a page l
 out the way it lays out the loaded components. The library holds no page-level skeleton, since the
 shape of a page belongs to the application.
 
-`Accordion`, `Avatar`, `Calendar`, `Carousel`, `ColorPicker`, `Combobox`, `Dialog`, `Menu`, `Popover`, `Select`, `Sheet`, `SkeletonRegion`, `Slider`, `Tabs`, `ToastProvider` and `Tooltip` carry a `"use client"` boundary. With
+`Accordion`, `Avatar`, `Breadcrumb`, `Calendar`, `Carousel`, `ColorPicker`, `Combobox`, `DateField`, `Dialog`, `Input`, `Menu`, `MultiSelect`, `Popover`, `Select`, `Sheet`, `SkeletonRegion`, `Slider`, `Stepper`, `Tabs`, `Textarea`, `ToastProvider` and `Tooltip` carry a `"use client"` boundary. With
 React Server Components, keep components with interaction callbacks in a client
 component. Display-only elements like `Badge` can render on the server.
 

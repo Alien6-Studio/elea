@@ -1,0 +1,87 @@
+.elea-ui-select.elea-multi-select { display: block; min-inline-size: 0; }
+.elea-multi-select .elea-multi-select__trigger {
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: var(--elea-space-1);
+  cursor: text;
+}
+.elea-multi-select__trigger:focus-within {
+  outline: var(--elea-control-focus-outline, 2px solid var(--_elea-field-focus, var(--elea-color-focus)));
+  outline-offset: -2px;
+  border-color: transparent;
+  box-shadow: var(--elea-control-focus-shadow, none);
+}
+.elea-multi-select__trigger[data-disabled] {
+  background: var(--elea-color-surface-subtle);
+  color: var(--elea-color-text-muted);
+  cursor: not-allowed;
+}
+.elea-multi-select__search {
+  display: flex;
+  align-items: center;
+  flex: 1 1 8ch;
+  min-inline-size: 0;
+  gap: var(--elea-space-2);
+  color: var(--elea-color-text-subtle);
+}
+.elea-multi-select__search svg { flex: none; }
+.elea-multi-select__search input {
+  flex: 1;
+  min-inline-size: 0;
+  padding: var(--elea-space-1) 0;
+  border: 0;
+  background: transparent;
+  color: var(--elea-color-text-default);
+  font: inherit;
+  outline: none;
+}
+.elea-multi-select__search input::placeholder { color: var(--elea-color-text-subtle); }
+.elea-multi-select__tag, .elea-multi-select__bulk, .elea-multi-select [role="option"] {
+  box-sizing: border-box;
+  border: 0;
+  background-color: transparent;
+  font-family: inherit;
+}
+.elea-multi-select__tag {
+  display: inline-flex;
+  padding: 0;
+  max-inline-size: 100%;
+  border-radius: var(--elea-radius-full);
+  cursor: pointer;
+}
+.elea-multi-select__tag .elea-badge { box-sizing: border-box; max-inline-size: 100%; min-block-size: 1.5rem; }
+.elea-multi-select__tag-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.elea-multi-select__tag:disabled, .elea-multi-select__bulk:disabled { cursor: not-allowed; opacity: 0.6; }
+.elea-multi-select__tag:focus-visible, .elea-multi-select__bulk:focus-visible {
+  outline: 2px solid var(--elea-color-focus);
+  outline-offset: 1px;
+}
+.elea-multi-select .elea-ui-select__list { inset-inline: 0; }
+.elea-multi-select [role="option"] {
+  inline-size: 100%;
+  white-space: normal;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.elea-multi-select .elea-ui-select__option--active { background-color: var(--elea-color-surface-muted); }
+.elea-multi-select .elea-ui-select__check { flex: none; }
+.elea-multi-select__group { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
+.elea-multi-select__group legend, .elea-multi-select__empty {
+  display: block;
+  padding: var(--elea-space-2) var(--elea-space-3);
+  font-size: var(--elea-font-size-sm);
+  color: var(--elea-color-text-muted);
+}
+.elea-multi-select__group legend { font-size: var(--elea-font-size-xs); font-weight: var(--elea-font-weight-semibold); }
+.elea-multi-select__bulk {
+  padding: var(--elea-space-2) var(--elea-space-3);
+  color: var(--elea-color-text-link);
+  font-size: var(--elea-font-size-sm);
+  cursor: pointer;
+}
+.elea-multi-select__bulk:enabled:hover { text-decoration: underline; }
+@media (forced-colors: active) {
+  .elea-multi-select .elea-ui-select__option--active { outline: 1px solid Highlight; outline-offset: -1px; }
+  .elea-multi-select .elea-ui-select__option--disabled { color: GrayText; opacity: 1; }
+}

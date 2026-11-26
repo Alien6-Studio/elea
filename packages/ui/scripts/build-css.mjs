@@ -9,7 +9,16 @@ const FIRST = ["button.css", "button-effects.css"];
 const read = (name) => readFileSync(`src/css/${name}`, "utf8");
 const sheets = readdirSync("src/css").filter((name) => name.endsWith(".css") && name !== BASE).sort();
 const ordered = [...FIRST, ...sheets.filter((name) => !FIRST.includes(name))];
-const dependencies = { "carousel.css": ["button.css"], "color-picker.css": ["field.css"], "combobox.css": ["field.css", "select.css"] };
+const dependencies = {
+  "carousel.css": ["button.css"],
+  "color-picker.css": ["field.css"],
+  "combobox.css": ["field.css", "select.css"],
+  "date-field.css": ["field.css", "button.css", "popover.css", "calendar.css"],
+  "identifier-input.css": ["field.css"],
+  "phone-input.css": ["field.css", "select.css", "combobox.css"],
+  "multi-select.css": ["badge.css", "select.css"],
+  "stepper.css": ["button.css", "skeleton.css"],
+};
 
 // A sheet loaded alone still animates: it carries the shared keyframes it names
 const shared = keyframesIn(read(BASE));

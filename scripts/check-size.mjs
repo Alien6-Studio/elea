@@ -34,11 +34,15 @@ const cropAdjustmentFiles = new Set(["AdjustableCrop.js", "CropFormatControls.js
 // holds alone: it states the layer order and carries the shared keyframes it names.
 // The surface and control sheets include optional profile shapes and scalar fallbacks.
 // Carousel also ships the standalone Button sheet, including its explicit corner scale and semantic tones.
+// Stepper ships its navigation, footer and loading state with the Button and Skeleton sheets.
+// DateField bundles the standalone calendar, field and popover styles. Field counters and digit masks are optional.
 const UI_BUDGETS = {
+  breadcrumb: 1_375, "date-field": 6_975, "multi-select": 5_475, "input-formats": 1_600, "input-mask": 1_500, "phone-format": 525, "text-controls": 1_700,
+  "card-network": 325, "identifier-input": 5_000, phone: 175, "phone-input": 3_200,
   calendar: 3_600, carousel: 5_575, "color-picker": 2_400, combobox: 4_200,
   accordion: 2_500, alert: 1_700, avatar: 1_500, badge: 1_125, button: 3_950, "button-effects": 1_500, card: 1_560, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
-  dialog: 3_750, field: 2_025, footer: 1_250, index: 600, menu: 2_700, motion: 1_250, pagination: 2_050, popover: 4_175, progress: 1_500,
-  "radio-group": 1_750, select: 4_900, separator: 750, sheet: 1_775, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, table: 2_250, tabs: 3_100, toast: 3_400, tooltip: 2_300,
+  dialog: 3_750, field: 2_025, footer: 1_250, index: 675, menu: 2_700, motion: 1_250, pagination: 2_050, popover: 4_175, progress: 1_500,
+  "radio-group": 1_750, select: 5_025, separator: 750, sheet: 1_775, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, stepper: 6_150, table: 2_250, tabs: 3_100, toast: 3_400, tooltip: 2_300,
 };
 
 function files(dir) {

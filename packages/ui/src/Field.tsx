@@ -1,6 +1,9 @@
-import { forwardRef, useId, type InputHTMLAttributes, type LabelHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
+import { useId, type LabelHTMLAttributes, type ReactNode } from "react";
 import { cx } from "./cx.js";
 import { Skeleton } from "./Skeleton.js";
+import { Input, type InputProps } from "./TextControls.js";
+
+export { Input, Textarea, type CharacterCounter, type InputProps, type TextareaProps } from "./TextControls.js";
 
 export interface FieldProps {
   label: ReactNode;
@@ -43,26 +46,6 @@ export interface LabelProps extends Omit<LabelHTMLAttributes<HTMLLabelElement>, 
 export function Label({ className, ...rest }: Readonly<LabelProps>) {
   return <label {...rest} className={cx("elea-field__label", className)} />;
 }
-
-export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "className" | "size"> {
-  invalid?: boolean | undefined;
-  size?: "sm" | "md" | "lg" | undefined;
-  className?: string | undefined;
-}
-
-/** A text input on the tokens; `invalid` paints the error state. The ref reaches the native input. */
-export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ invalid = false, size = "md", className, ...rest }, ref) {
-  return <input ref={ref} {...rest} className={cx("elea-ui-input", `elea-ui-input--${size}`, invalid && "elea-ui-input--invalid", className)} aria-invalid={invalid || rest["aria-invalid"] || undefined} />;
-});
-
-export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "className"> {
-  invalid?: boolean | undefined;
-  className?: string | undefined;
-}
-
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea({ invalid = false, className, ...rest }, ref) {
-  return <textarea ref={ref} {...rest} className={cx("elea-ui-input", "elea-ui-textarea", invalid && "elea-ui-input--invalid", className)} aria-invalid={invalid || rest["aria-invalid"] || undefined} />;
-});
 
 export interface FieldSkeletonProps extends Pick<InputProps, "size"> {
   /** Holds a line for the help text. */

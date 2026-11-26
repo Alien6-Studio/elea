@@ -1,0 +1,31 @@
+.elea-date-field { min-inline-size: 0; margin: 0; border: 0; padding: 0; }
+.elea-date-field__control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--elea-space-2);
+  padding-block: 0;
+  padding-inline-end: var(--elea-space-1);
+}
+.elea-date-field__segments { display: inline-flex; align-items: baseline; font-variant-numeric: tabular-nums; }
+.elea-date-field__segments > span { color: var(--elea-color-text-subtle); white-space: pre; }
+.elea-date-field__segments input {
+  appearance: none;
+  border: 0;
+  padding: var(--elea-space-1) 0;
+  border-radius: var(--elea-radius-sm);
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-align: center;
+  inline-size: 2.3ch;
+}
+.elea-date-field__segments [data-segment="year"] { inline-size: 4.3ch; }
+.elea-date-field__segments input::placeholder { color: var(--elea-color-text-subtle); }
+.elea-date-field__segments input:focus {
+  outline: var(--elea-control-focus-outline, 2px solid var(--_elea-field-focus, var(--elea-color-focus)));
+  outline-offset: 0;
+}
+.elea-date-field__control:has(input:disabled) { background: var(--elea-color-surface-subtle); color: var(--elea-color-text-muted); }
+.elea-date-field .elea-popover__panel { inline-size: 20rem; }
+.elea-date-field .elea-calendar { inline-size: 100%; padding: 0; }

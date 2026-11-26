@@ -1,0 +1,35 @@
+.elea-identifier-input,
+.elea-identifier-input__blocks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-inline-size: 0;
+  gap: var(--elea-space-1);
+}
+.elea-identifier-input { margin: 0; padding: 0; border: 0; gap: var(--elea-space-2); }
+.elea-identifier-input__block {
+  /* Let the HTML size follow the number of characters in this block. */
+  inline-size: auto;
+  max-inline-size: 100%;
+  padding-inline: var(--elea-space-1);
+  font-family: var(--elea-font-family-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.elea-card-mark {
+  display: inline-flex;
+  inline-size: 3.75rem;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--elea-radius-sm);
+  color: var(--elea-color-action-primary-text);
+  background: var(--elea-color-action-primary);
+}
+.elea-card-mark svg { display: block; inline-size: 100%; }
+.elea-card-mark text { font: italic 750 10px var(--elea-font-family-sans); }
+.elea-card-mark__etch { stroke: currentColor; opacity: .22; }
+.elea-card-mark__chip rect { fill: currentColor; opacity: .88; }
+.elea-card-mark__chip path { stroke: var(--elea-color-action-primary); stroke-width: .85; }
+@media (forced-colors: active) {
+  .elea-card-mark { border: 1px solid CanvasText; color: CanvasText; }
+}

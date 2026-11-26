@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 - 2026-11-26
+
+- The UI package adds `SirenInput`, `SiretInput`, `IbanInput` and `CardNumberInput` with individually editable blocks, whole-value paste and compact form values. IBAN block sizes follow the country prefix and the card number field recognizes Visa, Mastercard and American Express. The `/formats` entry also provides the four presets for single-field entry with `Input`.
+- `@alien6-studio/elea-ui/phone` adds `PhoneInput` with country search, national formatting and E.164 form submission. Applications using this entry install the optional `libphonenumber-js` peer.
+- The UI package adds `MultiSelect` for searchable tags, `DateField` for localized date entry and calendar selection, and `Breadcrumb` for collapsible trails with router links.
+- `Input` and `Textarea` accept an optional soft character counter. `Input` also accepts a digit mask for fixed-format identifiers.
+- The UI package adds `Stepper` for sectioned forms and wizards. It supports free or linear navigation, keyboard controls and labelled badges. `StepperSkeleton` covers loading and `StepperPanel` provides previous, next and final actions.
+
+Upgrade the ELEA packages your application uses together. Existing forms can adopt the new controls individually. In React Server Components, pass serializable props to `Input` and `Textarea` and define custom formatters or callbacks in a Client Component.
 
 ## 0.1.1 - 2026-11-26
 

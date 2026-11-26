@@ -1,0 +1,34 @@
+.elea-breadcrumb {
+  font: inherit;
+  font-family: var(--elea-font-family-sans);
+  font-size: var(--elea-font-size-sm);
+  color: var(--elea-color-text-default);
+}
+.elea-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--elea-space-1) 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.elea-breadcrumb__list > li { min-width: 0; overflow-wrap: anywhere; }
+.elea-breadcrumb__separator { margin-inline: var(--elea-space-2); color: var(--elea-color-text-subtle); }
+.elea-breadcrumb__link, .elea-breadcrumb__overflow { color: var(--elea-color-text-muted); }
+.elea-breadcrumb__link { text-underline-offset: .16em; }
+.elea-breadcrumb__overflow {
+  font: inherit;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  background: transparent;
+  border: 0;
+  border-radius: var(--elea-shape-control, var(--elea-radius-sm));
+  cursor: pointer;
+}
+.elea-breadcrumb__link:hover, .elea-breadcrumb__overflow:hover { color: var(--elea-color-text-link-hover); }
+.elea-breadcrumb__overflow:hover { background: var(--elea-color-surface-muted); }
+.elea-breadcrumb :is(a, button):focus-visible {
+  outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus));
+  outline-offset: 2px;
+}

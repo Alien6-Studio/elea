@@ -1,0 +1,138 @@
+/* Each step draws the segment that leads to the next marker. */
+.elea-stepper {
+  --_elea-step-size: var(--elea-stepper-indicator-size, var(--elea-space-8));
+  --_elea-step-stroke: var(--elea-stepper-connector-thickness, 2px);
+  --_elea-step-inset: var(--elea-space-2);
+  --_elea-step-active: var(--elea-stepper-active, var(--elea-color-action-primary));
+  --_elea-step-done: var(--elea-stepper-done, var(--elea-color-action-primary-ink));
+  --_elea-step-upcoming: var(--elea-stepper-upcoming, var(--elea-color-text-muted));
+  min-inline-size: 0;
+  color: var(--elea-color-text-default);
+  font-family: var(--elea-font-family-sans);
+  font-size: var(--elea-font-size-sm);
+  line-height: var(--elea-font-leading-normal);
+}
+.elea-stepper__list {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-x: auto;
+}
+.elea-stepper__step { position: relative; flex: 1 0 clamp(4.5rem, 33.333%, 6rem); min-inline-size: 0; }
+.elea-stepper__step:not(:last-child)::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+  inset-inline: calc(var(--_elea-step-size) + 2 * var(--_elea-step-inset)) 0;
+  inset-block-start: calc(var(--_elea-step-inset) + (var(--_elea-step-size) - var(--_elea-step-stroke)) / 2);
+  block-size: var(--_elea-step-stroke);
+  background: var(--elea-stepper-track, var(--elea-color-border-strong));
+}
+.elea-stepper__step[data-state="done"]::after { background: var(--_elea-step-active); }
+.elea-stepper__item {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--elea-space-2);
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+  padding: var(--_elea-step-inset);
+}
+.elea-stepper__button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  overflow-wrap: inherit;
+  cursor: pointer;
+}
+/* The button's name is its label. Its pointer target includes the marker and supporting text. */
+.elea-stepper__button::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.elea-stepper__button:disabled { cursor: not-allowed; }
+.elea-stepper__button:focus-visible { outline: none; }
+.elea-stepper__indicator {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--_elea-step-size);
+  block-size: var(--_elea-step-size);
+  border-radius: var(--elea-radius-full);
+  font-weight: var(--elea-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.elea-stepper__step[data-state] .elea-stepper__indicator {
+  border: 1px solid;
+  color: var(--_elea-step-upcoming);
+}
+.elea-stepper__step[data-state="current"] .elea-stepper__indicator {
+  border-color: var(--_elea-step-active);
+  background: var(--_elea-step-active);
+  color: var(--elea-stepper-on-active, var(--elea-color-action-primary-text));
+  outline: 2px solid var(--elea-stepper-active, var(--elea-color-action-primary-ink));
+  outline-offset: 2px;
+}
+.elea-stepper__step[data-state="done"] .elea-stepper__indicator { color: var(--_elea-step-done); }
+.elea-stepper__step[data-state="upcoming"][data-disabled] .elea-stepper__indicator { border-style: dashed; }
+.elea-stepper__item:has(.elea-stepper__button:focus-visible) .elea-stepper__indicator::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus));
+}
+.elea-stepper__indicator svg { inline-size: 55%; block-size: 55%; }
+.elea-stepper__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--elea-space-1);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+.elea-stepper__label { font-weight: var(--elea-font-weight-medium); }
+.elea-stepper__step[data-state="current"] .elea-stepper__label { font-weight: var(--elea-font-weight-bold); }
+.elea-stepper__button:is(:hover:enabled, :focus-visible) { text-decoration: underline; text-underline-offset: .16em; }
+.elea-stepper__step[data-disabled] .elea-stepper__label { color: var(--elea-color-text-muted); }
+.elea-stepper__description { order: 1; flex-basis: 100%; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-xs); }
+.elea-stepper__badge { display: inline-flex; align-items: center; max-inline-size: 100%; }
+.elea-stepper__badge:not(:has(> *)) {
+  box-sizing: border-box;
+  justify-content: center;
+  min-inline-size: 1.5em;
+  padding-inline: var(--elea-space-1);
+  border-radius: var(--elea-radius-full);
+  background: var(--elea-color-surface-muted);
+  color: var(--elea-color-text-muted);
+  font-size: var(--elea-font-size-xs);
+  font-weight: var(--elea-font-weight-medium);
+}
+.elea-stepper__body > .elea-skeleton { max-inline-size: 100%; }
+
+.elea-stepper[data-orientation="vertical"] .elea-stepper__list { flex-direction: column; overflow: visible; }
+.elea-stepper[data-orientation="vertical"] .elea-stepper__step { flex: none; }
+.elea-stepper[data-orientation="vertical"] .elea-stepper__step:not(:last-child) { padding-block-end: var(--elea-space-3); }
+.elea-stepper[data-orientation="vertical"] .elea-stepper__step:not(:last-child)::after {
+  inset-block: calc(var(--_elea-step-size) + 2 * var(--_elea-step-inset)) 0;
+  inset-inline: calc(var(--_elea-step-inset) + (var(--_elea-step-size) - var(--_elea-step-stroke)) / 2) auto;
+  inline-size: var(--_elea-step-stroke);
+  block-size: auto;
+}
+.elea-stepper[data-orientation="vertical"] .elea-stepper__item { flex-direction: row; gap: var(--elea-space-3); }
+.elea-stepper[data-orientation="vertical"] .elea-stepper__body { align-content: center; min-block-size: var(--_elea-step-size); }
+.elea-stepper__panel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--elea-space-3); }
+
+@media (forced-colors: active) {
+  .elea-stepper__item:has(.elea-stepper__button:focus-visible) .elea-stepper__indicator::after { outline-color: Highlight; forced-color-adjust: none; }
+  .elea-stepper__step:not(:last-child)::after { background: GrayText; forced-color-adjust: none; }
+  .elea-stepper__step[data-state="done"]::after { background: Highlight; }
+  .elea-stepper__step[data-state="current"] .elea-stepper__indicator { background: Highlight; border-color: Highlight; outline-color: Highlight; color: HighlightText; forced-color-adjust: none; }
+}

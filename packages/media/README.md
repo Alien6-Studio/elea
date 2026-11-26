@@ -36,7 +36,9 @@ Pass `formats={createCropFormats(options)}` to let people move and resize a crop
 The move and resize controls accept arrow keys. Include the four `labels.corners` below to show a handle
 at each corner and a composition grid during adjustment. Choose the original ratio, a square
 (1080 × 1080), landscape (1600 × 900), portrait (1080 × 1350), custom pixel dimensions or
-a free ratio. With `formats` enabled, the confirm button stays disabled until the image has loaded.
+a free ratio.
+
+With `formats` enabled, the confirm button stays disabled until the source image has loaded.
 Free crops export the selected source pixels at their natural resolution.
 The media `bundle.css` includes the format controls. When importing individual styles,
 load the media `styles.css` and `crop-adjustments.css` alongside the UI styles for Field,

@@ -49,7 +49,17 @@ function localToday(): number {
 }
 
 /** A single-date picker. Moving through the grid leaves the selection under the host's control. */
-export function Calendar({ value, onChange, label, labels, locale, defaultMonth, min, max, weekStartsOn = 1, className }: Readonly<CalendarProps>) {
+export function Calendar({ onChange, ...props }: Readonly<CalendarProps>) {
+  return <CalendarGrid {...props} onSelect={date => { if (date !== props.value) onChange(date); }} />;
+}
+
+interface CalendarGridProps extends Omit<CalendarProps, "onChange"> {
+  onSelect: (date: string) => void;
+  focusOnOpen?: boolean;
+}
+
+/** Internal grid shared by the standalone calendar and the DateField popover. */
+export function CalendarGrid({ value, onSelect, label, labels, locale, defaultMonth, min, max, weekStartsOn = 1, className, focusOnOpen = false }: Readonly<CalendarGridProps>) {
   const selected = value === null ? null : readDate(value);
   const openingMonth = defaultMonth === undefined ? null : readDate(defaultMonth + "-01");
   const lower = min === undefined ? earliest : readDate(min);
@@ -62,7 +72,7 @@ export function Calendar({ value, onChange, label, labels, locale, defaultMonth,
   const [view, setView] = useState({ value, day: selected ?? openingMonth });
   if (view.value !== value) setView({ value, day: selected ?? view.day });
   const cursor = view.day ?? today;
-  const moveFocus = useRef(false);
+  const moveFocus = useRef(focusOnOpen);
   const monthId = useId();
   const format = useMemo(() => {
     const options = { timeZone: "UTC", calendar: "gregory" };
@@ -135,6 +145,7 @@ export function Calendar({ value, onChange, label, labels, locale, defaultMonth,
       <td role="gridcell" key={day} aria-selected={day === selected}>
         <button type="button" className="elea-calendar__day" disabled={disabled} tabIndex={day === active ? 0 : -1}
           aria-label={format.date.format(day)} aria-current={day === today ? "date" : undefined}
+          data-elea-focus={focusOnOpen && day === active ? true : undefined}
           ref={node => {
             if (node && day === active && moveFocus.current) {
               moveFocus.current = false;
@@ -144,7 +155,7 @@ export function Calendar({ value, onChange, label, labels, locale, defaultMonth,
           onKeyDown={event => navigate(event, day)}
           onClick={() => {
             setView({ value, day });
-            if (day !== selected) onChange(new Date(day).toISOString().slice(0, 10));
+            onSelect(new Date(day).toISOString().slice(0, 10));
           }}>
           {format.number.format(new Date(day).getUTCDate())}
         </button>

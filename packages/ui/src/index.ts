@@ -1,12 +1,17 @@
+export { CardNumberInput, IbanInput, SirenInput, SiretInput, type IdentifierInputProps } from "./IdentifierInput.js";
+export type { InputFormat, SegmentedInputFormat } from "./inputMask.js";
 export { cx } from "./cx.js";
 export { scopeOf, useSurfaceScope, type Appearance, type SurfaceScope } from "./scope.js";
 export { Button, ButtonSkeleton, IconButton, type ButtonSkeletonProps, type ButtonEffect, type ButtonLinkRenderProps, type ButtonTone, type ButtonProps, type ButtonRadius, type ButtonShadow, type ButtonSize, type ButtonVariant, type IconButtonProps, type LinkButtonProps } from "./Button.js";
+export { Breadcrumb, type BreadcrumbItem, type BreadcrumbProps } from "./Breadcrumb.js";
 export { Badge, BadgeSkeleton, type BadgeProps, type BadgeSkeletonProps, type BadgeTone, type BadgeVariant } from "./Badge.js";
-export { Field, FieldSkeleton, Input, Label, Textarea, type FieldProps, type FieldSkeletonProps, type InputProps, type LabelProps, type TextareaProps } from "./Field.js";
+export { Field, FieldSkeleton, Input, Label, Textarea, type CharacterCounter, type FieldProps, type FieldSkeletonProps, type InputProps, type LabelProps, type TextareaProps } from "./Field.js";
 export { Calendar, type CalendarProps } from "./Calendar.js";
 export { Carousel, type CarouselGap, type CarouselNavigation, type CarouselProps } from "./Carousel.js";
 export { ColorPicker, type ColorPickerProps } from "./ColorPicker.js";
 export { Combobox, type ComboboxOption, type ComboboxProps } from "./Combobox.js";
+export { MultiSelect, type MultiSelectOption, type MultiSelectProps, type MultiSelectLabels } from "./MultiSelect.js";
+export { DateField, type DateFieldProps, type DateFieldLabels } from "./DateField.js";
 export { Checkbox, Toggle, type CheckboxProps, type ToggleProps } from "./Checkbox.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./RadioGroup.js";
 export { type ConfirmField } from "./ConfirmField.js";
@@ -16,6 +21,7 @@ export { ConfirmPopover, Popover, type ConfirmPopoverProps, type PopoverAnchor, 
 export { Menu, MenuContent, MenuGroup, MenuItem, MenuRoot, MenuSeparator, MenuTrigger, type MenuContentProps, type MenuItemData, type MenuItemProps, type MenuProps, type MenuRootProps, type MenuTriggerProps } from "./Menu.js";
 export { Tooltip, type TooltipProps } from "./Tooltip.js";
 export { Pagination, paginationRange, type PaginationLabels, type PaginationProps } from "./Pagination.js";
+export { Stepper, StepperPanel, StepperSkeleton, type StepperOrientation, type StepperPanelProps, type StepperProps, type StepperSkeletonProps, type StepperStep } from "./Stepper.js";
 export { Select, type MultipleSelectProps, type SelectOption, type SelectProps, type SingleSelectProps } from "./Select.js";
 export { Footer, type FooterGroup, type FooterLink, type FooterProps } from "./Footer.js";
 export { Tab, TabList, TabPanel, Tabs, TabsRoot, type TabItem, type TabListProps, type TabPanelProps, type TabPresentation, type TabProps, type TabsProps, type TabsRootProps } from "./Tabs.js";

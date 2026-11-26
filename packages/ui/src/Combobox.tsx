@@ -33,7 +33,7 @@ interface Search {
   activeValue: string | null;
 }
 
-function ignoresKey(event: KeyboardEvent<HTMLInputElement>) {
+export function ignoresKey(event: KeyboardEvent) {
   // WebKit can send the IME's confirming Enter after compositionend, with only keyCode 229.
   return event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229
     || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey;

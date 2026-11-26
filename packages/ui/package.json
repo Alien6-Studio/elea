@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-ui",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Elea UI primitives for React: buttons, fields, cards, tables, alerts, toasts, dialogs, sheets, popovers, menus, tabs and more, styled with Elea tokens only",
   "type": "module",
   "sideEffects": [
@@ -25,12 +25,23 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./formats": {
+      "types": "./dist/inputFormats.d.ts",
+      "import": "./dist/inputFormats.js",
+      "default": "./dist/inputFormats.js"
+    },
+    "./phone": {
+      "types": "./dist/phone.d.ts",
+      "import": "./dist/phone.js",
+      "default": "./dist/phone.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./bundle.css": "./dist/bundle.css",
     "./css/accordion.css": "./dist/css/accordion.css",
     "./css/alert.css": "./dist/css/alert.css",
     "./css/avatar.css": "./dist/css/avatar.css",
     "./css/badge.css": "./dist/css/badge.css",
+    "./css/breadcrumb.css": "./dist/css/breadcrumb.css",
     "./css/button-effects.css": "./dist/css/button-effects.css",
     "./css/button.css": "./dist/css/button.css",
     "./css/calendar.css": "./dist/css/calendar.css",
@@ -39,12 +50,16 @@
     "./css/checkbox.css": "./dist/css/checkbox.css",
     "./css/color-picker.css": "./dist/css/color-picker.css",
     "./css/combobox.css": "./dist/css/combobox.css",
+    "./css/date-field.css": "./dist/css/date-field.css",
     "./css/dialog.css": "./dist/css/dialog.css",
     "./css/field.css": "./dist/css/field.css",
+    "./css/identifier-input.css": "./dist/css/identifier-input.css",
     "./css/footer.css": "./dist/css/footer.css",
     "./css/menu.css": "./dist/css/menu.css",
     "./css/motion.css": "./dist/css/motion.css",
+    "./css/multi-select.css": "./dist/css/multi-select.css",
     "./css/pagination.css": "./dist/css/pagination.css",
+    "./css/phone-input.css": "./dist/css/phone-input.css",
     "./css/popover.css": "./dist/css/popover.css",
     "./css/progress.css": "./dist/css/progress.css",
     "./css/radio-group.css": "./dist/css/radio-group.css",
@@ -53,6 +68,7 @@
     "./css/sheet.css": "./dist/css/sheet.css",
     "./css/skeleton.css": "./dist/css/skeleton.css",
     "./css/slider.css": "./dist/css/slider.css",
+    "./css/stepper.css": "./dist/css/stepper.css",
     "./css/table.css": "./dist/css/table.css",
     "./css/tabs.css": "./dist/css/tabs.css",
     "./css/toast.css": "./dist/css/toast.css",
@@ -66,11 +82,17 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-tokens": "^0.1.1"
+    "@alien6-studio/elea-tokens": "^0.1.2"
   },
   "peerDependencies": {
+    "libphonenumber-js": "^1.13.17",
     "react": "^18.3.1 || ^19.0.0",
     "react-dom": "^18.3.1 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "libphonenumber-js": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"

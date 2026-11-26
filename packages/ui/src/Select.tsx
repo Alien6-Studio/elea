@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type ComponentPropsWithoutRef, type KeyboardEvent, type ReactNode, type RefObject } from "react";
 import { cx } from "./cx.js";
 
 export interface SelectOption {
@@ -202,41 +202,39 @@ function shownOf(props: SelectProps, selected: readonly SelectOption[], placehol
   return selected.map((option, index) => <span key={option.value}>{index > 0 ? ", " : ""}{option.label}</span>);
 }
 
-interface SelectListProps {
-  id: string;
-  listId: string;
-  control: ListControl;
-  listRef: RefObject<HTMLUListElement | null>;
+interface ChoiceListProps extends ComponentPropsWithoutRef<"div"> {
+  multiple?: boolean | undefined;
+  listRef?: RefObject<HTMLDivElement | null>;
 }
 
-function SelectList({ id, listId, control, listRef }: Readonly<SelectListProps>) {
-  const { props, active, setActive, pick } = control;
-  const { options, label, labelledBy, multiple } = props;
-  const selectedValues = valuesOf(props);
-  return (
-    <ul ref={listRef} id={listId} role="listbox" aria-multiselectable={multiple || undefined} aria-label={label} aria-labelledby={labelledBy} className="elea-ui-select__list">
-      {options.map((option, index) => {
-        const selected = selectedValues.includes(option.value);
-        return (
-          <li
-            key={option.value}
-            id={`${id}-option-${index}`}
-            role="option"
-            aria-selected={selected}
-            aria-disabled={option.disabled || undefined}
-            className={cx("elea-ui-select__option", index === active && "elea-ui-select__option--active", selected && "elea-ui-select__option--selected", option.disabled && "elea-ui-select__option--disabled")}
-            onMouseEnter={() => { if (!option.disabled) setActive(index); }}
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => pick(option)}
-          >
-            {multiple && <span className={cx("elea-ui-select__check", selected && "elea-ui-select__check--on")} aria-hidden="true">{selected && <CheckIcon />}</span>}
-            <span className="elea-ui-select__label">{option.label}</span>
-            {!multiple && selected && <span className="elea-ui-select__mark" aria-hidden="true"><CheckIcon /></span>}
-          </li>
-        );
-      })}
-    </ul>
-  );
+/** The trigger owns focus and identifies the active row through aria-activedescendant. */
+export function ChoiceList({ multiple, listRef, ...props }: Readonly<ChoiceListProps>) {
+  return <div {...props} ref={listRef} role="listbox" aria-multiselectable={multiple || undefined} />;
+}
+
+interface ChoiceRowProps {
+  id: string;
+  label?: string | undefined;
+  disabled?: boolean | undefined;
+  active: boolean;
+  selected: boolean;
+  multiple?: boolean | undefined;
+  prefix?: ReactNode;
+  onActivate: () => void;
+  onPick: () => void;
+  children: ReactNode;
+}
+
+export function ChoiceRow({ id, label, disabled, active, selected, multiple, prefix, onActivate, onPick, children }: Readonly<ChoiceRowProps>) {
+  return <div id={id} role="option" tabIndex={-1} aria-label={label} aria-selected={selected} aria-disabled={disabled || undefined}
+    className={cx("elea-ui-select__option", active && "elea-ui-select__option--active",
+      selected && "elea-ui-select__option--selected", disabled && "elea-ui-select__option--disabled")}
+    onMouseEnter={() => { if (!disabled) onActivate(); }}
+    onMouseDown={event => event.preventDefault()} onClick={() => { if (!disabled) onPick(); }}>
+    {prefix ?? (multiple && <span className={cx("elea-ui-select__check", selected && "elea-ui-select__check--on")} aria-hidden="true">{selected && <CheckIcon />}</span>)}
+    <span className="elea-ui-select__label">{children}</span>
+    {!multiple && selected && <span className="elea-ui-select__mark" aria-hidden="true"><CheckIcon /></span>}
+  </div>;
 }
 
 /**
@@ -250,7 +248,7 @@ export function Select(props: Readonly<SelectProps>) {
   const id = givenId ?? generated;
   const listId = `${id}-listbox`;
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const selectedValues = valuesOf(props);
   const [active, setActive] = useState(() => Math.max(0, options.findIndex((option) => selectedValues.includes(option.value))));
@@ -298,7 +296,14 @@ export function Select(props: Readonly<SelectProps>) {
         <span className={cx("elea-ui-select__value", selectedOptions.length === 0 && "elea-ui-select__value--placeholder")}>{shownOf(props, selectedOptions, placeholder)}</span>
         <span className="elea-ui-select__chevron"><ChevronIcon /></span>
       </button>
-      {open && <SelectList id={id} listId={listId} control={control} listRef={listRef} />}
+      {open && <ChoiceList id={listId} listRef={listRef} aria-label={label} aria-labelledby={labelledBy}
+        multiple={props.multiple} className="elea-ui-select__list">
+        {options.map((option, index) => <ChoiceRow key={option.value} id={`${id}-option-${index}`}
+          active={index === active} selected={selectedValues.includes(option.value)} disabled={option.disabled}
+          multiple={props.multiple} onActivate={() => setActive(index)} onPick={() => pick(option)}>
+          {option.label}
+        </ChoiceRow>)}
+      </ChoiceList>}
       {name && selectedValues.map((value) => <input key={value} type="hidden" name={name} value={value} disabled={disabled} />)}
     </div>
   );

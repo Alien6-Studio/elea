@@ -222,7 +222,8 @@ import { colorFamilies } from "@alien6-studio/elea-tokens/palette";
 import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ContentView, ContentExcerpt, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { DropZone, cropRect } from "@alien6-studio/elea-media";
-import { Button, Calendar, Carousel, ColorPicker, Combobox, Dialog, Footer } from "@alien6-studio/elea-ui";
+import { ibanFormat, paymentCardFormat, sirenFormat, siretFormat } from "@alien6-studio/elea-ui/formats";
+import { Breadcrumb, Button, Calendar, CardNumberInput, Carousel, ColorPicker, Combobox, DateField, Dialog, Footer, IbanInput, Input, MultiSelect, SirenInput, SiretInput, Stepper, Textarea, StepperPanel, StepperSkeleton } from "@alien6-studio/elea-ui";
 import { JSDOM } from "jsdom";
 
 const require = createRequire(import.meta.url);
@@ -258,6 +259,12 @@ assert.equal(cropRect({ width: 200, height: 100 }, { width: 100, height: 100 }, 
 // UI primitives render on the server from the published entry point
 const button = renderToString(React.createElement(Button, null, "Save"));
 assert.ok(button.startsWith("<button") && button.includes("Save"), button);
+const wizard = { steps: [{ id: "write", label: "Write" }, { id: "review", label: "Review" }], current: "write", onSelect() {} };
+const stepper = renderToString(React.createElement(Stepper, { ...wizard, label: "Publication", linear: true }));
+assert.ok(stepper.includes('aria-current="step"') && stepper.includes("Review"), stepper);
+const panel = renderToString(React.createElement(StepperPanel, { ...wizard, previousLabel: "Back", nextLabel: "Continue" }));
+assert.ok(panel.includes("Continue"), panel);
+assert.ok(renderToString(React.createElement(StepperSkeleton, { steps: 2 })).includes('aria-hidden="true"'));
 const calendar = renderToString(React.createElement(Calendar, { label: "Publication date", labels: { previousMonth: "Previous", nextMonth: "Next" }, locale: "en-GB", value: "2028-02-29", onChange() {} }));
 assert.ok(calendar.includes('role="grid"') && calendar.includes("29 February 2028"), calendar);
 const carousel = renderToString(React.createElement(Carousel, {
@@ -269,6 +276,36 @@ const picker = renderToString(React.createElement(ColorPicker, { label: "Ink", h
 assert.ok(picker.includes('type="color"') && picker.includes("#345678") && picker.includes("Ink hex"), picker);
 const collection = renderToString(React.createElement(Combobox, { label: "Collection", emptyMessage: "No matches", options: [{ value: "ice", label: "Glaciers" }], value: "ice", onChange() {} }));
 assert.ok(collection.includes('role="combobox"') && collection.includes("Glaciers"), collection);
+const trail = renderToString(React.createElement(Breadcrumb, { label: "Location", overflowLabel: "Earlier pages", items: [{ id: "home", label: "Library", href: "/" }, { id: "proof", label: "Proof" }] }));
+assert.ok(trail.includes('aria-current="page"') && trail.includes('href="/"'), trail);
+const regions = renderToString(React.createElement(MultiSelect, { label: "Regions", labels: { empty: "No matches", remove: label => "Remove " + label }, options: [{ value: "eu", label: "Europe" }], value: ["eu"], onChange() {} }));
+assert.ok(regions.includes('role="combobox"') && regions.includes("Remove Europe"), regions);
+const dateField = renderToString(React.createElement(DateField, { name: "day", label: "Publication", labels: { day: "Day", month: "Month", year: "Year", openCalendar: "Choose date", previousMonth: "Previous", nextMonth: "Next" }, locale: "en-GB", value: "2028-02-29", onChange() {} }));
+assert.ok(dateField.includes('value="2028-02-29"') && dateField.includes("Choose date"), dateField);
+for (const [Component, format, raw, expected, sizes] of [
+  [IbanInput, ibanFormat, "gb82west12345698765432", "GB82 WEST 1234 5698 7654 32", [4, 4, 4, 4, 4, 2]],
+  [CardNumberInput, paymentCardFormat, "378282246310005", "3782 822463 10005", [4, 6, 5]],
+  [SirenInput, sirenFormat, "001234567", "001 234 567", [3, 3, 3]],
+  [SiretInput, siretFormat, "00123456700017", "001 234 567 00017", [3, 3, 3, 5]],
+]) {
+  const markup = renderToString(React.createElement(Input, { format, defaultValue: raw }));
+  assert.ok(markup.includes('value="' + expected + '"'), markup);
+  assert.equal(format.parse(expected), raw.toUpperCase());
+  const field = React.createElement(Component, { name: "identifier", label: "Identifier", defaultValue: raw,
+    segmentLabel: (index, total) => "Block " + (index + 1) + " of " + total });
+  const { window } = new JSDOM(renderToString(React.createElement("form", null, field)));
+  const form = window.document.forms[0];
+  const blocks = Array.from(form.querySelectorAll('input[type="text"]'));
+  assert.deepEqual(blocks.map(input => input.size), sizes);
+  assert.deepEqual(blocks.map(input => input.value), expected.split(" "));
+  assert.equal(blocks[0].getAttribute("aria-label"), "Block 1 of " + sizes.length);
+  assert.deepEqual([...new window.FormData(form)], [["identifier", raw.toUpperCase()]]);
+  window.close();
+}
+const masked = renderToString(React.createElement(Input, { defaultValue: "123456", mask: "### ###", counter: { max: 7 } }));
+assert.ok(masked.includes('value="123 456"') && masked.includes("7 / 7"), masked);
+const overLimit = renderToString(React.createElement(Textarea, { defaultValue: "Proof", counter: { max: 2 } }));
+assert.ok(overLimit.includes('aria-invalid="true"') && overLimit.includes("5 / 2"), overLimit);
 const footer = renderToString(React.createElement(Footer, { groups: [{ label: "Project", links: [{ label: "Docs", href: "/docs" }] }] }));
 assert.ok(footer.startsWith("<footer") && footer.includes('aria-label="Project"') && footer.includes('href="/docs"'), footer);
 
@@ -343,7 +380,14 @@ import { ContentEditor, ContentProvider, type ContentEditorProps, type ImageCrop
 import { tokens, type FlatToken } from "@alien6-studio/elea-tokens";
 import { createThemeProfile, editions, makeBrandTheme, type BrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ImageCropper, type CropState, type DropZoneProps } from "@alien6-studio/elea-media";
-import { Button, type ButtonProps, type LinkButtonProps } from "@alien6-studio/elea-ui";
+import { Button, IbanInput, type ButtonProps, type IdentifierInputProps, type InputProps, type LinkButtonProps } from "@alien6-studio/elea-ui";
+import { ibanFormat } from "@alien6-studio/elea-ui/formats";
+export const ibanInput: InputProps = { format: ibanFormat };
+const bankField: IdentifierInputProps = {
+  label: "IBAN", name: "iban", segmentLabel: (index, total) => "Block " + (index + 1) + " of " + total,
+  value: "DE89", onValueChange: (raw: string) => void raw,
+};
+export const bankAccount = createElement(IbanInput, bankField);
 
 const registry: BlockRegistry = defaultRegistry;
 const document: EleaDocument = parseDocument("text", { registry });
@@ -385,7 +429,9 @@ try {
     mkdirSync(consumer);
     writeFileSync(join(consumer, "package.json"), JSON.stringify({ private: true, type: "module" }));
     console.log(`\n== React ${version}`);
-    run("npm", [...install, `react@${version}`, `react-dom@${version}`, `@types/react@${types}`, `@types/react-dom@${domTypes}`, `jsdom@${devDependencies.jsdom}`, ...archives], consumer);
+    const withPhone = version.startsWith("19.");
+    const phoneDependency = withPhone ? [`libphonenumber-js@${devDependencies["libphonenumber-js"]}`] : [];
+    run("npm", [...install, ...phoneDependency, `react@${version}`, `react-dom@${version}`, `@types/react@${types}`, `@types/react-dom@${domTypes}`, `jsdom@${devDependencies.jsdom}`, ...archives], consumer);
     let exported = 0;
     for (const { manifest } of publishable) exported += checkExports(manifest.name, consumer);
     console.log(`exports verified: ${exported} declared targets shipped, LICENSE present in every archive`);
@@ -394,7 +440,40 @@ try {
     run("node", ["consume.mjs"], consumer);
     writeFileSync(join(consumer, "core.mjs"), CONSUMER_CORE);
     run("node", ["core.mjs"], consumer);
-    writeFileSync(join(consumer, "types.ts"), CONSUMER_TYPES);
+    if (withPhone) {
+      run("node", ["--input-type=module", "-e", `
+        import assert from "node:assert/strict";
+        import { createElement } from "react";
+        import { renderToString } from "react-dom/server";
+        import { JSDOM } from "jsdom";
+        import { getCountries, PhoneInput, phoneFormat, phoneToE164 } from "@alien6-studio/elea-ui/phone";
+        assert.ok(getCountries().includes("FR"));
+        assert.equal(phoneFormat("GB").format("02079460018"), "020 7946 0018");
+        assert.equal(phoneToE164("020 7946 0018", "GB"), "+442079460018");
+        const telephone = createElement(PhoneInput, { name: "tel", "aria-label": "Telephone", locale: "en",
+          country: "GB", onCountryChange() {}, value: "02079460018", onValueChange() {},
+          labels: { country: "Country", empty: "No countries" } });
+        const { window } = new JSDOM(renderToString(createElement("form", null, telephone)));
+        const form = window.document.forms[0];
+        assert.equal(form.querySelector('[role="combobox"]').getAttribute("aria-label"), "Country");
+        assert.equal(form.querySelector('input[type="tel"]').value, "020 7946 0018");
+        assert.deepEqual([...new window.FormData(form)], [["tel", "+442079460018"]]);
+        window.close();
+      `], consumer);
+    } else {
+      run("node", ["--input-type=module", "-e", `
+        import assert from "node:assert/strict";
+        assert.throws(() => import.meta.resolve("libphonenumber-js/min"), { code: "ERR_MODULE_NOT_FOUND" });
+      `], consumer);
+    }
+    const phoneTypes = withPhone ? `
+      import { PhoneInput, phoneFormat, type CountryCode, type PhoneInputProps } from "@alien6-studio/elea-ui/phone";
+      export const contactInput = (country: CountryCode): InputProps => ({ format: phoneFormat(country) });
+      const telephone: PhoneInputProps = { locale: "en", country: "GB", onCountryChange() {},
+        value: "", onValueChange() {}, labels: { country: "Country", empty: "No countries" } };
+      export const contactPhone = createElement(PhoneInput, telephone);
+    ` : "";
+    writeFileSync(join(consumer, "types.ts"), CONSUMER_TYPES + phoneTypes);
     writeFileSync(join(consumer, "tsconfig.json"), JSON.stringify({ compilerOptions: { module: "ESNext", moduleResolution: "bundler", target: "ES2022", jsx: "react-jsx", strict: true, noEmit: true, skipLibCheck: true, types: [] }, files: ["types.ts"] }));
     run(join(root, "node_modules", ".bin", "tsc"), ["-p", "tsconfig.json"], consumer);
     console.log("types verified: packaged declarations resolve under moduleResolution bundler");
