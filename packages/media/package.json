@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-media",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Elea media components for React: a drop zone for files and an image cropper with zoom and rotation, styled with Elea tokens only",
   "type": "module",
   "sideEffects": [
@@ -37,8 +37,8 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-tokens": "^0.0.0",
-    "@alien6-studio/elea-ui": "^0.0.0"
+    "@alien6-studio/elea-tokens": "^0.1.0",
+    "@alien6-studio/elea-ui": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",
