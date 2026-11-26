@@ -121,14 +121,14 @@ export function useCropMask(stage: Size, aspect: number | undefined, labels: { m
       action: actionFor(control, event.currentTarget) });
   }
   function move(event: PointerEvent<HTMLButtonElement>) {
-    if (disabled || !drag || drag.id !== event.pointerId) return;
+    if (disabled || drag?.id !== event.pointerId) return;
     event.stopPropagation();
     if (drag.selection.aspect !== ratio) return;
     const next = adjust(drag.action, bounds(drag.selection, stage), stage, ratio, event.clientX - drag.origin.x, event.clientY - drag.origin.y);
     setSelection(remember(next, stage, ratio));
   }
   function stop(event: PointerEvent<HTMLButtonElement>) {
-    if (!drag || drag.id !== event.pointerId) return;
+    if (drag?.id !== event.pointerId) return;
     event.stopPropagation();
     setDrag(null);
   }

@@ -119,18 +119,18 @@ export function Button(props: ButtonProps | LinkButtonProps) {
     "aria-label": loading && loadingLabel ? loadingLabel : rest["aria-label"],
   };
   if ("href" in rest && rest.href !== undefined) {
-    const { href, disabled, render, ...anchor } = rest as LinkButtonProps;
+    const { href, disabled, render, onClick, onAuxClick, ...anchor } = rest as LinkButtonProps;
     const inactive = disabled || loading;
     const link = {
       ...anchor,
       ...shared,
       ...pointerProps(effect, anchor.onPointerDown, anchor.onPointerMove, anchor.onPointerLeave),
-      children: content,
     };
     if (inactive) {
-      return <a {...link} role={anchor.role ?? "link"} aria-disabled tabIndex={-1} onClick={undefined} onAuxClick={undefined} />;
+      return <a {...link} role={anchor.role ?? "link"} aria-disabled tabIndex={-1}>{content}</a>;
     }
-    return render ? render({ ...link, href }) : <a {...link} href={href} />;
+    if (render) return render({ ...link, href, onClick, onAuxClick, children: content });
+    return <a {...link} href={href} onClick={onClick} onAuxClick={onAuxClick}>{content}</a>;
   }
   const { disabled, type = "button", ...button } = rest as ButtonProps;
   return (
