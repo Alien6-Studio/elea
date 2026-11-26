@@ -1,6 +1,6 @@
 import { lazy, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { brandPalettes } from "@alien6-studio/elea-tokens/brand";
-import { Accordion, Alert, Avatar, AvatarGroup, Badge, Button, Calendar, ColorPicker, Combobox, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
+import { Accordion, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, Button, Calendar, ColorPicker, Combobox, DateField, MultiSelect, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Stepper, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
 import { sitePath } from "../links.js";
 import { glacierImage, notebookTitle } from "../notebook.js";
 import { brandRoute, makeBrandTheme, type BrandTheme } from "./brandTheme.js";
@@ -12,6 +12,11 @@ import { AlertPage, AvatarPage, CardPage, CarouselPage, PlateCarousel, ProgressP
 import { AccordionPage, SliderPage, TablePage, ToastExampleIcon, ToastPage } from "./data.js";
 import { PopoverPage, SheetPage } from "./overlay.js";
 import { CalendarPage, collections, ColorPickerPage, ComboboxPage, monthLabels } from "./form-guides.js";
+import { StepperPage } from "./stepper.js";
+import { BreadcrumbPage } from "./BreadcrumbGuide.js";
+import { DateFieldPage } from "./DateFieldGuide.js";
+import { MultiSelectPage } from "./MultiSelectGuide.js";
+import { reviewSteps } from "./ReviewSteps.js";
 import "./catalog.css";
 
 const MediaPage = lazy(async () => ({ default: (await import("./media.js")).MediaPage }));
@@ -22,6 +27,7 @@ interface Entry {
   name: string;
   category: Category;
   summary: string;
+  components?: readonly string[];
   interaction: ReactNode;
   page: ComponentType<{ brand?: BrandTheme }>;
   workspace?: true;
@@ -43,7 +49,8 @@ const entries: Entry[] = [
   },
   {
     slug: "field", name: "Field, Input, Textarea", category: "Forms", page: FieldsPage,
-    summary: "Pair text inputs with labels, instructions and validation.",
+    components: ["SirenInput", "SiretInput", "IbanInput", "CardNumberInput", "PhoneInput"],
+    summary: "Label and validate text, IBANs, card numbers, SIREN, SIRET and international phone numbers.",
     interaction: <>Pass the field render props to the input so its label, help text and error are announced together. <kbd>Tab</kbd> moves between controls.</>,
     preview: <Field label="Article title">{(control) => <Input {...control} readOnly value={notebookTitle} />}</Field>,
   },
@@ -58,6 +65,20 @@ const entries: Entry[] = [
     summary: "Choose a date in a monthly calendar with optional booking limits.",
     interaction: <>Arrow keys move by day or week. <kbd>Page Up</kbd> and <kbd>Page Down</kbd> change the month. Press <kbd>Enter</kbd> or <kbd>Space</kbd> to select the focused date.</>,
     preview: <Calendar className="gallery__calendar" label="Publication date" labels={monthLabels} locale="en-GB" value="2028-02-29" onChange={() => {}} />,
+  },
+  {
+    slug: "date-field", name: "DateField", category: "Forms", page: DateFieldPage,
+    summary: "Type a date in local order or choose one from the calendar.",
+    interaction: <>Tab between the date segments and the calendar button. The calendar supports arrow keys and returns focus when you choose a day.</>,
+    preview: <DateField label="Publication date" value="2028-03-01" onChange={() => {}} locale="en-GB"
+      labels={{ ...monthLabels, day: "Day", month: "Month", year: "Year", openCalendar: "Open calendar" }} />,
+  },
+  {
+    slug: "multi-select", name: "MultiSelect", category: "Forms", page: MultiSelectPage,
+    summary: "Search a collection and select several values as removable tags.",
+    interaction: <>Type to filter and use the arrow keys to browse. Press <kbd>Enter</kbd> to toggle a result or <kbd>Backspace</kbd> in the empty search field to remove the last tag.</>,
+    preview: <MultiSelect label="Collections" options={collections} value={["ice"]} onChange={() => {}}
+      labels={{ empty: "No collections found", remove: name => "Remove " + name }} />,
   },
   {
     slug: "combobox", name: "Combobox", category: "Forms", page: ComboboxPage,
@@ -186,6 +207,20 @@ const entries: Entry[] = [
     preview: <Pagination page={2} pageCount={3} onPageChange={() => {}} labels={{ navigation: "Preview pages", previous: "Previous", next: "Next", page: "Page {page}" }} />,
   },
   {
+    slug: "breadcrumb", name: "Breadcrumb", category: "Navigation", page: BreadcrumbPage,
+    summary: "Trace a page through its ancestors and return to a parent.",
+    interaction: <>Tab to an ancestor and press <kbd>Enter</kbd> to follow it. On a long trail, expand the ellipsis to bring earlier links into the tab order.</>,
+    preview: <Breadcrumb label="Publication location" overflowLabel="Earlier pages" items={[
+      { id: "library", label: "Library", href: "#/ui" }, { id: "issue", label: "Spring issue" }
+    ]} />,
+  },
+  {
+    slug: "stepper", name: "Stepper", category: "Navigation", page: StepperPage,
+    summary: "Navigate the steps of a workflow and show which step is current.",
+    interaction: <>Use the arrow keys to focus available steps. <kbd>Home</kbd> and <kbd>End</kbd> move to the ends. Activate a step with <kbd>Enter</kbd> or <kbd>Space</kbd>. The current step is announced to screen readers.</>,
+    preview: <Stepper label="Proof sections" steps={reviewSteps} current="images" onSelect={() => {}} />,
+  },
+  {
     slug: "tabs", workspace: true, name: "Tabs", category: "Navigation", page: TabsPage,
     summary: "Move between related views within the same workspace.",
     interaction: <>Use <kbd>←</kbd> and <kbd>→</kbd> to switch views. <kbd>Home</kbd> and <kbd>End</kbd> activate the first and last enabled tabs. <kbd>Tab</kbd> moves from the selected tab into its panel.</>,
@@ -242,7 +277,7 @@ function Overview({ brand, motionSwitch }: { brand?: BrandTheme; motionSwitch: R
   const searchRef = useRef<HTMLInputElement>(null);
   const terms = query.trim().toLowerCase().split(/\s+/u);
   const filtered = entries.filter((entry) => {
-    const text = `${entry.name} ${entry.category} ${entry.summary} ${entry.slug}`.toLowerCase();
+    const text = `${entry.name} ${entry.category} ${entry.summary} ${entry.slug} ${entry.components?.join(" ") ?? ""}`.toLowerCase();
     return (category === "All" || entry.category === category) && terms.every((term) => text.includes(term));
   });
 
@@ -309,7 +344,11 @@ function ComponentGuide({ entry, brand, motionSwitch }: { entry: Entry; brand?: 
       </aside>
       <article className="catalog-guide">
         <div className="catalog-guide__bar">
-          <nav aria-label="Breadcrumb" className="catalog-breadcrumb"><a href={brandRoute("ui", brand)}>Components</a><span aria-hidden="true">/</span>{entry.category}</nav>
+          <Breadcrumb label="Breadcrumb" overflowLabel="Earlier pages" items={[
+            { id: "ui", label: "Components", href: brandRoute("ui", brand) },
+            { id: entry.category, label: entry.category },
+            { id: entry.slug, label: entry.name },
+          ]} />
           <div className="catalog-guide__actions">
             <a href={brandRoute("theme", brand)}>Edit theme</a>
             {motionSwitch}

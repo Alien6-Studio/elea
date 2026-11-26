@@ -6,9 +6,9 @@ test("the catalogue combines category and search and recovers from an empty resu
   await page.goto(catalog);
   const main = page.getByRole("main");
   const results = main.getByRole("status").filter({ hasText: /component guide/ });
-  await expect(results).toHaveText("29 component guides");
+  await expect(results).toHaveText("33 component guides");
   await main.getByRole("button", { name: "Forms" }).click();
-  await expect(results).toHaveText("8 component guides");
+  await expect(results).toHaveText("10 component guides");
   const search = main.getByRole("searchbox", { name: "Search components" });
   await search.fill("radio");
   await expect(results).toHaveText("1 component guide");
@@ -18,7 +18,7 @@ test("the catalogue combines category and search and recovers from an empty resu
   await main.getByRole("button", { name: "Clear filters" }).press("Enter");
   await expect(search).toBeFocused();
   await expect(search).toHaveValue("");
-  await expect(results).toHaveText("29 component guides");
+  await expect(results).toHaveText("33 component guides");
 });
 
 test("the mobile catalogue opens the Carousel guide and its three layouts fit the screen", async ({ page }) => {

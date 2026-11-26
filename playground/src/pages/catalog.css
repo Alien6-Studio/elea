@@ -3,7 +3,7 @@
   padding: var(--site-page-inset) 0 clamp(3rem, 7vw, 6rem);
 }
 .catalog { color: var(--elea-color-text-default); }
-:is(.catalog-examples a, .catalog-index a, .catalog-breadcrumb a, .catalog-guide__actions a, .catalog-guide__example, .catalog-filters button):focus-visible {
+:is(.catalog-examples a, .catalog-index a, .catalog-guide__actions a, .catalog-guide__example, .catalog-filters button):focus-visible {
   outline: 2px solid var(--elea-color-focus);
   outline-offset: 3px;
 }
@@ -163,9 +163,7 @@
 .catalog-index a[aria-current], .catalog-index a:hover { background: var(--elea-color-surface-muted); color: var(--elea-color-text-link); }
 .catalog-index__all, .catalog-index a[aria-current] { font-weight: 650; }
 .catalog-guide__bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1rem; margin-bottom: .8rem; }
-.catalog-breadcrumb { display: flex; gap: .55rem; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
 .catalog-motion .elea-toggle__label { font-size: var(--elea-font-size-sm); color: var(--elea-color-text-muted); }
-.catalog-breadcrumb a { color: inherit; }
 .catalog-guide__actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; font-size: var(--elea-font-size-sm); }
 .catalog-guide { min-width: 0; }
 :is(.catalog-demos, .gallery__preview)[data-elea-theme] {
@@ -189,6 +187,17 @@
   background: var(--elea-color-surface-subtle);
 }
 .demo__stage > * { max-width: 100%; min-width: 0; }
+.stepper-guide .demo__stage {
+  padding: var(--elea-space-6) 0;
+  border: 0;
+  background: transparent;
+}
+.stepper-guide .catalog-source {
+  border: 0;
+  border-block-start: 1px solid var(--elea-color-border-default);
+  border-radius: 0;
+}
+.stepper-guide .catalog-source summary { padding-inline-start: 0; }
 .catalog-button-effects,
 .catalog-button-radii {
   display: grid;
@@ -235,7 +244,7 @@
   .catalog-tools { margin-top: 1.5rem; }
 }
 @media (max-width: 36rem) {
-  .gallery { grid-template-columns: 1fr; }
+  .gallery { grid-template-columns: minmax(0, 1fr); }
   .catalog-search { width: 100%; }
   .catalog-filters button { padding-inline: .55rem; }
 }

@@ -1,3 +1,4 @@
+import { TextFieldExamples } from "./TextFieldExamples.js";
 import { useState, type CSSProperties } from "react";
 import type { ButtonLinkRenderProps } from "@alien6-studio/elea-ui";
 import { Badge, Button, Checkbox, ConfirmDialog, Dialog, DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogRoot, DialogTitle, Field, Footer, IconButton, Input, Menu, MenuContent, MenuGroup, MenuItem, MenuRoot, MenuSeparator, MenuTrigger, Pagination, RadioGroup, Select, Tab, TabList, TabPanel, Tabs, TabsRoot, Textarea, Toggle, Tooltip } from "@alien6-studio/elea-ui";
@@ -289,6 +290,7 @@ export function FieldsPage() {
           <Textarea placeholder="A longer text" aria-label="A longer text" />
         </div>
       </Demo>
+      <TextFieldExamples />
       <h2>Props of Field</h2>
       <PropsTable rows={[
         { name: "label", type: "ReactNode", description: "Visible label, linked to the control." },
@@ -298,6 +300,9 @@ export function FieldsPage() {
       ]} />
       <h2>Props of Input and Textarea</h2>
       <PropsTable rows={[
+        { name: "counter", type: "{ max: number }", description: "Show a live character count and flag overflow. Use native maxLength for a hard limit." },
+        { name: "format", type: "InputFormat (Input)", description: "Format bank details, business identifiers or telephone numbers while editing. The preset parses display text into a compact value." },
+        { name: "mask", type: "string (Input)", description: "Use # for a digit and literals for separators, such as ### ### ###." },
         { name: "invalid", type: "boolean", description: "Paints the error state and sets aria-invalid." },
         { name: "size", type: '"sm" | "md" | "lg"', description: "Height and type size of an Input." },
         { name: "ref", type: "Ref<HTMLInputElement | HTMLTextAreaElement>", description: "Reaches the native control, so register() from a form library spreads onto it." },
