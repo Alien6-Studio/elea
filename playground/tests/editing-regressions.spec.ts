@@ -116,26 +116,42 @@ test.describe("touch media controls", () => {
 
   test("images, videos and files have separate circular actions on touch", async ({ page }) => {
     await openReference(page);
-    for (const type of ["image", "video", "attachment"]) {
+    await page.getByRole("combobox", { name: "Language", exact: true }).tap();
+    await page.getByRole("option", { name: "English", exact: true }).tap();
+    const labels = {
+      image: ["Adjust crop", "Replace the image", "Remove the image"],
+      video: ["Change URL", "Remove the video"],
+      attachment: ["Replace attachment", "Remove attachment"],
+    };
+    for (const [type, names] of Object.entries(labels)) {
       const actions = editor(page).locator(`[data-elea-block-type="${type}"] .elea-media-block__actions`);
       await actions.scrollIntoViewIfNeeded();
       await expect(actions).toHaveCSS("opacity", "1");
       await expect(actions).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      const buttons = actions.getByRole("button");
-      await expect(buttons).toHaveCount(2);
-      for (const button of await buttons.all()) {
+      await expect(actions.getByRole("button")).toHaveCount(names.length);
+      let previousRight = -Infinity;
+      for (const name of names) {
+        const button = actions.getByRole("button", { name, exact: true });
+        await button.tap({ trial: true });
         await expect(button).toHaveCSS("border-radius", "50%");
         const disc = await button.evaluate(node => {
           const rect = node.getBoundingClientRect();
           const color = getComputedStyle(node).backgroundColor.match(/\d+/g)!.map(Number);
-          return { width: rect.width, height: rect.height, color };
+          return { left: rect.left, right: rect.right, width: rect.width, height: rect.height, color };
         });
+        expect(disc.left).toBeGreaterThan(previousRight);
+        previousRight = disc.right;
         expect(disc.width).toBe(disc.height);
         expect(disc.width).toBeGreaterThanOrEqual(44);
         expect(Math.min(...disc.color)).toBeGreaterThan(200);
         expect(Math.max(...disc.color) - Math.min(...disc.color)).toBeLessThan(24);
       }
     }
+    const image = editor(page).locator('[data-elea-block-type="image"]');
+    const adjust = image.getByRole("button", { name: "Adjust crop", exact: true });
+    await adjust.tap();
+    await image.getByRole("button", { name: "Cancel", exact: true }).tap();
+    await expect(adjust).toBeFocused();
   });
 });
 
