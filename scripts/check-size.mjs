@@ -4,7 +4,7 @@ import { gzipSync } from "node:zlib";
 
 // Size budget of every package, gzip bytes of the compiled JavaScript and CSS.
 // Raising a budget is a deliberate decision made in the same change as the growth.
-// tokens: 23.35 KB including the scoped shapes and explicit Button radii, the ELEA Sans declarations, scoped colour roles, local feedback aliases and the optional brand generator, three
+// tokens: 23.6 KB including the scoped shapes and opt-in profile Button radius scale, the ELEA Sans declarations, scoped colour roles, local feedback aliases and the optional brand generator, three
 // prebuilt CSS editions with paired palettes and control proportions and depth, motion tokens, the Tailwind v3 presets, the shadcn/ui aliases and the
 // cascade layer every sheet states, with scoped appearance color pairs and portal-compatible brand classes.
 // content: 28.1 KB including multiline Markdown lists, checklists with the state of their tasks, media links, the shared image URL policy
@@ -21,7 +21,7 @@ import { gzipSync } from "node:zlib";
 // the package can grow by components without any of them growing unnoticed. This includes scoped
 // control tokens, independent feedback fills and foregrounds with local host fallbacks,
 // the font on standalone controls and surfaces, and the optional Tabs presentations.
-const BUDGETS = { tokens: 23_350, content: 28_100, "content-viewer": 12_750, media: 8_000, "content-editor": 75_500 };
+const BUDGETS = { tokens: 23_600, content: 28_100, "content-viewer": 12_750, media: 8_000, "content-editor": 75_500 };
 const referencePaletteFiles = new Set(["palette.js", "palette.css", "color-themes.js"]);
 // The optional atlas includes nine sets of component shapes, thirteen colour schemes and five surface scales.
 const referencePaletteBudget = 6_225;

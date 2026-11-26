@@ -86,6 +86,30 @@ test("shape roles travel with a full profile and remain independent of its colou
   assert.ok(makeBrandTheme(colourOnly).css.includes("--elea-shape-action: initial;"));
 });
 
+test("profile Button radii scale the geometry of all nine actions, including ellipse axes and caps", () => {
+  const number = /\d+(?:\.\d+)?/g;
+  for (const id of profiles) {
+    const brand = createThemeProfile(id);
+    const { css } = makeBrandTheme({ ...brand, buttonRadiusScale: "profile" });
+    const action = colorThemes[id].shapes.action;
+    assert.ok(css.includes("--elea-button-radius-lg: var(--elea-shape-action);"), id);
+    assert.ok(css.includes(`--elea-shape-action: ${action};`), id);
+    for (const [size, factor] of Object.entries({ sm: 0.5, md: 0.75 })) {
+      const scaled = css.match(new RegExp(`--elea-button-radius-${size}: ([^;]+);`))?.[1];
+      assert.ok(scaled, id);
+      if (id === "ponctuation") {
+        assert.equal(scaled, `calc(min(${action}, 1.5em) * ${factor})`);
+      } else {
+        // The syntax and units must match; every coordinate, including a zero, scales in place.
+        assert.equal(scaled.replace(number, "#"), action.replace(number, "#"), id);
+        assert.deepEqual(scaled.match(number)!.map(Number), action.match(number)!.map(n => Number(n) * factor), id);
+      }
+    }
+    assert.equal(makeBrandTheme(brand).css, makeBrandTheme({ ...brand, buttonRadiusScale: "uniform" }).css, id);
+  }
+  assert.throws(() => makeBrandTheme({ ...editions.Precision, buttonRadiusScale: "invalid" as never }), /Button radius scale/);
+});
+
 test("a uniform brand or an explicit corner or radius resets all inherited shape roles", () => {
   const reserve = createThemeProfile("reserve");
   const { css: shaped } = makeBrandTheme(reserve);
@@ -97,7 +121,8 @@ test("a uniform brand or an explicit corner or radius resets all inherited shape
     editions.Precision, { ...reserve, shape: undefined }, { ...reserve, corner: "Round" as const },
     { ...reserve, radius: "10px" }, { ...reserve, radius: "0px" },
   ]) {
-    const { css } = makeBrandTheme(brand);
+    const { css } = makeBrandTheme({ ...brand, buttonRadiusScale: "profile" });
+    assert.equal(css, makeBrandTheme(brand).css);
     for (const role of ["action", "control", "surface", "indicator"]) {
       assert.ok(css.includes(`--elea-shape-${role}: initial;`), role);
     }

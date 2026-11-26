@@ -167,7 +167,7 @@ makeBrandTheme({ ...editions.Precision, seed: "#0f766e", accent: "#f2c94c", font
 ## Reference colours and semantic roles
 
 `makeBrandTheme(createThemeProfile("braise"))` from the brand entry point generates
-the same scoped CSS as selecting Braise in the Studio. Each profile
+scoped CSS for Braise. Each profile
 combines a colour scheme with a reading typeface, density, corner shape and
 control treatment. Inspect these choices on `colorThemes.braise.profile`.
 
@@ -181,6 +181,19 @@ The scalar radius tokens remain lengths for individual corners and calculations.
 A custom `radius`, a different `corner` preset, or `shape: undefined` returns
 the profile to its scalar radii. Changing only the colours preserves the shape.
 See the [runnable nine-profile example](../../docs/examples/theme-shapes.mjs).
+
+Button's explicit `sm`, `md` and `lg` radii are uniform by default. To preserve
+the profile’s curves at each step, opt in when generating the theme:
+
+```ts
+makeBrandTheme({ ...createThemeProfile("reserve"), buttonRadiusScale: "profile" }, "product");
+```
+
+Small and medium scale each axis and cap to 50% and 75% of its original value.
+Large uses the profile’s action shape. For a full capsule the smaller steps
+scale from a maximum of 1.5em. To supply your own shapes, set
+`--elea-button-radius-sm`, `--elea-button-radius-md` and `--elea-button-radius-lg`
+as complete CSS corner values on your scope or Button.
 
 Set `controls` to `"flat"`, `"raised"` or `"inset"` to change the treatment
 of buttons, fields and tabs independently of the palette.

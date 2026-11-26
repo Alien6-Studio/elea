@@ -52,6 +52,8 @@ export interface BrandTheme {
   corner: Corners;
   /** Profile-specific shapes apply at the profile's reference corner setting, unless a free radius is supplied. */
   shape?: ThemeProfileId | undefined;
+  /** Use uniform Button radii (default), or scale the active profile's action shape for sm, md and lg. */
+  buttonRadiusScale?: "uniform" | "profile" | undefined;
   typeface: Typeface;
   rhythm: Rhythm;
   /** The product's own interface font: any CSS font stack, `var(--font-inter), system-ui` included. */
@@ -290,8 +292,22 @@ function assignedAction(scale: readonly Swatch[], step: ColorStep, surfaces: Sur
   return { light: appearance(0), dark: appearance(1) };
 }
 
+function buttonRadii(action: string | undefined, corner: Corners, scale: "uniform" | "profile") {
+  if (scale !== "uniform" && scale !== "profile") throw new RangeError("Unknown Button radius scale");
+  if (action && scale === "profile") {
+    const scaled = (factor: number) => {
+      // A full radius is deliberately oversized. Bound it before scaling the two smaller capsules.
+      if (action.startsWith("var(--elea-radius-full")) return `calc(min(${action}, 1.5em) * ${factor})`;
+      return action.replace(/(\d+(?:\.\d+)?)(rem|%)/g, (_, length, unit) => `${Number(length) * factor}${unit}`);
+    };
+    return { sm: scaled(0.5), md: scaled(0.75), lg: "var(--elea-shape-action)" };
+  }
+  const uniform = action && corner === "Square" ? RADII.Soft : undefined;
+  return { sm: uniform?.[0], md: uniform?.[1], lg: uniform?.[3] };
+}
+
 /** Generate scoped CSS, colour roles and their tone scales. */
-export function makeBrandTheme({ edition, controls, seed, corner, shape, typeface, rhythm, font, accent, palette, radius }: BrandTheme, className = "elea-brand") {
+export function makeBrandTheme({ edition, controls, seed, corner, shape, buttonRadiusScale = "uniform", typeface, rhythm, font, accent, palette, radius }: BrandTheme, className = "elea-brand") {
   assertBrandTheme({ seed, corner, typeface, rhythm, font, accent }, className);
   if (edition !== undefined && !Object.hasOwn(editions, edition)) throw new RangeError("Unknown edition");
   if (palette !== undefined && (palette === null || typeof palette !== "object" || Array.isArray(palette))) throw new RangeError("Expected palette assignments");
@@ -319,9 +335,8 @@ export function makeBrandTheme({ edition, controls, seed, corner, shape, typefac
       return `  --elea-color-${role}-${swatch.step}: ${value};`;
     })),
     ...["sm", "md", "lg", "xl"].map((size, index) => `  --elea-radius-${size}: ${radii[index]};`),
-    // A square canvas can still carry shaped actions with an explicit, uniform corner.
-    ...Object.entries({ sm: RADII.Soft[0], md: RADII.Soft[1], lg: RADII.Soft[3] }).map(([size, value]) =>
-      `  --elea-button-radius-${size}: ${shapes && corner === "Square" ? value : "initial"};`),
+    ...Object.entries(buttonRadii(shapes?.action, corner, buttonRadiusScale)).map(([size, value]) =>
+      `  --elea-button-radius-${size}: ${value ?? "initial"};`),
     // Reset each role at the brand boundary so nested uniform themes use their scalar radii.
     ...(["action", "control", "surface", "indicator"] as const).map(role => `  --elea-shape-${role}: ${shapes?.[role] ?? "initial"};`),
     ...(font === undefined ? [] : [`  --elea-font-family-sans: ${font};`]),

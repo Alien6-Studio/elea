@@ -123,6 +123,31 @@ test("explicit Button radii are uniform and distinct within a square shape profi
   assert.equal(getComputedStyle(screen.getByRole("button", { name: "md" })).borderTopLeftRadius, "9px");
 });
 
+test("an opt-in profile scales the action corners and respects nested brand and host overrides", () => {
+  const brand = createThemeProfile("echappee");
+  const outer = makeBrandTheme({ ...brand, buttonRadiusScale: "profile" }, "outer").css;
+  const inner = makeBrandTheme(brand, "inner").css;
+  const sheet = readFileSync(new URL("css/button.css", import.meta.url), "utf8");
+  render(<div className="outer" data-testid="outer">
+    <style>{outer + inner + sheet}</style>
+    <Button radius="sm">Small</Button><Button radius="md">Medium</Button><Button radius="lg">Large</Button>
+    <div className="inner"><Button radius="sm">Uniform</Button></div>
+  </div>);
+  const corners = (name: string) => {
+    const style = getComputedStyle(screen.getByRole("button", { name }));
+    return [style.borderTopRightRadius, style.borderBottomLeftRadius];
+  };
+  assert.deepEqual(corners("Small"), ["9px", "0px"]);
+  assert.deepEqual(corners("Medium"), ["13.5px", "0px"]);
+  assert.deepEqual(corners("Large"), ["18px", "0px"]);
+  assert.deepEqual(corners("Uniform"), ["4px", "4px"]);
+  const scope = screen.getByTestId("outer");
+  scope.style.setProperty("--elea-control-radius", "5px");
+  scope.style.setProperty("--elea-shape-action", "8px 0px");
+  assert.deepEqual(corners("Medium"), ["5px", "5px"]);
+  assert.deepEqual(corners("Large"), ["0px", "0px"]);
+});
+
 test("Button publishes the pointer to the effects that follow it", () => {
   const seen: string[] = [];
   const handlers = { onPointerDown: () => seen.push("down"), onPointerMove: () => seen.push("move"), onPointerLeave: () => seen.push("leave") };

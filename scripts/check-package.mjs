@@ -331,7 +331,7 @@ import { parseDocument, defaultRegistry } from "@alien6-studio/elea-content";
 import { ContentView, type ContentViewProps } from "@alien6-studio/elea-content-viewer";
 import { ContentEditor, ContentProvider, type ContentEditorProps } from "@alien6-studio/elea-content-editor";
 import { tokens, type FlatToken } from "@alien6-studio/elea-tokens";
-import { editions, makeBrandTheme, type BrandTheme } from "@alien6-studio/elea-tokens/brand";
+import { createThemeProfile, editions, makeBrandTheme, type BrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ImageCropper, type CropState, type DropZoneProps } from "@alien6-studio/elea-media";
 import { Button, type ButtonProps } from "@alien6-studio/elea-ui";
 
@@ -345,10 +345,11 @@ const editorProps: ContentEditorProps = { blocks: document.blocks, onBlocksChang
 const first: FlatToken | undefined = tokens[0];
 const brand: BrandTheme = editions.Obsidian;
 const stylesheet: string = makeBrandTheme(brand).css;
+const profileStylesheet = makeBrandTheme({ ...createThemeProfile("reserve"), buttonRadiusScale: "profile" }).css;
 const zone: DropZoneProps = { label: "Add", onFiles: () => {} };
 const crop: CropState = { zoom: 1, rotation: 0, offset: { x: 0, y: 0 } };
 const buttonProps: ButtonProps = { children: "Save", variant: "primary" };
-export { CoreContentView, withoutSanitizer, ContentView, ContentEditor, ContentProvider, ImageCropper, Button, viewerProps, editorProps, block, first, stylesheet, zone, crop, buttonProps };
+export { CoreContentView, withoutSanitizer, ContentView, ContentEditor, ContentProvider, ImageCropper, Button, viewerProps, editorProps, block, first, stylesheet, profileStylesheet, zone, crop, buttonProps };
 `;
 
 try {
