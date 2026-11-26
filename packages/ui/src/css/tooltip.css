@@ -14,7 +14,7 @@
   background: var(--elea-color-surface-inverse);
   color: var(--elea-color-text-inverse);
   border: 0;
-  border-radius: var(--elea-radius-md);
+  border-radius: var(--elea-shape-surface, var(--elea-radius-md));
   font-size: var(--elea-font-size-xs);
   line-height: var(--elea-font-leading-normal);
   white-space: normal;

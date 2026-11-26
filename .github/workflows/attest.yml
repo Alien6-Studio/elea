@@ -118,7 +118,7 @@ jobs:
       - name: Verify the signed receipt and retain only public evidence
         run: |-
           "$RUNNER_TEMP/attest" verify proof/receipt.yaml --recompute --require signature,recompute,success --trust-store .github/attest/trust --offline --format json > proof/verification.json
-          sha256sum artifacts/* > proof/SHA256SUMS
+          find artifacts -type f -print0 | sort -z | xargs -0 sha256sum > proof/SHA256SUMS
           cp .github/attest/trust/*.pub proof/
           tar -czf qualification-evidence.tar.gz proof/ artifacts/
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9

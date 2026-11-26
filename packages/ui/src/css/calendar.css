@@ -15,7 +15,7 @@
 .elea-calendar__step, .elea-calendar__day {
   box-sizing: border-box;
   border: 0;
-  border-radius: var(--elea-control-radius, var(--elea-radius-md));
+  border-radius: var(--elea-control-radius, var(--elea-shape-control, var(--elea-radius-md)));
   padding: 0;
   background: transparent;
   color: inherit;
@@ -27,7 +27,7 @@
 .elea-calendar__step:dir(rtl) svg { scale: -1 1; }
 .elea-calendar button:where(:enabled):hover { background: var(--elea-color-surface-muted); }
 .elea-calendar button:disabled { color: var(--elea-color-text-subtle); opacity: .55; cursor: not-allowed; }
-.elea-calendar [aria-selected="true"] .elea-calendar__day { background: var(--elea-color-action-primary); color: var(--elea-color-action-primary-text); font-weight: var(--elea-font-weight-semibold); }
+.elea-calendar [aria-selected="true"] .elea-calendar__day { border-radius: var(--elea-control-radius, var(--elea-shape-indicator, var(--elea-radius-md))); background: var(--elea-color-action-primary); color: var(--elea-color-action-primary-text); font-weight: var(--elea-font-weight-semibold); }
 .elea-calendar__day[aria-current="date"]::after { content: ""; position: absolute; inset-block-end: var(--elea-space-1); inset-inline-start: calc(50% - 2px); inline-size: 4px; block-size: 4px; border-radius: 50%; background: currentColor; }
 .elea-calendar button:focus-visible { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: -2px; }
 .elea-calendar [aria-selected="true"] button:focus-visible { outline-color: var(--elea-color-action-primary-text); }

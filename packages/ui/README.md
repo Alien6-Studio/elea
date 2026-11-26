@@ -279,8 +279,9 @@ rules in force. Use border-box on controls to align their outer heights.
 
 | Properties | Controls |
 | --- | --- |
+| `--elea-shape-action`, `--elea-shape-control`, `--elea-shape-surface`, `--elea-shape-indicator` | Optional theme profiles for buttons, fields, panels and compact selections. Accept CSS `border-radius` shorthands, including elliptical corners. |
 | `--elea-control-height`, `--elea-control-padding-inline`, `--elea-control-font-size` | Button, IconButton, Input, Select trigger, and tab button. Textarea takes inline padding and font size, with `--elea-textarea-min-height` for its block size. |
-| `--elea-control-radius`, `--elea-control-border` | Radius for actions, fields, the Select trigger and segmented tabs. Border color for outline actions, fields and the Select trigger. An explicit Button `radius` prop takes precedence. |
+| `--elea-control-radius`, `--elea-control-border` | Radius for actions, fields, the Select trigger and segmented tabs. Border color for outline actions, fields and the Select trigger. A host radius overrides the theme shape. A Button with an explicit `radius="md"` uses that host radius or the medium radius token. Other explicit Button radii use their own steps. |
 | `--elea-control-surface`, `--elea-control-outline-surface`, `--elea-control-hover-surface` | Field and alternate tab track fill, outline action fill, and hover color for enabled fields, outline actions and tabs. Filled action colors still follow their semantic variant. |
 | `--elea-field-border-width` | Border width on Input, Textarea and the Select trigger. Accepts the CSS border-width shorthand. |
 | `--elea-control-edge`, `--elea-control-press-shadow` | A resting box shadow on actions and fields and a selected segment. The press shadow applies to primary, secondary, tertiary and outline buttons. An explicit Button shadow takes precedence at rest. |

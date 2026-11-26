@@ -15,7 +15,7 @@ export function applyColorTheme(brand: BrandTheme, id: ColorThemeId): BrandTheme
 /** Create a complete brand from a named profile. */
 export function createThemeProfile(id: ThemeProfileId): BrandTheme {
   const { profile, colours } = colorThemes[id];
-  return applyColorTheme({ ...profile, seed: colours.primary }, id);
+  return applyColorTheme({ ...profile, shape: id, seed: colours.primary }, id);
 }
 
 /** Identify a complete scheme for selection and compact sharing, including its role sources. */

@@ -17,7 +17,7 @@
   background: var(--elea-control-surface, color-mix(in srgb, var(--elea-color-surface-default) var(--elea-_control-fill, 100%), var(--elea-color-surface-subtle)));
   border: solid var(--elea-control-border, var(--elea-color-border-strong));
   border-width: var(--elea-field-border-width, var(--elea-_field-border-width, 1px));
-  border-radius: var(--elea-control-radius, var(--elea-radius-md));
+  border-radius: var(--elea-control-radius, var(--elea-shape-control, var(--elea-radius-md)));
   padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-3));
   transition: border-color var(--elea-motion-duration-base) var(--elea-motion-easing-standard), box-shadow var(--elea-motion-duration-base) var(--elea-motion-easing-standard);
   box-shadow: var(--elea-control-edge, var(--elea-_control-edge, none));

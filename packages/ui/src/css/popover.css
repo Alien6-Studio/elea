@@ -16,7 +16,7 @@
   background: var(--elea-color-surface-default);
   color: var(--elea-color-text-default);
   border: 1px solid var(--elea-color-border-default);
-  border-radius: var(--elea-radius-lg);
+  border-radius: var(--elea-shape-surface, var(--elea-radius-lg));
   box-shadow: var(--elea-shadow-md);
   font-size: var(--elea-font-size-sm);
   line-height: var(--elea-font-leading-normal);

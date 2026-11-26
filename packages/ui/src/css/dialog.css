@@ -10,7 +10,7 @@
   overflow: auto;
   background: var(--elea-color-surface-default);
   color: var(--elea-color-text-default);
-  border-radius: var(--elea-radius-xl);
+  border-radius: var(--elea-shape-surface, var(--elea-radius-xl));
   box-shadow: var(--elea-shadow-md);
   padding: var(--elea-space-6);
   outline: none;

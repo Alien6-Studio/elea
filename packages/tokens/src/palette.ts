@@ -102,11 +102,13 @@ export type SurfaceFamily = keyof typeof surfaceFamilies;
 
 export const defaultTertiaryFamily = "Violet" satisfies ColorFamily;
 
-/** Key colours for complete schemes. Each hex is tone 500 of its own role. */
+/** Key colours for each scheme and role-based corner shapes for the complete profiles. */
 export const colorThemes = {
   rasance: {
     name: "Rasance", style: "Carbon & ivory", neutral: "Gray",
     profile: { controls: "inset", typeface: "Sans", rhythm: "Balanced", corner: "Square" },
+    // Opposing shallow edges suggest the ridges picked out by raking light.
+    shapes: { action: "0.875rem 0 / 0.25rem 0", control: "0", surface: "0", indicator: "0.625rem 0 / 0.1875rem 0" },
     colours: {
       primary: "#181817", secondary: "#d3cec1", tertiary: "#686963",
       success: "#546752", info: "#526571", warning: "#936735", danger: "#914444",
@@ -115,6 +117,11 @@ export const colorThemes = {
   reserve: {
     name: "Réserve", style: "Ultramarine & chalk", neutral: "Gray",
     profile: { controls: "flat", typeface: "Sans", rhythm: "Compact", corner: "Square" },
+    // Cap the spread of the imprint on wide actions; keep its four unequal arcs on small marks.
+    shapes: {
+      action: "min(30%, 3.75rem) min(17%, 2.125rem) min(29%, 3.625rem) min(21%, 2.625rem) / 48% 40% 54% 38%",
+      control: "0", surface: "0.1875rem", indicator: "var(--elea-shape-action)",
+    },
     colours: {
       primary: "#2926bf", secondary: "#a6afd9", tertiary: "#504878",
       success: "#447665", info: "#4765a4", warning: "#a07430", danger: "#a24e5a",
@@ -123,6 +130,8 @@ export const colorThemes = {
   braise: {
     name: "Braise", style: "Madder & apricot", neutral: "Gray",
     profile: { controls: "raised", typeface: "Serif", rhythm: "Airy", corner: "Soft" },
+    // Broad horizontal curves soften the edges of stacked fields of colour.
+    shapes: { action: "0.875rem / 0.375rem", control: "0.5rem / 0.25rem", surface: "1.5rem / 0.625rem", indicator: "0.625rem / 0.25rem" },
     colours: {
       primary: "#f0aa70", secondary: "#873f47", tertiary: "#d39a99",
       success: "#61795d", info: "#657a93", warning: "#aa7938", danger: "#a64051",
@@ -131,6 +140,8 @@ export const colorThemes = {
   "hors-champ": {
     name: "Hors champ", style: "Sky & petrol", neutral: "Gray",
     profile: { controls: "flat", typeface: "Sans", rhythm: "Airy", corner: "Soft" },
+    // A photographic frame contains a small sign with eased corners.
+    shapes: { action: "0.1875rem", control: "0.125rem", surface: "0", indicator: "0.1875rem" },
     colours: {
       primary: "#344d54", secondary: "#aec8d7", tertiary: "#ba482c",
       success: "#4e7567", info: "#547791", warning: "#a27944", danger: "#a64350",
@@ -139,6 +150,8 @@ export const colorThemes = {
   "hors-registre": {
     name: "Hors registre", style: "Tangerine & hot pink", neutral: "Gray",
     profile: { controls: "raised", typeface: "Sans", rhythm: "Balanced", corner: "Square" },
+    // Offset opposing corners repeat through the inked forms.
+    shapes: { action: "0.125rem 0.875rem", control: "0.125rem 0.375rem", surface: "0 1rem", indicator: "0 0.625rem" },
     colours: {
       primary: "#ee762e", secondary: "#d64a85", tertiary: "#248d96",
       success: "#39734c", info: "#316f85", warning: "#9c6b20", danger: "#ac3549",
@@ -147,6 +160,8 @@ export const colorThemes = {
   echappee: {
     name: "Échappée", style: "Signal red & stencil black", neutral: "Gray",
     profile: { controls: "flat", typeface: "Sans", rhythm: "Compact", corner: "Soft" },
+    // The rounded balloon tapers to an attachment at its lower left.
+    shapes: { action: "1.125rem 1.125rem 1.125rem 0", control: "0.375rem 0.375rem 0.375rem 0", surface: "0.875rem 0.875rem 0.875rem 0", indicator: "0.875rem 0.875rem 0.875rem 0" },
     colours: {
       primary: "#c42832", secondary: "#272728", tertiary: "#c4bfb6",
       success: "#52715a", info: "#526d83", warning: "#977137", danger: "#902637",
@@ -155,6 +170,8 @@ export const colorThemes = {
   "grand-bain": {
     name: "Grand bain", style: "Pool blue & stucco pink", neutral: "Gray",
     profile: { controls: "flat", typeface: "Sans", rhythm: "Airy", corner: "Square" },
+    // A level base anchors the raised arc of the water.
+    shapes: { action: "1.125rem 1.125rem 0 0 / 0.625rem 0.625rem 0 0", control: "0.375rem 0.375rem 0 0", surface: "1.75rem 1.75rem 0 0 / 0.875rem 0.875rem 0 0", indicator: "0.75rem 0.75rem 0 0" },
     colours: {
       primary: "#298ac4", secondary: "#dcaa9c", tertiary: "#dfbc52",
       success: "#488068", info: "#405e9d", warning: "#a87726", danger: "#a74847",
@@ -163,6 +180,8 @@ export const colorThemes = {
   ponctuation: {
     name: "Ponctuation", style: "Pumpkin yellow & jet black", neutral: "Gray",
     profile: { controls: "inset", typeface: "Mono", rhythm: "Compact", corner: "Round" },
+    // Round dots grow into capsules as their labels grow.
+    shapes: { action: "var(--elea-radius-full, 9999px)", control: "0.875rem", surface: "1.5rem", indicator: "var(--elea-shape-action)" },
     colours: {
       primary: "#edbb28", secondary: "#232321", tertiary: "#739397",
       success: "#53734d", info: "#456f7e", warning: "#a16c21", danger: "#a34a40",
@@ -171,6 +190,8 @@ export const colorThemes = {
   lisiere: {
     name: "Lisière", style: "Bay green & fabric pink", neutral: "Gray",
     profile: { controls: "inset", typeface: "Serif", rhythm: "Airy", corner: "Soft" },
+    // Unequal banks bend around a horizontal ribbon.
+    shapes: { action: "1.5rem 0.375rem 1rem 0.75rem / 0.75rem 0.5rem 1rem 0.375rem", control: "0.625rem 0.25rem 0.5rem 0.25rem", surface: "2rem 0.5rem 1.5rem 1rem / 1rem 0.75rem 1.5rem 0.5rem", indicator: "var(--elea-shape-action)" },
     colours: {
       primary: "#226f68", secondary: "#ef65a5", tertiary: "#354e38",
       success: "#537649", info: "#426e91", warning: "#946e31", danger: "#a34258",

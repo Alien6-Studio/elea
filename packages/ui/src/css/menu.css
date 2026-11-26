@@ -9,7 +9,7 @@
   padding: var(--elea-space-1);
   background: var(--elea-color-surface-default);
   border: 1px solid var(--elea-color-border-default);
-  border-radius: var(--elea-radius-lg);
+  border-radius: var(--elea-shape-surface, var(--elea-radius-lg));
   box-shadow: var(--elea-shadow-md);
   --elea-enter-shrink: 0.08;
   animation: elea-enter var(--elea-motion-duration-base) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
@@ -23,7 +23,7 @@
   width: 100%;
   padding: calc(var(--elea-space-2) + var(--elea-_density, 0px)) var(--elea-space-3);
   border: 0;
-  border-radius: var(--elea-radius-md);
+  border-radius: var(--elea-shape-control, var(--elea-radius-md));
   background: transparent;
   color: var(--elea-color-text-default);
   font: inherit;

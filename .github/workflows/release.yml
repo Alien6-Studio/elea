@@ -99,6 +99,11 @@ jobs:
         with:
           node-version: "24"
           registry-url: https://registry.npmjs.org
+      - name: Prepare versioned documentation and integrator notes
+        if: steps.existing.outputs.exists != 'true'
+        env:
+          RELEASE_TAG: ${{ inputs.version || github.ref_name }}
+        run: node scripts/release-notes.mjs "$RELEASE_TAG" > "$RUNNER_TEMP/elea-release.md"
       - name: Publish every workspace using the configured npm trusted publisher
         env:
           RELEASE_TAG: ${{ inputs.version || github.ref_name }}
@@ -144,4 +149,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.version || github.ref_name }}
-        run: gh release create "$RELEASE_TAG" artifacts/*.tgz proof/receipt.yaml proof/verification.json proof/SHA256SUMS proof/*.pub qualification-evidence.tar.gz --verify-tag --title "$RELEASE_TAG" --notes-from-tag
+        run: gh release create "$RELEASE_TAG" artifacts/*.tgz proof/receipt.yaml proof/verification.json proof/SHA256SUMS proof/*.pub qualification-evidence.tar.gz --verify-tag --title "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/elea-release.md"

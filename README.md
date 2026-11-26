@@ -60,9 +60,11 @@ the packages built from the commit under review.
 
 ## Release and verification
 
-See [docs/release.md](docs/release.md): signed `vX.Y.Z` tags, qualification
-with Continuum Attest, npm trusted publishing with provenance, immutable
-releases.
+Each [package release](https://github.com/Alien6-Studio/elea/releases) links
+to the package guides and runnable examples at its signed tag. Read the
+[changelog](CHANGELOG.md) for upgrade instructions and the
+[release guide](docs/release.md) to reproduce the [theme shapes example](docs/examples/theme-shapes.mjs)
+and verify the published archives.
 
 ## Contributing and security
 

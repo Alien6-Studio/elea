@@ -48,8 +48,8 @@ export function motionAttribute(motion: boolean | undefined): "on" | "off" | und
 export type ButtonProps = ButtonBaseProps & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className"> & { className?: string | undefined; href?: undefined };
 export type LinkButtonProps = ButtonBaseProps & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className"> & { className?: string | undefined; href: string; disabled?: boolean | undefined };
 
-function look({ size = "md", radius = "md", shadow = "none", effect = "lift" }: ButtonLookProps): string {
-  return cx(`elea-button--${size}`, radius !== "md" && `elea-button--radius-${radius}`, shadow !== "none" && `elea-button--shadow-${shadow}`, effect !== "lift" && `elea-button--fx-${effect}`);
+function look({ size = "md", radius, shadow = "none", effect = "lift" }: ButtonLookProps): string {
+  return cx(`elea-button--${size}`, radius && `elea-button--radius-${radius}`, shadow !== "none" && `elea-button--shadow-${shadow}`, effect !== "lift" && `elea-button--fx-${effect}`);
 }
 
 function classes({ variant = "primary", loading, fullWidth, className, ...rest }: ButtonBaseProps & { className?: string | undefined }): string {

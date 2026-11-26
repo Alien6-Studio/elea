@@ -18,11 +18,11 @@
     "build:packages": "npm run build -w packages/tokens && npm run build -w packages/content && npm run build -w packages/content-viewer && npm run build -w packages/ui && npm run build -w packages/media && npm run build -w packages/content-editor",
     "build": "npm run build:packages",
     "lint": "npm run lint -w packages/tokens && npm run lint -w packages/content && npm run lint -w packages/content-viewer && npm run lint -w packages/media && npm run lint -w packages/ui && npm run lint -w packages/content-editor",
-    "test": "node --import tsx --test 'packages/*/src/**/*.test.ts' 'packages/*/src/**/*.test.tsx'",
+    "test": "node --import tsx --test 'packages/*/src/**/*.test.ts' 'packages/*/src/**/*.test.tsx' scripts/release-notes.test.mjs",
     "test:coverage": "c8 --check-coverage --lines 85 --statements 85 --functions 95 --branches 70 --exclude '**/dist/**' --exclude '**/*.test.*' --exclude '**/scripts/**' --exclude '**/src/test/**' --reporter=lcov --reporter=text npm test",
     "test:package": "node scripts/check-package.mjs",
     "pack": "npm pack -w packages/tokens -w packages/content -w packages/content-viewer -w packages/media -w packages/content-editor -w packages/ui --pack-destination artifacts",
-    "check": "npm run build && npm run check:size && npm run lint && npm run test:coverage && npm run test:package --",
+    "check": "npm run build && node docs/examples/theme-shapes.mjs && npm run check:size && npm run lint && npm run test:coverage && npm run test:package --",
     "check:size": "node scripts/check-size.mjs"
   },
   "devDependencies": {

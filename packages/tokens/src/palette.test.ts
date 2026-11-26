@@ -59,6 +59,7 @@ test("each theme profile exports its colours, typography, spacing and geometry t
     assert.equal(brand.typeface, profile.typeface);
     assert.equal(brand.rhythm, profile.rhythm);
     assert.equal(brand.corner, profile.corner);
+    assert.equal(brand.shape, id);
     assert.equal(brand.controls, profile.controls);
     assert.equal(brand.edition, undefined);
     assert.equal(matchingColorTheme(brand), id);
@@ -67,6 +68,37 @@ test("each theme profile exports its colours, typography, spacing and geometry t
     const tabStyle = { inset: "rail", flat: "underline", raised: "segmented" }[profile.controls];
     assert.ok(css.includes("--elea-_tabs-presentation: " + tabStyle));
     assert.ok(css.includes("--elea-font-family-content: var(--elea-font-family-" + profile.typeface.toLowerCase() + ")"));
+  }
+});
+
+test("shape roles travel with a full profile and remain independent of its colours", () => {
+  for (const id of profiles) {
+    const profile = createThemeProfile(id);
+    const recoloured = applyColorTheme(profile, id === "braise" ? "reserve" : "braise");
+    assert.equal(recoloured.shape, id);
+    const { css } = makeBrandTheme(recoloured);
+    for (const [role, shape] of Object.entries(colorThemes[id].shapes)) {
+      assert.ok(css.includes(`--elea-shape-${role}: ${shape};`), id + " " + role);
+    }
+  }
+  const colourOnly = applyColorTheme(editions.Editorial, "reserve");
+  assert.equal(colourOnly.shape, undefined);
+  assert.ok(makeBrandTheme(colourOnly).css.includes("--elea-shape-action: initial;"));
+});
+
+test("a uniform brand or an explicit corner or radius resets all inherited shape roles", () => {
+  const reserve = createThemeProfile("reserve");
+  for (const brand of [
+    editions.Precision, { ...reserve, shape: undefined }, { ...reserve, corner: "Round" as const },
+    { ...reserve, radius: "10px" }, { ...reserve, radius: "0px" },
+  ]) {
+    const { css } = makeBrandTheme(brand);
+    for (const role of ["action", "control", "surface", "indicator"]) {
+      assert.ok(css.includes(`--elea-shape-${role}: initial;`), role);
+    }
+  }
+  for (const shape of ["fjord", "__proto__", "constructor", "", null, 3]) {
+    assert.throws(() => makeBrandTheme({ ...reserve, shape: shape as never }), /Unknown shape profile/);
   }
 });
 

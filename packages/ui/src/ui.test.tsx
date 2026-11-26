@@ -10,6 +10,7 @@ import axe from "axe-core";
 import { Badge } from "./Badge.js";
 import { Select } from "./Select.js";
 import { Button, IconButton } from "./Button.js";
+import { Card, CardImage } from "./Card.js";
 import { Checkbox, Toggle } from "./Checkbox.js";
 import { cx } from "./cx.js";
 import { ConfirmDialog, Dialog } from "./Dialog.js";
@@ -63,9 +64,46 @@ test("Button takes five sizes, a radius, a shadow and an effect", () => {
   const { rerender } = render(<Button size="xs" radius="full" shadow="md" effect="scale">Go</Button>);
   assert.equal(screen.getByRole("button", { name: "Go" }).className, "elea-button elea-button--primary elea-button--xs elea-button--radius-full elea-button--shadow-md elea-button--fx-scale");
   rerender(<Button size="xl" radius="md" shadow="none" effect="lift">Go</Button>);
-  assert.equal(screen.getByRole("button", { name: "Go" }).className, "elea-button elea-button--primary elea-button--xl");
+  assert.equal(screen.getByRole("button", { name: "Go" }).className, "elea-button elea-button--primary elea-button--xl elea-button--radius-md");
   rerender(<IconButton label="Close" size="xl" radius="none" shadow="sm" effect="push"><span>x</span></IconButton>);
   assert.equal(screen.getByRole("button", { name: "Close" }).className, "elea-button elea-button--icon elea-button--ghost elea-button--xl elea-button--radius-none elea-button--shadow-sm elea-button--fx-push");
+});
+
+test("scoped shapes distinguish actions, controls, surfaces and selections", () => {
+  const sheets = ["button", "field", "card", "checkbox"].map(name =>
+    readFileSync(new URL(`css/${name}.css`, import.meta.url), "utf8"));
+  const { container } = render(<>
+    <style>{sheets.join("\n")}</style>
+    <Button>Publish</Button><Button radius="md">Save</Button><Button radius="sm">Back</Button>
+    <Input aria-label="Title" /><Checkbox label="Include image" checked readOnly />
+    <Card padding="none"><CardImage alt="Cover" /></Card>
+  </>);
+  container.style.setProperty("--elea-radius-sm", "2px");
+  container.style.setProperty("--elea-radius-md", "4px");
+  const publish = screen.getByRole("button", { name: "Publish" });
+  const save = screen.getByRole("button", { name: "Save" });
+  const back = screen.getByRole("button", { name: "Back" });
+  const input = screen.getByRole("textbox");
+  const image = screen.getByRole("img");
+  const check = container.querySelector(".elea-checkbox__box")!;
+  const top = (element: Element) => getComputedStyle(element).borderTopRightRadius;
+  assert.equal(top(publish), "4px");
+  container.style.setProperty("--elea-shape-action", "3px 12px 3px 2px");
+  container.style.setProperty("--elea-shape-control", "5px");
+  container.style.setProperty("--elea-shape-surface", "1px 20px 4px 2px / 1px 8px 4px 2px");
+  container.style.setProperty("--elea-shape-indicator", "9px");
+  assert.equal(top(publish), "12px");
+  assert.equal(top(save), "4px");
+  assert.equal(top(input), "5px");
+  assert.equal(top(check), "9px");
+  assert.equal(top(image.parentElement!), "20px 8px");
+  assert.equal(top(image), "20px 8px");
+  assert.equal(getComputedStyle(image).borderBottomLeftRadius, "0px");
+  container.style.setProperty("--elea-control-radius", "6px");
+  assert.equal(top(publish), "6px");
+  assert.equal(top(save), "6px");
+  assert.equal(top(back), "2px");
+  assert.equal(top(input), "6px");
 });
 
 test("Button publishes the pointer to the effects that follow it", () => {

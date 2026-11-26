@@ -17,7 +17,7 @@
   gap: var(--elea-space-2);
   padding: var(--elea-space-2) var(--elea-space-3);
   border: 1px solid var(--elea-color-border-default);
-  border-radius: var(--elea-radius-md);
+  border-radius: var(--elea-shape-control, var(--elea-radius-md));
   background: var(--elea-color-surface-default);
   cursor: pointer;
   transition: var(--elea-motion-duration-base) var(--elea-motion-easing-standard);

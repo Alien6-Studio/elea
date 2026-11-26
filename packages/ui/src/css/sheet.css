@@ -23,7 +23,7 @@
 .elea-sheet--start { --elea-sheet-x: -100%; border-inline-end: 1px solid var(--elea-color-border-default); }
 .elea-sheet--end { --elea-sheet-x: 100%; border-inline-start: 1px solid var(--elea-color-border-default); }
 .elea-sheet--top { --elea-sheet-y: -100%; border-block-end: 1px solid var(--elea-color-border-default); }
-.elea-sheet--bottom { --elea-sheet-y: 100%; border-block-start: 1px solid var(--elea-color-border-default); border-start-start-radius: var(--elea-radius-xl); border-start-end-radius: var(--elea-radius-xl); }
+.elea-sheet--bottom { --elea-sheet-y: 100%; border-block-start: 1px solid var(--elea-color-border-default); border-radius: var(--elea-shape-surface, var(--elea-radius-xl)); border-end-start-radius: 0; border-end-end-radius: 0; }
 :is(.elea-sheet--start, .elea-sheet--end) { inline-size: var(--elea-sheet-size); block-size: 100%; }
 :is(.elea-sheet--top, .elea-sheet--bottom) { inline-size: 100%; max-block-size: var(--elea-sheet-size); }
 .elea-sheet--sm { --elea-sheet-size: 20rem; }

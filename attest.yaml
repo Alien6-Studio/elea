@@ -16,6 +16,7 @@ steps:
       - package-lock.json
       - tsconfig.base.json
       - README.md
+      - CHANGELOG.md
       - docs/
       - LICENSE
       - CONTRIBUTING.md

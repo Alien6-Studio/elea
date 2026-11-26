@@ -1,7 +1,7 @@
 import baseTokens from "../tokens/elea.tokens.json" with { type: "json" };
 import darkTokens from "../tokens/elea.dark.tokens.json" with { type: "json" };
 import { brandAppearanceVariable, cssVariableName, localAppearanceSelector } from "./css.js";
-import { colorFamilies, surfaceFamilies, colorSteps, defaultColorStep, defaultTertiaryFamily, brandColorRoles, type BrandColorRole, type ColorFamily, type ColorStep, type SurfaceFamily } from "./palette.js";
+import { colorFamilies, colorThemes, surfaceFamilies, colorSteps, defaultColorStep, defaultTertiaryFamily, brandColorRoles, type BrandColorRole, type ColorFamily, type ColorStep, type SurfaceFamily, type ThemeProfileId } from "./palette.js";
 
 import { statusColors } from "./status.js";
 
@@ -50,6 +50,8 @@ export interface BrandTheme {
   /** Six hexadecimal digits prefixed by a hash. */
   seed: string;
   corner: Corners;
+  /** Profile-specific shapes apply at the profile's reference corner setting, unless a free radius is supplied. */
+  shape?: ThemeProfileId | undefined;
   typeface: Typeface;
   rhythm: Rhythm;
   /** The product's own interface font: any CSS font stack, `var(--font-inter), system-ui` included. */
@@ -289,7 +291,7 @@ function assignedAction(scale: readonly Swatch[], step: ColorStep, surfaces: Sur
 }
 
 /** Generate scoped CSS, colour roles and their tone scales. */
-export function makeBrandTheme({ edition, controls, seed, corner, typeface, rhythm, font, accent, palette, radius }: BrandTheme, className = "elea-brand") {
+export function makeBrandTheme({ edition, controls, seed, corner, shape, typeface, rhythm, font, accent, palette, radius }: BrandTheme, className = "elea-brand") {
   assertBrandTheme({ seed, corner, typeface, rhythm, font, accent }, className);
   if (edition !== undefined && !Object.hasOwn(editions, edition)) throw new RangeError("Unknown edition");
   if (palette !== undefined && (palette === null || typeof palette !== "object" || Array.isArray(palette))) throw new RangeError("Expected palette assignments");
@@ -297,6 +299,11 @@ export function makeBrandTheme({ edition, controls, seed, corner, typeface, rhyt
   const radii = length
     ? [0.5, 0.75, 1, 1.5].map((factor) => `${Number((Number(length[1]) * factor).toFixed(4))}${length[2]}`)
     : RADII[corner];
+  if (shape !== undefined && (typeof shape !== "string" || !Object.hasOwn(colorThemes, shape) || !("shapes" in colorThemes[shape]))) {
+    throw new RangeError("Unknown shape profile");
+  }
+  const profile = shape === undefined ? undefined : colorThemes[shape];
+  const shapes = !length && profile?.profile.corner === corner ? profile.shapes : undefined;
   const reading = READING[rhythm];
   const accentSeed = accent ?? (edition && editions[edition].accent);
   const primary = referenceShade(palette?.primary) ?? seedScale(seed);
@@ -312,6 +319,8 @@ export function makeBrandTheme({ edition, controls, seed, corner, typeface, rhyt
       return `  --elea-color-${role}-${swatch.step}: ${value};`;
     })),
     ...["sm", "md", "lg", "xl"].map((size, index) => `  --elea-radius-${size}: ${radii[index]};`),
+    // Reset each role at the brand boundary so nested uniform themes use their scalar radii.
+    ...(["action", "control", "surface", "indicator"] as const).map(role => `  --elea-shape-${role}: ${shapes?.[role] ?? "initial"};`),
     ...(font === undefined ? [] : [`  --elea-font-family-sans: ${font};`]),
     `  --elea-font-family-content: ${typeFamilies[typeface]};`,
     `  --elea-font-size-lg: ${reading.size};`,

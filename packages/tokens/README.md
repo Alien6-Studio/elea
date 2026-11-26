@@ -170,6 +170,18 @@ makeBrandTheme({ ...editions.Precision, seed: "#0f766e", accent: "#f2c94c", font
 the same scoped CSS as selecting Braise in the Studio. Each profile
 combines a colour scheme with a reading typeface, density, corner shape and
 control treatment. Inspect these choices on `colorThemes.braise.profile`.
+
+Named profiles supply four CSS shapes for actions, fields, surfaces and selection
+indicators. For example, Réserve pairs a curved ultramarine action with a quiet
+rectangular field. Use `--elea-shape-action`, `--elea-shape-control`,
+`--elea-shape-surface` and `--elea-shape-indicator` as complete CSS
+`border-radius` values. For a custom surface, use
+`border-radius: var(--elea-shape-surface, var(--elea-radius-xl))`.
+The scalar radius tokens remain lengths for individual corners and calculations.
+A custom `radius`, a different `corner` preset, or `shape: undefined` returns
+the profile to its scalar radii. Changing only the colours preserves the shape.
+See the [runnable nine-profile example](../../docs/examples/theme-shapes.mjs).
+
 Set `controls` to `"flat"`, `"raised"` or `"inset"` to change the treatment
 of buttons, fields and tabs independently of the palette.
 
