@@ -1,6 +1,47 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { colorThemes } from "@alien6-studio/elea-tokens/palette";
+import { textContrast } from "./contrast";
+
+for (const reducedMotion of ["reduce", "no-preference"] as const) {
+  test(`navbar switches legible colour pairs together with ${reducedMotion} motion`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light", reducedMotion });
+    await page.goto("/elea/playground/#/ui/button?scheme=reserve");
+    const picker = page.getByRole("combobox", { name: "Site theme", exact: true });
+    const sample = page.getByRole("button", { name: "info solid", exact: true });
+    await picker.click();
+    const next = page.getByRole("option", { name: "Braise", exact: true });
+    await expect(next).toBeVisible();
+    expect(await textContrast(sample)).toBeGreaterThanOrEqual(4.5);
+    const transitions = await sample.evaluate(element => getComputedStyle(element).transitionProperty);
+    const recording = await sample.evaluateHandle(element => {
+      const pairs = new Set<string>();
+      let frame: number;
+      function pair() {
+        const styles = getComputedStyle(element);
+        return `${styles.color} on ${styles.backgroundColor}`;
+      }
+      function record() {
+        pairs.add(pair());
+        frame = requestAnimationFrame(record);
+      }
+      record();
+      return async () => {
+        await new Promise(requestAnimationFrame);
+        await Promise.allSettled(element.getAnimations().filter(animation => "transitionProperty" in animation).map(animation => animation.finished));
+        cancelAnimationFrame(frame);
+        pairs.add(pair());
+        return [...pairs];
+      };
+    });
+    await next.click();
+    await expect(picker).toHaveText("Braise");
+    const pairs = await recording.evaluate(stop => stop());
+    expect(pairs).toHaveLength(2);
+    expect(await textContrast(sample)).toBeGreaterThanOrEqual(4.5);
+    await expect(sample).toHaveCSS("transition-property", transitions);
+  });
+}
 
 test("the navbar applies each complete theme, including the static notebook and the button guide", async ({ page }) => {
   await page.goto("/elea/");

@@ -3,12 +3,14 @@ name: GitHub Pages
 on:
   push:
     branches: [gh-pages]
+  pull_request:
+    branches: [gh-pages]
 
 permissions:
   contents: read
 
 concurrency:
-  group: elea-pages
+  group: elea-pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -17,9 +19,10 @@ jobs:
     with:
       source-ref: main
       pages-ref: ${{ github.sha }}
-      upload-pages: true
+      upload-pages: ${{ github.event_name == 'push' }}
 
   deploy:
+    if: github.event_name == 'push'
     needs: build
     runs-on: ubuntu-24.04
     environment:

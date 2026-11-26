@@ -3,7 +3,7 @@ import { SiteFooter } from "./components/SiteFooter.js";
 import { SiteHeader } from "./components/SiteHeader.js";
 import { siteNavigation, sitePath } from "./links.js";
 import { brandRoute, exactProfile, readBrandTheme, studioTheme, type BrandTheme, type StudioThemeId } from "./pages/brandTheme.js";
-import { siteProfile, siteScope } from "./siteProfile.js";
+import { applySiteScope, siteProfile, siteScope } from "./siteProfile.js";
 import { archivedWorkspace } from "./pages/design-lab/index.js";
 import { href, useHashRoute } from "./router.js";
 
@@ -31,8 +31,8 @@ export function App() {
   const profile = shared ? exactProfile(shared) : saved;
   const scope = siteScope(profile ?? saved);
   useLayoutEffect(() => {
-    document.documentElement.dataset.eleaTheme = scope;
-  }, [scope, saved]);
+    applySiteScope(scope);
+  }, [scope]);
 
   function selectProfile(id: StudioThemeId) {
     siteProfile.set(id);

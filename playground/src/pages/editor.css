@@ -46,9 +46,27 @@
 }
 .workspace-draft__bar h2, .workspace-output__heading h2 { margin: 0; font-size: 1rem; letter-spacing: -.025em; font-weight: 600; }
 .workspace-draft__bar > div:first-child > span { font-size: var(--elea-font-size-xs); color: var(--elea-color-text-muted); }
-.workspace-paper { padding: clamp(1.8rem, 4vw, 3rem) clamp(1rem, 3vw, 2.4rem) 3rem .35rem; }
-.workspace-paper .elea-content-editor { margin-inline: auto; }
-.workspace-paper .elea-content-editor--classic, .workspace-paper .elea-content-editor--markdown, .workspace-paper .elea-content-editor--preview { padding-inline-start: clamp(1rem, 3vw, 2.4rem); }
+.workspace-paper {
+  --elea-editor-gutter: 5rem;
+  --workspace-paper-inset: clamp(1rem, 3vw, 2.4rem);
+  padding: clamp(1.8rem, 4vw, 3rem) var(--workspace-paper-inset) 3rem .35rem;
+}
+.workspace-paper .elea-editor-workspace {
+  --workspace-text-inset: var(--elea-editor-gutter);
+  max-inline-size: calc(var(--elea-size-measure) + var(--elea-editor-gutter));
+  margin-inline: auto;
+}
+.workspace-paper .elea-editor-workspace:has(> :is(.elea-content-editor--classic, .elea-content-editor--markdown)) {
+  --workspace-text-inset: var(--workspace-paper-inset);
+  max-inline-size: var(--elea-size-measure);
+}
+.workspace-paper .elea-content-editor__mode { margin-inline-start: var(--workspace-text-inset); }
+.workspace-paper .elea-content-editor {
+  --elea-editor-gutter: inherit;
+  padding-inline-start: var(--workspace-text-inset, var(--workspace-paper-inset));
+}
+.workspace-paper .elea-content-editor__add { margin-inline-start: 0; }
+.workspace-paper .elea-content-editor--preview { margin-inline: auto; }
 .workspace-output {
   position: sticky;
   top: .65rem;
@@ -117,8 +135,7 @@
 }
 @media (max-width: 32rem) {
   .workspace-desk { margin-inline: calc(-.55 * var(--site-gutter)); }
-  .workspace-paper .elea-content-editor { --elea-editor-gutter: 3rem; }
-  .workspace-paper { padding-inline: .25rem .9rem; }
+  .workspace-paper { --elea-editor-gutter: var(--elea-space-12); padding-inline: .25rem .9rem; }
   .workspace-intro { padding-block: 1.65rem 1.35rem; gap: .45rem; }
   .workspace-document > span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
   .workspace-tools { gap: .25rem; padding: .75rem .65rem; }

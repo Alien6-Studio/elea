@@ -8,6 +8,20 @@ export function siteScope(id: StudioThemeId) {
   return id === "reserve" ? "site" : `site-${id}`;
 }
 
+let restoreTransitions = 0;
+
+export function applySiteScope(scope: string) {
+  const root = document.documentElement;
+  if (root.dataset.eleaTheme === scope) return;
+  root.dataset.switchingProfile = "";
+  root.dataset.eleaTheme = scope;
+  cancelAnimationFrame(restoreTransitions);
+  // Paint the new foreground and background together before restoring interaction transitions.
+  restoreTransitions = requestAnimationFrame(() => {
+    restoreTransitions = requestAnimationFrame(() => { delete root.dataset.switchingProfile; });
+  });
+}
+
 function read(): StudioThemeId {
   try {
     const value = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey);
@@ -19,7 +33,7 @@ function read(): StudioThemeId {
 
 function apply(id: StudioThemeId) {
   // The playground can be displaying an explicit shared brand from its URL.
-  if (!document.getElementById("root")) document.documentElement.dataset.eleaTheme = siteScope(id);
+  if (!document.getElementById("root")) applySiteScope(siteScope(id));
   // The static notebook deliberately opens a shareable, themed workspace.
   for (const link of document.querySelectorAll<HTMLAnchorElement>("[data-site-profile-link]")) {
     const [path] = link.hash.split("?");

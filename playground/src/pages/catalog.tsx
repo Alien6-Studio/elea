@@ -1,6 +1,7 @@
-import { lazy, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
+import { lazy, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { brandPalettes } from "@alien6-studio/elea-tokens/brand";
 import { Accordion, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, Button, Calendar, ColorPicker, Combobox, DateField, MultiSelect, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Stepper, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
+import { GuideRoute, sectionHref, sectionId, visitSection } from "../components/Demo.js";
 import { sitePath } from "../links.js";
 import { glacierImage, notebookTitle } from "../notebook.js";
 import { brandRoute, makeBrandTheme, type BrandTheme } from "./brandTheme.js";
@@ -328,12 +329,35 @@ function Overview({ brand, motionSwitch }: { brand?: BrandTheme; motionSwitch: R
   );
 }
 
-function ComponentGuide({ entry, brand, motionSwitch }: { entry: Entry; brand?: BrandTheme; motionSwitch: ReactNode }) {
+function ComponentGuide({ entry, brand, motionSwitch, section }: { entry: Entry; brand?: BrandTheme; motionSwitch: ReactNode; section?: string }) {
   const Page = entry.page;
+  const guide = brandRoute(`ui/${entry.slug}`, brand);
+  const article = useRef<HTMLElement>(null);
+  const contents = useRef<HTMLDetailsElement>(null);
+  const [indexOpen, setIndexOpen] = useState(false);
+  const [sections, setSections] = useState<{ id: string; label: string }[]>([]);
+
+  useLayoutEffect(() => {
+    const headings = article.current?.querySelectorAll<HTMLElement>(".catalog-demos h2:not(.demo__stage h2), .catalog-interaction > h2");
+    setSections(Array.from(headings ?? [], heading => {
+      const label = heading.textContent.trim();
+      heading.id ||= sectionId(label);
+      heading.tabIndex = -1;
+      return { id: heading.id, label };
+    }));
+  }, [entry]);
+
+  useLayoutEffect(() => {
+    if (!section) return;
+    const heading = document.getElementById(section);
+    if (heading && article.current?.contains(heading) && sections.some(item => item.id === section)) visitSection(heading);
+  }, [section, sections]);
   return (
     <div className="catalog-layout">
       <aside className="catalog-index">
-        <nav aria-label="Component index">
+        <Button className="catalog-index__toggle" variant="outline" size="sm" aria-expanded={indexOpen}
+          aria-controls="guide-component-index" onClick={() => setIndexOpen(open => !open)}>Browse components</Button>
+        <nav id="guide-component-index" aria-label="Component index">
           <a className="catalog-index__all" href={brandRoute("ui", brand)}>All components</a>
           {categories.map((category) => <div key={category}>
             <h2>{category}</h2>
@@ -342,7 +366,7 @@ function ComponentGuide({ entry, brand, motionSwitch }: { entry: Entry; brand?: 
           </div>)}
         </nav>
       </aside>
-      <article className="catalog-guide">
+      <article ref={article} className="catalog-guide">
         <div className="catalog-guide__bar">
           <Breadcrumb label="Breadcrumb" overflowLabel="Earlier pages" items={[
             { id: "ui", label: "Components", href: brandRoute("ui", brand) },
@@ -354,7 +378,19 @@ function ComponentGuide({ entry, brand, motionSwitch }: { entry: Entry; brand?: 
             {motionSwitch}
           </div>
         </div>
-        <div className="catalog-demos" data-elea-theme={brand && "brand"}><Page brand={brand} /></div>
+        <details className="catalog-contents" ref={contents}>
+          <summary>On this page</summary>
+          <nav aria-label="On this page">
+            {sections.map(item => <a key={item.id} href={sectionHref(guide, item.id)}
+              aria-current={section === item.id ? "location" : undefined} onClick={event => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                if (contents.current) contents.current.open = false;
+                const target = document.getElementById(item.id);
+                if (event.currentTarget.hash === location.hash && target) visitSection(target);
+              }}>{item.label}</a>)}
+          </nav>
+        </details>
+        <GuideRoute.Provider value={guide}><div className="catalog-demos" data-elea-theme={brand && "brand"}><Page brand={brand} /></div></GuideRoute.Provider>
         <section className="catalog-interaction"><h2>Keyboard and accessibility</h2><p>{entry.interaction}</p></section>
         {entry.workspace && (
           <a className="catalog-guide__example" href={brandRoute("playground", brand)}>
@@ -367,7 +403,8 @@ function ComponentGuide({ entry, brand, motionSwitch }: { entry: Entry; brand?: 
 }
 
 export default function CatalogPage({ route, brand }: { route: string; brand?: BrandTheme }) {
-  const current = entries.find((entry) => route === `ui/${entry.slug}`);
+  const [, slug, section] = route.split("/");
+  const current = entries.find((entry) => slug === entry.slug);
   useEffect(() => {
     document.title = `${current?.name ?? "Components"} · Elea`;
   }, [current]);
@@ -385,7 +422,7 @@ export default function CatalogPage({ route, brand }: { route: string; brand?: B
     <div className="catalog" data-elea-motion={motion ? "on" : "off"}>
       {css && <style>{css}</style>}
       {current
-        ? <ComponentGuide key={current.slug} entry={current} brand={brand} motionSwitch={motionSwitch} />
+        ? <ComponentGuide key={current.slug} entry={current} brand={brand} motionSwitch={motionSwitch} section={section} />
         : <Overview brand={brand} motionSwitch={motionSwitch} />}
     </div>
   );

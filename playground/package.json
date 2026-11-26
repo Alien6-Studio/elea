@@ -8,7 +8,7 @@
   "scripts": {
     "build": "vite build",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "playwright test",
+    "test": "playwright test --project=chromium --project=firefox --project=webkit",
     "test:next": "next build tests/fixtures/next"
   },
   "dependencies": {

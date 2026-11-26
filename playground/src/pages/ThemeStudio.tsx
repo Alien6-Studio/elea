@@ -1,11 +1,12 @@
 import { Button, Field, Input, RadioGroup, Select } from "@alien6-studio/elea-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createDocument, en } from "@alien6-studio/elea-content";
 import { SiteTypefaceField } from "../components/SiteTypefaceField.js";
 import { siteProfileOptions } from "../components/SiteProfileSelect.js";
 import { notebookBlocks, notebookSummary, notebookTitle } from "../samples.js";
 import { ReaderEdition } from "./ReaderEdition.js";
 import { corners, makeBrandTheme, rhythms, typefaces } from "@alien6-studio/elea-tokens/brand";
+import { qualifyTheme } from "@alien6-studio/elea-tokens/qualification";
 import { colorThemes } from "@alien6-studio/elea-tokens/palette";
 import { brandRoute, exactProfile, featuredColourThemes, readBrandTheme, studioTheme, studioThemeName, validBrand, type BrandTheme, type StudioThemeId } from "./brandTheme.js";
 import "./studio.css";
@@ -25,7 +26,8 @@ export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChan
     return () => window.removeEventListener("hashchange", followLocation);
   }, []);
   const { corner, typeface, rhythm } = brand;
-  const { css } = makeBrandTheme(brand);
+  const { css } = useMemo(() => makeBrandTheme(brand), [brand]);
+  const report = useMemo(() => qualifyTheme(brand), [brand]);
   const selectedProfile = exactProfile(brand);
   const cornerOptions: { value: string; label: string }[] = corners.map(value => ({ value, label: value }));
   if (brand.shape && brand.shape !== brand.profile) {
@@ -111,7 +113,9 @@ export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChan
           <div className="studio-export__actions">
             <Button href={brandRoute("playground", brand)} trailingIcon="→">Open themed workspace</Button>
             <Button href={`data:text/css;charset=utf-8,${encodeURIComponent(css)}`} download="elea-brand.css" variant="outline" trailingIcon="↓">Download CSS</Button>
+            <Button href={`data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(report, null, 2))}`} download="elea-theme-report.json" variant="outline" trailingIcon="↓">Download contrast report</Button>
           </div>
+          <p>{report.checks.filter(check => check.passed).length} of {report.checks.length} resolved colour pairs meet 4.5:1 in this profile. The report lists the colours, states and appearances tested.</p>
           <p>Load it with Elea’s styles and set <code>data-elea-theme="brand"</code> on a container: dialogs and toasts opened from it follow.</p>
         </div>
       </div>

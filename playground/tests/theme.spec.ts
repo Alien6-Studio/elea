@@ -527,6 +527,39 @@ test("an old Precision preset opens in emerald and keeps explicitly customized b
   await expect(gallery).toHaveAttribute("href", /brand=2854b8.*radius=10px/);
 });
 
+for (const width of [320, 1024, 1571]) {
+  test(`Studio corner choices keep their labels intact at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(studioPath + "?scheme=echappee");
+    if (width === 320) await page.getByRole("button", { name: "Settings", exact: true }).click();
+    await page.getByRole("combobox", { name: "Site typeface", exact: true }).click();
+    await page.getByRole("option", { name: "Instrument Sans", exact: true }).click();
+    const corners = page.getByRole("group", { name: "Corners", exact: true });
+    const shape = corners.getByRole("radio", { name: "Theme shape", exact: true });
+    await expect(shape).toBeChecked();
+    await page.evaluate(() => document.fonts.ready);
+
+    for (const name of ["Theme shape", "Square", "Soft", "Round"]) {
+      const layout = await corners.getByText(name, { exact: true }).evaluate(text => {
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        const lines = range.getClientRects();
+        const card = text.closest("label")!.getBoundingClientRect();
+        const group = text.closest("fieldset")!.getBoundingClientRect();
+        const fits = [...lines].every(line => line.left >= card.left && line.right <= card.right);
+        return { lines: lines.length, fits, withinGroup: card.left >= group.left && card.right <= group.right };
+      });
+      expect(layout, name).toEqual({ lines: 1, fits: true, withinGroup: true });
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    await shape.focus();
+    await page.keyboard.press("ArrowRight");
+    const square = corners.getByRole("radio", { name: "Square", exact: true });
+    await expect(square).toBeFocused();
+    await expect(square).toBeChecked();
+  });
+}
+
 test("settings, preview and expanded CSS fit a 320px viewport", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 });
   await page.goto(studioPath);

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import {
-  Accordion, Badge, Button, Slider, Table, TableBody, TableCaption, TableCell, TableFoot, TableHead, TableHeaderCell, TableRow,
+  Accordion, Badge, Button, Dialog, Field, Input, Select, Slider, Table, TableBody, TableCaption, TableCell, TableFoot, TableHead, TableHeaderCell, TableRow,
   ToastProvider, useToast, type TableSort, type ToastPosition,
 } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
@@ -14,6 +14,41 @@ const articles = [
 type Column = "title" | "words" | "readers";
 const tones = { Published: "success", "In review": "warning", Draft: "neutral" } as const;
 const figure = (value: number) => value.toLocaleString("en-GB");
+
+function RegionalDensity() {
+  const [density, setDensity] = useState("standard");
+  const [query, setQuery] = useState("");
+  const [summary, setSummary] = useState(false);
+  const results = articles.filter(article => article.title.toLowerCase().includes(query.trim().toLowerCase()));
+  const total = results.reduce((sum, article) => sum + article.words, 0);
+
+  return (
+    <section aria-label="Article workspace" data-elea-density={density} className="catalog-fill catalog-stack"
+      style={{ gap: "var(--elea-density-action-gap)" }}>
+      <Field label="Region density">{({ id }) => (
+        <Select id={id} value={density} onChange={setDensity} options={[
+          { value: "compact", label: "Compact" }, { value: "standard", label: "Standard" },
+          { value: "comfortable", label: "Comfortable" },
+        ]} />
+      )}</Field>
+      <Field label="Filter articles" help="Search by title.">{control => (
+        <Input {...control} type="search" value={query} onChange={event => setQuery(event.target.value)} />
+      )}</Field>
+      <Table label="Search results">
+        <TableHead><TableRow><TableHeaderCell>Article</TableHeaderCell><TableHeaderCell align="end">Words</TableHeaderCell></TableRow></TableHead>
+        <TableBody>
+          {results.map(article => <TableRow key={article.title}><TableHeaderCell scope="row">{article.title}</TableHeaderCell><TableCell numeric>{figure(article.words)}</TableCell></TableRow>)}
+          {!results.length && <TableRow><TableCell colSpan={2}>No matching articles</TableCell></TableRow>}
+        </TableBody>
+      </Table>
+      <div><Button onClick={() => setSummary(true)}>Word count</Button></div>
+      <Dialog open={summary} onClose={() => setSummary(false)} title="Word count" closeLabel="Close word count"
+        actions={<Button onClick={() => setSummary(false)}>Done</Button>}>
+        {figure(total)} words across {results.length} {results.length === 1 ? "article" : "articles"}.
+      </Dialog>
+    </section>
+  );
+}
 
 export function TablePage() {
   const [order, setOrder] = useState<{ column: Column; direction: Exclude<TableSort, "none"> }>({ column: "words", direction: "descending" });
@@ -69,6 +104,14 @@ export function TablePage() {
             ))}
           </TableBody>
         </Table>
+      </Demo>
+      <Demo title="Regional density" description="Change the spacing of the field, table and actions together. Open the word count to see the same density in a dialog."
+        code={`<section data-elea-density="compact">
+  <Field label="Filter articles">{control => <Input {...control} />}</Field>
+  <Table label="Search results">…</Table>
+  <Button onClick={showWordCount}>Word count</Button>
+</section>`}>
+        <RegionalDensity />
       </Demo>
       <Demo title="Dense, striped, with a caption and a footer" description="A caption names the table for everyone; the footer carries the totals." code={`<Table density="sm" striped>
   <TableCaption>Words written this week</TableCaption>
@@ -126,7 +169,7 @@ export function TablePage() {
       <h2>Props</h2>
       <PropsTable rows={[
         { name: "label", type: "string", description: "Names the scrolling region and lets the keyboard reach it; pass it for any table that may overflow." },
-        { name: "density", type: '"sm" | "md"', defaultValue: '"md"', description: "Height of the rows." },
+        { name: "density", type: '"sm" | "md"', defaultValue: '"md"', description: "Set the row padding explicitly, or omit to inherit the regional density." },
         { name: "striped, hoverable", type: "boolean", defaultValue: "false", description: "Tints every other row; rows answer the pointer." },
         { name: "stickyHeader", type: "boolean", defaultValue: "false", description: "Keeps the header in view; give the table a height through className." },
         { name: "TableRow selected", type: "boolean", defaultValue: "false", description: "Tints the row. State the selection through the row's own control, such as a checkbox." },

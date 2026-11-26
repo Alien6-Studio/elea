@@ -9,7 +9,7 @@ export function MediaPage() {
     <div className="crop-guide">
       <h1>Image upload and crop</h1>
       <p className="lead">Frame one photo for a cover and a card. Reopen either crop to refine it.</p>
-      <Demo code={example}>
+      <Demo title="Cover and card crops" code={example}>
         <ImageUploadExample sampleUrl={`${sitePath}assets/harbour-light.webp`} />
       </Demo>
       <h2>Parts</h2>

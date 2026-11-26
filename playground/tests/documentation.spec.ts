@@ -218,7 +218,7 @@ test.describe("typography on a touch screen", () => {
   });
 });
 
-test("the header and footer pair the Galet mark with the site typeface", async ({ page }) => {
+test("the header and footer retain the Galet mark and ELEA lettering across site typefaces", async ({ page }) => {
   for (const route of ["/elea/getting-started/", "/elea/playground/#/ui"]) {
     await page.goto(route);
     const marks = ["banner", "contentinfo"] as const;
@@ -241,7 +241,7 @@ test("the header and footer pair the Galet mark with the site typeface", async (
     }
     await page.evaluate(() => document.documentElement.style.setProperty("--elea-font-family-sans", "Georgia, serif"));
     for (const role of marks) {
-      await expect(page.getByRole(role).getByRole("link", { name: "Elea", exact: true })).toHaveCSS("font-family", "Georgia, serif");
+      await expect(page.getByRole(role).getByRole("link", { name: "Elea", exact: true })).toHaveCSS("font-family", /^"ELEA Sans"/);
     }
   }
 });

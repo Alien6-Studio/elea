@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("territories can be filtered, grouped, removed and submitted with the keyboard", async ({ page }) => {
+test("territories can be filtered, grouped, removed and submitted with the keyboard", async ({ page, browserName }) => {
   await page.goto("/elea/playground/#/ui/multi-select");
   const field = page.getByRole("combobox", { name: "Territories" });
   await field.click();
@@ -11,7 +11,8 @@ test("territories can be filtered, grouped, removed and submitted with the keybo
   await field.press("Enter");
   await expect(field).toBeFocused();
   const group = page.getByRole("button", { name: "Select all Nordic territories" });
-  await field.press("Tab");
+  // macOS Safari uses Option-Tab to include buttons with its default keyboard navigation settings.
+  await field.press(browserName === "webkit" && process.platform === "darwin" ? "Alt+Tab" : "Tab");
   await expect(group).toBeFocused();
   await group.press("Enter");
   await expect(page.getByRole("button", { name: "Remove Denmark" })).toBeVisible();

@@ -28,9 +28,11 @@ test("typed and calendar dates share bounds and the calendar restores focus", as
   const previous = page.getByRole("button", { name: "Previous month" });
   if (await previous.isEnabled()) await previous.click();
   await expect(grid.getByRole("button", { name: /19 February 2028/ })).toBeDisabled();
-  await expect(grid.getByRole("button", { name: /29 February 2028/ })).toBeEnabled();
+  const leapDay = grid.getByRole("button", { name: /29 February 2028/ });
+  await expect(leapDay).toBeEnabled();
+  await expect(leapDay).toBeInViewport({ ratio: 1 });
   await testInfo.attach("date-field-calendar", { body: await page.screenshot(), contentType: "image/png" });
-  await grid.getByRole("button", { name: /29 February 2028/ }).click();
+  await leapDay.click();
   await expect(trigger).toBeFocused();
   await expect(iso).toHaveText("2028-02-29");
   await trigger.press("Enter");

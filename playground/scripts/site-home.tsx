@@ -5,6 +5,8 @@ import { alien6ContactUrl, repositoryUrl, sitePath } from "../src/links.js";
 import { brandRoute, defaultSiteTheme } from "../src/pages/brandTheme.js";
 import { glacierImage, notebookSummary, notebookTitle } from "../src/notebook.js";
 
+import { ThemeComparison } from "../src/components/ThemeComparison.js";
+
 const interactive = `${sitePath}playground/#/`;
 const notebook = {
   blocks: [
@@ -73,10 +75,11 @@ export function SiteHome() {
         <div className="home-editions__heading">
           <div>
             <h2 id="home-theme">Publication themes</h2>
-            <p>Explore the colour themes and adjust their type, spacing and corners in the studio.</p>
+            <p>Compare the same field note in two editions.</p>
           </div>
           <a href={`${interactive}theme`}>Open theme studio <span aria-hidden="true">→</span></a>
         </div>
+        <div id="theme-comparison"><ThemeComparison interactive={false} /></div>
       </section>
       <div className="site-container home-tools">
         <section className="home-tool" aria-labelledby="home-components">

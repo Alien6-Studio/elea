@@ -66,6 +66,26 @@ test("the sample document renders in both panes", async ({ page }) => {
   await expect(viewerPane(page).locator('a[href="/elea/content/"]')).not.toHaveAttribute("target", "_blank");
 });
 
+test("the writing controls align with the manuscript in split, focus and mobile layouts", async ({ page }) => {
+  const title = editorPane(page).getByRole("textbox", { name: "Your content title..." });
+  async function expectAligned() {
+    const [heading, paragraph, pencil, append] = await Promise.all(
+      [title, firstParagraph(page), commands(page), add(page)].map(element => element.boundingBox()),
+    );
+    for (const box of [paragraph, pencil, append]) {
+      expect(box!.x).toBeCloseTo(heading!.x, 0);
+    }
+  }
+  await expect(viewerPane(page)).toBeVisible();
+  await expectAligned();
+  await page.getByRole("button", { name: "Focus mode" }).click();
+  await expect(viewerPane(page)).toBeHidden();
+  await expectAligned();
+  await page.setViewportSize({ width: 320, height: 844 });
+  await expect(page.getByRole("button", { name: "Manuscript", exact: true })).toBeVisible();
+  await expectAligned();
+});
+
 test("the mode menu takes the place of history on a narrow screen and returns focus to the pencil", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
   await page.emulateMedia({ reducedMotion: "reduce" });

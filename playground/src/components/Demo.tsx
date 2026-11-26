@@ -1,5 +1,22 @@
-import { useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useRef, useState, type ReactNode } from "react";
 import { Button } from "@alien6-studio/elea-ui";
+
+/** The guide route includes the theme query when someone shares a custom profile. */
+export const GuideRoute = createContext("");
+
+export function sectionId(label: string) {
+  return label.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+export function sectionHref(guide: string, id: string) {
+  const [path, query] = guide.split("?");
+  return `${path}/${id}${query ? "?" + query : ""}`;
+}
+
+export function visitSection(heading: HTMLElement) {
+  heading.focus({ preventScroll: true });
+  heading.scrollIntoView({ block: "start" });
+}
 
 export interface DemoProps {
   title?: string;
@@ -11,6 +28,8 @@ export interface DemoProps {
 
 /** A live example with its source. */
 export function Demo({ title, description, children, code }: DemoProps) {
+  const guide = useContext(GuideRoute);
+  const id = title && sectionId(title);
   const source = code.trim();
   const block = useRef<HTMLElement>(null);
   const [message, setMessage] = useState("");
@@ -33,7 +52,11 @@ export function Demo({ title, description, children, code }: DemoProps) {
   }
   return (
     <section className="demo">
-      {title && <h2 className="demo__title">{title}</h2>}
+      {title && <h2 className="demo__title" id={id} tabIndex={-1}>
+        {guide && id ? <a href={sectionHref(guide, id)} onClick={event => {
+          if (event.currentTarget.hash === location.hash) visitSection(event.currentTarget.parentElement!);
+        }}>{title}</a> : title}
+      </h2>}
       {description && <p className="demo__description">{description}</p>}
       <div className="demo__stage">{children}</div>
       <details className="catalog-source" onToggle={() => setMessage("")}>

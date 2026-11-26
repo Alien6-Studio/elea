@@ -40,6 +40,30 @@ description: A type specimen of ELEA Sans, with its roman and italic cuts, small
   </section>
 </div>
 
+<section class="type-uses" aria-labelledby="interface-typography">
+  <h2 id="interface-typography">Typography in use</h2>
+  <p class="type-instruction">The masthead and footer pair the Galet mark with the lowercase ELEA Sans wordmark at weight 400. Both use the surrounding ink colour. The masthead scales down to 2rem on small screens.</p>
+  <dl>
+    <div><dt>Display</dt><dd data-elea-type="display">Harbour light</dd></div>
+    <div><dt>Page title</dt><dd data-elea-type="page">Field notebook</dd></div>
+    <div><dt>Section title</dt><dd data-elea-type="section">Observations at low tide</dd></div>
+    <div><dt>Reading text</dt><dd data-elea-type="reading">At first light the mooring lines draw diagonals across the quay. By noon the tide has lifted them clear of the stone.</dd></div>
+    <div><dt>Label</dt><dd data-elea-type="label">Observation date</dd></div>
+    <div><dt>Data</dt><dd data-elea-type="data">2026-11-26</dd></div>
+    <div><dt>Annotation</dt><dd data-elea-type="annotation">Local time, measured at the harbour entrance.</dd></div>
+  </dl>
+  <div class="ledger-scroll" tabindex="0" role="region" aria-label="Field ledger">
+    <table class="type-ledger"><caption>Figures in a field ledger</caption>
+      <thead><tr><th scope="col">Record</th><th scope="col">Date</th><th scope="col" class="number">Distance</th><th scope="col" class="number">Coverage</th><th scope="col" class="number">Cost</th></tr></thead>
+      <tbody data-elea-type="data">
+        <tr><th scope="row">EL-0017</th><td>2026-11-25</td><td class="number">8.42 km</td><td class="number">92.5%</td><td class="number">€108.40</td></tr>
+        <tr><th scope="row">EL-0108</th><td>2026-11-26</td><td class="number">12.06 km</td><td class="number">100.0%</td><td class="number">€91.05</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="type-instruction">Align quantities to the end of the column and use consistent precision within each column. Keep leading zeroes in identifiers. Format dates, currencies and units for your readers’ locale.</p>
+</section>
+
 <table class="type-weights">
   <caption>Weights in roman and italic</caption>
   <thead><tr><th scope="col">Weight</th><th scope="col">Roman</th><th scope="col">Italic</th></tr></thead>

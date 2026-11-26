@@ -14,6 +14,7 @@ mkdirSync(new URL("fonts/", assets), { recursive: true });
 
 const styles = [
   ["@alien6-studio/elea-tokens/elea.css", "elea.css"],
+  ["@alien6-studio/elea-tokens/typography.css", "type-roles.css"],
   ["@alien6-studio/elea-tokens/editions.css", "editions.css"],
   ["@alien6-studio/elea-ui/styles.css", "elea-ui.css"],
   ["@alien6-studio/elea-content-viewer/styles.css", "elea-viewer.css"],

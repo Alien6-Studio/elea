@@ -12,6 +12,13 @@
   --elea-font-family-sans: "Instrument Sans Variable", system-ui, sans-serif;
 }
 
+:root[data-switching-profile],
+:root[data-switching-profile] *,
+:root[data-switching-profile] *::before,
+:root[data-switching-profile] *::after {
+  transition: none !important;
+}
+
 :root[data-site-font="roboto"] {
   --elea-font-family-sans: "Roboto Variable", Roboto, system-ui, sans-serif;
 }
@@ -72,11 +79,12 @@
   justify-self: start;
   min-height: 2.75rem;
   color: var(--elea-color-text-default);
-  font: 400 clamp(2.5rem, 5vw, 3rem)/.9 var(--elea-font-family-sans);
+  font: 400 clamp(2.5rem, 5vw, 3rem)/.9 "ELEA Sans", sans-serif;
   font-synthesis: none;
   letter-spacing: normal;
   text-decoration: none;
 }
+.site__masthead .site__wordmark { gap: .1875em; }
 .site__wordmark::before {
   content: "";
   flex: none;
@@ -192,8 +200,9 @@
 }
 @media (max-width: 25rem) {
   .site__masthead { --site-gutter: .5rem; }
+  .site__masthead-inner { grid-template-columns: max-content minmax(0, 1fr); column-gap: var(--elea-space-2); }
   .site__wordmark { font-size: 2rem; }
-  .site__masthead-tools { gap: .125rem; }
+  .site__masthead-tools { gap: .125rem; max-inline-size: 100%; }
   .site__masthead .site__theme-toggle { width: 2rem; }
   .site-profile-select { min-width: 0; inline-size: 9.125rem; }
   .site-profile-select .site-profile-option { gap: .3rem; }

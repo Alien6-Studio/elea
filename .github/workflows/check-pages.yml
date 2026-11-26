@@ -22,7 +22,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -50,13 +50,18 @@ jobs:
         working-directory: pages
       - run: scripts/build.sh ../elea
         working-directory: pages
-      # The runner image already holds the browser's system libraries: only the headless shell is fetched.
-      - run: npx playwright install --only-shell chromium
-        working-directory: pages/playground
-      - run: npm test
-        working-directory: pages/playground
-        env:
-          CI: "true"
+      - name: Record the two checked-out revisions
+        run: |
+          echo "ELEA_SOURCE_REVISION=$(git -C elea rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "ELEA_PAGES_REVISION=$(git -C pages rev-parse HEAD)" >> "$GITHUB_ENV"
+      - run: scripts/browser-check.sh
+        working-directory: pages
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: ${{ !cancelled() }}
+        with:
+          name: theme-qualification
+          path: pages/playground/test-results/**/theme-proof.json
+          retention-days: 7
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: failure()
         with:
