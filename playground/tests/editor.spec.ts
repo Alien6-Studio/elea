@@ -513,16 +513,43 @@ test("images upload through the host service and attachments come from the picke
   await add(page).click();
   await editorPane(page).getByRole("menuitem", { name: "Image" }).click();
   await editorPane(page).locator('input[type="file"]').first().setInputFiles(PIXEL);
-  // The picture is framed before it goes up; the export comes out of a canvas as PNG
-  await expect(editorPane(page).getByRole("img", { name: "Picture to frame" })).toBeVisible();
+  const frame = editorPane(page).getByRole("group", { name: "Picture to frame" });
+  const mask = frame.locator(".elea-cropper__crop-window");
+  await expect(mask).toHaveCSS("position", "absolute");
+  await expect(mask).not.toHaveCSS("box-shadow", "none");
+  const move = frame.getByRole("button", { name: "Move crop area" });
+  await expect(move).toHaveCSS("cursor", "move");
+  for (const corner of ["top left", "top right", "bottom left", "bottom right"]) {
+    await expect(frame.getByRole("button", { name: `Resize from ${corner}` })).toBeVisible();
+  }
+  await expect(editorPane(page).getByRole("button", { name: "Use this image" })).toBeEnabled();
+  const left = () => mask.evaluate((element: HTMLElement) => element.offsetLeft);
+  const initialLeft = await left();
+  const centre = await move.evaluate(element => ({ x: element.clientWidth / 2, y: element.clientHeight / 2 }));
+  await move.dragTo(move, { sourcePosition: centre, targetPosition: { x: centre.x + 16, y: centre.y } });
+  await expect.poll(left).toBeGreaterThan(initialLeft);
+  const savedLeft = await left();
   await editorPane(page).getByRole("button", { name: "Use this image" }).click();
   // The host says what it is doing; the phase is announced through the live region
   await expect(editorPane(page).getByRole("status").filter({ hasText: "Checking the picture…" })).toBeAttached();
   await expect(editorPane(page).locator(".elea-media-block__image")).toHaveAttribute("src", /^data:image\/png/);
   await editorPane(page).getByRole("textbox", { name: "Image caption..." }).fill("A pixel");
   await expect(viewerPane(page).locator(".elea-caption")).toHaveText("A pixel");
+  const picture = editorPane(page).locator(".elea-media-block__image");
+  const firstRendition = await picture.getAttribute("src");
+  await picture.hover();
+  const adjust = editorPane(page).getByRole("button", { name: "Adjust crop" });
+  await adjust.click();
+  await expect(frame.locator("img")).toHaveAttribute("src", /^blob:/);
+  await expect.poll(left).toBe(savedLeft);
+  await move.press("Shift+ArrowLeft");
+  await expect.poll(left).toBeLessThan(savedLeft);
+  await editorPane(page).getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(adjust).toBeFocused();
+  await expect(picture).toHaveAttribute("src", firstRendition!);
+  await expect(viewerPane(page).locator(".elea-caption")).toHaveText("A pixel");
   // Removing the picture brings the drop zone back, the caption kept for the next one
-  await editorPane(page).locator(".elea-media-block__image").hover();
+  await picture.hover();
   await editorPane(page).getByRole("button", { name: "Remove the image" }).click();
   await expect(editorPane(page).locator('input[type="file"]').first()).toBeAttached();
 
@@ -569,7 +596,7 @@ test("Markdown edits the document and accepts a dropped image with cropping", as
   await expect(dropZone).toHaveClass(/elea-dropzone--active/);
   await dropZone.dispatchEvent("drop", { dataTransfer });
   await dataTransfer.dispose();
-  await expect(editor.getByRole("img", { name: "Picture to frame" })).toBeVisible();
+  await expect(editor.getByRole("group", { name: "Picture to frame" })).toBeVisible();
   await editor.getByRole("slider", { name: "Zoom" }).press("ArrowRight");
   const confirmImage = editor.getByRole("button", { name: "Use this image" });
   await confirmImage.focus();

@@ -1,28 +1,42 @@
 import { createDocument, defaultRegistry, documentToText, documentToHtml, documentToMarkdown, en, fr, markdownToBlocks, parseDocument, type EleaBlock, type EleaDocument, type EleaMessages } from "@alien6-studio/elea-content";
-import { ContentEditor, ContentProvider, type ContentEditorServices, type EditorMode, type PickedAttachment } from "@alien6-studio/elea-content-editor";
+import { ContentEditor, ContentProvider, type ContentEditorServices, type ImageCropSource, type EditorMode, type PickedAttachment } from "@alien6-studio/elea-content-editor";
 import { createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { Button, Select, Tabs } from "@alien6-studio/elea-ui";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { notebookBlocks, notebookSummary, notebookTitle, playgroundBlocks } from "../samples.js";
 import { brandRoute, makeBrandTheme, type BrandTheme } from "./brandTheme.js";
 import { siteHostnames } from "../links.js";
+import { glacierImage } from "../notebook.js";
 import { ReaderEdition } from "./ReaderEdition.js";
 
 import "@alien6-studio/elea-media/styles.css";
+import "@alien6-studio/elea-media/crop-adjustments.css";
 import "@alien6-studio/elea-content-editor/styles.css";
 import "./editor.css";
 
 const sanitizer = createDefaultSanitizer({ links: { siteHostnames } });
 
+const crops = new Map<string, ImageCropSource>();
+const demoCrop: ContentEditorServices["imageCrop"] = {
+  formats: true,
+  resolveOriginal: file => crops.get(file.id) ?? (file.url === glacierImage.data.file.url
+    ? { source: file.url, name: "glacier.webp" } : undefined),
+};
+
 /** Fake host services: images become data URLs after a pretend check, attachments come from a fixed list. */
-const uploadImage: NonNullable<ContentEditorServices["uploadImage"]> = (file, _context, { report, signal }) =>
+const uploadImage: NonNullable<ContentEditorServices["uploadImage"]> = (file, _context, { report, signal, crop }) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     report({ label: "Uploading", progress: 0 });
     reader.onprogress = (event) => { if (event.lengthComputable) report({ label: "Uploading", progress: event.loaded / event.total }); };
     reader.onload = () => {
       report({ label: "Checking the picture…" });
-      const check = setTimeout(() => resolve({ url: String(reader.result), id: "" }), 600);
+      const check = setTimeout(() => {
+        if (signal.aborted) return;
+        const id = crypto.randomUUID();
+        if (crop) crops.set(id, crop);
+        resolve({ url: String(reader.result), id });
+      }, 600);
       signal.addEventListener("abort", () => clearTimeout(check));
     };
     reader.onerror = () => reject(new Error("The picture could not be read."));
@@ -153,7 +167,7 @@ export function PlaygroundPage({ brand }: { brand?: BrandTheme }) {
   );
 
   return (
-    <ContentProvider messages={messages} siteHostnames={siteHostnames} uploadImage={uploadImage} renderAttachmentPicker={({ onSelect }) => <Picker onSelect={onSelect} />}>
+    <ContentProvider messages={messages} imageCrop={demoCrop} siteHostnames={siteHostnames} uploadImage={uploadImage} renderAttachmentPicker={({ onSelect }) => <Picker onSelect={onSelect} />}>
       {css && <style>{css}</style>}
       <div className="workspace site-container">
         <header className="workspace-intro">

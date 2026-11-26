@@ -1,6 +1,7 @@
 import { lazy, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { brandPalettes } from "@alien6-studio/elea-tokens/brand";
 import { Accordion, Alert, Avatar, AvatarGroup, Badge, Button, Calendar, ColorPicker, Combobox, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Input, Pagination, Progress, RadioGroup, Select, Separator, Skeleton, Slider, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
+import { sitePath } from "../links.js";
 import { glacierImage, notebookTitle } from "../notebook.js";
 import { brandRoute, makeBrandTheme, type BrandTheme } from "./brandTheme.js";
 import {
@@ -72,9 +73,9 @@ const entries: Entry[] = [
   },
   {
     slug: "media", name: "Image upload and crop", category: "Media", page: MediaPage,
-    summary: "Combine DropZone and ImageCropper to choose, frame and export an image.",
-    interaction: <>Use <kbd>Enter</kbd> on the drop zone to choose a file. Adjust zoom and rotation with the slider arrow keys, then confirm the crop.</>,
-    preview: <img className="gallery__crop" src={glacierImage.data.file.url} alt="" loading="lazy" />,
+    summary: "Frame an article cover and a feature card from the same original photograph.",
+    interaction: <>Use the arrow keys on the frame to move it or on a corner to resize it. Hold <kbd>Shift</kbd> for larger steps. Open Adjust crop to return to a saved composition.</>,
+    preview: <img className="gallery__crop" src={`${sitePath}assets/harbour-light.webp`} alt="" loading="lazy" />,
   },
   {
     slug: "choice", name: "Checkbox and Toggle", category: "Forms", page: ChoicesPage,

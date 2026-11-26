@@ -1,4 +1,5 @@
 import { useState, type CSSProperties } from "react";
+import type { ButtonLinkRenderProps } from "@alien6-studio/elea-ui";
 import { Badge, Button, Checkbox, ConfirmDialog, Dialog, DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogRoot, DialogTitle, Field, Footer, IconButton, Input, Menu, MenuContent, MenuGroup, MenuItem, MenuRoot, MenuSeparator, MenuTrigger, Pagination, RadioGroup, Select, Tab, TabList, TabPanel, Tabs, TabsRoot, Textarea, Toggle, Tooltip } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
 import { sitePath } from "../links.js";
@@ -9,6 +10,20 @@ const PlusIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="n
 
 const buttonEffects = ["lift", "scale", "push", "shine", "ripple", "spotlight", "magnetic", "tilt"] as const;
 const effectLabel = (effect: typeof buttonEffects[number]) => effect[0]!.toUpperCase() + effect.slice(1);
+
+const tones = ["primary", "secondary", "tertiary", "neutral", "danger", "warning", "success", "info"] as const;
+const surfaces = ["solid", "outline", "ghost"] as const;
+const actionShape = {
+  "--elea-shape-action": "1.5rem 0.25rem 1rem 0.5rem",
+  "--elea-button-radius-sm": "0.75rem 0.125rem 0.5rem 0.25rem",
+} as CSSProperties;
+const toolbarShape = { "--elea-control-radius": "0.25rem 1rem 0.5rem 0" } as CSSProperties;
+
+function GuideLink({ to, ...props }: Omit<ButtonLinkRenderProps, "href"> & { to: string }) {
+  return <a href={to} {...props} />;
+}
+
+const renderGuideLink = ({ href, ...props }: ButtonLinkRenderProps) => <GuideLink {...props} to={href} />;
 
 const radiusSamples = [
   { label: "Inherited", radius: undefined }, { label: "None", radius: "none" },
@@ -55,7 +70,7 @@ export function ButtonsPage({ brand = defaultSiteTheme }: { brand?: BrandTheme }
   return (
     <>
       <h1>Button</h1>
-      <p className="lead">A button inherits its shape and palette from the active theme. Choose a variant for the action, a size for the layout and an effect for the gesture.</p>
+      <p className="lead">A button inherits its shape and palette from the active theme. Choose its tone for meaning, its variant for emphasis and its size for the layout.</p>
       <Demo title="Variants" description={<>A plain <code>&lt;Button&gt;</code> uses the primary colour at medium size. Each variant below draws from the same theme and inherits its action shape.</>} code={`<Button>Primary</Button>
 <Button variant="secondary">Secondary</Button>
 <Button variant="tertiary">Tertiary</Button>
@@ -74,6 +89,30 @@ export function ButtonsPage({ brand = defaultSiteTheme }: { brand?: BrandTheme }
         <Button variant="success">Success</Button>
         <Button variant="info">Info</Button>
         <Button variant="warning">Warning</Button>
+      </Demo>
+      <Demo title="Tone and emphasis" description={<>Each row uses the same eight colour roles. Compare a tone across solid, outline and ghost, then switch the theme in the navbar. <code>variant="danger"</code> is shorthand for <code>variant="solid" tone="danger"</code>.</>} code={`import { Button } from "@alien6-studio/elea-ui";
+
+const tones = ${JSON.stringify(tones)} as const;
+const variants = ${JSON.stringify(surfaces)} as const;
+
+export function ActionPalette() {
+  return variants.map(variant => (
+    <fieldset key={variant}>
+      <legend>{variant}</legend>
+      {tones.map(tone => <Button key={tone} variant={variant} tone={tone}>{tone}</Button>)}
+    </fieldset>
+  ));
+}`}>
+        <div style={{ display: "grid", gap: "var(--elea-space-5)", width: "100%" }}>
+          {surfaces.map(surface => (
+            <div role="group" aria-label={surface} key={surface}>
+              <strong>{surface.charAt(0).toUpperCase() + surface.slice(1)}</strong>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--elea-space-2)", marginTop: "var(--elea-space-2)" }}>
+                {tones.map(tone => <Button key={tone} variant={surface} tone={tone} aria-label={`${tone} ${surface}`}>{tone}</Button>)}
+              </div>
+            </div>
+          ))}
+        </div>
       </Demo>
       <Demo title="An info colour of its own" description="The Info button above uses the active theme. This example gives one button a teal fill and defines its text, hover and pressed colours for light and dark appearances." code={`import type { CSSProperties } from "react";
 import { Button } from "@alien6-studio/elea-ui";
@@ -108,6 +147,27 @@ const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
           ))}
         </div>
       </Demo>
+      <Demo title="Asymmetric corners" description="Read the four corners clockwise from the top left. Publish uses the theme silhouette. Save draft has an explicit small radius. Filter inherits the toolbar’s control radius." code={`import type { CSSProperties } from "react";
+import { Button } from "@alien6-studio/elea-ui";
+
+const actionShape = ${JSON.stringify(actionShape, null, 2)} as CSSProperties;
+const toolbarShape = ${JSON.stringify(toolbarShape, null, 2)} as CSSProperties;
+
+export function PublicationActions() {
+  return (
+    <section style={actionShape}>
+      <Button>Publish</Button>
+      <Button size="sm" radius="sm">Save draft</Button>
+      <div style={toolbarShape}><Button>Filter</Button></div>
+    </section>
+  );
+}`}>
+        <div className="catalog-button-radii" style={actionShape}>
+          <figure><Button>Publish</Button><figcaption>Action silhouette</figcaption></figure>
+          <figure><Button size="sm" radius="sm">Save draft</Button><figcaption>Small radius</figcaption></figure>
+          <figure style={toolbarShape}><Button>Filter</Button><figcaption>Toolbar override</figcaption></figure>
+        </div>
+      </Demo>
       <Demo title="Shadow" description="The default follows the theme. An explicit shadow adds elevation on a busy surface." code={`<Button>Theme default</Button>
 <Button shadow="sm">Small shadow</Button>
 <Button shadow="md">Medium shadow</Button>`}>
@@ -123,6 +183,20 @@ const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
         <Button disabled>Disabled</Button>
         <Button href="https://example.org" variant="outline">A link</Button>
         <Button href="https://example.org" variant="outline" disabled>Unavailable link</Button>
+      </Demo>
+      <Demo title="Router links" description={<>The first link opens the Card guide. Pass the button’s children and event handlers to your router link, mapping <code>href</code> to <code>to</code>. When disabled or loading, ELEA renders an unfocusable anchor with <code>aria-disabled</code> and no destination.</>} code={`import { Button, type ButtonLinkRenderProps } from "@alien6-studio/elea-ui";
+import { Link } from "react-router";
+
+const renderLink = ({ href, ...props }: ButtonLinkRenderProps) => <Link {...props} to={href} />;
+
+export function GuideLinks() {
+  return <>
+    <Button href="/ui/card" render={renderLink}>Open Card guide</Button>
+    <Button href="/ui/card" render={renderLink} disabled>Guide unavailable</Button>
+  </>;
+}`}>
+        <Button href={brandRoute("ui/card", brand)} render={renderGuideLink}>Open Card guide</Button>
+        <Button href={brandRoute("ui/card", brand)} render={renderGuideLink} disabled>Guide unavailable</Button>
       </Demo>
       <Demo title="Motion" description="Hover or press these two buttons. The first follows the gallery’s Expressive motion switch. The second stays still. Both respect the visitor’s reduced-motion preference." code={`<div data-elea-motion="on">
   <Button>Follows the page</Button>
@@ -140,7 +214,8 @@ const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
       </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
-        { name: "variant", type: '"primary" | "secondary" | "tertiary" | "outline" | "ghost" | "danger" | "success" | "info" | "warning"', defaultValue: '"primary"', description: "Visual weight or status colour of the action." },
+        { name: "variant", type: '"solid" | "outline" | "ghost" | "primary" | "secondary" | "tertiary" | "danger" | "success" | "info" | "warning"', defaultValue: '"primary"', description: "Surface treatment. Colour variants are shorthands for solid buttons." },
+        { name: "tone", type: '"primary" | "secondary" | "tertiary" | "neutral" | "danger" | "warning" | "success" | "info"', description: "Colour role for the surface. An explicit tone takes precedence over a colour variant." },
         { name: "size", type: '"xs" | "sm" | "md" | "lg" | "xl"', defaultValue: '"md"', description: "Height and type size." },
         { name: "radius", type: '"none" | "sm" | "md" | "lg" | "full"', defaultValue: "Theme shape", description: "Override the inherited action shape with an explicit corner radius." },
         { name: "shadow", type: '"none" | "sm" | "md"', defaultValue: '"none"', description: "A resting shadow that lifts the button off the surface." },
@@ -149,6 +224,7 @@ const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
         { name: "loading", type: "boolean", defaultValue: "false", description: "Shows a spinner, keeps the label for layout, blocks interaction." },
         { name: "loadingLabel", type: "string", description: "Accessible name while loading." },
         { name: "href", type: "string", description: "Renders an anchor styled as a button." },
+        { name: "render", type: "(props: ButtonLinkRenderProps) => ReactElement", description: "Renders the active link through a host router. Requires href." },
         { name: "fullWidth", type: "boolean", defaultValue: "false", description: "Stretches to the container." },
         { name: "motion", type: "boolean", description: "Turns expressive motion on or off for this button. By default it follows the nearest data-elea-motion container." },
       ]} />

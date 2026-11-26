@@ -12,10 +12,10 @@ async function chooseFormat(page: Page, label: string) {
   await expect(trigger).toBeFocused();
 }
 
-async function downloadSize(page: Page) {
-  const link = page.getByRole("link", { name: "Download PNG" });
+async function downloadSize(page: Page, name: string, slot: "Article cover" | "Feature card" = "Article cover") {
+  const link = page.getByRole("region", { name: slot, exact: true }).getByRole("link", { name: "Download PNG" });
   const [download] = await Promise.all([page.waitForEvent("download"), link.click()]);
-  expect(download.suggestedFilename()).toBe("glacier-cover.png");
+  expect(download.suggestedFilename()).toBe(name);
   const file = await download.path();
   if (!file) throw new Error("Missing downloaded crop");
   const png = await readFile(file);
@@ -38,20 +38,19 @@ test("a local image can be framed with the keyboard, downloaded and replaced", a
   const stage = await page.locator(".demo__stage").boundingBox();
   expect((await frame.boundingBox())!.width).toBeLessThanOrEqual(stage!.width);
   const format = page.getByRole("combobox", { name: "Crop format" });
-  await expect(format).toBeFocused();
-  await expect(format).toHaveText("16:9 · 1600 × 900");
+  await expect(page.getByRole("heading", { name: "Frame the cover" })).toBeFocused();
+  await expect(format).toHaveText("Article cover · 1600 × 900");
   const zoom = page.getByRole("slider", { name: "Zoom" });
   await zoom.press("ArrowRight");
   await expect(zoom).toHaveValue("1.01");
   const rotation = page.getByRole("slider", { name: "Rotation" });
   await rotation.press("ArrowRight");
   await expect(rotation).toHaveValue("1");
-  await page.getByRole("button", { name: "Use crop" }).click();
-  const image = page.getByRole("img", { name: "Cropped cover" });
+  await page.getByRole("button", { name: "Apply crop" }).click();
+  const image = page.getByRole("region", { name: "Article cover", exact: true }).getByRole("img");
   await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth / img.naturalHeight)).toBeCloseTo(16 / 9, 2);
-  const downloadLink = page.getByRole("link", { name: "Download PNG" });
-  await expect(downloadLink).toBeFocused();
-  expect(await downloadSize(page)).toEqual([1600, 900]);
+  await expect(page.getByRole("region", { name: "Article cover", exact: true }).getByRole("button", { name: "Adjust crop" })).toBeFocused();
+  expect(await downloadSize(page, "glacier-cover.png")).toEqual([1600, 900]);
   await page.getByRole("button", { name: "Replace image" }).click();
   await expect(image).toHaveCount(0);
   expect(uploads).toEqual([]);
@@ -60,10 +59,10 @@ test("a local image can be framed with the keyboard, downloaded and replaced", a
 
 test("the square preset exports its specified pixel dimensions", async ({ page }) => {
   await page.goto(route);
-  await chooseFormat(page, "1:1 · 1080 × 1080");
+  await chooseFormat(page, "Square · 1080 × 1080");
   await page.getByRole("group", { name: "Cover crop" }).locator("img").evaluate((img: HTMLImageElement) => img.decode());
-  await page.getByRole("button", { name: "Use crop" }).click();
-  expect(await downloadSize(page)).toEqual([1080, 1080]);
+  await page.getByRole("button", { name: "Apply crop" }).click();
+  expect(await downloadSize(page, "harbour-light-cover.png")).toEqual([1080, 1080]);
 });
 
 test("the crop window changes shape, position and size over the full photo", async ({ page }) => {
@@ -74,7 +73,7 @@ test("the crop window changes shape, position and size over the full photo", asy
   const format = page.getByRole("combobox", { name: "Crop format" });
   const window = frame.locator(".elea-cropper__crop-window");
   const ratio = () => window.evaluate(el => el.getBoundingClientRect().width / el.getBoundingClientRect().height);
-  await chooseFormat(page, "1:1 · 1080 × 1080");
+  await chooseFormat(page, "Square · 1080 × 1080");
   await expect.poll(ratio).toBeCloseTo(1, 2);
   const frameSize = await frame.evaluate(el => [el.clientWidth, el.clientHeight]);
   const photoSize = await photo.evaluate(el => [el.clientWidth, el.clientHeight]);
@@ -86,10 +85,10 @@ test("the crop window changes shape, position and size over the full photo", asy
   await format.press("Escape");
   await expect(page.getByRole("listbox", { name: "Crop format" })).toHaveCount(0);
   await expect(format).toBeFocused();
-  await expect(format).toHaveText("1:1 · 1080 × 1080");
+  await expect(format).toHaveText("Square · 1080 × 1080");
   expect(await cropBounds()).toEqual(squareBounds);
   expect(await photo.evaluate(el => [el.clientWidth, el.clientHeight])).toEqual(photoSize);
-  await chooseFormat(page, "4:5 · 1080 × 1350");
+  await chooseFormat(page, "Portrait · 1080 × 1350");
   await expect.poll(ratio).toBeCloseTo(4 / 5, 2);
   expect(await frame.evaluate(el => [el.clientWidth, el.clientHeight])).toEqual(frameSize);
   expect(await photo.evaluate(el => [el.clientWidth, el.clientHeight])).toEqual(photoSize);
@@ -97,11 +96,11 @@ test("the crop window changes shape, position and size over the full photo", asy
   const before = await window.boundingBox();
   await frame.getByLabel("Move crop area").press("ArrowRight");
   await expect.poll(async () => (await window.boundingBox())!.x).toBeGreaterThan(before!.x);
-  await frame.getByLabel("Resize crop area").press("ArrowLeft");
+  await frame.getByLabel("Resize from bottom right").press("ArrowLeft");
   await expect.poll(async () => (await window.boundingBox())!.width).toBeLessThan(before!.width);
   await expect.poll(ratio).toBeCloseTo(4 / 5, 2);
-  await page.getByRole("button", { name: "Use crop" }).click();
-  expect(await downloadSize(page)).toEqual([1080, 1350]);
+  await page.getByRole("button", { name: "Apply crop" }).click();
+  expect(await downloadSize(page, "harbour-light-cover.png")).toEqual([1080, 1350]);
 });
 
 test("custom crop dimensions validate before exporting the requested size", async ({ page }) => {
@@ -113,7 +112,7 @@ test("custom crop dimensions validate before exporting the requested size", asyn
   await page.getByRole("option", { name: "Custom dimensions" }).click();
   const width = page.getByLabel("Width (px)", { exact: true });
   const height = page.getByLabel("Height (px)", { exact: true });
-  const confirm = page.getByRole("button", { name: "Use crop" });
+  const confirm = page.getByRole("button", { name: "Apply crop" });
   await width.fill("0");
   await expect(confirm).toBeDisabled();
   await expect(page.getByText("Use whole pixels from 1 to 8192 per side, up to 16,777,216 pixels in total.", { exact: true })).toBeVisible();
@@ -126,7 +125,7 @@ test("custom crop dimensions validate before exporting the requested size", asyn
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole("group", { name: "Cover crop" }).locator("img").evaluate((img: HTMLImageElement) => img.decode());
   await confirm.click();
-  expect(await downloadSize(page)).toEqual([640, 480]);
+  expect(await downloadSize(page, "harbour-light-cover.png")).toEqual([640, 480]);
 });
 
 test("the file picker explains a rejection and recovers with the sample", async ({ page }) => {
@@ -136,9 +135,38 @@ test("the file picker explains a rejection and recovers with the sample", async 
   await expect(page.getByRole("alert")).toHaveText("Choose a JPEG, PNG or WebP image.");
   await page.locator('input[type="file"]').setInputFiles({ name: "broken.png", mimeType: "image/png", buffer: Buffer.from("No image data") });
   await expect(page.getByRole("alert")).toContainText("could not be opened");
-  await page.getByRole("button", { name: "Use glacier photo" }).click();
+  await page.getByRole("button", { name: "Use sample photo" }).click();
   await expect(page.getByRole("alert")).toHaveCount(0);
   await expect.poll(() => page.getByRole("group", { name: "Cover crop" }).locator("img").evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
-  await page.getByRole("button", { name: "Use crop" }).click();
+  await page.getByRole("button", { name: "Apply crop" }).click();
   await expect(page.getByRole("link", { name: "Download PNG" })).toBeVisible();
+});
+
+test("each destination reopens its crop on the original and cancellation preserves the saved output", async ({ page }) => {
+  await page.goto(route);
+  const cover = page.getByRole("region", { name: "Article cover", exact: true });
+  const card = page.getByRole("region", { name: "Feature card", exact: true });
+  const frame = page.getByRole("group", { name: "Cover crop" });
+  await frame.locator("img").evaluate((image: HTMLImageElement) => image.decode());
+  const original = await frame.locator("img").getAttribute("src");
+  const mask = frame.locator(".elea-cropper__crop-window");
+  const rectangle = () => mask.evaluate(element => element.getAttribute("style"));
+  await frame.getByRole("button", { name: "Move crop area" }).press("Shift+ArrowLeft");
+  const crop = await rectangle();
+  await page.getByRole("button", { name: "Apply crop" }).click();
+  const first = cover.getByRole("img");
+  await expect(first).toHaveAttribute("src", /^blob:/);
+  const saved = await first.getAttribute("src");
+  await card.getByRole("button", { name: "Adjust crop" }).click();
+  await expect(page.getByRole("combobox", { name: "Crop format" })).toHaveText("Feature card · 1080 × 1350");
+  await page.getByRole("button", { name: "Apply crop" }).click();
+  expect(await downloadSize(page, "harbour-light-card.png", "Feature card")).toEqual([1080, 1350]);
+  await expect(first).toHaveAttribute("src", saved!);
+  await cover.getByRole("button", { name: "Adjust crop" }).click();
+  await expect(frame.locator("img")).toHaveAttribute("src", original!);
+  await expect.poll(rectangle).toBe(crop);
+  await frame.getByRole("button", { name: "Move crop area" }).press("Shift+ArrowLeft");
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(first).toHaveAttribute("src", saved!);
+  await expect(card.getByRole("link", { name: "Download PNG" })).toBeVisible();
 });
