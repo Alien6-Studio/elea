@@ -6,6 +6,7 @@ import { createRef, useState } from "react";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToStaticMarkup, renderToString } from "react-dom/server";
+import { createThemeProfile, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import axe from "axe-core";
 import { Badge } from "./Badge.js";
 import { Select } from "./Select.js";
@@ -104,6 +105,22 @@ test("scoped shapes distinguish actions, controls, surfaces and selections", () 
   assert.equal(top(save), "6px");
   assert.equal(top(back), "2px");
   assert.equal(top(input), "6px");
+});
+
+test("explicit Button radii are uniform and distinct within a square shape profile", () => {
+  const { css } = makeBrandTheme(createThemeProfile("reserve"));
+  const sheet = readFileSync(new URL("css/button.css", import.meta.url), "utf8");
+  const { container } = render(<div className="elea-brand">
+    <style>{css + sheet}</style>
+    {(["sm", "md", "lg"] as const).map(radius => <Button key={radius} radius={radius}>{radius}</Button>)}
+  </div>);
+  for (const [size, radius] of Object.entries({ sm: "4px", md: "6px", lg: "12px" })) {
+    const style = getComputedStyle(screen.getByRole("button", { name: size }));
+    assert.equal(style.borderTopLeftRadius, radius);
+    assert.equal(style.borderBottomRightRadius, radius);
+  }
+  container.style.setProperty("--elea-control-radius", "9px");
+  assert.equal(getComputedStyle(screen.getByRole("button", { name: "md" })).borderTopLeftRadius, "9px");
 });
 
 test("Button publishes the pointer to the effects that follow it", () => {

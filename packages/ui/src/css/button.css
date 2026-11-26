@@ -29,9 +29,9 @@
 .elea-button--lg { font-size: var(--elea-control-font-size, clamp(calc(var(--elea-font-size-base) + 1px), var(--elea-font-size-lg), calc(var(--elea-font-size-xl) - 1px))); padding: var(--elea-space-3) var(--elea-control-padding-inline, var(--elea-space-5)); --_elea-button-size: 3rem; }
 .elea-button--xl { font-size: var(--elea-control-font-size, var(--elea-font-size-xl)); padding: var(--elea-space-4) var(--elea-control-padding-inline, var(--elea-space-6)); --_elea-button-size: 3.5rem; }
 .elea-button--radius-none { border-radius: 0; }
-.elea-button--radius-sm { border-radius: var(--elea-radius-sm); }
-.elea-button--radius-md { border-radius: var(--elea-control-radius, var(--elea-radius-md)); }
-.elea-button--radius-lg { border-radius: var(--elea-radius-xl); }
+.elea-button--radius-sm { border-radius: var(--elea-button-radius-sm, var(--elea-radius-sm)); }
+.elea-button--radius-md { border-radius: var(--elea-control-radius, var(--elea-button-radius-md, var(--elea-radius-md))); }
+.elea-button--radius-lg { border-radius: var(--elea-button-radius-lg, var(--elea-radius-xl)); }
 .elea-button--radius-full { border-radius: var(--elea-radius-full); }
 .elea-button--shadow-sm { --elea-button-shadow: var(--elea-shadow-sm); }
 .elea-button--shadow-md { --elea-button-shadow: var(--elea-shadow-md); }

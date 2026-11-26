@@ -319,6 +319,9 @@ export function makeBrandTheme({ edition, controls, seed, corner, shape, typefac
       return `  --elea-color-${role}-${swatch.step}: ${value};`;
     })),
     ...["sm", "md", "lg", "xl"].map((size, index) => `  --elea-radius-${size}: ${radii[index]};`),
+    // A square canvas can still carry shaped actions with an explicit, uniform corner.
+    ...Object.entries({ sm: RADII.Soft[0], md: RADII.Soft[1], lg: RADII.Soft[3] }).map(([size, value]) =>
+      `  --elea-button-radius-${size}: ${shapes && corner === "Square" ? value : "initial"};`),
     // Reset each role at the brand boundary so nested uniform themes use their scalar radii.
     ...(["action", "control", "surface", "indicator"] as const).map(role => `  --elea-shape-${role}: ${shapes?.[role] ?? "initial"};`),
     ...(font === undefined ? [] : [`  --elea-font-family-sans: ${font};`]),

@@ -4,7 +4,7 @@ import { gzipSync } from "node:zlib";
 
 // Size budget of every package, gzip bytes of the compiled JavaScript and CSS.
 // Raising a budget is a deliberate decision made in the same change as the growth.
-// tokens: 23.25 KB including the scoped shape properties, the ELEA Sans declarations, scoped colour roles, local feedback aliases and the optional brand generator, three
+// tokens: 23.35 KB including the scoped shapes and explicit Button radii, the ELEA Sans declarations, scoped colour roles, local feedback aliases and the optional brand generator, three
 // prebuilt CSS editions with paired palettes and control proportions and depth, motion tokens, the Tailwind v3 presets, the shadcn/ui aliases and the
 // cascade layer every sheet states, with scoped appearance color pairs and portal-compatible brand classes.
 // content: 28.1 KB including multiline Markdown lists, checklists with the state of their tasks, media links, the shared image URL policy
@@ -21,7 +21,7 @@ import { gzipSync } from "node:zlib";
 // the package can grow by components without any of them growing unnoticed. This includes scoped
 // control tokens, independent feedback fills and foregrounds with local host fallbacks,
 // the font on standalone controls and surfaces, and the optional Tabs presentations.
-const BUDGETS = { tokens: 23_250, content: 28_100, "content-viewer": 12_750, media: 8_000, "content-editor": 75_500 };
+const BUDGETS = { tokens: 23_350, content: 28_100, "content-viewer": 12_750, media: 8_000, "content-editor": 75_500 };
 const referencePaletteFiles = new Set(["palette.js", "palette.css", "color-themes.js"]);
 // The optional atlas includes nine sets of component shapes, thirteen colour schemes and five surface scales.
 const referencePaletteBudget = 6_225;
@@ -33,9 +33,10 @@ const cropAdjustmentFiles = new Set(["AdjustableCrop.js", "CropFormatControls.js
 // (motion, button-effects) or a script without a sheet (cx, index, scope) answers alone. A sheet
 // holds alone: it states the layer order and carries the shared keyframes it names.
 // The surface and control sheets include optional profile shapes and scalar fallbacks.
+// Carousel also ships the standalone Button sheet, including its explicit corner scale.
 const UI_BUDGETS = {
-  calendar: 3_600, carousel: 5_000, "color-picker": 2_400, combobox: 4_200,
-  accordion: 2_500, alert: 1_700, avatar: 1_500, badge: 1_125, button: 3_450, "button-effects": 1_500, card: 1_550, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
+  calendar: 3_600, carousel: 5_025, "color-picker": 2_400, combobox: 4_200,
+  accordion: 2_500, alert: 1_700, avatar: 1_500, badge: 1_125, button: 3_475, "button-effects": 1_500, card: 1_550, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
   dialog: 3_750, field: 2_025, footer: 1_250, index: 600, menu: 2_700, motion: 1_250, pagination: 2_050, popover: 4_150, progress: 1_500,
   "radio-group": 1_750, select: 4_900, separator: 750, sheet: 1_775, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, table: 2_250, tabs: 3_100, toast: 3_400, tooltip: 2_275,
 };

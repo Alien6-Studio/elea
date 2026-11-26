@@ -88,6 +88,11 @@ test("shape roles travel with a full profile and remain independent of its colou
 
 test("a uniform brand or an explicit corner or radius resets all inherited shape roles", () => {
   const reserve = createThemeProfile("reserve");
+  const { css: shaped } = makeBrandTheme(reserve);
+  assert.ok(shaped.includes("--elea-radius-md: 0;"));
+  for (const [size, value] of Object.entries({ sm: "0.25rem", md: "0.375rem", lg: "0.75rem" })) {
+    assert.ok(shaped.includes(`--elea-button-radius-${size}: ${value};`));
+  }
   for (const brand of [
     editions.Precision, { ...reserve, shape: undefined }, { ...reserve, corner: "Round" as const },
     { ...reserve, radius: "10px" }, { ...reserve, radius: "0px" },
@@ -95,6 +100,9 @@ test("a uniform brand or an explicit corner or radius resets all inherited shape
     const { css } = makeBrandTheme(brand);
     for (const role of ["action", "control", "surface", "indicator"]) {
       assert.ok(css.includes(`--elea-shape-${role}: initial;`), role);
+    }
+    for (const size of ["sm", "md", "lg"]) {
+      assert.ok(css.includes(`--elea-button-radius-${size}: initial;`), size);
     }
   }
   for (const shape of ["fjord", "__proto__", "constructor", "", null, 3]) {
