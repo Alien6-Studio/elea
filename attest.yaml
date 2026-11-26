@@ -4,10 +4,22 @@ steps:
   qualify:
     run: |-
       set -eu
+      # Attest protects its inputs. Build the recorded revision in a writable directory.
+      revision=$(cat artifacts/source-revision.txt)
+      test "$revision" = "$(git rev-parse HEAD)"
+      git diff --quiet "$revision" --
+      test -z "$(git ls-files --others --exclude-standard)"
+      evidence="$PWD/artifacts"
+      build=$(mktemp -d)
+      trap 'rm -rf "$build"' EXIT
+      git archive --output="$build/source.tar" "$revision"
+      tar -xf "$build/source.tar" -C "$build"
+      cd "$build"
       npm ci
       npm run check -- --pack-destination artifacts
       npm audit --audit-level=high
       node --version > artifacts/toolchain.txt
+      cp -R artifacts/. "$evidence/"
     inputs:
       - packages/
       - scripts/
