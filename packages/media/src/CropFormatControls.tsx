@@ -51,7 +51,9 @@ export function useCropFormat(formats: CropFormatOptions | undefined, initialSiz
   const size = { width: Number(custom.width), height: Number(custom.height) };
   const invalid = format === "custom" && !isValidOutputSize(size);
   const free = format === "free";
-  const outputSize = free || format === "original" ? undefined : format === "custom" ? custom.lastValid : presets[format].size;
+  let outputSize: Size | undefined;
+  if (format === "custom") outputSize = custom.lastValid;
+  else if (!free && format !== "original") outputSize = presets[format].size;
   const { labels } = formats;
 
   function edit(axis: keyof Size, text: string) {

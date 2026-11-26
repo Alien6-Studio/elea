@@ -10,17 +10,17 @@ export const defaultColorStep = 500 satisfies ColorStep;
 
 // Families share a perceptual lightness axis. Chroma peaks around the middle of the scale.
 const lightness = [0.975, 0.945, 0.89, 0.81, 0.72, 0.635, 0.535, 0.46, 0.385, 0.302, 0.218];
-const saturation = [0.10, 0.23, 0.44, 0.68, 0.87, 1, 0.96, 0.84, 0.67, 0.49, 0.33];
+const saturation = [0.1, 0.23, 0.44, 0.68, 0.87, 1, 0.96, 0.84, 0.67, 0.49, 0.33];
 
 // Inverse Oklab transform to linear sRGB (Björn Ottosson).
 function linearRgb(light: number, a: number, b: number) {
   const l = (light + 0.3963377774 * a + 0.2158037573 * b) ** 3;
   const m = (light - 0.1055613458 * a - 0.0638541728 * b) ** 3;
-  const s = (light - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+  const s = (light - 0.0894841775 * a - 1.291485548 * b) ** 3;
   return [
     4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
     -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
-    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
   ];
 }
 
@@ -63,7 +63,7 @@ export const colorFamilies = {
   Emerald: family(165, 0.145),
   Lagoon: family(197, 0.13),
   Sky: family(232, 0.15),
-  Cobalt: family(264, 0.20),
+  Cobalt: family(264, 0.2),
   Iris: family(285, 0.185),
   Violet: family(306, 0.175),
   Plum: family(328, 0.15),
@@ -77,11 +77,11 @@ export type ColorFamily = keyof typeof colorFamilies;
 
 // Art-directed neutrals keep the paper and the ink of a scheme as their exact endpoints.
 function surfaceRamp(paper: string, ink: string) {
-  const amounts = [0, 0.045, 0.10, 0.21, 0.32, 0.50, 0.68, 0.85, 0.90, 0.95, 1];
+  const amounts = [0, 0.045, 0.1, 0.21, 0.32, 0.5, 0.68, 0.85, 0.9, 0.95, 1];
   return colorSteps.map((step, index) => {
     const value = [1, 3, 5].map(offset => {
-      const start = parseInt(paper.slice(offset, offset + 2), 16);
-      const end = parseInt(ink.slice(offset, offset + 2), 16);
+      const start = Number.parseInt(paper.slice(offset, offset + 2), 16);
+      const end = Number.parseInt(ink.slice(offset, offset + 2), 16);
       return Math.round(start + (end - start) * amounts[index]!).toString(16).padStart(2, "0");
     }).join("");
     return { step, value: "#" + value };

@@ -6,14 +6,18 @@ const version = tag.slice(1);
 const readJson = path => JSON.parse(readFileSync(path, "utf8"));
 if (readJson("package.json").version !== version) throw new Error("The root package version must match the tag");
 
-const changelog = readFileSync("CHANGELOG.md", "utf8").replace(/\r\n/g, "\n");
+const changelog = readFileSync("CHANGELOG.md", "utf8").replaceAll("\r\n", "\n");
 const headings = [...changelog.matchAll(/^## ([^\n]+)$/gm)];
-const releases = headings.filter(([, heading]) => heading.trim().split(/\s+-\s+\d{4}-\d{2}-\d{2}$/)[0] === version);
+const releases = headings.filter(([, heading]) => {
+  const [release, separator, date, extra] = heading.trim().split(/\s+/, 4);
+  return release === version && (separator === undefined ||
+    (separator === "-" && /^\d{4}-\d{2}-\d{2}$/.test(date ?? "") && extra === undefined));
+});
 if (releases.length !== 1) throw new Error(`Expected exactly one CHANGELOG.md section for ${version}`);
 const [heading] = releases;
 const next = headings[headings.indexOf(heading) + 1];
 const changes = changelog.slice(heading.index + heading[0].length, next?.index).trim();
-const prose = changes.replace(/<!--[\s\S]*?-->/g, "").replace(/^#{1,6} .*$/gm, "").trim();
+const prose = changes.replaceAll(/<!--[\s\S]*?-->/g, "").replaceAll(/^#{1,6} .*$/gm, "").trim();
 if (!prose) throw new Error(`Add integrator-facing release notes under CHANGELOG.md section ${version}`);
 
 const repo = process.env.GITHUB_REPOSITORY ?? "Alien6-Studio/elea";

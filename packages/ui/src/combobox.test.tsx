@@ -46,7 +46,7 @@ test("the combobox filters labels and only submits the controlled option value",
   const listbox = screen.getByRole("listbox", { name: "Habitat" });
   assert.equal(input.getAttribute("aria-controls"), listbox.id);
   assert.deepEqual(screen.getAllByRole("option").map(node => node.textContent), ["Coastal"]);
-  assert.equal(activeOption(input), screen.getByRole("option", { name: "Coastal" }));
+  assert.equal(activeOption(input), screen.getByRole("option", { name: "Coastal", selected: true }));
   assert.equal(submitted(), "a");
   fireEvent.keyDown(input, { key: "Enter" });
   assert.deepEqual(changes, ["c"]);
@@ -56,6 +56,14 @@ test("the combobox filters labels and only submits the controlled option value",
   view.rerender(form("c"));
   assert.equal(input.value, "Coastal");
   assert.equal(submitted(), "c");
+  fireEvent.click(input);
+  fireEvent.keyDown(input, { key: "ArrowDown" });
+  assert.equal(activeOption(input), screen.getByRole("option", { name: "Desert", selected: true }));
+  assert.equal(screen.getByRole("option", { name: "Coastal", selected: false }).tabIndex, -1);
+  assert.equal(submitted(), "c");
+  fireEvent.keyDown(input, { key: "Escape" });
+  assert.equal(input.value, "Coastal");
+  assert.deepEqual(changes, ["c"]);
   fireEvent.click(input);
   view.rerender(form("c", true));
   assert.equal(input.disabled, true);

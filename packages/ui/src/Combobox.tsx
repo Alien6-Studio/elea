@@ -33,6 +33,12 @@ interface Search {
   activeValue: string | null;
 }
 
+function ignoresKey(event: KeyboardEvent<HTMLInputElement>) {
+  // WebKit can send the IME's confirming Enter after compositionend, with only keyCode 229.
+  return event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229
+    || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey;
+}
+
 /** An editable single-choice field. Only choosing an enabled option commits a value. */
 export function Combobox({ value, onChange, options, label, emptyMessage, placeholder, disabled, name, id, className, ...aria }: Readonly<ComboboxProps>) {
   const generatedId = useId();
@@ -40,7 +46,7 @@ export function Combobox({ value, onChange, options, label, emptyMessage, placeh
   const listId = `${inputId}-listbox`;
   const input = useRef<HTMLInputElement>(null);
   const popup = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLUListElement>(null);
+  const list = useRef<HTMLDivElement>(null);
   const composing = useRef(false);
   const [search, setSearch] = useState<Search | null>(null);
   const expanded = search !== null && !disabled;
@@ -65,17 +71,17 @@ export function Combobox({ value, onChange, options, label, emptyMessage, placeh
     setSearch(null);
     onChange(option.value);
   };
+  const moveActive = (step: 1 | -1) => {
+    const edge = step > 0 ? enabled[0] : enabled.at(-1);
+    const current = active ? enabled.indexOf(active) : -1;
+    const next = expanded && current >= 0 ? enabled[(current + step + enabled.length) % enabled.length] : edge;
+    setSearch({ query: search?.query ?? null, activeValue: next?.value ?? null });
+  };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (disabled || composing.current || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
-    if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+    if (disabled || composing.current || ignoresKey(event)) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
-      const step = event.key === "ArrowDown" ? 1 : -1;
-      const current = active ? enabled.indexOf(active) : -1;
-      const next = expanded && current >= 0
-        ? enabled[(current + step + enabled.length) % enabled.length]
-        : step > 0 ? enabled[0] : enabled.at(-1);
-      setSearch({ query: search?.query ?? null, activeValue: next?.value ?? null });
+      moveActive(event.key === "ArrowDown" ? 1 : -1);
     } else if (expanded && event.key === "Enter") {
       event.preventDefault();
       if (active) choose(active);
@@ -105,19 +111,19 @@ export function Combobox({ value, onChange, options, label, emptyMessage, placeh
       </svg>
       {expanded && (
         <div ref={popup} className="elea-ui-select__list">
-          <ul ref={list} role="listbox" id={listId} aria-label={label} className="elea-combobox__options">
+          <div ref={list} role="listbox" id={listId} aria-label={label} className="elea-combobox__options">
             {matches.map((option, i) => (
-              <li key={option.value} id={`${listId}-${i}`} role="option"
-                aria-selected={option.value === value} aria-disabled={option.disabled || undefined}
+              <button key={option.value} id={`${listId}-${i}`} type="button" role="option" tabIndex={-1}
+                aria-selected={option === active} aria-disabled={option.disabled || undefined}
                 className={cx("elea-ui-select__option", option === active && "elea-ui-select__option--active",
-                  option.value === value && "elea-ui-select__option--selected", option.disabled && "elea-ui-select__option--disabled")}
+                  option === active && "elea-ui-select__option--selected", option.disabled && "elea-ui-select__option--disabled")}
                 onMouseDown={event => event.preventDefault()}
                 onMouseEnter={() => { if (!option.disabled) setSearch({ ...search, activeValue: option.value }); }}
                 onClick={() => choose(option)}
-              >{option.label}</li>
+              >{option.label}</button>
             ))}
-          </ul>
-          {matches.length === 0 && <p role="status" className="elea-combobox__empty">{emptyMessage}</p>}
+          </div>
+          <output htmlFor={inputId} className="elea-combobox__empty">{matches.length === 0 ? emptyMessage : ""}</output>
         </div>
       )}
       {name && selected && <input type="hidden" name={name} value={selected.value} disabled={disabled} />}

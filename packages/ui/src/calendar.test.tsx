@@ -118,10 +118,12 @@ test("an empty calendar waits for local today at hydration when an opening month
   const element = <Calendar {...base} />;
   const container = document.createElement("div");
   container.innerHTML = renderToString(element);
-  assert.ok(container.querySelector('[aria-busy="true"]'));
+  assert.equal(within(container).getByRole("group", { name: base.label }).getAttribute("aria-busy"), "true");
   const errors: unknown[] = [];
   render(element, { container, hydrate: true, onRecoverableError: error => errors.push(error) });
   assert.deepEqual(errors, []);
+  const group = within(container).getByRole("group", { name: base.label });
+  assert.ok(within(group).getByRole("grid", { name: base.label }));
   assert.equal(container.querySelector('[aria-current="date"]')?.textContent, String(new Date().getDate()));
 });
 

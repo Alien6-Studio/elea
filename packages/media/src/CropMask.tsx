@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 import type { CropRect, Point, Size } from "./crop.js";
 
 interface Selection {
@@ -78,6 +78,7 @@ export function useCropMask(stage: Size, aspect: number | undefined, labels: { m
   const ratio = aspect !== undefined && Number.isFinite(aspect) && aspect > 0 ? aspect : undefined;
   const [selection, setSelection] = useState<Selection>({ center: { x: 0.5, y: 0.5 }, span: { width: 0.8, height: 0.8 }, aspect: ratio });
   const drag = useRef<Drag | null>(null);
+  const descriptionId = useId();
   if (!labels || stage.width <= 0 || stage.height <= 0) return { rect: { x: 0, y: 0, ...stage }, overlay: null };
 
   let rect = bounds(selection, stage);
@@ -98,7 +99,7 @@ export function useCropMask(stage: Size, aspect: number | undefined, labels: { m
   }
   function move(event: PointerEvent<HTMLButtonElement>) {
     const from = drag.current;
-    if (disabled || !from || from.id !== event.pointerId) return;
+    if (disabled || from?.id !== event.pointerId) return;
     event.stopPropagation();
     if (from.selection.aspect !== ratio) return;
     const next = adjust(from.action, bounds(from.selection, stage), stage, ratio, event.clientX - from.origin.x, event.clientY - from.origin.y, from.rtl);
@@ -119,10 +120,12 @@ export function useCropMask(stage: Size, aspect: number | undefined, labels: { m
     setSelection(remember(adjust(action, rect, stage, ratio, step.x * amount, step.y * amount, rtl), stage, ratio));
   }
   const control = (action: Action, label: string, description: string) => (
-    <button type="button" className={`elea-cropper__${action}`} aria-label={label} aria-description={description}
+    <button type="button" className={`elea-cropper__${action}`} aria-label={label} aria-describedby={`${descriptionId}-${action}`}
       aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Shift+ArrowLeft Shift+ArrowRight Shift+ArrowUp Shift+ArrowDown"
       disabled={disabled} onKeyDown={event => key(event, action)} onPointerDown={event => start(event, action)}
-      onPointerMove={move} onPointerUp={stop} onPointerCancel={stop} onLostPointerCapture={stop} />
+      onPointerMove={move} onPointerUp={stop} onPointerCancel={stop} onLostPointerCapture={stop}>
+      <span hidden id={`${descriptionId}-${action}`}>{description}</span>
+    </button>
   );
   const overlay = <div className="elea-cropper__crop-window" style={{ left: rect.x, top: rect.y, width: rect.width, height: rect.height }}>
     {control("move", labels.move, `x: ${Math.round(rect.x)}, y: ${Math.round(rect.y)}`)}

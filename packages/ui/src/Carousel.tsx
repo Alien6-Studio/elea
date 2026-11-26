@@ -43,8 +43,29 @@ export interface CarouselProps<Item> {
 
 const slideAction = ":scope > button:enabled, :scope > a[href]";
 
+/** Run after the next frame unless focus has moved to another element in the meantime. */
+function runIfFocusKept(target: HTMLElement, action: () => void) {
+  requestAnimationFrame(() => {
+    if (document.activeElement === target || document.activeElement === document.body) action();
+  });
+}
+
+function hasModifier(event: KeyboardEvent<HTMLElement>) {
+  return event.altKey || event.metaKey || event.ctrlKey || event.shiftKey;
+}
+
 function bounded(index: number, last: number) {
   return Math.max(0, Math.min(Number.isFinite(index) ? Math.trunc(index) : 0, last));
+}
+
+function visibleCount(itemsPerView: number | undefined, measured: number | undefined) {
+  if (itemsPerView === undefined || !Number.isFinite(itemsPerView)) return measured ?? 1;
+  return Math.min(measured ?? Infinity, Math.max(1, Math.trunc(itemsPerView)));
+}
+
+function inlineStep(element: Element, forwardInLtr: boolean) {
+  const rtl = getComputedStyle(element).direction === "rtl";
+  return forwardInLtr === rtl ? -1 : 1;
 }
 
 /** A manually navigated collection. Only the visible items are mounted. */
@@ -62,9 +83,7 @@ export function Carousel<Item>({ items, itemKey, renderItem, label, roleDescript
   const count = items.length;
   const hasItems = count > 0;
   const responsive = minItemWidth !== undefined && minItemWidth > 0;
-  const maxVisible = itemsPerView !== undefined && Number.isFinite(itemsPerView)
-    ? Math.max(1, Math.trunc(itemsPerView)) : responsive ? Infinity : 1;
-  const visible = responsive ? Math.min(capacity, maxVisible) : maxVisible;
+  const visible = visibleCount(itemsPerView, responsive ? capacity : undefined);
   const last = Math.max(0, count - visible);
   const first = bounded(index ?? position, last);
   const end = Math.min(count, first + visible);
@@ -73,7 +92,7 @@ export function Carousel<Item>({ items, itemKey, renderItem, label, roleDescript
     const node = viewport.current;
     if (!node || !minItemWidth || minItemWidth <= 0) return;
     const measure = () => {
-      const gap = parseFloat(getComputedStyle(node).columnGap) || 0;
+      const gap = Number.parseFloat(getComputedStyle(node).columnGap) || 0;
       setCapacity(Math.max(1, Math.floor((node.clientWidth + gap) / (minItemWidth + gap))));
     };
     measure();
@@ -98,12 +117,12 @@ export function Carousel<Item>({ items, itemKey, renderItem, label, roleDescript
   }
 
   function navigate(event: KeyboardEvent<HTMLElement>, fromSlide = false) {
-    if (event.defaultPrevented || event.altKey || event.metaKey || event.ctrlKey || event.shiftKey || event.nativeEvent.isComposing) return;
+    if (event.defaultPrevented || hasModifier(event) || event.nativeEvent.isComposing) return;
     const target = event.target as HTMLElement;
     const slide = fromSlide ? target.closest<HTMLElement>(".elea-carousel__slide") : null;
     // A slide may hold a form or another composite widget with its own arrow-key interaction.
-    if (fromSlide && (!slide || slide.querySelector(slideAction) !== target || slide.parentElement !== viewport.current)) return;
-    const current = slide ? Number(slide.dataset.index) : first;
+    if (fromSlide && (slide?.querySelector(slideAction) !== target || slide.parentElement !== viewport.current)) return;
+    const current = Number(slide?.dataset.index ?? first);
     const limit = slide ? count - 1 : last;
     let next: number;
     switch (event.key) {
@@ -111,8 +130,7 @@ export function Carousel<Item>({ items, itemKey, renderItem, label, roleDescript
       case "End": next = limit; break;
       case "ArrowLeft":
       case "ArrowRight": {
-        const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
-        next = destination(current + (event.key === (rtl ? "ArrowLeft" : "ArrowRight") ? 1 : -1), limit);
+        next = destination(current + inlineStep(event.currentTarget, event.key === "ArrowRight"), limit);
         break;
       }
       default: return;
@@ -121,24 +139,16 @@ export function Carousel<Item>({ items, itemKey, renderItem, label, roleDescript
     if (!slide) {
       change(next);
       if (target.classList.contains("elea-carousel__dot")) {
-        const group = event.currentTarget;
-        requestAnimationFrame(() => {
-          if (document.activeElement === target || document.activeElement === document.body) {
-            group.querySelector<HTMLButtonElement>("[aria-current]")?.focus();
-          }
-        });
+        const dots = target.parentElement!;
+        runIfFocusKept(target, () => dots.querySelector<HTMLButtonElement>("[aria-current]")?.focus());
       }
       return;
     }
     const start = Math.min(next, Math.max(first, next - visible + 1));
     change(start);
-    function focusSlide() {
-      viewport.current?.querySelector<HTMLElement>(`[data-index="${next}"]`)?.querySelector<HTMLElement>(slideAction)?.focus();
-    }
+    const focusSlide = () => viewport.current?.querySelector<HTMLElement>(`[data-index="${next}"]`)?.querySelector<HTMLElement>(slideAction)?.focus();
     if (start === first) focusSlide();
-    else requestAnimationFrame(() => {
-      if (document.activeElement === target || document.activeElement === document.body) focusSlide();
-    });
+    else runIfFocusKept(target, focusSlide);
   }
 
   function startSwipe(event: PointerEvent) {
@@ -150,12 +160,11 @@ export function Carousel<Item>({ items, itemKey, renderItem, label, roleDescript
   function endSwipe(event: PointerEvent) {
     const start = swipe.current;
     swipe.current = null;
-    if (!start || event.pointerId !== start.id) return;
+    if (start?.id !== event.pointerId) return;
     const dx = event.clientX - start.x;
     if (Math.abs(dx) < 45 || Math.abs(dx) <= 1.5 * Math.abs(event.clientY - start.y)) return;
     suppressClick.current = true;
-    const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
-    change(destination(first + ((dx < 0) !== rtl ? 1 : -1), last));
+    change(destination(first + inlineStep(event.currentTarget, dx < 0), last));
   }
 
   if (!hasItems) return null;
@@ -163,25 +172,26 @@ export function Carousel<Item>({ items, itemKey, renderItem, label, roleDescript
     return (visible === 1 ? start + 1 : `${start + 1}–${Math.min(count, start + visible)}`) + " / " + count;
   }
   const arrows = navigation !== "dots";
+  // A gap is keyed by the page that precedes it.
+  const dots = paginationRange(first + 1, last + 1, 3).map((page, offset, all) => ({ page, key: page ?? `gap-${all[offset - 1]}` }));
   const controls = interactive && last > 0 && (
-    <div className="elea-carousel__controls" role="group" aria-label={controlsLabel ?? label}
-      data-align={controlsAlign} onKeyDown={event => navigate(event)}>
-      {arrows && <IconButton label={previousLabel} aria-controls={id} aria-disabled={!loop && first === 0} onClick={() => change(destination(first - 1, last))}>
+    <fieldset className="elea-carousel__controls" aria-label={controlsLabel ?? label} data-align={controlsAlign}>
+      {arrows && <IconButton label={previousLabel} aria-controls={id} aria-disabled={!loop && first === 0} onKeyDown={navigate} onClick={() => change(destination(first - 1, last))}>
         <span className="elea-carousel__arrow">←</span>
       </IconButton>}
       {navigation !== "arrows" && <div className="elea-carousel__dots">
-        {paginationRange(first + 1, last + 1, 3).map((page, offset) => page === null
-          ? <span key={`gap-${offset}`} aria-hidden="true">…</span>
+        {dots.map(({ page, key }) => page === null
+          ? <span key={key} aria-hidden="true">…</span>
           : <button key={page} type="button" className="elea-carousel__dot"
               aria-label={getDotLabel?.(page - 1) ?? rangeLabel(page - 1)} aria-controls={id}
               aria-current={page === first + 1 || undefined} tabIndex={page === first + 1 ? 0 : -1}
-              onClick={() => change(page - 1)} />)}
+              onKeyDown={navigate} onClick={() => change(page - 1)} />)}
       </div>}
-      <span className="elea-carousel__position" data-visible={showCounter} role="status">{rangeLabel(first)}</span>
-      {arrows && <IconButton label={nextLabel} aria-controls={id} aria-disabled={!loop && first === last} onClick={() => change(destination(first + 1, last))}>
+      <output className="elea-carousel__position" data-visible={showCounter}>{rangeLabel(first)}</output>
+      {arrows && <IconButton label={nextLabel} aria-controls={id} aria-disabled={!loop && first === last} onKeyDown={navigate} onClick={() => change(destination(first + 1, last))}>
         <span className="elea-carousel__arrow">→</span>
       </IconButton>}
-    </div>
+    </fieldset>
   );
   return (
     <section aria-label={label} aria-roledescription={roleDescription} className={cx("elea-carousel", className)}>

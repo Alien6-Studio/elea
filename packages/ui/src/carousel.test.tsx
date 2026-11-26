@@ -66,6 +66,14 @@ test("controlled and looping collections respect RTL, host updates and changes i
   assert.ok(screen.getByText("First"));
 });
 
+test("resetting the surrounding form keeps the live position in sync with its slide", () => {
+  const { container } = render(<form><Carousel {...props} /></form>);
+  fireEvent.click(screen.getByRole("button", { name: "Next edition" }));
+  container.querySelector("form")!.reset();
+  assert.equal(screen.getByRole("status").textContent, "2 / 4");
+  assert.ok(screen.getByText("Second"));
+});
+
 test("a responsive strip moves focus between actions without selecting them", async () => {
   const picked: string[] = [];
   const strip = <Carousel {...props} minItemWidth={160}
@@ -127,6 +135,10 @@ test("horizontal swipes navigate without activating an action and vertical gestu
   pointer(third, "pointerup", 12, 5, "mouse");
   fireEvent.click(third, { detail: 1 });
   assert.deepEqual(picked, ["Second", "Third"]);
+  third.closest<HTMLElement>(".elea-carousel__viewport")!.dir = "rtl";
+  pointer(third, "pointerdown", 20, 0);
+  pointer(third, "pointerup", 100, 0);
+  assert.ok(screen.getByText("Fourth"));
 });
 
 test("embedded controls retain their own arrow keys and touch gestures", () => {

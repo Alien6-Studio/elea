@@ -47,13 +47,13 @@ export interface ImageCropperProps {
 const INITIAL: CropState = { zoom: 1, rotation: 0, offset: { x: 0, y: 0 } };
 const FALLBACK_WIDTH = 640;
 
-function CropSlider({ label, value, onChange, ...range }: CropSliderProps) {
+function CropSlider({ label, value, onChange, ...range }: Readonly<CropSliderProps>) {
   return <label className="elea-cropper__slider"><span>{label}</span>
     <input type="range" {...range} value={value} onChange={event => onChange(event.currentTarget.valueAsNumber)} />
   </label>;
 }
 
-function CropButton({ variant, ...props }: CropButtonProps) {
+function CropButton({ variant, ...props }: Readonly<CropButtonProps>) {
   return <button type="button" className={variant === "primary" ? "elea-cropper__button elea-cropper__button--primary" : "elea-cropper__button"} {...props} />;
 }
 

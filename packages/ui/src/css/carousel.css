@@ -8,7 +8,7 @@
   gap: var(--elea-space-2);
 }
 .elea-carousel__footer { margin-block-start: var(--elea-space-3); }
-.elea-carousel__controls { max-inline-size: 100%; margin-inline-start: auto; }
+.elea-carousel__controls { min-inline-size: 0; max-inline-size: 100%; margin: 0; margin-inline-start: auto; padding: 0; border: 0; }
 .elea-carousel__controls[data-align="start"] { margin-inline: 0 auto; }
 .elea-carousel__controls[data-align="center"] { margin-inline: auto; }
 .elea-carousel__position {

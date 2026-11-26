@@ -23,8 +23,8 @@ export interface CardImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   alt: string;
 }
 
-export const CardImage = forwardRef<HTMLImageElement, CardImageProps>(function CardImage({ className, ...rest }, ref) {
-  return <img {...rest} ref={ref} className={cx("elea-card__image", className)} />;
+export const CardImage = forwardRef<HTMLImageElement, CardImageProps>(function CardImage({ className, alt, ...rest }, ref) {
+  return <img {...rest} alt={alt} ref={ref} className={cx("elea-card__image", className)} />;
 });
 
 export interface CardTitleProps extends CardPartProps {

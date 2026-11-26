@@ -27,6 +27,18 @@ function drag(action: keyof typeof labels, x: number, y: number) {
   fireEvent.pointerUp(control, { pointerId: 1 });
 }
 
+test("each crop handle describes its own current position or size", () => {
+  render(<><Mask ratio={1} /><Mask ratio={1} /></>);
+  const [firstMove, secondMove] = screen.getAllByRole("button", { name: labels.move, description: "x: 140, y: 40" });
+  const [firstResize, secondResize] = screen.getAllByRole("button", { name: labels.resize, description: "320 × 320" });
+  fireEvent.keyDown(firstMove!, { key: "ArrowRight", shiftKey: true });
+  fireEvent.keyDown(firstResize!, { key: "ArrowDown" });
+  assert.equal(screen.getByRole("button", { description: "x: 150, y: 40" }), firstMove);
+  assert.equal(screen.getByRole("button", { description: "321 × 321" }), firstResize);
+  assert.equal(screen.getByRole("button", { description: "x: 140, y: 40" }), secondMove);
+  assert.equal(screen.getByRole("button", { description: "320 × 320" }), secondResize);
+});
+
 test("locked and free masks share the same rectangle when unlocking; resizing free axes is independent", () => {
   const { rerender } = render(<Mask ratio={1} />);
   assert.deepEqual(rect(), { x: 140, y: 40, width: 320, height: 320 });

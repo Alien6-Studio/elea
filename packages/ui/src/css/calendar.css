@@ -1,6 +1,9 @@
 .elea-calendar {
   box-sizing: border-box;
   inline-size: min(100%, 21rem);
+  min-inline-size: 0;
+  margin: 0;
+  border: 0;
   padding: var(--elea-space-3);
   background: var(--elea-color-surface-default);
   color: var(--elea-color-text-default);

@@ -13,7 +13,8 @@ function statusPairs(fill: string, surface: string, text: string, edge: string,
 /** Live references let a host change one status colour for every component in its scope. */
 export function defaultStatusProperties(role: StatusRole, dark?: boolean, prefix = "elea") {
   const token = (name: string) => `var(--${prefix}-color-${name})`;
-  const edge = dark === undefined ? `var(--${prefix}-_status-edge)` : dark ? "#ffffff" : "#000000";
+  const fixedEdge = dark ? "#ffffff" : "#000000";
+  const edge = dark === undefined ? `var(--${prefix}-_status-edge)` : fixedEdge;
   return statusPairs(token(role), token("surface-default"), token("text-inverse"), edge,
     (first, amount, second) => `color-mix(in srgb, ${first} ${amount}%, ${second})`);
 }
@@ -31,8 +32,8 @@ export function statusFallback(path: string, prefix = "elea"): string | undefine
 export function statusColors(fill: string, surface: string, inverse: string, dark: boolean) {
   return statusPairs(fill, surface, inverse, dark ? "#ffffff" : "#000000", (first, amount, second) => {
     const bytes = [1, 3, 5].map(offset => {
-      const a = parseInt(first.slice(offset, offset + 2), 16);
-      const b = parseInt(second.slice(offset, offset + 2), 16);
+      const a = Number.parseInt(first.slice(offset, offset + 2), 16);
+      const b = Number.parseInt(second.slice(offset, offset + 2), 16);
       return Math.round((a * amount + b * (100 - amount)) / 100).toString(16).padStart(2, "0");
     });
     return "#" + bytes.join("");

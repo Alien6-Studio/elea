@@ -75,7 +75,7 @@ export function Calendar({ value, onChange, label, labels, locale, defaultMonth,
     };
   }, [locale]);
   const classes = cx("elea-calendar", className);
-  if (cursor === null) return <div className={classes} role="group" aria-label={label} aria-busy="true" />;
+  if (cursor === null) return <fieldset className={classes} aria-label={label} aria-busy="true" />;
 
   const active = clamp(cursor);
   const month = monthStart(active);
@@ -93,7 +93,8 @@ export function Calendar({ value, onChange, label, labels, locale, defaultMonth,
       case "ArrowLeft":
       case "ArrowRight": {
         const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
-        next = day + (event.key === (rtl ? "ArrowLeft" : "ArrowRight") ? dayLength : -dayLength);
+        const forward = event.key === (rtl ? "ArrowLeft" : "ArrowRight");
+        next = day + (forward ? dayLength : -dayLength);
         break;
       }
       case "ArrowDown": next = day + 7 * dayLength; break;
@@ -152,7 +153,7 @@ export function Calendar({ value, onChange, label, labels, locale, defaultMonth,
   }
 
   return (
-    <div className={classes} role="group" aria-label={label} lang={locale}>
+    <fieldset className={classes} aria-label={label} lang={locale}>
       <div className="elea-calendar__header">
         <span id={monthId} aria-live="polite" aria-atomic="true">{format.month.format(month)}</span>
         {monthButton(-1, labels.previousMonth)}
@@ -166,6 +167,6 @@ export function Calendar({ value, onChange, label, labels, locale, defaultMonth,
           ))}
         </tbody>
       </table>
-    </div>
+    </fieldset>
   );
 }

@@ -43,10 +43,18 @@ test("release notes contain only the selected section and documentation at the s
 
 test("publication requires one exact nonempty version section and the example on disk", t => {
   for (const changelog of ["## Unreleased\nA different version", "## 1.2.30\nLater release",
+    "## 1.2.3-2026-01-01\nMissing separators", "## 1.2.3 - 2026-1-01\nIncomplete date",
+    "## 1.2.3 - 2026-01-01 draft\nTrailing text",
     "## 1.2.3\n### Changes\n<!-- to be filled -->", "## 1.2.3\nFirst\n## 1.2.3\nSecond"]) {
     assert.notEqual(notes(checkout(t, changelog)).status, 0, changelog);
   }
   const cwd = checkout(t, "## 1.2.3\nNew version notes.");
   rmSync(join(cwd, "docs/examples/theme-shapes.mjs"));
   assert.notEqual(notes(cwd).status, 0);
+});
+
+test("dated release headings accept whitespace around the separator and CRLF", t => {
+  const draft = notes(checkout(t, "##   1.2.3\t-  \t2026-01-01   \r\nRelease notes.\r\n"));
+  assert.equal(draft.status, 0, draft.stderr);
+  assert.match(draft.stdout, /Release notes\./);
 });
