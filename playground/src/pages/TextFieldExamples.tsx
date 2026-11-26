@@ -4,8 +4,10 @@ import { Demo } from "../components/Demo.js";
 import { IdentifierFields } from "./IdentifierFields.js";
 import identifierSource from "./IdentifierFields.tsx?raw";
 import telephoneSource from "./CountryTelephone.tsx?raw";
+import captionSource from "./CaptionEditor.tsx?raw";
 
 const CountryTelephone = lazy(() => import("./CountryTelephone.js"));
+const CaptionEditor = lazy(() => import("./CaptionEditor.js"));
 
 export function TextFieldExamples() {
   return <>
@@ -37,6 +39,9 @@ export function TextFieldExamples() {
       description="Choose a country for a national number, or paste a number starting with +. An E.164 value appears when the number has a possible length for its numbering plan."
       code={telephoneSource}>
       <Suspense fallback={<FieldSkeleton />}><CountryTelephone /></Suspense>
+    </Demo>
+    <Demo title="Formatted caption" description="Edit a caption of up to 140 characters, then save it to see the HTML your form can store." code={captionSource}>
+      <Suspense fallback={<FieldSkeleton />}><CaptionEditor /></Suspense>
     </Demo>
   </>;
 }

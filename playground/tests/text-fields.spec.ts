@@ -1,5 +1,40 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
+test("a compact classic field inherits its frame, limits plain text and submits formatted HTML", async ({ page, browserName }) => {
+  await page.goto("/elea/playground/#/ui/field");
+  const form = page.getByRole("form", { name: "Exhibition caption" });
+  const editor = form.locator(".elea-content-editor");
+  const frame = form.locator(".elea-classic-editor");
+  const canvas = frame.locator(".elea-classic-editor__canvas");
+  const text = canvas.locator('[contenteditable="true"]').first();
+  await form.evaluate(element => {
+    element.style.setProperty("--elea-control-radius", "12px 2px 8px 3px");
+    element.style.setProperty("--elea-control-border", "#64748b");
+    element.style.setProperty("--elea-color-focus", "#136540");
+    element.style.setProperty("--elea-color-selection", "#a62457");
+  });
+  await expect(frame).toHaveCSS("border-radius", "12px 2px 8px 3px");
+  await expect(frame).toHaveCSS("border-top-color", "rgb(100, 116, 139)");
+  await expect(canvas).toHaveCSS("height", "128px");
+  expect((await editor.boundingBox())!.width).toBeCloseTo((await form.boundingBox())!.width, 0);
+  await text.focus();
+  await expect(frame).toHaveCSS("border-top-color", "rgb(19, 101, 64)");
+  await expect(frame).toHaveCSS("box-shadow", /rgb\(19, 101, 64\)/);
+  await text.press("End");
+  await text.pressSequentially(" At dusk.");
+  await form.getByRole("button", { name: "Save caption" }).click();
+  const html = form.getByLabel("Saved HTML");
+  await expect(html).toContainText("At dusk.");
+  await expect(html).toHaveText(/<(em|i)>glacier<\/(em|i)>/);
+  await text.focus();
+  await text.press("End");
+  await pasteInto(page, text, "x".repeat(160), browserName);
+  await expect(form.getByText("140 / 140 characters", { exact: true })).toBeVisible();
+  await text.pressSequentially("z");
+  expect((await text.textContent())?.length).toBe(140);
+  await expect(text).not.toContainText("z");
+});
+
 test("a caption can exceed its soft limit and recover", async ({ page }) => {
   await page.goto("/elea/playground/#/ui/field");
   const caption = page.getByRole("textbox", { name: "Photo caption" });

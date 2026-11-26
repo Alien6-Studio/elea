@@ -896,8 +896,7 @@ test("the classic mode shows a fixed bar above a continuous document, nothing ar
   const paragraph = firstParagraph(page);
   await paragraph.click({ position: { x: 10, y: 10 } });
   const frame = editorPane(page).locator(".elea-classic-editor");
-  await expect(frame).toHaveCSS("outline-offset", "-2px");
-  await expect(frame).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
+  await expect(frame).not.toHaveCSS("box-shadow", "none");
   await expect(bar.locator(".elea-doc-toolbar__group--idle")).toHaveCount(0);
   await selectInEditable(page, paragraph, 0, "Elea renders".length);
   await expect(page.locator("[data-elea-bubble]")).toHaveCount(0);

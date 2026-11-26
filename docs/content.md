@@ -59,6 +59,20 @@ its picture changes before the upload settles, so the request can be cancelled.
 
 Pass `mode` with `onModeChange` to let the writer switch from the pencil menu.
 
+### Edit an HTML form field
+
+The playground uses the version on `main`. This example requires editor and content APIs added after 0.1.2.
+
+Use `mode="classic"` and `width="full"` to fit a form column. A host can set
+`--elea-editor-canvas-height`, `--elea-control-radius` and `--elea-control-border`
+on the form. Its `--elea-color-focus` and `--elea-color-selection` colours
+carry through to the writing surface.
+
+Import the stored HTML with `htmlToBlocks` once when opening a record. Keep the
+blocks in state while editing, then call `blocksToHtml` when saving. Both functions
+come from `@alien6-studio/elea-content`. Set `maxLength` to limit the plain text and
+display the character counter. Try the formatted caption in the [field guide](/elea/playground/#/ui/field).
+
 ### What loads when
 
 The Markdown source area, the preview and the picture cropper stay out of the editor's first
