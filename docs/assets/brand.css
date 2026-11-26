@@ -89,7 +89,14 @@
 }
 .site__nav-links, .site__masthead-tools { display: flex; align-items: center; }
 .site__nav-links { gap: clamp(.875rem, 2vw, 1.875rem); }
+.site__masthead-links { gap: clamp(.75rem, 1.1vw, 1.125rem); }
 .site__masthead-tools { justify-self: end; gap: .375rem; }
+.site-profile-select { inline-size: 10.25rem; }
+.site-profile-select .elea-ui-select__list { inset-inline: auto 0; min-inline-size: max(100%, 11rem); }
+.site-profile-option, .site-profile-option__swatches { display: inline-flex; align-items: center; vertical-align: middle; }
+.site-profile-option { gap: .5rem; max-inline-size: 100%; }
+.site-profile-option__swatches { flex: none; overflow: hidden; border-radius: var(--elea-radius-sm); }
+.site-profile-option__swatches > span { width: .55rem; height: .85rem; }
 .site__nav-links a, .site__repository {
   color: var(--elea-color-text-muted);
   font-size: var(--elea-font-size-sm);
@@ -114,6 +121,7 @@
   gap: .25rem;
   padding: .45rem .65rem;
 }
+.site__repository-mark { display: none; }
 .site__masthead .site__theme-toggle { width: 2.5rem; height: 2.5rem; padding: 0; }
 .site__theme-toggle .elea-button__label, .site__theme-when-light, .site__theme-when-dark { display: flex; }
 :root:not([data-theme]) .site__theme-toggle,
@@ -150,14 +158,22 @@
 }
 .site-footer__signature:is(:hover, :focus-visible) img { opacity: 0.8; }
 
-@media (max-width: 60rem) {
+@media (max-width: 72rem) {
   .site__masthead-inner {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 0;
     padding-top: .5rem;
   }
   .site__masthead-tools { grid-column: 2; grid-row: 1; }
-  .site__masthead-links { grid-column: 1 / -1; grid-row: 2; flex-wrap: wrap; }
+  .site__masthead-links {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: stretch;
+    flex-wrap: wrap;
+    padding-inline-start: calc(var(--site-nav-rail) + var(--site-nav-gap));
+  }
+}
+@media (max-width: 60rem) {
   .site__nav-links {
     gap: 1.25rem;
     overflow-x: auto;
@@ -169,7 +185,19 @@
   }
   .site__nav-links a:focus-visible { outline-offset: -2px; }
 }
+@media (max-width: 32rem) {
+  .site__repository { justify-content: center; width: 2rem; min-height: 2.5rem; padding: 0; }
+  .site__repository-mark { display: block; }
+  .site__repository-label { display: none; }
+}
 @media (max-width: 25rem) {
+  .site__masthead { --site-gutter: .5rem; }
+  .site__wordmark { font-size: 2rem; }
+  .site__masthead-tools { gap: .125rem; }
+  .site__masthead .site__theme-toggle { width: 2rem; }
+  .site-profile-select { min-width: 0; inline-size: 9.125rem; }
+  .site-profile-select .site-profile-option { gap: .3rem; }
+  .site-profile-select .site-profile-option__swatches > span { width: .33rem; }
   .site__nav-links {
     justify-content: space-between;
     gap: .625rem;

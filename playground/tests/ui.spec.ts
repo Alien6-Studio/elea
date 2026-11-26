@@ -58,6 +58,32 @@ test("button motion follows its container, the prop and the visitor preference",
   expect(await transform(follows)).toMatch(/^(none|0px)$/);
 });
 
+test("Réserve previews every button effect on the same primary action", async ({ page }) => {
+  await page.goto("/elea/playground/#/ui/button?scheme=reserve");
+  const demo = page.locator("section.demo").filter({ has: page.getByRole("heading", { name: "Effects", exact: true }) });
+  const buttons = demo.getByRole("button");
+  await expect(buttons).toHaveText(["Lift", "Scale", "Push", "Shine", "Ripple", "Spotlight", "Magnetic", "Tilt"]);
+
+  const appearance = (button: typeof buttons) => button.evaluate(element => {
+    const { width, height } = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return {
+      width, height, background: style.backgroundColor, text: style.color,
+      corners: [style.borderTopLeftRadius, style.borderTopRightRadius, style.borderBottomRightRadius, style.borderBottomLeftRadius],
+    };
+  });
+  const primary = await appearance(page.getByRole("button", { name: "Primary", exact: true }));
+  const width = (await appearance(buttons.first())).width;
+  expect(new Set(primary.corners).size).toBe(4);
+  for (const button of await buttons.all()) {
+    const name = await button.innerText();
+    await expect(button).not.toHaveClass(/elea-button--(?:radius|shadow)-/);
+    expect(await appearance(button), name).toEqual({ ...primary, width });
+  }
+  // Push rests on the edge it sinks into when pressed.
+  await expect(demo.getByRole("button", { name: "Push", exact: true })).not.toHaveCSS("box-shadow", "none");
+});
+
 test("buttons take a size, a radius, a shadow and an effect that follows the pointer", async ({ page }) => {
   await page.goto("/elea/playground/#/ui/button");
   await page.addStyleTag({ content: "* { transition: none !important; }" });

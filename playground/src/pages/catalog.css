@@ -189,6 +189,12 @@
   background: var(--elea-color-surface-subtle);
 }
 .demo__stage > * { max-width: 100%; min-width: 0; }
+.catalog-button-effects {
+  display: grid;
+  inline-size: min(100%, 34rem);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 7.5rem), 1fr));
+  gap: var(--elea-space-3);
+}
 .demo__stage .elea-pagination__list { flex-wrap: wrap; }
 .demo__stage > .elea-footer { width: 100%; }
 .catalog-source { min-width: 0; border: 1px solid var(--elea-color-border-default); border-top: 0; border-radius: var(--elea-shape-surface, var(--elea-radius-lg)); border-top-left-radius: 0; border-top-right-radius: 0; }

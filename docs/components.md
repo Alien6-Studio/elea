@@ -13,7 +13,7 @@ export function DraftActions({ saveDraft }: { saveDraft: () => void }) {
 }
 ```
 
-[Try Button states](/elea/playground/#/ui/button)
+This button inherits its outline from the active theme and uses its primary colour. Set `variant="secondary"` to give it a secondary role, or `effect="ripple"` to change its press gesture. Compare the same button across themes with **Site theme** in the header. [Try Button states](/elea/playground/#/ui/button).
 
 Use the UI and tokens packages at the same version. The UI bundle loads both stylesheets.
 

@@ -35,7 +35,7 @@ function NotebookPreview() {
       </div>
       <div className="notebook__foot">
         <span>Rendered with <code>ContentView</code></span>
-        <a href={`${sitePath}playground/${brandRoute("playground", defaultSiteTheme)}`}>Edit this notebook <span aria-hidden="true">→</span></a>
+        <a data-site-profile-link="" href={`${sitePath}playground/${brandRoute("playground", defaultSiteTheme)}`}>Edit this notebook <span aria-hidden="true">→</span></a>
       </div>
     </fieldset>
   );

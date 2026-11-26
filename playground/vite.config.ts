@@ -17,8 +17,8 @@ export default defineConfig({
   base: "/elea/playground/",
   build: {
     rolldownOptions: {
-      input: { index: "index.html", "glyph-carousel": "glyph-carousel.js" },
-      output: { entryFileNames: entry => entry.name === "glyph-carousel" ? "glyph-carousel.js" : "assets/[name]-[hash].js" },
+      input: { index: "index.html", "glyph-carousel": "glyph-carousel.js", "site-profile": "site-profile.js" },
+      output: { entryFileNames: entry => ["glyph-carousel", "site-profile"].includes(entry.name) ? "[name].js" : "assets/[name]-[hash].js" },
     },
   },
   plugins: [

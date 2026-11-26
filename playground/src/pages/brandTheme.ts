@@ -144,8 +144,8 @@ function readProfile(id: StudioThemeId, params: URLSearchParams) {
   return withPalette(validBrand(brand) ?? base, params);
 }
 
-export function readBrandTheme(): BrandTheme | undefined {
-  const params = new URLSearchParams(globalThis.location?.hash.split("?")[1]);
+export function readBrandTheme(query = globalThis.location?.hash.split("?")[1]): BrandTheme | undefined {
+  const params = new URLSearchParams(query);
   const profile = featuredColourThemes.find(id => id === params.get("scheme"));
   // Older custom schemes serialized the full brand settings, even without an edition.
   const fullBrand = ["brand", "corners", "type", "rhythm"].every(key => params.has(key));
@@ -222,4 +222,10 @@ export function brandRoute(route: "colours" | "theme" | "playground" | "ui" | `u
     if (palette.neutral) params.set("neutral", palette.neutral.toLowerCase());
   }
   return `${path}?${params}`;
+}
+
+/** The untouched profile represented by a shared brand, or null for a custom design. */
+export function exactProfile(brand: BrandTheme) {
+  return brand.profile && brandRoute("theme", brand) === brandRoute("theme", studioTheme(brand.profile))
+    ? brand.profile : null;
 }

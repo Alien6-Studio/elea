@@ -7,6 +7,9 @@ import { brandRoute, type BrandTheme } from "./brandTheme.js";
 const TrashIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>;
 const PlusIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>;
 
+const buttonEffects = ["lift", "scale", "push", "shine", "ripple", "spotlight", "magnetic", "tilt"] as const;
+const effectLabel = (effect: typeof buttonEffects[number]) => effect[0]!.toUpperCase() + effect.slice(1);
+
 const tealInfo = {
   "--elea-color-action-info": "light-dark(#0e7490, #67e8f9)",
   "--elea-color-action-info-text": "light-dark(white, black)",
@@ -19,8 +22,8 @@ export function ButtonsPage() {
   return (
     <>
       <h1>Button</h1>
-      <p className="lead">Give a form or toolbar a clear primary action. Choose a variant for each action and use a loading state while work is in progress.</p>
-      <Demo title="Variants" code={`<Button>Primary</Button>
+      <p className="lead">A button inherits its shape and palette from the active theme. Choose a variant for the action, a size for the layout and an effect for the gesture.</p>
+      <Demo title="Variants" description={<>A plain <code>&lt;Button&gt;</code> uses the primary colour at medium size. Each variant below draws from the same theme and inherits its action shape.</>} code={`<Button>Primary</Button>
 <Button variant="secondary">Secondary</Button>
 <Button variant="tertiary">Tertiary</Button>
 <Button variant="outline">Outline</Button>
@@ -60,27 +63,27 @@ const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
         <Button size="xl">Extra large</Button>
         <IconButton variant="disc" label="Add"><PlusIcon /></IconButton>
       </Demo>
-      <Demo title="Radius" description="From square corners to a pill. The default follows the corner style of the theme." code={`<Button radius="none">None</Button>
+      <Demo title="Radius" description={<>Switch themes in the navbar to compare the first button’s silhouette. The next five use the <code>radius</code> prop to go from square corners to a pill. A container can set <code>--elea-control-radius</code> for the inherited and medium buttons.</>} code={`<Button>Inherited shape</Button>
+<Button radius="none">None</Button>
 <Button radius="sm">Small</Button>
-<Button>Medium</Button>
+<Button radius="md">Medium</Button>
 <Button radius="lg">Large</Button>
 <Button radius="full">Full</Button>
 <IconButton variant="outline" radius="full" label="Add"><PlusIcon /></IconButton>`}>
+        <Button>Inherited shape</Button>
         <Button radius="none">None</Button>
         <Button radius="sm">Small</Button>
-        <Button>Medium</Button>
+        <Button radius="md">Medium</Button>
         <Button radius="lg">Large</Button>
         <Button radius="full">Full</Button>
         <IconButton variant="outline" radius="full" label="Add"><PlusIcon /></IconButton>
       </Demo>
       <Demo title="Shadow" description="The default follows the theme. An explicit shadow adds elevation on a busy surface." code={`<Button>Theme default</Button>
 <Button shadow="sm">Small shadow</Button>
-<Button shadow="md">Medium shadow</Button>
-<Button variant="outline" shadow="md" radius="full">Outline pill</Button>`}>
+<Button shadow="md">Medium shadow</Button>`}>
         <Button>Theme default</Button>
         <Button shadow="sm">Small shadow</Button>
         <Button shadow="md">Medium shadow</Button>
-        <Button variant="outline" shadow="md" radius="full">Outline pill</Button>
       </Demo>
       <Demo title="Loading and disabled" description="Save shows a pending state for two seconds." code={`<Button loading={loading} loadingLabel="Saving" onClick={save}>Save</Button>
 <Button disabled>Disabled</Button>
@@ -91,39 +94,25 @@ const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
         <Button href="https://example.org" variant="outline">A link</Button>
         <Button href="https://example.org" variant="outline" disabled>Unavailable link</Button>
       </Demo>
-      <Demo title="Motion" description="Once the page or a container opts in, a button moves on a damped spring: it lifts on hover, its icons lean in and a press compresses it before it bounces back. The Expressive motion switch of this gallery sets it on the page. Motion stays off by default and never runs when the visitor prefers reduced motion." code={`<html data-elea-motion="on">
-
-<Button trailingIcon={<PlusIcon />}>Continue</Button>
-<Button variant="secondary" icon={<PlusIcon />}>Add a page</Button>
-<Button variant="outline">Follows the page</Button>
-<Button variant="outline" motion={false}>Always still</Button>`}>
-        <Button trailingIcon={<PlusIcon />}>Continue</Button>
-        <Button variant="secondary" icon={<PlusIcon />}>Add a page</Button>
-        <Button variant="outline">Follows the page</Button>
-        <Button variant="outline" motion={false}>Always still</Button>
+      <Demo title="Motion" description="Hover or press these two buttons. The first follows the gallery’s Expressive motion switch. The second stays still. Both respect the visitor’s reduced-motion preference." code={`<div data-elea-motion="on">
+  <Button>Follows the page</Button>
+  <Button motion={false}>Always still</Button>
+</div>`}>
+        <Button>Follows the page</Button>
+        <Button motion={false}>Always still</Button>
       </Demo>
-      <Demo title="Effects" description="The effect names the gesture a button plays under expressive motion. Hover and press each one: push sinks onto its edge, ripple spreads from the press, spotlight, magnetic and tilt follow the pointer." code={`<Button effect="lift">Lift</Button>
-<Button effect="scale" radius="full">Scale</Button>
-<Button effect="push" variant="secondary">Push</Button>
-<Button effect="shine">Shine</Button>
-<Button effect="ripple" variant="outline">Ripple</Button>
-<Button effect="spotlight" variant="secondary">Spotlight</Button>
-<Button effect="magnetic" radius="full" shadow="md">Magnetic</Button>
-<Button effect="tilt" size="lg">Tilt</Button>`}>
-        <Button effect="lift">Lift</Button>
-        <Button effect="scale" radius="full">Scale</Button>
-        <Button effect="push" variant="secondary">Push</Button>
-        <Button effect="shine">Shine</Button>
-        <Button effect="ripple" variant="outline">Ripple</Button>
-        <Button effect="spotlight" variant="secondary">Spotlight</Button>
-        <Button effect="magnetic" radius="full" shadow="md">Magnetic</Button>
-        <Button effect="tilt" size="lg">Tilt</Button>
+      <Demo title="Effects"
+        description="Try each gesture on the same primary button. All eight share the theme’s colour, shape and size. With expressive motion on, Push has a raised edge that sinks when pressed."
+        code={buttonEffects.map(effect => `<Button effect="${effect}">${effectLabel(effect)}</Button>`).join("\n")}>
+        <div className="catalog-button-effects">
+          {buttonEffects.map(effect => <Button key={effect} effect={effect}>{effectLabel(effect)}</Button>)}
+        </div>
       </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
         { name: "variant", type: '"primary" | "secondary" | "tertiary" | "outline" | "ghost" | "danger" | "success" | "info" | "warning"', defaultValue: '"primary"', description: "Visual weight or status colour of the action." },
         { name: "size", type: '"xs" | "sm" | "md" | "lg" | "xl"', defaultValue: '"md"', description: "Height and type size." },
-        { name: "radius", type: '"none" | "sm" | "md" | "lg" | "full"', defaultValue: '"md"', description: "Corner rounding, from square to pill." },
+        { name: "radius", type: '"none" | "sm" | "md" | "lg" | "full"', defaultValue: "Theme shape", description: "Override the inherited action shape with an explicit corner radius." },
         { name: "shadow", type: '"none" | "sm" | "md"', defaultValue: '"none"', description: "A resting shadow that lifts the button off the surface." },
         { name: "effect", type: '"lift" | "scale" | "push" | "shine" | "ripple" | "spotlight" | "magnetic" | "tilt"', defaultValue: '"lift"', description: "The gesture played under expressive motion. It does nothing while motion is off." },
         { name: "icon, trailingIcon", type: "ReactNode", description: "Icons before and after the label, hidden from assistive technology." },

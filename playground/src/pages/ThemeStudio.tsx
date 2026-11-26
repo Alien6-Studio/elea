@@ -2,27 +2,15 @@ import { Button, Field, Input, RadioGroup, Select } from "@alien6-studio/elea-ui
 import { useEffect, useState } from "react";
 import { createDocument, en } from "@alien6-studio/elea-content";
 import { SiteTypefaceField } from "../components/SiteTypefaceField.js";
+import { siteProfileOptions } from "../components/SiteProfileSelect.js";
 import { notebookBlocks, notebookSummary, notebookTitle } from "../samples.js";
 import { ReaderEdition } from "./ReaderEdition.js";
 import { corners, makeBrandTheme, rhythms, typefaces } from "@alien6-studio/elea-tokens/brand";
 import { colorThemes } from "@alien6-studio/elea-tokens/palette";
-import { brandRoute, featuredColourThemes, readBrandTheme, studioTheme, studioThemeName, validBrand, type BrandTheme, type StudioThemeId } from "./brandTheme.js";
+import { brandRoute, exactProfile, featuredColourThemes, readBrandTheme, studioTheme, studioThemeName, validBrand, type BrandTheme, type StudioThemeId } from "./brandTheme.js";
 import "./studio.css";
 
 const notebook = createDocument(notebookBlocks);
-
-function themeOption(id: StudioThemeId) {
-  const { name, colours } = colorThemes[id];
-  return {
-    value: id, label: <span className="studio-colour-option">
-      <span className="studio-colour-option__swatches" aria-hidden="true">
-        {[colours.primary, colours.secondary, colours.tertiary].map((colour, index) =>
-          <span key={index} style={{ backgroundColor: colour }} />)}
-      </span>
-      {name}
-    </span>,
-  };
-}
 
 export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChange: (next: BrandTheme) => void }) {
   const [mobileView, setMobileView] = useState<"preview" | "settings">("preview");
@@ -38,8 +26,7 @@ export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChan
   }, []);
   const { corner, typeface, rhythm } = brand;
   const { css } = makeBrandTheme(brand);
-  const selectedProfile = brand.profile && brandRoute("theme", brand) === brandRoute("theme", studioTheme(brand.profile))
-    ? brand.profile : null;
+  const selectedProfile = exactProfile(brand);
   const cornerOptions: { value: string; label: string }[] = corners.map(value => ({ value, label: value }));
   if (brand.shape && brand.shape !== brand.profile) {
     cornerOptions.unshift({ value: brand.shape, label: colorThemes[brand.shape].name });
@@ -80,7 +67,7 @@ export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChan
         <Field label={<span id="studio-colour-theme-label">Theme</span>} id="studio-colour-theme">
           {({ id }) => <Select id={id} labelledBy="studio-colour-theme-label"
             value={selectedProfile} placeholder={brand.profile ? studioThemeName(brand) + " (customised)" : "Custom theme"}
-            options={featuredColourThemes.map(themeOption)}
+            options={siteProfileOptions}
             onChange={value => changeTheme(studioTheme(value as StudioThemeId))} />}
         </Field>
         <Button href={brandRoute("colours", brand)} variant="ghost">Edit colours</Button>

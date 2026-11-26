@@ -5,7 +5,7 @@ import { sitePath } from "../src/links.js";
 import { GlyphCarousel } from "../src/components/GlyphCarousel.js";
 import { SiteHeader } from "../src/components/SiteHeader.js";
 import { SiteFooter } from "../src/components/SiteFooter.js";
-import { defaultSiteTheme, makeBrandTheme } from "../src/pages/brandTheme.js";
+import { featuredColourThemes, makeBrandTheme, studioTheme } from "../src/pages/brandTheme.js";
 import { SiteHome } from "./site-home.js";
 
 const assets = new URL("../../docs/assets/", import.meta.url);
@@ -21,7 +21,12 @@ const styles = [
 for (const [specifier, target] of styles) {
   copyFileSync(new URL(import.meta.resolve(specifier)), new URL(target, assets));
 }
-writeFileSync(new URL("site-profile.css", assets), makeBrandTheme(defaultSiteTheme, "elea-site").css);
+// The default scope also supplies a fallback for old or unavailable stored profiles.
+const profileStyles = [
+  makeBrandTheme(studioTheme("reserve"), "elea-site").css,
+  ...featuredColourThemes.filter(id => id !== "reserve").map(id => makeBrandTheme(studioTheme(id), `elea-site-${id}`).css),
+];
+writeFileSync(new URL("site-profile.css", assets), profileStyles.join("\n"));
 
 for (const file of ["elea-sans.css", "ELEASans-Variable.woff2", "ELEASans-Italic-Variable.woff2"]) {
   const source = import.meta.resolve(`@alien6-studio/elea-tokens/fonts/${file}`);
