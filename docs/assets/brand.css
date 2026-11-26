@@ -68,6 +68,7 @@
 .site__wordmark {
   display: inline-flex;
   align-items: center;
+  gap: .05em;
   justify-self: start;
   min-height: 2.75rem;
   color: var(--elea-color-text-default);
@@ -75,6 +76,16 @@
   font-synthesis: none;
   letter-spacing: normal;
   text-decoration: none;
+}
+.site__wordmark::before {
+  content: "";
+  flex: none;
+  width: .89em;
+  height: .89em;
+  transform: translateY(.08em);
+  background-color: currentColor;
+  mask: url("./elea-mark.svg") center / contain no-repeat;
+  forced-color-adjust: none;
 }
 .site__nav-links, .site__masthead-tools { display: flex; align-items: center; }
 .site__nav-links { gap: clamp(.875rem, 2vw, 1.875rem); }

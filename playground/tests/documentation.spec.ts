@@ -218,7 +218,7 @@ test.describe("typography on a touch screen", () => {
   });
 });
 
-test("the header and footer wordmarks follow the site typeface", async ({ page }) => {
+test("the header and footer pair the Galet mark with the site typeface", async ({ page }) => {
   for (const route of ["/elea/getting-started/", "/elea/playground/#/ui"]) {
     await page.goto(route);
     const marks = ["banner", "contentinfo"] as const;
@@ -227,6 +227,17 @@ test("the header and footer wordmarks follow the site typeface", async ({ page }
       await expect(link).toHaveText("elea");
       await expect(link).toHaveCSS("font-family", /^"ELEA Sans"/);
       await expect(link).toHaveCSS("font-weight", "400");
+      const mark = await link.evaluate(async element => {
+        const style = getComputedStyle(element, "::before");
+        const url = style.maskImage.match(/^url\("(.*)"\)$/)?.[1];
+        if (!url) return null;
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        return { ink: style.backgroundColor, visible: image.naturalWidth > 0 && parseFloat(style.width) > 0 };
+      });
+      expect(mark?.visible).toBe(true);
+      expect(mark?.ink).toBe(await link.evaluate(element => getComputedStyle(element).color));
     }
     await page.evaluate(() => document.documentElement.style.setProperty("--elea-font-family-sans", "Georgia, serif"));
     for (const role of marks) {
