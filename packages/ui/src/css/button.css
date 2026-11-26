@@ -1,7 +1,7 @@
 /* Buttons */
 .elea-button {
   --_elea-button-size: 2.5rem;
-  --_elea-button-height: var(--elea-control-height, max(1.5rem, calc(var(--_elea-button-size) + var(--elea-_density, 0px))));
+  --_elea-button-height: var(--elea-control-height, max(1.5rem, calc(var(--_elea-button-size) + var(--elea-density-control-offset, var(--elea-_density, 0px)))));
   box-sizing: border-box;
   min-height: var(--_elea-button-height);
   display: inline-flex;
@@ -165,7 +165,7 @@
   background: var(--elea-color-neutral-100);
   color: var(--elea-color-neutral-800);
 }
-.elea-button--disc.elea-button--md { --_elea-button-height: var(--elea-control-height, 2.75rem); }
+.elea-button--disc.elea-button--md { --_elea-button-height: var(--elea-control-height, calc(2.75rem + var(--elea-density-control-offset, 0px))); }
 .elea-button--disc:enabled:is(:hover, :focus-visible) { background: var(--elea-color-neutral-200); }
 .elea-button--disc:focus-visible { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-neutral-600)); }
 .elea-button--disc:disabled { opacity: 1; color: var(--elea-color-neutral-500); }

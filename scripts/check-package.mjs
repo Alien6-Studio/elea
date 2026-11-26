@@ -144,7 +144,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { JSDOM } from "jsdom";
-import { createElement } from "react";
+import { createElement, createRef } from "react";
 import { renderToString } from "react-dom/server";
 import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { Button, Input } from "@alien6-studio/elea-ui";
@@ -250,6 +250,14 @@ for (const exchange of [exchangeLight, exchangeDark]) {
 }
 assert.equal(exchangeLight.color.focus.$value, sourceLight.color.focus.$value);
 assert.equal(exchangeDark.color.focus.$value, sourceDark.color.focus.$value);
+const { qualifyTheme, compareThemeReports } = await import("@alien6-studio/elea-tokens/qualification");
+const report = qualifyTheme(editions.Editorial);
+assert.ok(report.checks.some(check => check.id === "primary.light.fill" && check.passed));
+assert.deepEqual(compareThemeReports(report, report), []);
+const typeSheet = readFileSync(require.resolve("@alien6-studio/elea-tokens/typography.css"), "utf8");
+for (const role of ["display", "page", "section", "reading", "label", "data", "annotation"]) {
+  assert.ok(typeSheet.includes('data-elea-type="' + role + '"'));
+}
 const baseSheet = readFileSync(require.resolve("@alien6-studio/elea-tokens/elea.css"), "utf8");
 for (const role of ["primary", "secondary"]) {
   assert.ok(baseSheet.includes("--elea-color-action-" + role + ": var(--elea-color-" + role + "-500);"));
@@ -388,7 +396,7 @@ console.log("core verified: viewer rendered on the server without DOMPurify or j
 `;
 
 const CONSUMER_TYPES = `
-import { createElement } from "react";
+import { createElement, createRef } from "react";
 import { ContentView as CoreContentView, type ContentViewProps as CoreContentViewProps } from "@alien6-studio/elea-content-viewer/core";
 import type { EleaDocument, EleaBlock, BlockRegistry } from "@alien6-studio/elea-content";
 import { blocksToHtml, htmlToBlocks, parseDocument, defaultRegistry } from "@alien6-studio/elea-content";
@@ -397,7 +405,7 @@ import { ContentEditor, ContentProvider, type ContentEditorProps, type ImageCrop
 import { tokens, type FlatToken } from "@alien6-studio/elea-tokens";
 import { createThemeProfile, editions, makeBrandTheme, type BrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ImageCropper, type CropState, type DropZoneProps } from "@alien6-studio/elea-media";
-import { Button, IbanInput, type ButtonProps, type IdentifierInputProps, type InputProps, type LinkButtonProps } from "@alien6-studio/elea-ui";
+import { Button, IbanInput, Stepper, StepperPanel, StepperSkeleton, type ButtonProps, type IdentifierInputProps, type InputProps, type LinkButtonProps } from "@alien6-studio/elea-ui";
 import { ibanFormat } from "@alien6-studio/elea-ui/formats";
 export const ibanInput: InputProps = { format: ibanFormat };
 const bankField: IdentifierInputProps = {
@@ -405,6 +413,10 @@ const bankField: IdentifierInputProps = {
   value: "DE89", onValueChange: (raw: string) => void raw,
 };
 export const bankAccount = createElement(IbanInput, bankField);
+const navigation = { current: 0, steps: [{ id: "draft", label: "Draft" }], onSelect: (step: { id: string }) => void step.id };
+export const steps = createElement(Stepper, { ...navigation, label: "Flow", ref: createRef<HTMLElement>(), className: "flow", "aria-describedby": "hint" });
+export const actions = createElement(StepperPanel, { ...navigation, previousLabel: "Back", nextLabel: "Next", ref: createRef<HTMLDivElement>(), id: "actions" });
+export const loading = createElement(StepperSkeleton, { ref: createRef<HTMLDivElement>(), style: { width: "100%" } });
 
 const registry: BlockRegistry = defaultRegistry;
 const document: EleaDocument = parseDocument("text", { registry });
@@ -463,7 +475,7 @@ try {
     if (withPhone) {
       run("node", ["--input-type=module", "-e", `
         import assert from "node:assert/strict";
-        import { createElement } from "react";
+        import { createElement, createRef } from "react";
         import { renderToString } from "react-dom/server";
         import { JSDOM } from "jsdom";
         import { getCountries, PhoneInput, phoneFormat, phoneToE164 } from "@alien6-studio/elea-ui/phone";

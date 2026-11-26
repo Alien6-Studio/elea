@@ -1,3 +1,4 @@
+import { channels, contrast } from "./contrast.js";
 import baseTokens from "../tokens/elea.tokens.json" with { type: "json" };
 import darkTokens from "../tokens/elea.dark.tokens.json" with { type: "json" };
 import { brandAppearanceVariable, cssVariableName, localAppearanceSelector } from "./css.js";
@@ -171,20 +172,8 @@ const controlStyles = {
 
 const editionControls = { Precision: "raised", Editorial: "flat", Obsidian: "inset" } as const satisfies Record<Edition, ControlTreatment>;
 
-function channels(hex: string) {
-  return [1, 3, 5].map((index) => Number.parseInt(hex.slice(index, index + 2), 16));
-}
-
 function mix(hex: string, target: number, amount: number) {
   return "#" + channels(hex).map((channel) => Math.round(channel + (target - channel) * amount).toString(16).padStart(2, "0")).join("");
-}
-
-function luminance(colour: string) {
-  const [r = 0, g = 0, b = 0] = channels(colour).map((channel) => {
-    const value = channel / 255;
-    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  });
-  return r * 0.2126 + g * 0.7152 + b * 0.0722;
 }
 
 const HEX = /^#[a-f0-9]{6}$/i;
@@ -228,12 +217,6 @@ function referenceShade(pick: PaletteSelection | undefined) {
   if (pick === undefined) return;
   if (pick === null || !colorSteps.includes(pick.step)) throw new RangeError("Unknown reference colour step");
   return referenceFamily(pick.family);
-}
-
-function contrast(foreground: string, background: string) {
-  const a = luminance(foreground) + 0.05;
-  const b = luminance(background) + 0.05;
-  return Math.max(a / b, b / a);
 }
 
 function seedScale(seed: string): Swatch[] {

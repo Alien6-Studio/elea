@@ -25,7 +25,7 @@
   font: inherit;
   cursor: pointer;
 }
-.elea-calendar__day { position: relative; inline-size: 100%; min-block-size: var(--elea-control-height, calc(2.5rem + var(--elea-_density, 0px))); }
+.elea-calendar__day { position: relative; inline-size: 100%; min-block-size: var(--elea-control-height, calc(2.5rem + var(--elea-density-control-offset, var(--elea-_density, 0px)))); }
 .elea-calendar__step { display: grid; place-items: center; inline-size: 2rem; min-block-size: 2rem; }
 .elea-calendar__step:dir(rtl) svg { scale: -1 1; }
 .elea-calendar button:where(:enabled):hover { background: var(--elea-color-surface-muted); }

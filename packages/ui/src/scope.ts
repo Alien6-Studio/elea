@@ -2,23 +2,28 @@
 
 import { useEffect, useReducer, useState } from "react";
 
+export type Density = "compact" | "standard" | "comfortable";
 export type Appearance = "light" | "dark" | "auto";
 
+const densitySelector = '[data-elea-density="compact"],[data-elea-density="standard"],[data-elea-density="comfortable"]';
 const appearanceSelector = '[data-elea-appearance="light"],[data-elea-appearance="dark"],[data-elea-appearance="auto"]';
 
 /** What a surface rendered outside its container takes from it. */
 export interface SurfaceScope {
+  "data-elea-density"?: Density | undefined;
   "data-elea-theme"?: string | undefined;
   "data-elea-appearance"?: Appearance | undefined;
   "data-elea-motion"?: string | undefined;
 }
 
 /**
- * Theme, appearance and motion resolve from their respective nearest ancestors. A surface in a portal carries them as its own attributes, so the
+ * Theme, appearance, density and motion resolve from their respective nearest ancestors. A surface in a portal carries them as its own attributes, so the
  * tokens a host sets under `[data-elea-theme="…"]` reach it without naming its classes.
  */
 export function scopeOf(element: Element | null | undefined): SurfaceScope {
+  const density = element?.closest<HTMLElement>(densitySelector)?.dataset["eleaDensity"] as Density | undefined;
   return {
+    ...(density && { "data-elea-density": density }),
     "data-elea-theme": element?.closest<HTMLElement>("[data-elea-theme]")?.dataset["eleaTheme"],
     "data-elea-appearance": element?.closest<HTMLElement>(appearanceSelector)?.dataset["eleaAppearance"] as Appearance | undefined,
     "data-elea-motion": element?.closest<HTMLElement>("[data-elea-motion]")?.dataset["eleaMotion"],
@@ -38,7 +43,7 @@ export function useSurfaceScope(observe = true) {
     if (!observe || !Observer) return;
     const observer = new Observer(refresh);
     for (let node: Element | null = element; node; node = node.parentElement) {
-      observer.observe(node, { attributeFilter: ["data-elea-theme", "data-elea-appearance", "data-elea-motion"] });
+      observer.observe(node, { attributeFilter: ["data-elea-theme", "data-elea-appearance", "data-elea-density", "data-elea-motion"] });
     }
     return () => observer.disconnect();
   }, [element, observe]);

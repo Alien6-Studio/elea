@@ -36,6 +36,29 @@
 :is(.elea-menu__item, .elea-ui-select__option, .elea-dialog > *, .elea-sheet > *):nth-child(n+3) { animation-delay: calc(60ms * var(--elea-motion, 0)); }
 :is(.elea-menu__item, .elea-ui-select__option, .elea-dialog > *, .elea-sheet > *):nth-child(n+4) { animation-delay: calc(90ms * var(--elea-motion, 0)); }
 :is(.elea-menu__item, .elea-ui-select__option, .elea-dialog > *, .elea-sheet > *):nth-child(n+5) { animation-delay: calc(120ms * var(--elea-motion, 0)); }
+/* Transitions retarget the current frame when a modal closes mid-entry or reopens mid-exit. */
+:is(.elea-dialog-backdrop, .elea-sheet-backdrop) {
+  --_elea-surface-time: calc(var(--elea-motion-intent-open, var(--elea-motion-duration-slow)) * var(--elea-motion, 0));
+  --_elea-surface-curve: var(--elea-motion-bounce, var(--elea-motion-easing-standard));
+  transition: opacity var(--_elea-surface-time) var(--elea-motion-easing-standard);
+}
+:is(.elea-dialog-backdrop, .elea-sheet-backdrop)[data-state="closing"] {
+  --_elea-surface-time: calc(var(--elea-motion-intent-close, var(--elea-motion-duration-base)) * var(--elea-motion, 0));
+  --_elea-surface-curve: var(--elea-motion-easing-exit);
+  opacity: 0;
+  pointer-events: none;
+}
+.elea-dialog, .elea-sheet {
+  transition: translate var(--_elea-surface-time) var(--_elea-surface-curve), scale var(--_elea-surface-time) var(--_elea-surface-curve);
+}
+.elea-dialog-backdrop[data-state="closing"] > .elea-dialog { translate: 0 0.5rem; scale: 0.98; }
+.elea-sheet-backdrop[data-state="closing"] > .elea-sheet { translate: var(--elea-sheet-x, 0%) var(--elea-sheet-y, 0%); }
+@starting-style {
+  .elea-dialog-backdrop, .elea-sheet-backdrop { opacity: 0; }
+  .elea-dialog { translate: 0 0.75rem; scale: 0.94; }
+  .elea-sheet { translate: var(--elea-sheet-x, 0%) var(--elea-sheet-y, 0%); }
+}
 @media (prefers-reduced-motion: reduce) {
+  .elea-dialog-backdrop, .elea-sheet-backdrop, .elea-dialog, .elea-sheet { transition: none; }
   [data-elea-motion] { --elea-motion: 0; --elea-motion-bounce: var(--elea-motion-easing-standard); --elea-motion-rebound: var(--elea-motion-easing-standard); }
 }

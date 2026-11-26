@@ -1,0 +1,33 @@
+@layer elea.tokens, elea.base, elea.components;
+@layer elea.base {
+  [data-elea-type="display"] {
+    font: var(--elea-font-weight-semibold) var(--elea-font-size-5xl)/1.05 var(--elea-font-family-sans);
+    letter-spacing: -.045em;
+    max-inline-size: 18ch;
+  }
+  [data-elea-type="page"] {
+    font: var(--elea-font-weight-bold) var(--elea-font-size-4xl)/1.1 var(--elea-font-family-sans);
+    letter-spacing: -.035em;
+    max-inline-size: 28ch;
+  }
+  [data-elea-type="section"] {
+    font: var(--elea-font-weight-semibold) var(--elea-font-size-2xl)/var(--elea-font-leading-tight) var(--elea-font-family-sans);
+    letter-spacing: -.02em;
+    max-inline-size: 38ch;
+  }
+  [data-elea-type="reading"] {
+    font: var(--elea-font-weight-regular) var(--elea-font-size-lg)/var(--elea-font-leading-relaxed) var(--elea-font-family-content);
+    letter-spacing: normal;
+    max-inline-size: var(--elea-size-measure);
+  }
+  [data-elea-type="label"], [data-elea-type="data"] {
+    font: var(--elea-font-weight-medium) var(--elea-font-size-sm)/var(--elea-font-leading-normal) var(--elea-font-family-sans);
+    letter-spacing: normal;
+  }
+  [data-elea-type="data"] { font-variant-numeric: lining-nums tabular-nums; }
+  [data-elea-type="annotation"] {
+    font: var(--elea-font-weight-regular) var(--elea-font-size-xs)/var(--elea-font-leading-normal) var(--elea-font-family-sans);
+    letter-spacing: .01em;
+    max-inline-size: 56ch;
+  }
+}

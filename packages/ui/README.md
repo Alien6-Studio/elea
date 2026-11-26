@@ -319,6 +319,12 @@ Enter or Space selects the focused step. The filled marker follows the current s
 and the underlined label follows keyboard focus.
 
 Render `<StepperSkeleton steps={3} orientation="vertical" />` while the steps load.
+
+A ref on `Stepper` points to its `<nav>`. Refs on `StepperPanel` and
+`StepperSkeleton` point to their outer `<div>`. Each accepts `id`, `className`,
+`style`, DOM events and native attributes on that same element. `onSelect` on
+the navigation and footer receives the selected step. The skeleton owns
+`aria-hidden` and the navigation owns the current-step indicator.
 The standalone sheet is `@alien6-studio/elea-ui/css/stepper.css`.
 
 Set `--elea-stepper-indicator-size` and `--elea-stepper-connector-thickness` on a
@@ -461,6 +467,27 @@ React Server Components, keep components with interaction callbacks in a client
 component. Display-only elements like `Badge` can render on the server.
 
 
+### Motion by intent
+
+| Intent | Duration override | Used by | Interruption |
+| --- | --- | --- | --- |
+| Open | `--elea-motion-intent-open` | Dialog and Sheet entry | Closing reverses the transition from its current position. |
+| Close | `--elea-motion-intent-close` | Dialog and Sheet exit | Focus returns to the opener immediately. Reopening cancels removal and focuses the surface again. |
+| Select | `--elea-motion-intent-select` | Tab indicator | The selected tab changes immediately, including under repeated arrow keys. |
+| Confirm | `--elea-motion-intent-confirm` | Toast entrance | The live region announces new messages as they arrive. |
+| Progress | `--elea-motion-intent-progress` | Determinate progress and step connectors | New values retarget the indicator. |
+| Reorder | `--elea-motion-intent-reorder` | Dragged editor block | The insertion marker follows the pointer immediately. Dropping or cancelling restores opacity. |
+
+Duration overrides accept CSS times. An element resolves its intent against its
+local duration scale, for example `var(--elea-motion-intent-open, var(--elea-motion-duration-slow))`.
+Open, select, confirm and progress use the slow duration by default. Close uses
+the base duration and reorder uses the fast duration.
+
+An exiting modal is inert and disappears when its backdrop fade finishes. Closing
+the last modal releases the scroll lock. Motion disabled or a reduced-motion
+preference makes closing immediate. Keep the controlled root mounted and change
+its `open` prop to play the exit.
+
 ## Portals and local appearance
 
 Apply `data-elea-appearance` on a DOM or JSX container. Dialog, Sheet and
@@ -478,6 +505,27 @@ already manages updates. A brand class alone can style the local tree. Use
 the corresponding `data-elea-theme` attribute where a portal must retain
 that brand.
 
+
+## Regional density
+
+Set `data-elea-density="compact"`, `"standard"` or `"comfortable"` on a section
+to coordinate its controls, field label and help spacing, menu items, action bars
+and table rows. A nested section can select its own density. Dialogs, sheets
+and notifications inherit the nearest setting at their origin, including changes
+while they are open. The reading rhythm and the brand's shape are independent.
+
+```tsx
+<section data-elea-density="compact">
+  <Field label="Title">{control => <Input {...control} />}</Field>
+  <Table label="Articles">{/* headings and rows */}</Table>
+  <Button>Save</Button>
+</section>
+```
+
+An explicit table `density="sm"` or `density="md"` sets the row padding for
+that table. Control sizes still describe the hierarchy inside the region.
+A host's explicit `--elea-control-height` takes precedence. Omit the regional
+attribute for the original spacing of each component and treatment.
 
 ## Scoped control styling
 

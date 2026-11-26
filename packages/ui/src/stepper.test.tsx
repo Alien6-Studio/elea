@@ -2,6 +2,7 @@ import "./test/dom.js";
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { createRef } from "react";
 import { renderToString } from "react-dom/server";
 import { Stepper, StepperPanel, StepperSkeleton, type StepperStep } from "./Stepper.js";
 
@@ -34,12 +35,14 @@ test("a controlled stepper exposes ordered steps, current position, descriptions
 
 test("linear navigation allows returning to earlier steps while its footer advances past disabled steps", () => {
   const requests: StepperStep[] = [];
-  const props = { steps, linear: true, onSelect: (step: StepperStep) => requests.push(step) };
+  const props = { steps, linear: true, label: "Workflow", orientation: "horizontal" as const, onSelect: (step: StepperStep) => requests.push(step) };
   const panel = (current: number) => <>
-    <Stepper {...props} current={current} label="Workflow" />
+    <Stepper {...props} current={current} />
     <StepperPanel {...props} current={current} previousLabel="Back" nextLabel="Continue" finish={<button type="submit">Finish</button>} />
   </>;
   const { rerender } = render(panel(0));
+  const footer = screen.getByRole("button", { name: "Continue" }).parentElement!;
+  for (const attribute of ["label", "orientation", "linear"]) assert.equal(footer.hasAttribute(attribute), false);
   assert.ok(screen.getByRole<HTMLButtonElement>("button", { name: "Back" }).disabled);
   assert.ok(screen.getByRole<HTMLButtonElement>("button", { name: "Review" }).disabled);
   fireEvent.click(screen.getByRole("button", { name: "Review" }));
@@ -97,4 +100,34 @@ test("empty sequences, unknown positions and a noninteractive loading layout ren
   rerender(<StepperSkeleton steps={4} orientation="vertical" />);
   assert.equal(container.querySelectorAll('[data-orientation="vertical"] li').length, 4);
   for (const count of [0, -1, Infinity]) assert.equal(renderToString(<StepperSkeleton steps={count} />), "");
+});
+
+test("stepper refs, styles, DOM events and attributes reach each documented root", () => {
+  const navigation = createRef<HTMLElement>();
+  const panel = createRef<HTMLDivElement>();
+  const skeleton = createRef<HTMLDivElement>();
+  let clicks = 0;
+  const props = { steps, current: 0, onSelect: () => undefined };
+  const { unmount } = render(<>
+    <Stepper {...props} ref={navigation} label="Workflow" id="flow" aria-describedby="hint" dir="rtl"
+      className="host" style={{ padding: 12 }} onClick={() => clicks++} />
+    <StepperPanel {...props} ref={panel} previousLabel="Back" nextLabel="Next" data-owner="form" className="actions" />
+    <StepperSkeleton ref={skeleton} data-owner="pending" className="loading" />
+  </>);
+  assert.equal(navigation.current, screen.getByRole("navigation", { name: "Workflow" }));
+  assert.equal(navigation.current?.className, "elea-stepper host");
+  assert.equal(navigation.current?.style.padding, "12px");
+  assert.equal(navigation.current?.getAttribute("aria-describedby"), "hint");
+  assert.equal(navigation.current?.dir, "rtl");
+  fireEvent.click(screen.getByRole("button", { name: "Draft" }));
+  assert.equal(clicks, 1);
+  assert.equal(panel.current?.className, "elea-stepper__panel actions");
+  assert.equal(panel.current?.dataset.owner, "form");
+  assert.equal(skeleton.current?.className, "elea-stepper loading");
+  assert.equal(skeleton.current?.getAttribute("aria-hidden"), "true");
+  assert.equal(skeleton.current?.dataset.owner, "pending");
+  unmount();
+  assert.equal(navigation.current, null);
+  assert.equal(panel.current, null);
+  assert.equal(skeleton.current, null);
 });

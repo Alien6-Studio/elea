@@ -69,13 +69,13 @@
 .elea-multi-select__group { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
 .elea-multi-select__group legend, .elea-multi-select__empty {
   display: block;
-  padding: var(--elea-space-2) var(--elea-space-3);
+  padding: var(--elea-density-action-gap, var(--elea-space-2)) var(--elea-space-3);
   font-size: var(--elea-font-size-sm);
   color: var(--elea-color-text-muted);
 }
 .elea-multi-select__group legend { font-size: var(--elea-font-size-xs); font-weight: var(--elea-font-weight-semibold); }
 .elea-multi-select__bulk {
-  padding: var(--elea-space-2) var(--elea-space-3);
+  padding: var(--elea-density-action-gap, var(--elea-space-2)) var(--elea-space-3);
   color: var(--elea-color-text-link);
   font-size: var(--elea-font-size-sm);
   cursor: pointer;

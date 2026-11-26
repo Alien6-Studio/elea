@@ -4,8 +4,8 @@
   gap: var(--elea-space-2);
 }
 .elea-ui-input.elea-color-picker__swatch {
-  flex: 0 0 var(--elea-control-height, 2.5rem);
-  width: var(--elea-control-height, 2.5rem);
+  flex: 0 0 var(--elea-control-height, calc(2.5rem + var(--elea-density-control-offset, 0px)));
+  width: var(--elea-control-height, calc(2.5rem + var(--elea-density-control-offset, 0px)));
   height: auto;
   padding: var(--elea-space-1);
   cursor: pointer;

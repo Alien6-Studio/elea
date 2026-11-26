@@ -190,7 +190,7 @@ export function MultiSelect({ options, value, onChange, label, labels, placehold
           onBlur={closeOnBlur} onKeyDown={onKeyDown} />
       </label>
     </div>
-    {expanded && <div ref={popup} className="elea-ui-select__list">
+    {expanded && <div ref={popup} className="elea-ui-select__list" tabIndex={-1}>
       <ChoiceList id={listId} aria-label={label} multiple>
         {Array.from(groups, ([group, members]) => group === undefined ? members.map(row)
           : <fieldset key={`group:${group}`} className="elea-multi-select__group">

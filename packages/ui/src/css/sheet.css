@@ -1,11 +1,9 @@
 /* Sheet: a modal panel docked to an edge of the viewport */
-.elea-sheet-backdrop { position: fixed; inset: 0; z-index: 100; display: flex; background: color-mix(in srgb, var(--elea-color-neutral-950) 50%, transparent); animation: elea-fade var(--elea-motion-duration-slow) var(--elea-motion-easing-standard); }
+.elea-sheet-backdrop { position: fixed; inset: 0; z-index: 100; display: flex; background: color-mix(in srgb, var(--elea-color-neutral-950) 50%, transparent); }
 .elea-sheet-backdrop--start { justify-content: flex-start; }
 .elea-sheet-backdrop--end { justify-content: flex-end; }
 .elea-sheet-backdrop--top { align-items: flex-start; }
 .elea-sheet-backdrop--bottom { align-items: flex-end; }
-/* The sheet slides in from its edge by a distance the motion factor scales, so without it the first frame is the resting state. */
-@keyframes elea-sheet { from { translate: calc(var(--elea-sheet-x, 0%) * var(--elea-motion, 0)) calc(var(--elea-sheet-y, 0%) * var(--elea-motion, 0)); } }
 .elea-sheet {
   font-family: var(--elea-font-family-sans);
   display: flex;
@@ -18,7 +16,6 @@
   color: var(--elea-color-text-default);
   box-shadow: var(--elea-shadow-md);
   outline: none;
-  animation: elea-sheet var(--elea-motion-duration-slow) var(--elea-motion-easing-standard);
 }
 .elea-sheet--start { --elea-sheet-x: -100%; border-inline-end: 1px solid var(--elea-color-border-default); }
 .elea-sheet--end { --elea-sheet-x: 100%; border-inline-start: 1px solid var(--elea-color-border-default); }
@@ -40,5 +37,5 @@
 .elea-sheet__description { margin: calc(var(--elea-space-2) * -1) 0 0; color: var(--elea-color-text-muted); }
 /* The body takes the room left and scrolls, so the header and the actions stay in place. */
 .elea-sheet__body { flex: 1; min-block-size: 0; overflow: auto; }
-.elea-sheet__actions { display: flex; justify-content: flex-end; gap: var(--elea-space-2); padding-block-start: var(--elea-space-4); border-block-start: 1px solid var(--elea-color-border-default); }
+.elea-sheet__actions { display: flex; justify-content: flex-end; gap: var(--elea-density-action-gap, var(--elea-space-2)); padding-block-start: var(--elea-space-4); border-block-start: 1px solid var(--elea-color-border-default); }
 @media (prefers-reduced-motion: reduce) { .elea-sheet__close { transition: none; } }

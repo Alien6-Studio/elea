@@ -27,6 +27,7 @@
   inset-inline: calc(var(--_elea-step-size) + 2 * var(--_elea-step-inset)) 0;
   inset-block-start: calc(var(--_elea-step-inset) + (var(--_elea-step-size) - var(--_elea-step-stroke)) / 2);
   block-size: var(--_elea-step-stroke);
+  transition: background-color calc(var(--elea-motion-intent-progress, var(--elea-motion-duration-slow)) * var(--elea-motion, 0)) var(--elea-motion-easing-standard);
   background: var(--elea-stepper-track, var(--elea-color-border-strong));
 }
 .elea-stepper__step[data-state="done"]::after { background: var(--_elea-step-active); }
@@ -128,7 +129,7 @@
 }
 .elea-stepper[data-orientation="vertical"] .elea-stepper__item { flex-direction: row; gap: var(--elea-space-3); }
 .elea-stepper[data-orientation="vertical"] .elea-stepper__body { align-content: center; min-block-size: var(--_elea-step-size); }
-.elea-stepper__panel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--elea-space-3); }
+.elea-stepper__panel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--elea-density-action-gap, var(--elea-space-3)); }
 
 @media (forced-colors: active) {
   .elea-stepper__item:has(.elea-stepper__button:focus-visible) .elea-stepper__indicator::after { outline-color: Highlight; forced-color-adjust: none; }

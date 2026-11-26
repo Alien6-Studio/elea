@@ -1,0 +1,18 @@
+[data-elea-density="compact"] {
+  --elea-density-control-offset: -0.25rem;
+  --elea-density-field-gap: 0.125rem;
+  --elea-density-action-gap: var(--elea-space-1);
+  --elea-density-table-padding: var(--elea-space-2);
+}
+[data-elea-density="standard"] {
+  --elea-density-control-offset: 0rem;
+  --elea-density-field-gap: var(--elea-space-1);
+  --elea-density-action-gap: var(--elea-space-2);
+  --elea-density-table-padding: var(--elea-space-3);
+}
+[data-elea-density="comfortable"] {
+  --elea-density-control-offset: 0.25rem;
+  --elea-density-field-gap: var(--elea-space-2);
+  --elea-density-action-gap: var(--elea-space-3);
+  --elea-density-table-padding: var(--elea-space-4);
+}

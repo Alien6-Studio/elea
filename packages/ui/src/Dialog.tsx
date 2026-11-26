@@ -23,8 +23,12 @@ export function cycleFocus(event: Pick<KeyboardEvent, "shiftKey" | "preventDefau
   focusable.at(event.shiftKey ? -1 : 0)?.focus();
 }
 
-// Open modals, the foremost last: the keys are its own, but for those a control inside has taken.
-const stack: unknown[] = [];
+// Only the top modal owns the keyboard and can restore focus.
+interface ActiveModal {
+  opener: HTMLElement | null;
+}
+const stack: ActiveModal[] = [];
+let unlockedOverflow = "";
 
 /**
  * What every modal surface shares: once mounted and open, focus moves inside the panel, Tab cycles
@@ -41,11 +45,11 @@ export function useModal(open: boolean, onClose: () => void) {
 
   useEffect(() => {
     if (!visible) return;
-    const opener = document.activeElement;
     const panel = panelRef.current;
+    const active: ActiveModal = { opener: document.activeElement as HTMLElement | null };
     if (panel) entryOf(panel).focus();
     const onKeyDown = (event: KeyboardEvent) => {
-      if (stack.at(-1) !== onKeyDown || event.defaultPrevented) return;
+      if (stack.at(-1) !== active || event.defaultPrevented) return;
       if (event.key === "Escape") {
         event.preventDefault();
         closeRef.current();
@@ -53,15 +57,18 @@ export function useModal(open: boolean, onClose: () => void) {
       }
       if (event.key === "Tab" && panel) cycleFocus(event, panel);
     };
-    stack.push(onKeyDown);
+    if (stack.length === 0) unlockedOverflow = document.body.style.overflow;
+    stack.push(active);
     document.addEventListener("keydown", onKeyDown);
-    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      stack.splice(stack.indexOf(onKeyDown), 1);
+      const index = stack.indexOf(active);
+      const above = stack[index + 1];
+      if (above && panel?.contains(above.opener)) above.opener = active.opener;
+      stack.splice(index, 1);
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
-      (opener as HTMLElement | null)?.focus?.();
+      if (stack.length === 0) document.body.style.overflow = unlockedOverflow;
+      if (!above) active.opener?.focus?.();
     };
   }, [visible]);
 
@@ -112,14 +119,46 @@ export function ModalSurface({ open, onClose, prefix, backdropClassName, classNa
   const descriptionId = useId();
   const [described, setDescribed] = useState(false);
   const context = useMemo(() => ({ prefix, titleId, descriptionId, onClose, describe: setDescribed }), [prefix, titleId, descriptionId, onClose]);
-  const [origin, scope] = useSurfaceScope(visible);
+  const [retained, setRetained] = useState(false);
+  const [origin, scope] = useSurfaceScope(visible || retained);
+  const motionSetting = motionAttribute(motion) ?? scope["data-elea-motion"];
+  const closing = !visible && retained && motionSetting === "on";
+  const lastFrame = useRef<Pick<ModalSurfaceProps, "backdropClassName" | "className" | "children"> | null>(null);
+
+  useEffect(() => {
+    // A host can clear its selected record or sheet side in the same update that closes it.
+    if (visible && motionSetting === "on") lastFrame.current = { backdropClassName, className, children };
+    else if (!closing) lastFrame.current = null;
+  }, [visible, closing, motionSetting, backdropClassName, className, children]);
+
+  useEffect(() => {
+    if (visible || !closing) {
+      setRetained(visible && motionSetting === "on");
+      return;
+    }
+    // Only the backdrop opacity controls presence. Descendants may animate indefinitely.
+    const frame = panelRef.current?.parentElement;
+    const fade = frame?.getAnimations?.().find(item => "transitionProperty" in item && item.transitionProperty === "opacity");
+    if (!fade) {
+      setRetained(false);
+      return;
+    }
+    let current = true;
+    const finish = () => { if (current) setRetained(false); };
+    fade.finished.then(finish, finish);
+    return () => { current = false; };
+  }, [visible, closing, motionSetting, panelRef]);
 
   const marker = <template ref={origin} />;
-  if (!visible) return marker;
+  if (!visible && !closing) return marker;
+  const frame = closing && lastFrame.current ? lastFrame.current : { backdropClassName, className, children };
   const surface = createPortal(
-    <div className={cx(`${prefix}-backdrop`, backdropClassName)} {...scope} data-elea-motion={motionAttribute(motion) ?? scope["data-elea-motion"]} onMouseDown={(event) => { if (dismissOnBackdrop && event.target === event.currentTarget) onClose(); }}>
-      <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={described ? descriptionId : undefined} className={cx(prefix, className)} tabIndex={-1}>
-        <ModalContext.Provider value={context}>{children}</ModalContext.Provider>
+    <div className={cx(`${prefix}-backdrop`, frame.backdropClassName)} {...scope} data-elea-motion={motionSetting}
+      data-state={closing ? "closing" : "open"} aria-hidden={closing || undefined}
+      ref={node => { node?.toggleAttribute("inert", closing); }}
+      onMouseDown={(event) => { if (visible && dismissOnBackdrop && event.target === event.currentTarget) onClose(); }}>
+      <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={described ? descriptionId : undefined} className={cx(prefix, frame.className)} tabIndex={-1}>
+        <ModalContext.Provider value={context}>{frame.children}</ModalContext.Provider>
       </div>
     </div>,
     document.body,

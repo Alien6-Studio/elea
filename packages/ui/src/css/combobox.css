@@ -12,7 +12,7 @@
 .elea-combobox .elea-ui-select__list { inset-inline: 0; }
 :where(.elea-combobox__options > button) { width: 100%; border: 0; background: transparent; font: inherit; text-align: start; }
 .elea-combobox .elea-ui-select__option { white-space: normal; overflow-wrap: anywhere; }
-.elea-combobox__empty:not(:empty) { display: block; padding: var(--elea-space-2) var(--elea-space-3); font-size: var(--elea-font-size-sm); color: var(--elea-color-text-muted); }
+.elea-combobox__empty:not(:empty) { display: block; padding: var(--elea-density-action-gap, var(--elea-space-2)) var(--elea-space-3); font-size: var(--elea-font-size-sm); color: var(--elea-color-text-muted); }
 @media (forced-colors: active) {
   .elea-combobox .elea-ui-select__option--active { outline: 1px solid Highlight; outline-offset: -1px; }
   .elea-combobox .elea-ui-select__option--disabled { color: GrayText; opacity: 1; }

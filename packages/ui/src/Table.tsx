@@ -16,9 +16,9 @@ export interface TableProps extends Omit<HTMLAttributes<HTMLTableElement>, "clas
 }
 
 /** A data table that scrolls sideways on its own instead of widening the page; compose it with the `Table…` parts below. */
-export const Table = forwardRef<HTMLTableElement, TableProps>(function Table({ label, density = "md", striped = false, hoverable = false, stickyHeader = false, className, ...rest }, ref) {
+export const Table = forwardRef<HTMLTableElement, TableProps>(function Table({ label, density, striped = false, hoverable = false, stickyHeader = false, className, ...rest }, ref) {
   return (
-    <div {...(label ? { role: "region", "aria-label": label, tabIndex: 0 } : {})} className={cx("elea-table", `elea-table--${density}`, striped && "elea-table--striped", hoverable && "elea-table--hoverable", stickyHeader && "elea-table--sticky", className)}>
+    <div {...(label ? { role: "region", "aria-label": label, tabIndex: 0 } : {})} className={cx("elea-table", `elea-table--${density ?? "md"}`, striped && "elea-table--striped", hoverable && "elea-table--hoverable", stickyHeader && "elea-table--sticky", className)} data-density={density}>
       <table {...rest} ref={ref} />
     </div>
   );

@@ -121,6 +121,16 @@ The chart and sidebar variables have no Elea counterpart and stay yours. An alia
 where it is declared: `shadcn.css` covers the root, `data-theme` containers and the three
 editions; for your own brand class, emit `toShadcnAliases(".journal")` next to its theme.
 
+## Interface density
+
+The runtime stylesheet includes three regional spacing profiles. Set
+`data-elea-density="compact"` on a workspace, `"comfortable"` on a roomy
+form or `"standard"` to reset an inner region. Each profile defines
+`--elea-density-control-offset`, `--elea-density-field-gap`,
+`--elea-density-action-gap` and `--elea-density-table-padding`.
+The brand generator's `rhythm` still controls reading text. See the
+[UI density example](../ui#regional-density).
+
 ## Local appearance
 
 Set `data-elea-appearance="light"`, `"dark"` or `"auto"` on an HTML container
@@ -302,3 +312,45 @@ the new values.
 
 `color` (neutral, primary, secondary scales; success, warning, danger, info; semantic text, surface,
 border, focus), `font` (family, size, weight, leading), `space`, `radius`, `shadow`, `size`.
+
+## Interface typography
+
+Import `@alien6-studio/elea-tokens/elea.css` and `@alien6-studio/elea-tokens/typography.css`.
+Set `data-elea-type` on the element that renders the text. Choose its HTML heading level separately.
+The following are the defaults at a 16px root. A scoped reading theme supplies its own body family, size, leading and measure.
+
+| Role | Use | Size / weight | Line height | Tracking | Maximum measure |
+| --- | --- | --- | --- | --- | --- |
+| `display` | Opening headline | 48px / 600 | 1.05 | −.045em | 18ch |
+| `page` | Page title | 36px / 700 | 1.1 | −.035em | 28ch |
+| `section` | Section heading | 24px / 600 | 1.25 | −.02em | 38ch |
+| `reading` | Body copy | 18px / 400 | 1.625 | Normal | Reading measure token |
+| `label` | Field or action label | 14px / 500 | 1.5 | Normal | Container |
+| `data` | Dates and numeric values | 14px / 500 | 1.5 | Normal | Column |
+| `annotation` | Source or figure note | 12px / 400 | 1.5 | .01em | 56ch |
+
+The data role requests lining, tabular figures. Align comparable amounts to the end of their column and format units, dates and currencies for the reader’s locale. Keep identifiers as strings to preserve leading zeroes.
+
+## Qualify a theme
+
+Import `qualifyTheme` and `compareThemeReports` from `@alien6-studio/elea-tokens/qualification`.
+The Studio’s **Download contrast report** exports the same JSON. Each record includes the resolved foreground, background, full-precision contrast ratio, threshold and outcome. A complete named profile has 56 checks across seven roles, two appearances and four states. Unassigned roles are listed separately because they inherit their colours from the host.
+
+From a source checkout, generate two reports and inspect the changes:
+
+```sh
+npm ci
+npm run build:packages
+node docs/examples/qualify-theme.mjs --profile reserve > reserve.json
+node docs/examples/qualify-theme.mjs --profile braise --previous reserve.json > braise.json
+```
+
+Pass `--theme path/to/brand.json` to use your own `BrandTheme`. A colour pair below 4.5:1 sets the command’s exit status to 1 and is included in the output. Diff entries are keyed by role, appearance and state, with the previous and current pair. The comparison lists changed theme settings, including typography and shape.
+
+The colour report uses the [WCAG relative luminance calculation](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) on the generated sRGB values. Browser styles, host overrides, focus indicators, images and document accessibility require separate checks. The site’s Playwright `theme-proof.spec.ts` records actual button foregrounds and backgrounds at rest, on hover and on press, and field, button and row measurements at all three densities. Its declared matrix covers Réserve and Rasance in light and dark across Chromium, Firefox and WebKit. Each result identifies the engine, version, viewport and component states exercised. To deliver a combined report, supply matching Playwright files from that build. Repeat `--evidence` for additional configurations:
+
+```sh
+node docs/examples/qualify-theme.mjs --profile reserve --evidence path/to/theme-proof.json > qualified.json
+```
+
+The command checks the recorded profile configuration and tokens version, retains the original run metadata and returns a failing status for unsuccessful measurements. Use results from the same library and site revisions as your delivery.

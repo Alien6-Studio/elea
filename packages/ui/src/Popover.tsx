@@ -121,15 +121,19 @@ function useAnchoredPanel({ open, anchor, side, align, onDismiss, modal = false 
       const target = event.target as Node;
       if (!panel.contains(target) && !originRef.current?.contains(target)) live.current.onDismiss();
     };
-    const follow = (event: Event) => {
+    const follow = (event?: Event) => {
       const target = anchorOf(panel, live.current.anchor);
-      if (!target || isGone(target, event.target)) live.current.onDismiss();
+      if (!target || (event && isGone(target, event.target))) live.current.onDismiss();
       else place(panel, target, live.current.side, live.current.align);
     };
+    // Async content, such as the local month in a date field, can change which side fits.
+    const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(() => follow());
+    observer?.observe(panel);
     document.addEventListener("mousedown", onPointerDown);
     window.addEventListener("scroll", follow, true);
     window.addEventListener("resize", follow);
     return () => {
+      observer?.disconnect();
       document.removeEventListener("mousedown", onPointerDown);
       window.removeEventListener("scroll", follow, true);
       window.removeEventListener("resize", follow);

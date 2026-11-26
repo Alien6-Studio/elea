@@ -21,7 +21,7 @@
   align-items: center;
   gap: var(--elea-space-2);
   width: 100%;
-  padding: calc(var(--elea-space-2) + var(--elea-_density, 0px)) var(--elea-space-3);
+  padding: calc(var(--elea-space-2) + var(--elea-density-control-offset, var(--elea-_density, 0px))) var(--elea-space-3);
   border: 0;
   border-radius: var(--elea-shape-control, var(--elea-radius-md));
   background: transparent;

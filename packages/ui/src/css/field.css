@@ -1,6 +1,6 @@
 /* Fields */
 .elea-field, .elea-field__label { font-family: var(--elea-font-family-sans); }
-.elea-field { display: flex; flex-direction: column; gap: var(--elea-space-1); }
+.elea-field { display: flex; flex-direction: column; gap: var(--elea-density-field-gap, var(--elea-space-1)); }
 .elea-field__label { font-size: var(--elea-font-size-sm); font-weight: var(--elea-font-weight-medium); color: var(--elea-color-text-default); }
 .elea-field__required { color: var(--elea-color-action-danger-ink, var(--elea-color-danger)); margin-left: var(--elea-space-1); }
 .elea-field__help { margin: 0; font-size: var(--elea-font-size-xs); color: var(--elea-color-text-subtle); }
@@ -10,7 +10,7 @@
 .elea-ui-input {
   box-sizing: border-box;
   width: 100%;
-  min-height: var(--elea-control-height, calc(2.5rem + var(--elea-_density, 0px)));
+  min-height: var(--elea-control-height, calc(2.5rem + var(--elea-density-control-offset, var(--elea-_density, 0px))));
   font: inherit;
   font-family: var(--elea-font-family-sans);
   line-height: var(--elea-font-leading-tight);
@@ -24,8 +24,8 @@
   transition: border-color var(--elea-motion-duration-base) var(--elea-motion-easing-standard), box-shadow var(--elea-motion-duration-base) var(--elea-motion-easing-standard);
   box-shadow: var(--elea-control-edge, var(--elea-_control-edge, none));
 }
-.elea-ui-input--sm { min-height: var(--elea-control-height, calc(2rem + var(--elea-_density, 0px))); font-size: var(--elea-control-font-size, var(--elea-font-size-sm)); padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-2)); }
-.elea-ui-input--lg { min-height: var(--elea-control-height, calc(3rem + var(--elea-_density, 0px))); font-size: var(--elea-control-font-size, clamp(calc(var(--elea-font-size-base) + 1px), var(--elea-font-size-lg), calc(var(--elea-font-size-xl) - 1px))); padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-4)); }
+.elea-ui-input--sm { min-height: var(--elea-control-height, calc(2rem + var(--elea-density-control-offset, var(--elea-_density, 0px)))); font-size: var(--elea-control-font-size, var(--elea-font-size-sm)); padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-2)); }
+.elea-ui-input--lg { min-height: var(--elea-control-height, calc(3rem + var(--elea-density-control-offset, var(--elea-_density, 0px)))); font-size: var(--elea-control-font-size, clamp(calc(var(--elea-font-size-base) + 1px), var(--elea-font-size-lg), calc(var(--elea-font-size-xl) - 1px))); padding: var(--elea-space-1) var(--elea-control-padding-inline, var(--elea-space-4)); }
 .elea-ui-input:hover:enabled { background: var(--elea-control-hover-surface, var(--elea-control-surface, color-mix(in srgb, var(--elea-color-surface-default) var(--elea-_control-fill, 100%), var(--elea-color-surface-subtle)))); }
 .elea-ui-input::placeholder { color: var(--elea-color-text-subtle); }
 .elea-ui-input:disabled { background: var(--elea-color-surface-subtle); color: var(--elea-color-text-muted); cursor: not-allowed; }

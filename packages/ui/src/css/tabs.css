@@ -4,7 +4,7 @@
 .elea-tabs__tab {
   flex: none;
   min-height: var(--elea-control-height, 0);
-  padding: calc(var(--elea-space-2) + var(--elea-_density, 0px)) var(--elea-control-padding-inline, var(--elea-space-3));
+  padding: calc(var(--elea-space-2) + var(--elea-density-control-offset, var(--elea-_density, 0px))) var(--elea-control-padding-inline, var(--elea-space-3));
   border: 0;
   border-block-end: 2px solid transparent;
   background: transparent;
@@ -23,7 +23,7 @@
   inset: auto 0 -2px;
   border-block-end: 2px solid;
   scale: 0 1;
-  transition: scale calc(var(--elea-motion-duration-slow) * var(--elea-motion, 0)) var(--elea-motion-easing-standard);
+  transition: scale calc(var(--elea-motion-intent-select, var(--elea-motion-duration-slow)) * var(--elea-motion, 0)) var(--elea-motion-easing-standard);
 }
 .elea-tabs__tab:hover:enabled { background: var(--elea-control-hover-surface, var(--elea-color-surface-muted)); }
 .elea-tabs__tab[aria-selected="true"] { color: var(--elea-color-text-link); }

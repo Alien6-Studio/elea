@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Set `data-elea-density` on a region to coordinate controls, field spacing, menus and table rows. The optional `@alien6-studio/elea-tokens/typography.css` stylesheet adds seven interface type roles.
+- Stepper, StepperPanel and StepperSkeleton forward native root attributes and refs. With motion on, Dialog and Sheet animate their exit. Focus and page scroll return immediately, and reopening interrupts the exit. Six motion intentions can be tuned independently.
+- Popovers reposition when their content grows. This keeps the last week of an opened DateField in view on small screens. MultiSelect skips the popup scroll container during Tab navigation.
+- The optional tokens `/qualification` entry reports resolved foreground/background contrast by role, state and appearance and compares two reports.
 - The tokens package adds standalone light and dark DTCG 2025.10 documents under `dtcg/2025.10/`. The [Style Dictionary example](docs/examples/dtcg/qualify.test.mjs) builds CSS from both and checks alias resolution.
 - The classic editor draws its focus ring around the complete frame. Set `--elea-color-focus` and `--elea-color-selection` to brand focus and text selection. Use `width="full"` and `--elea-editor-canvas-height` to fit a form field.
 - `ContentEditor` accepts a plain-text `maxLength` and shows a character counter. Use `htmlToBlocks` when opening an HTML field and `blocksToHtml` when saving it.

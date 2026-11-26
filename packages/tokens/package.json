@@ -17,6 +17,7 @@
   "files": [
     "dist",
     "tokens",
+    "typography.css",
     "README.md",
     "LICENSE"
   ],
@@ -36,6 +37,12 @@
       "import": "./dist/src/palette.js",
       "default": "./dist/src/palette.js"
     },
+    "./qualification": {
+      "types": "./dist/src/qualification.d.ts",
+      "import": "./dist/src/qualification.js",
+      "default": "./dist/src/qualification.js"
+    },
+    "./typography.css": "./typography.css",
     "./palette.css": "./dist/palette.css",
     "./elea.css": "./dist/elea.css",
     "./fonts/elea-sans.css": "./dist/fonts/elea-sans.css",

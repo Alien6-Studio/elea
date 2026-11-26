@@ -113,3 +113,21 @@ test("open portals follow changes to the nearest appearance without changing the
   assert.equal(scopeOf(notices)["data-elea-appearance"], "light");
   assert.equal(container.firstElementChild?.getAttribute("data-elea-appearance"), "light");
 });
+
+test("a portaled surface follows its nearest valid density independently of the theme", async () => {
+  render(
+    <article data-elea-density="comfortable">
+      <section data-elea-theme="journal" data-elea-density="compact" data-testid="local">
+        <Dialog open onClose={() => {}} title="Settings" closeLabel="Close">Density</Dialog>
+      </section>
+    </article>,
+  );
+  const backdrop = screen.getByRole("dialog", { name: "Settings" }).parentElement!;
+  const local = screen.getByTestId("local");
+  assert.equal(backdrop.getAttribute("data-elea-density"), "compact");
+  await act(async () => local.setAttribute("data-elea-density", "standard"));
+  assert.equal(backdrop.getAttribute("data-elea-density"), "standard");
+  await act(async () => local.setAttribute("data-elea-density", "unknown"));
+  assert.equal(backdrop.getAttribute("data-elea-density"), "comfortable");
+  assert.equal(backdrop.getAttribute("data-elea-theme"), "journal");
+});

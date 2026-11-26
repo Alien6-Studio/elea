@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { editions, makeBrandTheme } from "../src/brand.js";
@@ -16,6 +16,8 @@ cpSync(new URL("../fonts/", import.meta.url), join(dist, "fonts"), { recursive: 
 // Keep action roles live in CSS. Non-CSS consumers receive the same DTCG aliases as resolved colours.
 function actionAliases(set: typeof tokens, actions: Record<string, { $value: string }>, isDark: boolean) {
   const values = set.map(token => {
+    // Keep duration overrides on a nested host live through the fallback at the consuming element.
+    if (token.path.startsWith("motion.intent.")) return { ...token, value: "initial" };
     if (statusRoles.some(role => token.path === `color.${role}`)) {
       const source = brandAppearanceVariable(token.path, isDark ? "dark" : "light");
       return { ...token, value: `var(${source}, ${token.value})` };
@@ -34,10 +36,11 @@ function actionAliases(set: typeof tokens, actions: Record<string, { $value: str
 const runtimeTokens = toStylesheet(actionAliases(tokens, light.color.action, false), {
   dark: actionAliases(darkTokens, dark.color.action, true), localAppearance: true,
 });
+const density = readFileSync(new URL("./density.css", import.meta.url), "utf8");
 writeFileSync(join(dist, "elea.css"), [
   LAYER_ORDER,
   '@import "./fonts/elea-sans.css";',
-  `@layer elea.tokens {\n${runtimeTokens}}\n`,
+  `@layer elea.tokens {\n${runtimeTokens}${density}}\n`,
 ].join("\n"));
 writeFileSync(join(dist, "theme.css"), toTailwindTheme(tokens));
 const referenceColors = Object.entries(surfaceFamilies).flatMap(([name, shades]) =>

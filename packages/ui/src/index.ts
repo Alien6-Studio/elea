@@ -1,7 +1,7 @@
 export { CardNumberInput, IbanInput, SirenInput, SiretInput, type IdentifierInputProps } from "./IdentifierInput.js";
 export type { InputFormat, SegmentedInputFormat } from "./inputMask.js";
 export { cx } from "./cx.js";
-export { scopeOf, useSurfaceScope, type Appearance, type SurfaceScope } from "./scope.js";
+export { scopeOf, useSurfaceScope, type Appearance, type Density, type SurfaceScope } from "./scope.js";
 export { Button, ButtonSkeleton, IconButton, type ButtonSkeletonProps, type ButtonEffect, type ButtonLinkRenderProps, type ButtonTone, type ButtonProps, type ButtonRadius, type ButtonShadow, type ButtonSize, type ButtonVariant, type IconButtonProps, type LinkButtonProps } from "./Button.js";
 export { Breadcrumb, type BreadcrumbItem, type BreadcrumbProps } from "./Breadcrumb.js";
 export { Badge, BadgeSkeleton, type BadgeProps, type BadgeSkeletonProps, type BadgeTone, type BadgeVariant } from "./Badge.js";

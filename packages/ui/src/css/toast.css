@@ -30,7 +30,7 @@
   line-height: var(--elea-font-leading-normal);
   pointer-events: auto;
   --elea-enter-shrink: 0.06;
-  animation: elea-enter var(--elea-motion-duration-slow) var(--elea-motion-rebound, var(--elea-motion-easing-standard));
+  animation: elea-enter var(--elea-motion-intent-confirm, var(--elea-motion-duration-slow)) var(--elea-motion-rebound, var(--elea-motion-easing-standard));
   transition: opacity 200ms var(--elea-motion-easing-exit), translate 200ms var(--elea-motion-easing-exit), scale 200ms var(--elea-motion-easing-exit);
 }
 [data-elea-motion="on"] .elea-toast, .elea-toasts[data-elea-motion="on"] .elea-toast { animation-duration: 450ms; }

@@ -14,7 +14,7 @@
   block-size: 100%;
   border-radius: inherit;
   background: var(--elea-progress-color);
-  transition: inline-size var(--elea-motion-duration-slow) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
+  transition: inline-size var(--elea-motion-intent-progress, var(--elea-motion-duration-slow)) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
 }
 /* Without a value the bar travels the track, since the amount of work is unknown. */
 .elea-progress__bar--indeterminate { inline-size: 40%; animation: elea-progress 1.4s var(--elea-motion-easing-standard) infinite; }

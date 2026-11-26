@@ -36,6 +36,7 @@ test("Table scrolls inside a named region and composes native table parts", () =
   render(<Table ref={ref}><TableBody><TableRow><TableCell>Plain</TableCell></TableRow></TableBody></Table>);
   assert.equal(ref.current?.tagName, "TABLE");
   assert.equal(ref.current?.parentElement?.className, "elea-table elea-table--md");
+  assert.equal(ref.current?.parentElement?.getAttribute("data-density"), null);
   assert.equal(ref.current?.parentElement?.getAttribute("role"), null);
   assert.equal(ref.current?.parentElement?.getAttribute("tabindex"), null);
   assert.equal(screen.getByRole("cell", { name: "Plain" }).getAttribute("class"), null);
@@ -43,6 +44,7 @@ test("Table scrolls inside a named region and composes native table parts", () =
   render(<Invoices />);
   const region = screen.getByRole("region", { name: "Invoices" });
   assert.equal(region.className, "elea-table elea-table--sm elea-table--striped elea-table--hoverable elea-table--sticky h-64");
+  assert.equal(region.dataset["density"], "sm");
   assert.equal(region.tabIndex, 0);
   assert.equal(screen.getByTestId("table").tagName, "TABLE");
   assert.equal(screen.getByRole("table", { name: "Invoices of the quarter" }), screen.getByTestId("table"));
@@ -53,6 +55,11 @@ test("Table scrolls inside a named region and composes native table parts", () =
   assert.equal(screen.getByRole("cell", { name: "1 200" }).className, "elea-table__cell--end");
   assert.equal(screen.getByRole("cell", { name: "800" }).className, "elea-table__cell--center x");
   assert.equal(screen.getByRole("cell", { name: "2 000" }).closest("tfoot")?.tagName, "TFOOT");
+});
+
+test("Table can explicitly select medium spacing within a compact region", () => {
+  render(<section data-elea-density="compact"><Table density="md" label="Session log" /></section>);
+  assert.equal(screen.getByRole("region", { name: "Session log" }).dataset["density"], "md");
 });
 
 test("Table sorts through a button in the heading and states the direction", () => {

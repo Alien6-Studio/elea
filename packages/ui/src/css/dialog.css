@@ -1,10 +1,7 @@
 /* Dialog */
-.elea-dialog-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: var(--elea-space-4); background: color-mix(in srgb, var(--elea-color-neutral-950) 50%, transparent); animation: elea-fade var(--elea-motion-duration-slow) var(--elea-motion-easing-standard); }
+.elea-dialog-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: var(--elea-space-4); background: color-mix(in srgb, var(--elea-color-neutral-950) 50%, transparent); }
 .elea-dialog {
   font-family: var(--elea-font-family-sans);
-  --elea-enter-y: 0.75rem;
-  --elea-enter-shrink: 0.06;
-  animation: elea-enter var(--elea-motion-duration-slow) var(--elea-motion-bounce, var(--elea-motion-easing-standard));
   width: 100%;
   max-height: calc(100vh - 2 * var(--elea-space-4));
   overflow: auto;
@@ -29,4 +26,4 @@
 .elea-dialog__close:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
 .elea-dialog__description { margin: var(--elea-space-2) 0 0; color: var(--elea-color-text-muted); }
 .elea-dialog__body { margin-top: var(--elea-space-4); }
-.elea-dialog__actions { display: flex; justify-content: flex-end; gap: var(--elea-space-2); margin-top: var(--elea-space-6); }
+.elea-dialog__actions { display: flex; justify-content: flex-end; gap: var(--elea-density-action-gap, var(--elea-space-2)); margin-top: var(--elea-space-6); }

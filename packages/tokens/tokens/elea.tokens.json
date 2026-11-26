@@ -173,6 +173,14 @@
     "md": { "$type": "shadow", "$value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)" }
   },
   "motion": {
+    "intent": {
+      "open": { "$type": "duration", "$value": "{motion.duration.slow}" },
+      "close": { "$type": "duration", "$value": "{motion.duration.base}" },
+      "select": { "$type": "duration", "$value": "{motion.duration.slow}" },
+      "confirm": { "$type": "duration", "$value": "{motion.duration.slow}" },
+      "progress": { "$type": "duration", "$value": "{motion.duration.slow}" },
+      "reorder": { "$type": "duration", "$value": "{motion.duration.fast}" }
+    },
     "duration": {
       "fast": { "$type": "duration", "$value": "100ms" },
       "base": { "$type": "duration", "$value": "150ms" },

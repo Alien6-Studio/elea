@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, type KeyboardEvent, type ReactNode } from "react";
+import { forwardRef, useId, type HTMLAttributes, type KeyboardEvent, type ReactNode } from "react";
+import { cx } from "./cx.js";
 import { Button } from "./Button.js";
 import { Skeleton } from "./Skeleton.js";
 
@@ -24,7 +25,9 @@ interface StepperNavigationProps {
   onSelect: (step: StepperStep) => void;
 }
 
-export interface StepperProps extends StepperNavigationProps {
+type StepperRootAttributes<Element extends HTMLElement> = Omit<HTMLAttributes<Element>, "children" | "dangerouslySetInnerHTML" | "onSelect">;
+
+export interface StepperProps extends StepperNavigationProps, Omit<StepperRootAttributes<HTMLElement>, "role" | "aria-label"> {
   /** Accessible name of the navigation landmark. */
   label: string;
   orientation?: StepperOrientation | undefined;
@@ -58,12 +61,12 @@ function moveFocus(event: KeyboardEvent<HTMLButtonElement>, orientation: Stepper
 }
 
 /** Controlled progress navigation. Arrow keys explore the sequence; activating a button requests a step. */
-export function Stepper({ label, steps, current, onSelect, orientation = "horizontal", linear = false }: Readonly<StepperProps>) {
+export const Stepper = forwardRef<HTMLElement, StepperProps>(function Stepper({ label, steps, current, onSelect, orientation = "horizontal", linear = false, className, ...rest }, ref) {
   const id = useId();
   const active = currentIndex(steps, current);
   if (steps.length === 0) return null;
   return (
-    <nav className="elea-stepper" data-orientation={orientation} aria-label={label}>
+    <nav {...rest} ref={ref} className={cx("elea-stepper", className)} data-orientation={orientation} aria-label={label}>
       <ol className="elea-stepper__list">
         {steps.map((step, index) => {
           const selected = index === active;
@@ -100,9 +103,9 @@ export function Stepper({ label, steps, current, onSelect, orientation = "horizo
       </ol>
     </nav>
   );
-}
+});
 
-export interface StepperPanelProps extends StepperNavigationProps {
+export interface StepperPanelProps extends StepperNavigationProps, StepperRootAttributes<HTMLDivElement> {
   previousLabel: string;
   nextLabel: string;
   /** Host action shown in place of Next on the final available step. */
@@ -110,32 +113,37 @@ export interface StepperPanelProps extends StepperNavigationProps {
 }
 
 /** Optional footer. Previous and Next move one available step, including in a linear flow. */
-export function StepperPanel({ steps, current, onSelect, previousLabel, nextLabel, finish }: Readonly<StepperPanelProps>) {
+export const StepperPanel = forwardRef<HTMLDivElement, StepperPanelProps>(function StepperPanel(
+  // Hosts may share props with Stepper. Only the navigation uses these three settings.
+  { steps, current, onSelect, previousLabel, nextLabel, finish, className, linear: _linear, label: _label, orientation: _orientation, ...rest }:
+    StepperPanelProps & Partial<Pick<StepperProps, "linear" | "label" | "orientation">>,
+  ref,
+) {
   const active = currentIndex(steps, current);
   if (active < 0) return null;
   const previous = steps.slice(0, active).reverse().find(step => !step.disabled);
   const next = steps.slice(active + 1).find(step => !step.disabled);
   return (
-    <div className="elea-stepper__panel">
+    <div {...rest} ref={ref} className={cx("elea-stepper__panel", className)}>
       <Button variant="outline" disabled={!previous} onClick={() => previous && onSelect(previous)}>{previousLabel}</Button>
       {next || finish == null
         ? <Button disabled={!next} onClick={() => next && onSelect(next)}>{nextLabel}</Button>
         : finish}
     </div>
   );
-}
+});
 
-export interface StepperSkeletonProps {
+export interface StepperSkeletonProps extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "dangerouslySetInnerHTML" | "aria-hidden"> {
   steps?: number | undefined;
   orientation?: StepperOrientation | undefined;
 }
 
 /** Decorative placeholder with the same indicator, label and connector layout. */
-export function StepperSkeleton({ steps = 3, orientation = "horizontal" }: Readonly<StepperSkeletonProps>) {
+export const StepperSkeleton = forwardRef<HTMLDivElement, StepperSkeletonProps>(function StepperSkeleton({ steps = 3, orientation = "horizontal", className, ...rest }, ref) {
   const count = Number.isFinite(steps) ? Math.floor(steps) : 0;
   if (count < 1) return null;
   return (
-    <div className="elea-stepper" data-orientation={orientation} aria-hidden="true">
+    <div {...rest} ref={ref} className={cx("elea-stepper", className)} data-orientation={orientation} aria-hidden="true">
       <ol className="elea-stepper__list">
         {Array.from({ length: count }, (_, index) => index + 1).map(ordinal => (
           <li key={ordinal} className="elea-stepper__step">
@@ -148,4 +156,4 @@ export function StepperSkeleton({ steps = 3, orientation = "horizontal" }: Reado
       </ol>
     </div>
   );
-}
+});
