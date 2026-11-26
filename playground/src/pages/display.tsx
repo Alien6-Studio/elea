@@ -13,26 +13,25 @@ import portrait from "./portrait.svg";
 
 const InfoIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5v.5" /></svg>;
 
-const { rasance, reserve, braise, "hors-champ": horsChamp } = colourPlates;
-const exhibitionPlates = [rasance, reserve, braise, horsChamp];
+const exhibitionPlates = Object.values(colourPlates);
 type Plate = (typeof exhibitionPlates)[number];
-type PlateLayout = Pick<CarouselProps<Plate>, "itemsPerView" | "minItemWidth" | "gap" | "navigation" | "controlsPosition" | "controlsAlign" | "showCounter">;
+type PlateLayout = Pick<CarouselProps<Plate>, "defaultIndex" | "itemsPerView" | "minItemWidth" | "gap" | "navigation" | "controlsPosition" | "controlsAlign" | "showCounter">;
 
 const presentations = [
-  { title: "Single plate", plates: exhibitionPlates, layout: { navigation: "arrows" } },
-  { title: "Contact sheet", plates: [reserve, braise, rasance, horsChamp], layout: {
-    itemsPerView: 2, minItemWidth: 100, gap: "sm", navigation: "dots", controlsPosition: "bottom", controlsAlign: "center",
+  { title: "Single plate", layout: { navigation: "arrows" } },
+  { title: "Contact sheet", layout: {
+    defaultIndex: 1, itemsPerView: 2, minItemWidth: 100, gap: "sm", navigation: "dots", controlsPosition: "bottom", controlsAlign: "center",
   } },
-  { title: "Filmstrip", plates: [horsChamp, rasance, reserve, braise], layout: {
-    itemsPerView: 3, minItemWidth: 72, gap: "none", navigation: "both", controlsPosition: "bottom", controlsAlign: "start", showCounter: true,
+  { title: "Filmstrip", layout: {
+    defaultIndex: 3, itemsPerView: 3, minItemWidth: 72, gap: "none", navigation: "both", controlsPosition: "bottom", controlsAlign: "start", showCounter: true,
   } },
-] satisfies { title: string; plates: Plate[]; layout: PlateLayout }[];
+] satisfies { title: string; layout: PlateLayout }[];
 
-export function PlateCarousel({ label = "Exhibition plates", plates = exhibitionPlates, ...layout }: PlateLayout & { label?: string; plates?: Plate[] }) {
-  return <Carousel items={plates} itemKey={plate => plate.src} loop className="catalog-plate-carousel"
+export function PlateCarousel({ label = "Exhibition plates", ...layout }: PlateLayout & { label?: string }) {
+  return <Carousel items={exhibitionPlates} itemKey={plate => plate.src} loop className="catalog-plate-carousel"
     label={label} roleDescription="carousel" previousLabel="Previous plate" nextLabel="Next plate"
     getDotLabel={index => `Show plate ${index + 1}`} {...layout}
-    renderItem={plate => <img src={plate.src} alt={plate.alt} width={840} height={560} loading="lazy" />} />;
+    renderItem={plate => <img src={plate.src} alt={plate.alt} width={840} height={plate.height ?? 560} loading="lazy" />} />;
 }
 
 function plateExample(title: string, layout: PlateLayout) {
@@ -49,11 +48,11 @@ function plateExample(title: string, layout: PlateLayout) {
 export function CarouselPage() {
   return <>
     <h1>Carousel</h1>
-    <p className="lead">Browse the same four photographs one at a time, in pairs or as a continuous strip.</p>
+    <p className="lead">Browse the plates from the colour atlas one at a time, in pairs or as a continuous strip.</p>
     <div className="carousel-gallery">
-      {presentations.map(({ title, plates, layout }) => (
+      {presentations.map(({ title, layout }) => (
         <Demo key={title} title={title} code={plateExample(title, layout)}>
-          <PlateCarousel label={title} plates={plates} {...layout} />
+          <PlateCarousel label={title} {...layout} />
         </Demo>
       ))}
     </div>

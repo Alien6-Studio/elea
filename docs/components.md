@@ -21,7 +21,7 @@ For a checkout, [build the npm archives](https://github.com/Alien6-Studio/elea/b
 
 ## Theme
 
-Explore Rasance, Réserve, Braise and Hors champ in the [colour atlas](/elea/colours/). Each theme sets the palette, typography, spacing and control shapes. All four use white and light grey for reading surfaces, with neutral greys in dark mode. Adjust the theme and download its CSS in [Theme Studio](/elea/playground/#/theme).
+Browse the [colour atlas](/elea/colours/) to explore each theme’s photography and colour scales. The themes set the palette, typography, spacing and control shapes. Reading surfaces are white and light grey, with neutral greys in dark mode. Adjust the theme and download its CSS in [Theme Studio](/elea/playground/#/theme).
 
 Load the downloaded stylesheet after the UI bundle, then set `data-elea-theme="brand"` on your app container. See [how themes reach dialogs, sheets and toasts](https://github.com/Alien6-Studio/elea/tree/main/packages/ui#themes-and-surfaces-outside-their-container).
 

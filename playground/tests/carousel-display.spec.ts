@@ -17,11 +17,11 @@ test("the Carousel guide presents three independent layouts with their own navig
   const next = { name: "Next plate", exact: true };
   const dots = { name: /^Show plate \d+$/ };
   await expect(single.getByRole("button", dots)).toHaveCount(0);
-  await expect(single.getByRole("status")).toHaveText("1 / 4");
+  await expect(single.getByRole("status")).toHaveText("1 / 9");
   await expect(single.getByRole("status")).toHaveCSS("clip-path", "none");
   await expect(sheet.getByRole("button", next)).toHaveCount(0);
-  await expect(sheet.getByRole("button", dots)).toHaveCount(3);
-  await expect(film.getByRole("button", dots)).toHaveCount(2);
+  await expect(sheet.getByRole("button", { name: "Show plate 8", exact: true })).toBeVisible();
+  await expect(film.getByRole("button", { name: "Show plate 7", exact: true })).toBeVisible();
   const singleImage = await single.getByRole("img").boundingBox();
   const singleNext = await single.getByRole("button", next).boundingBox();
   expect(singleNext!.y + singleNext!.height).toBeLessThanOrEqual(singleImage!.y);
@@ -35,14 +35,14 @@ test("the Carousel guide presents three independent layouts with their own navig
   expect(sheetControls!.x + sheetControls!.width / 2).toBeCloseTo(sheetBox!.x + sheetBox!.width / 2, 0);
 
   await sheet.getByRole("button", { name: "Show plate 3", exact: true }).click();
-  await expect(sheet.getByRole("status")).toHaveText("3–4 / 4");
-  await expect(film.getByRole("status")).toHaveText("1–3 / 4");
-  await expect(single.getByRole("status")).toHaveText("1 / 4");
+  await expect(sheet.getByRole("status")).toHaveText("3–4 / 9");
+  await expect(film.getByRole("status")).toHaveText("4–6 / 9");
+  await expect(single.getByRole("status")).toHaveText("1 / 9");
   await film.getByRole("button", next).click();
-  await expect(film.getByRole("status")).toHaveText("2–4 / 4");
-  await expect(film.getByRole("button", { name: "Show plate 2" })).toHaveAttribute("aria-current", "true");
-  await expect(sheet.getByRole("status")).toHaveText("3–4 / 4");
-  await expect(single.getByRole("status")).toHaveText("1 / 4");
+  await expect(film.getByRole("status")).toHaveText("5–7 / 9");
+  await expect(film.getByRole("button", { name: "Show plate 5" })).toHaveAttribute("aria-current", "true");
+  await expect(sheet.getByRole("status")).toHaveText("3–4 / 9");
+  await expect(single.getByRole("status")).toHaveText("1 / 9");
 
   for (const name of ["Single plate", "Contact sheet", "Filmstrip"]) {
     const demo = page.locator(".demo").filter({ has: page.getByRole("heading", { name, exact: true }) });

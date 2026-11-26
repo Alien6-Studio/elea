@@ -7,6 +7,11 @@ const directions = [
   { name: "Réserve", id: "reserve", primary: "rgb(41, 38, 191)", type: "Sans", density: "Compact", corners: "Square" },
   { name: "Braise", id: "braise", primary: "rgb(240, 170, 112)", type: "Serif", density: "Airy", corners: "Soft" },
   { name: "Hors champ", id: "hors-champ", primary: "rgb(52, 77, 84)", type: "Sans", density: "Airy", corners: "Soft" },
+  { name: "Hors registre", id: "hors-registre", primary: "rgb(238, 118, 46)", type: "Sans", density: "Balanced", corners: "Square" },
+  { name: "Échappée", id: "echappee", primary: "rgb(196, 40, 50)", type: "Sans", density: "Compact", corners: "Soft" },
+  { name: "Grand bain", id: "grand-bain", primary: "rgb(41, 138, 196)", type: "Sans", density: "Airy", corners: "Square" },
+  { name: "Ponctuation", id: "ponctuation", primary: "rgb(237, 187, 40)", type: "Mono", density: "Compact", corners: "Round" },
+  { name: "Lisière", id: "lisiere", primary: "rgb(34, 111, 104)", type: "Serif", density: "Airy", corners: "Soft" },
 ];
 const surfaces = {
   light: { paper: "rgb(255, 255, 255)", panel: "rgb(244, 244, 244)", muted: "rgb(232, 232, 232)" },
@@ -51,7 +56,7 @@ for (const mode of ["light", "dark"] as const) {
     await expect(page.getByRole("gridcell", { name: "Primary 500", exact: true })).toHaveCSS("background-color", primary);
   });
 
-  test(`the four colour directions paint their action and reading surface in ${mode}`, async ({ page }) => {
+  test(`the colour directions paint their action and reading surface in ${mode}`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: mode });
     if (mode === "dark") await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(coloursUrl);
@@ -204,7 +209,7 @@ test("the mobile theme carousel browses independently of the applied theme", asy
   await expect(braise).toHaveCount(0);
   await expect(page).toHaveURL(/scheme=braise$/);
   await next.press("End");
-  await expect(carousel.getByRole("button", { name: "Hors champ", exact: true })).toBeVisible();
+  await expect(carousel.getByRole("button", { name: "Lisière", exact: true })).toBeVisible();
   await previous.press("Home");
   await expect(carousel.getByRole("button", { name: "Rasance", exact: true })).toBeVisible();
   await expect(page).toHaveURL(/scheme=braise$/);
@@ -223,7 +228,7 @@ test("choosing a colour theme in the mobile Studio updates the preview and survi
   await expect(selector).toHaveText("Réserve");
   await selector.click();
   for (const direction of directions) await expect(page.getByRole("option", { name: direction.name, exact: true })).toBeVisible();
-  await expect(page.getByRole("option")).toHaveCount(4);
+  await expect(page.getByRole("option")).toHaveCount(directions.length);
   await page.getByRole("option", { name: "Rasance", exact: true }).click();
   await expect(page).toHaveURL(/\?scheme=rasance$/);
   await expect(preview).toHaveCSS("background-color", surfaces.light.paper);

@@ -2,6 +2,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { Tabs } from "@alien6-studio/elea-ui";
 import { brandColorRoles, type BrandColorRole, type BrandTheme, type makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { colorFamilies, colorSteps, defaultColorStep, defaultTertiaryFamily, surfaceFamilies, type ColorFamily, type ColorStep } from "@alien6-studio/elea-tokens/palette";
+import type { ArtworkReference } from "../data/colourPlates.js";
 import { colourRoleLabels, ColourRoleEditor } from "./ColourRoles.js";
 import "./colour-atlas.css";
 
@@ -85,9 +86,10 @@ function AtlasPanel({ rows, mode, initialRow, initialStep, ...controls }: AtlasC
   );
 }
 
-export function ColourAtlas({ roleScales, themeName, ...controls }: AtlasControls & {
+export function ColourAtlas({ roleScales, themeName, reference, ...controls }: AtlasControls & {
   roleScales: Theme["roleScales"];
   themeName: string;
+  reference?: ArtworkReference | undefined;
 }) {
   const { palette, edition } = controls.brand;
   const themeRows: AtlasRow[] = brandColorRoles.flatMap(role => {
@@ -101,7 +103,7 @@ export function ColourAtlas({ roleScales, themeName, ...controls }: AtlasControl
     const family = Object.hasOwn(colorFamilies, palette.neutral) ? palette.neutral as ColorFamily : undefined;
     themeRows.push({ label: "Surface", shades: surfaceFamilies[palette.neutral], family });
   }
-  const reference = palette?.primary ?? palette?.secondary ?? { family: "Emerald", step: defaultColorStep };
+  const referenceSwatch = palette?.primary ?? palette?.secondary ?? { family: "Emerald", step: defaultColorStep };
 
   return (
     <section className="colour-atlas" aria-labelledby="atlas-title">
@@ -112,6 +114,10 @@ export function ColourAtlas({ roleScales, themeName, ...controls }: AtlasControl
         {
           value: "theme", label: "Theme palette", panel: <>
             <h3 className="colour-atlas__palette-name">{themeName}</h3>
+            {reference && <div className="colour-study">
+              <p>ELEA colour study after {reference.artist}, <a href={reference.url}><cite>{reference.title}</cite> <span aria-hidden="true">↗</span></a> ({reference.date}).</p>
+              <p>{reference.note}</p>
+            </div>}
             <AtlasPanel {...controls} mode="theme" rows={themeRows}
               initialRow="Primary" initialStep={palette?.primary?.step ?? defaultColorStep} />
           </>,
@@ -120,7 +126,7 @@ export function ColourAtlas({ roleScales, themeName, ...controls }: AtlasControl
           value: "reference", label: "Reference families", panel: <>
             <p className="colour-atlas__hint">Choose a shade to assign to a colour role.</p>
             <AtlasPanel {...controls} mode="reference" rows={referenceRows}
-              initialRow={reference.family} initialStep={reference.step} />
+              initialRow={referenceSwatch.family} initialStep={referenceSwatch.step} />
           </>,
         },
       ]} />

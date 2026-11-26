@@ -73,7 +73,7 @@ export function SiteHome() {
         <div className="home-editions__heading">
           <div>
             <h2 id="home-theme">Publication themes</h2>
-            <p>Explore four themes, then tune their colours, type and reading density in the studio.</p>
+            <p>Explore the colour themes and adjust their type, spacing and corners in the studio.</p>
           </div>
           <a href={`${interactive}theme`}>Open theme studio <span aria-hidden="true">→</span></a>
         </div>

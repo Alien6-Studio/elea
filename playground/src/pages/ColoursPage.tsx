@@ -10,19 +10,25 @@ import "./studio.css";
 
 function ThemePlate({ id, selected, onSelect }: { id: StudioThemeId; selected: boolean; onSelect: () => void }) {
   const { name, style, colours } = colorThemes[id];
-  const paper = surfaceFamilies[colourPlates[id].paper];
+  const plate = colourPlates[id];
+  const paper = surfaceFamilies[plate.paper];
   return (
     <Button className="colour-theme" variant="ghost" aria-label={name} aria-describedby={`theme-style-${id}`}
       aria-pressed={selected} onClick={onSelect} style={{
         "--paper": paper[0]!.value, "--shadow": paper.at(-1)!.value,
+        "--poster-stock": `var(--${plate.stock})`, "--poster-ink": `var(--${plate.ink})`,
         "--primary": colours.primary, "--secondary": colours.secondary, "--tertiary": colours.tertiary,
       } as CSSProperties}>
       <span className="colour-theme__poster" data-theme-id={id}>
         <strong>{name}</strong>
-        <img src={colourPlates[id].src} alt="" decoding="async" />
+        <img src={plate.src} alt="" decoding="async" />
       </span>
       <span className="colour-theme__caption">
-        <span id={`theme-style-${id}`}>{style}</span>
+        <span className="colour-theme__legend" id={`theme-style-${id}`}>
+          <span>{style}</span>
+          <small>Study after <cite>{plate.reference.title}</cite><br />
+            {plate.reference.artist} · {plate.reference.date}</small>
+        </span>
         {selected && <span className="colour-theme__selected" aria-hidden="true">✓</span>}
         <span className="colour-theme__swatches" aria-hidden="true"><i /><i /><i /></span>
       </span>
@@ -35,6 +41,8 @@ export function ColoursPage({ brand, onChange }: { brand: BrandTheme; onChange: 
   const [role, setRole] = useState<BrandColorRole>("primary");
   const [atlasVersion, setAtlasVersion] = useState(0);
   const activeTheme = matchingColourTheme(brand);
+  const origin = brand.profile ?? featuredColourThemes.find(id => id === activeTheme);
+  const reference = origin && colourPlates[origin].reference;
   function chooseTheme(id: StudioThemeId) {
     setRole("primary");
     setAtlasVersion(version => version + 1);
@@ -66,7 +74,7 @@ export function ColoursPage({ brand, onChange }: { brand: BrandTheme; onChange: 
       />
       <ColourRoles brand={brand} activeRole={role} />
       <ColourAtlas key={atlasVersion} brand={brand} onChange={onChange} palettes={palettes}
-        roleScales={roleScales} themeName={studioThemeName(brand)}
+        roleScales={roleScales} themeName={studioThemeName(brand)} reference={reference}
         role={role} onRoleChange={setRole} />
       <div className="studio-page-actions colours-export" data-elea-theme="brand">
         <Button href={`data:text/css;charset=utf-8,${encodeURIComponent(css)}`} download="elea-brand.css" variant="outline" trailingIcon="↓">Download CSS</Button>
