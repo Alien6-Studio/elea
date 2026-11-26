@@ -4,6 +4,8 @@ import { brandColorRoles, colorFamilies, colorSteps, colorThemes, surfaceFamilie
 import { applyColorTheme, createThemeProfile, matchingColorTheme } from "./color-themes.js";
 import { editions, makeBrandTheme } from "./brand.js";
 
+const profiles = ["rasance", "reserve", "braise", "hors-champ", "hors-registre", "echappee", "grand-bain", "ponctuation", "lisiere"] as const;
+
 function linearChannels(hex: string) {
   return [1, 3, 5].map(offset => {
     const channel = parseInt(hex.slice(offset, offset + 2), 16) / 255;
@@ -51,7 +53,7 @@ test("gamut mapping preserves a common perceptual lightness across all hues at e
 });
 
 test("each theme profile exports its colours, typography, spacing and geometry together", () => {
-  for (const id of ["rasance", "reserve", "braise", "hors-champ"] as const) {
+  for (const id of profiles) {
     const brand = createThemeProfile(id);
     const { profile } = colorThemes[id];
     assert.equal(brand.typeface, profile.typeface);
@@ -128,11 +130,11 @@ test("role scales keep off-centre reference assignments and distinguish inherite
   assert.deepEqual(Object.keys(makeBrandTheme(custom).roleScales), ["primary"]);
 });
 
-test("the four profiles export identical achromatic surfaces, text and borders in both appearances", () => {
+test("the theme profiles export identical achromatic surfaces, text and borders in both appearances", () => {
   const ramp = surfaceFamilies.Gray;
   assert.deepEqual(ramp.map(({ step }) => step), colorSteps);
   for (const { value } of ramp) assert.match(value, /^#([\da-f]{2})\1\1$/);
-  for (const id of ["rasance", "reserve", "braise", "hors-champ"] as const) {
+  for (const id of profiles) {
     const profile = createThemeProfile(id);
     assert.equal(profile.palette?.neutral, "Gray");
     const { css } = makeBrandTheme(profile);

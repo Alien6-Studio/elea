@@ -167,7 +167,7 @@ makeBrandTheme({ ...editions.Precision, seed: "#0f766e", accent: "#f2c94c", font
 ## Reference colours and semantic roles
 
 `makeBrandTheme(createThemeProfile("braise"))` from the brand entry point generates
-the same scoped CSS as selecting Braise in the Studio. Each of the four profiles
+the same scoped CSS as selecting Braise in the Studio. Each profile
 combines a colour scheme with a reading typeface, density, corner shape and
 control treatment. Inspect these choices on `colorThemes.braise.profile`.
 Set `controls` to `"flat"`, `"raised"` or `"inset"` to change the treatment
@@ -176,9 +176,21 @@ of buttons, fields and tabs independently of the palette.
 `applyColorTheme(editions.Editorial, "rasance")` from the brand entry point applies
 a colour theme while keeping the edition’s typography, spacing and corners.
 Import `colorThemes` from the palette entry point to inspect each theme’s seven
-key colours and its surface family. Rasance uses carbon and ivory, Réserve
-ultramarine, Braise apricot and madder, and Hors champ petrol, sky and vermilion.
-All four profiles use `Gray` for backgrounds, fields, menus, body text and borders.
+key colours and its surface family.
+
+| Profile ID | Primary, secondary and tertiary at 500 |
+| --- | --- |
+| `rasance` | Carbon, ivory, graphite |
+| `reserve` | Ultramarine, chalk blue, ink violet |
+| `braise` | Apricot, madder, dusty rose |
+| `hors-champ` | Petrol, sky, vermilion |
+| `hors-registre` | Tangerine, hot pink, turquoise |
+| `echappee` | Signal red, stencil black, stone |
+| `grand-bain` | Pool blue, stucco pink, diving-board yellow |
+| `ponctuation` | Pumpkin yellow, jet black, sea grey |
+| `lisiere` | Bay green, fabric pink, foliage |
+
+These profiles use `Gray` for backgrounds, fields, menus, body text and borders.
 Default surfaces run from white in light mode to `#151515` in dark mode.
 Fjord, Cyanotype, Signal and Vellum retain their original surface families.
 

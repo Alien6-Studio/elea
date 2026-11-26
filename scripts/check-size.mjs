@@ -23,8 +23,8 @@ import { gzipSync } from "node:zlib";
 // the font on standalone controls and surfaces, and the optional Tabs presentations.
 const BUDGETS = { tokens: 23_000, content: 28_100, "content-viewer": 12_750, media: 8_000, "content-editor": 75_500 };
 const referencePaletteFiles = new Set(["palette.js", "palette.css", "color-themes.js"]);
-// The optional atlas includes eight schemes, a shared grey plus four paper scales, and four full theme profiles.
-const referencePaletteBudget = 5_100;
+// The optional atlas includes nine theme profiles, four colour-only schemes and five surface scales.
+const referencePaletteBudget = 5_550;
 // The interactive mask and format picker have their own budget. The base cropper keeps its
 // original limit, and the packed-consumer check verifies that the new controls load on demand.
 const cropAdjustmentFiles = new Set(["AdjustableCrop.js", "CropFormatControls.js", "CropMask.js", "createCropFormats.js", "crop-adjustments.css"]);

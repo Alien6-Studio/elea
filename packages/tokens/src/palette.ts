@@ -136,6 +136,46 @@ export const colorThemes = {
       success: "#4e7567", info: "#547791", warning: "#a27944", danger: "#a64350",
     },
   },
+  "hors-registre": {
+    name: "Hors registre", style: "Tangerine & hot pink", neutral: "Gray",
+    profile: { controls: "raised", typeface: "Sans", rhythm: "Balanced", corner: "Square" },
+    colours: {
+      primary: "#ee762e", secondary: "#d64a85", tertiary: "#248d96",
+      success: "#39734c", info: "#316f85", warning: "#9c6b20", danger: "#ac3549",
+    },
+  },
+  echappee: {
+    name: "Échappée", style: "Signal red & stencil black", neutral: "Gray",
+    profile: { controls: "flat", typeface: "Sans", rhythm: "Compact", corner: "Soft" },
+    colours: {
+      primary: "#c42832", secondary: "#272728", tertiary: "#c4bfb6",
+      success: "#52715a", info: "#526d83", warning: "#977137", danger: "#902637",
+    },
+  },
+  "grand-bain": {
+    name: "Grand bain", style: "Pool blue & stucco pink", neutral: "Gray",
+    profile: { controls: "flat", typeface: "Sans", rhythm: "Airy", corner: "Square" },
+    colours: {
+      primary: "#298ac4", secondary: "#dcaa9c", tertiary: "#dfbc52",
+      success: "#488068", info: "#405e9d", warning: "#a87726", danger: "#a74847",
+    },
+  },
+  ponctuation: {
+    name: "Ponctuation", style: "Pumpkin yellow & jet black", neutral: "Gray",
+    profile: { controls: "inset", typeface: "Mono", rhythm: "Compact", corner: "Round" },
+    colours: {
+      primary: "#edbb28", secondary: "#232321", tertiary: "#739397",
+      success: "#53734d", info: "#456f7e", warning: "#a16c21", danger: "#a34a40",
+    },
+  },
+  lisiere: {
+    name: "Lisière", style: "Bay green & fabric pink", neutral: "Gray",
+    profile: { controls: "inset", typeface: "Serif", rhythm: "Airy", corner: "Soft" },
+    colours: {
+      primary: "#226f68", secondary: "#ef65a5", tertiary: "#354e38",
+      success: "#537649", info: "#426e91", warning: "#946e31", danger: "#a34258",
+    },
+  },
   fjord: {
     name: "Fjord", style: "Nordic", neutral: "Slate",
     colours: {
