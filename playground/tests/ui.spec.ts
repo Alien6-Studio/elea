@@ -232,6 +232,34 @@ test("the Elea overview shows a rendered document, its blocks, and the Alien6 co
   await expect(page.getByRole("contentinfo").getByRole("img", { name: "Alien6" })).toHaveCSS("filter", "brightness(0) invert(1)");
 });
 
+test("the notebook cover and block view fill the same frame", async ({ page }) => {
+  await page.goto("/elea/");
+  const notebook = page.getByRole("group", { name: "Document view" });
+  const preview = notebook.getByRole("radio", { name: "Preview" });
+  const json = notebook.getByRole("radio", { name: "Block JSON" });
+  const cover = notebook.getByRole("img");
+  const source = notebook.locator("pre");
+  await page.evaluate(() => document.fonts.ready);
+
+  for (const width of [320, 912, 913, 1571]) {
+    await test.step(`${width}px`, async () => {
+      await page.setViewportSize({ width, height: 850 });
+      const frame = (await notebook.boundingBox())!;
+      const image = (await cover.boundingBox())!;
+      expect(image.x).toBeCloseTo(frame.x, 0);
+      expect(image.x + image.width).toBeCloseTo(frame.x + frame.width, 0);
+
+      await preview.press("ArrowRight");
+      await expect(json).toBeChecked();
+      const code = (await source.boundingBox())!;
+      expect(code.x).toBeCloseTo(frame.x, 0);
+      expect(code.x + code.width).toBeCloseTo(frame.x + frame.width, 0);
+      await json.press("ArrowLeft");
+      await expect(preview).toBeChecked();
+    });
+  }
+});
+
 test("the documentation fits a mobile screen and can be navigated", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 760 });
   await page.goto("/elea/");
