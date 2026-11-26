@@ -2,13 +2,43 @@ import { useState, type CSSProperties } from "react";
 import { Badge, Button, Checkbox, ConfirmDialog, Dialog, DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogRoot, DialogTitle, Field, Footer, IconButton, Input, Menu, MenuContent, MenuGroup, MenuItem, MenuRoot, MenuSeparator, MenuTrigger, Pagination, RadioGroup, Select, Tab, TabList, TabPanel, Tabs, TabsRoot, Textarea, Toggle, Tooltip } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
 import { sitePath } from "../links.js";
-import { brandRoute, type BrandTheme } from "./brandTheme.js";
+import { brandRoute, defaultSiteTheme, exactProfile, type BrandTheme } from "./brandTheme.js";
 
 const TrashIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>;
 const PlusIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>;
 
 const buttonEffects = ["lift", "scale", "push", "shine", "ripple", "spotlight", "magnetic", "tilt"] as const;
 const effectLabel = (effect: typeof buttonEffects[number]) => effect[0]!.toUpperCase() + effect.slice(1);
+
+const radiusSamples = [
+  { label: "Inherited", radius: undefined }, { label: "None", radius: "none" },
+  { label: "Small", radius: "sm" }, { label: "Medium", radius: "md" },
+  { label: "Large", radius: "lg" }, { label: "Full", radius: "full" },
+] as const;
+
+function radiusExample(brand: BrandTheme) {
+  const id = exactProfile(brand);
+  const { profile: _profile, paletteOrigin: _origin, ...settings } = brand;
+  const config = id ? `{
+  ...createThemeProfile("${id}"),
+  buttonRadiusScale: "profile",
+}` : JSON.stringify(settings, null, 2);
+  return `import { ${id ? "createThemeProfile, " : ""}makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
+import { Button } from "@alien6-studio/elea-ui";
+import "@alien6-studio/elea-tokens/elea.css";
+import "@alien6-studio/elea-ui/styles.css";
+
+const { css } = makeBrandTheme(${config});
+
+export function ButtonRadii() {
+  return (
+    <section data-elea-theme="brand">
+      <style>{css}</style>
+${radiusSamples.map(({ radius }) => `      <Button${radius ? ` radius="${radius}"` : ""}>Publish</Button>`).join("\n")}
+    </section>
+  );
+}`;
+}
 
 const tealInfo = {
   "--elea-color-action-info": "light-dark(#0e7490, #67e8f9)",
@@ -17,8 +47,11 @@ const tealInfo = {
   "--elea-color-action-info-pressed": "color-mix(in srgb, var(--elea-color-action-info) 80%, light-dark(black, white))",
 } as CSSProperties;
 
-export function ButtonsPage() {
+export function ButtonsPage({ brand = defaultSiteTheme }: { brand?: BrandTheme }) {
   const [loading, setLoading] = useState(false);
+  const radiusDescription = brand.buttonRadiusScale === "profile" && brand.shape && !brand.radius
+    ? "Small and Medium tighten each curve of the theme’s silhouette. Large matches Inherited. None gives square corners and Full gives a pill."
+    : "Inherited follows the current theme. Small, Medium and Large use its corner radius values. None gives square corners and Full gives a pill.";
   return (
     <>
       <h1>Button</h1>
@@ -55,28 +88,25 @@ const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
 <Button icon={<PlusIcon />}>Medium</Button>
 <Button size="lg" trailingIcon={<PlusIcon />}>Large</Button>
 <Button size="xl">Extra large</Button>
-<IconButton variant="disc" label="Add"><PlusIcon /></IconButton>`}>
+<IconButton variant="disc" label="Add"><PlusIcon /></IconButton>
+<IconButton variant="outline" radius="full" label="Add item"><PlusIcon /></IconButton>`}>
         <Button size="xs">Extra small</Button>
         <Button size="sm" icon={<PlusIcon />}>Small</Button>
         <Button icon={<PlusIcon />}>Medium</Button>
         <Button size="lg" trailingIcon={<PlusIcon />}>Large</Button>
         <Button size="xl">Extra large</Button>
         <IconButton variant="disc" label="Add"><PlusIcon /></IconButton>
+        <IconButton variant="outline" radius="full" label="Add item"><PlusIcon /></IconButton>
       </Demo>
-      <Demo title="Radius" description={<>Switch themes in the navbar to compare the first button’s silhouette. The next five use the <code>radius</code> prop to go from square corners to a pill. A container can set <code>--elea-control-radius</code> for the inherited and medium buttons.</>} code={`<Button>Inherited shape</Button>
-<Button radius="none">None</Button>
-<Button radius="sm">Small</Button>
-<Button radius="md">Medium</Button>
-<Button radius="lg">Large</Button>
-<Button radius="full">Full</Button>
-<IconButton variant="outline" radius="full" label="Add"><PlusIcon /></IconButton>`}>
-        <Button>Inherited shape</Button>
-        <Button radius="none">None</Button>
-        <Button radius="sm">Small</Button>
-        <Button radius="md">Medium</Button>
-        <Button radius="lg">Large</Button>
-        <Button radius="full">Full</Button>
-        <IconButton variant="outline" radius="full" label="Add"><PlusIcon /></IconButton>
+      <Demo title="Radius" description={radiusDescription} code={radiusExample(brand)}>
+        <div className="catalog-button-radii">
+          {radiusSamples.map(({ label, radius }) => (
+            <figure key={label}>
+              <Button radius={radius} aria-label={`Publish (${label})`}>Publish</Button>
+              <figcaption>{label}</figcaption>
+            </figure>
+          ))}
+        </div>
       </Demo>
       <Demo title="Shadow" description="The default follows the theme. An explicit shadow adds elevation on a busy surface." code={`<Button>Theme default</Button>
 <Button shadow="sm">Small shadow</Button>

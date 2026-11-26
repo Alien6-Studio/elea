@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 import { colorThemes } from "@alien6-studio/elea-tokens/palette";
 
 test("the navbar applies each complete theme, including the static notebook and the button guide", async ({ page }) => {
@@ -56,31 +57,82 @@ test("shared settings survive navigation and take priority over the saved navbar
   await expect(page).toHaveURL(/#\/theme\?scheme=reserve$/);
 });
 
-test("switching between Rasance and Réserve repaints the button face and keeps radius overrides distinct", async ({ page }) => {
+function cornerValues(button: Locator) {
+  return button.evaluate(element => {
+    const style = getComputedStyle(element);
+    return [style.borderTopLeftRadius, style.borderTopRightRadius, style.borderBottomRightRadius, style.borderBottomLeftRadius];
+  });
+}
+
+test("the Button guide shows the selected profile’s corners at equal widths", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/elea/playground/#/ui/button");
   const picker = page.getByRole("combobox", { name: "Site theme", exact: true });
-  const radius = page.locator("section.demo").filter({ has: page.getByRole("heading", { name: "Radius", exact: true }) });
-  const inherited = radius.getByRole("button", { name: "Inherited shape", exact: true });
-  for (const name of ["Rasance", "Réserve", "Rasance"]) {
+  const demo = page.locator("section.demo").filter({ has: page.getByRole("heading", { name: "Radius", exact: true }) });
+  const sample = (label: string) => demo.getByRole("button", { name: `Publish (${label})`, exact: true });
+  const smallCorners = {
+    Rasance: ["7px 2px", "0px", "7px 2px", "0px"],
+    Réserve: ["min(15%, 30px) 24%", "min(8.5%, 17px) 20%", "min(14.5%, 29px) 27%", "min(10.5%, 21px) 19%"],
+    Braise: Array(4).fill("7px 3px"),
+    "Hors champ": Array(4).fill("1.5px"),
+    "Hors registre": ["1px", "7px", "1px", "7px"],
+    "Échappée": ["9px", "9px", "9px", "0px"],
+    "Grand bain": ["9px 5px", "9px 5px", "0px", "0px"],
+    Ponctuation: Array(4).fill("12px"),
+    "Lisière": ["12px 6px", "3px 4px", "8px", "6px 3px"],
+  };
+  for (const [name, small] of [...Object.entries(smallCorners), ["Rasance", smallCorners.Rasance] as const]) {
     await picker.click();
     await page.getByRole("option", { name, exact: true }).click();
     await expect(picker).toHaveText(name);
+    await expect.poll(() => cornerValues(sample("Small"))).toEqual(small);
+    const inherited = await cornerValues(sample("Inherited"));
+    expect(await cornerValues(sample("Large"))).toEqual(inherited);
+    const medium = await cornerValues(sample("Medium"));
+    expect(medium).not.toEqual(small);
+    expect(medium).not.toEqual(inherited);
+    await expect(sample("None")).toHaveCSS("border-radius", "0px");
+    await expect(sample("Full")).toHaveCSS("border-radius", "9999px");
     if (name === "Rasance") {
-      await expect(inherited).toHaveCSS("background-color", "rgb(24, 24, 23)");
-      await expect(inherited).toHaveCSS("box-shadow", /inset/);
-      await expect(inherited).toHaveCSS("border-top-left-radius", "14px 4px");
-      await expect(inherited).toHaveCSS("border-top-right-radius", "0px");
-      continue;
+      await expect(sample("Inherited")).toHaveCSS("background-color", "rgb(24, 24, 23)");
+      await expect(sample("Inherited")).toHaveCSS("box-shadow", /inset/);
+      expect(medium).toEqual(["10.5px 3px", "0px", "10.5px 3px", "0px"]);
+    } else if (name === "Réserve") {
+      await expect(sample("Inherited")).toHaveCSS("background-color", "rgb(41, 38, 191)");
+      await expect(sample("Inherited")).toHaveCSS("box-shadow", "none");
+      expect(medium).toEqual(["min(22.5%, 45px) 36%", "min(12.75%, 25.5px) 30%", "min(21.75%, 43.5px) 40.5%", "min(15.75%, 31.5px) 28.5%"]);
     }
-    await expect(inherited).toHaveCSS("background-color", "rgb(41, 38, 191)");
-    await expect(inherited).toHaveCSS("box-shadow", "none");
-    await expect(inherited).toHaveCSS("border-top-left-radius", /48%$/);
-    await expect(inherited).toHaveCSS("border-top-right-radius", /40%$/);
-    const explicit = await Promise.all(["None", "Small", "Medium", "Large", "Full"].map(name =>
-      radius.getByRole("button", { name, exact: true }).evaluate(button => parseFloat(getComputedStyle(button).borderTopLeftRadius))));
-    expect(explicit[0]).toBe(0);
-    expect(new Set(explicit).size).toBe(5);
-    expect(explicit).toEqual([...explicit].sort((left, right) => left - right));
   }
+  const widths = await demo.getByRole("button", { name: /^Publish/ }).evaluateAll(buttons => buttons.map(button => button.getBoundingClientRect().width));
+  expect(widths).toHaveLength(6);
+  expect(Math.max(...widths) - Math.min(...widths)).toBeLessThan(1);
+});
+
+test("Studio exports the same scaled action shape as a shared Button guide", async ({ page }) => {
+  await page.goto("/elea/playground/#/theme?edition=precision&scheme=braise&shape=reserve");
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("link", { name: "Download CSS" }).click(),
+  ]);
+  const file = await download.path();
+  if (!file) throw new Error("Expected the exported CSS file");
+  const css = await readFile(file, "utf8");
+  await page.getByRole("link", { name: "Open themed gallery" }).click();
+  await page.getByRole("link", { name: "Button", exact: true }).click();
+  await page.reload();
+  const small = page.getByRole("button", { name: "Publish (Small)", exact: true });
+  await expect(small).toHaveCSS("background-color", "rgb(240, 170, 112)");
+  await expect(small).toHaveCSS("border-top-left-radius", "min(15%, 30px) 24%");
+  const corners = await cornerValues(small);
+
+  const consumer = await page.context().newPage();
+  await consumer.setContent('<section data-elea-theme="brand"><button class="elea-button elea-button--primary elea-button--md elea-button--radius-sm">Publish</button></section>');
+  for (const asset of ["@alien6-studio/elea-tokens/elea.css", "@alien6-studio/elea-ui/styles.css"]) {
+    await consumer.addStyleTag({ content: await readFile(new URL(import.meta.resolve(asset)), "utf8") });
+  }
+  await consumer.addStyleTag({ content: css });
+  const exported = consumer.getByRole("button", { name: "Publish" });
+  await expect(exported).toHaveCSS("background-color", "rgb(240, 170, 112)");
+  expect(await cornerValues(exported)).toEqual(corners);
+  await consumer.close();
 });

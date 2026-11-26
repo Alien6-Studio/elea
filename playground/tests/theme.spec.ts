@@ -760,8 +760,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(buttons.map(control => control.height)).toEqual(heights);
       expect(buttons.map(control => control.fontSize)).toEqual([12, 14, 16, 18, 20]);
       await expect(sizes.getByRole("button", { name: "Add", exact: true })).toHaveCSS("width", "44px");
-      const radiusDemo = gallery.locator(".demo").filter({ has: page.getByRole("heading", { name: "Radius", exact: true }) });
-      await expect(radiusDemo.getByRole("button", { name: "Add", exact: true })).toHaveCSS("width", `${heights[2]}px`);
+      await expect(sizes.getByRole("button", { name: "Add item", exact: true })).toHaveCSS("width", `${heights[2]}px`);
 
       await index.getByRole("link", { name: "Field, Input, Textarea", exact: true }).click();
       const fields = gallery.locator(".demo").filter({ has: page.getByRole("heading", { name: "Textarea and sizes" }) });

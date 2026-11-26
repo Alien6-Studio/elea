@@ -90,7 +90,7 @@ test("buttons take a size, a radius, a shadow and an effect that follows the poi
   const named = (name: string) => page.getByRole("button", { name, exact: true });
   const style = (name: string, property: string) => named(name).evaluate((element, key) => getComputedStyle(element).getPropertyValue(key), property);
   expect([await style("Extra small", "min-height"), await style("Extra large", "min-height")]).toEqual(["26px", "58px"]);
-  expect([await style("None", "border-radius"), await style("Full", "border-radius")]).toEqual(["0px", "9999px"]);
+  expect([await style("Publish (None)", "border-radius"), await style("Publish (Full)", "border-radius")]).toEqual(["0px", "9999px"]);
   const resting = await style("Theme default", "box-shadow");
   const elevated = await style("Medium shadow", "box-shadow");
   expect(resting).toBe("none");

@@ -17,7 +17,7 @@ export interface BrandTheme extends TokenTheme {
 }
 
 export function studioTheme(id: StudioThemeId): BrandTheme {
-  return { ...createThemeProfile(id), profile: id };
+  return { ...createThemeProfile(id), profile: id, buttonRadiusScale: "profile" };
 }
 
 export const defaultSiteTheme = studioTheme("reserve");
@@ -117,7 +117,10 @@ function readCorners(brand: BrandTheme, params: URLSearchParams) {
 }
 
 function legacyPalette(brand: BrandTheme, params: URLSearchParams) {
-  if (params.has("shape")) brand = { ...brand, ...readCorners(brand, params) };
+  if (params.has("shape")) {
+    const corners = readCorners(brand, params);
+    brand = { ...brand, ...corners, buttonRadiusScale: corners.shape ? "profile" : undefined };
+  }
   const scheme = params.get("scheme");
   const source = params.get("source");
   if (scheme && Object.hasOwn(colorThemes, scheme)) {
