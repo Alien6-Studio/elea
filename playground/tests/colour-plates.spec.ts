@@ -4,8 +4,8 @@ import { textContrast } from "./contrast.js";
 const works = [
   { id: "rasance", name: "Rasance", artist: "Pierre Soulages", title: "Outrenoir",
     source: "https://www.pierre-soulages.com/document/pierre-soulages-la-lumiere-comme-matiere/" },
-  { id: "reserve", name: "Réserve", artist: "Yves Klein", title: "Blue Monochrome",
-    source: "https://www.moma.org/collection/works/80103" },
+  { id: "reserve", name: "Réserve", artist: "Yves Klein", title: "L’Arbre, grande éponge bleue",
+    source: "https://www.centrepompidou.fr/fr/ressources/oeuvre/cpjqdr" },
   { id: "braise", name: "Braise", artist: "Mark Rothko", title: "Walls of Light",
     source: "https://www.guggenheim.org/exhibition/mark-rothko-walls-of-light" },
   { id: "hors-champ", name: "Hors champ", artist: "Luigi Ghirri", title: "Cartes et territoires",

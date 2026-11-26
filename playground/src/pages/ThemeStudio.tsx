@@ -4,7 +4,7 @@ import { createDocument, en } from "@alien6-studio/elea-content";
 import { SiteTypefaceField } from "../components/SiteTypefaceField.js";
 import { notebookBlocks, notebookSummary, notebookTitle } from "../samples.js";
 import { ReaderEdition } from "./ReaderEdition.js";
-import { corners, makeBrandTheme, rhythms, typefaces, type Corners } from "@alien6-studio/elea-tokens/brand";
+import { corners, makeBrandTheme, rhythms, typefaces } from "@alien6-studio/elea-tokens/brand";
 import { colorThemes } from "@alien6-studio/elea-tokens/palette";
 import { brandRoute, featuredColourThemes, readBrandTheme, studioTheme, studioThemeName, validBrand, type BrandTheme, type StudioThemeId } from "./brandTheme.js";
 import "./studio.css";
@@ -40,15 +40,22 @@ export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChan
   const { css } = makeBrandTheme(brand);
   const selectedProfile = brand.profile && brandRoute("theme", brand) === brandRoute("theme", studioTheme(brand.profile))
     ? brand.profile : null;
+  const cornerOptions: { value: string; label: string }[] = corners.map(value => ({ value, label: value }));
+  if (brand.shape && brand.shape !== brand.profile) {
+    cornerOptions.unshift({ value: brand.shape, label: colorThemes[brand.shape].name });
+  }
+  if (brand.profile) cornerOptions.unshift({ value: brand.profile, label: "Theme shape" });
 
   function changeTheme(next: BrandTheme) {
     setDraft({ radius: next.radius ?? "", font: next.font ?? "" });
     onChange(next);
   }
-  function changeCorners(corner: Corners) {
+  function changeCorners(value: string) {
+    const classic = corners.find(corner => corner === value);
+    const shape = featuredColourThemes.find(id => id === value);
     const { radius: _removed, ...rest } = brand;
     setDraft({ ...draft, radius: "" });
-    onChange({ ...rest, corner });
+    onChange({ ...rest, corner: classic ?? (shape ? colorThemes[shape].profile.corner : brand.corner), shape });
   }
   function changeFree(key: "radius" | "font", value: string) {
     setDraft({ ...draft, [key]: value });
@@ -96,9 +103,11 @@ export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChan
                 onChange={(value) => onChange({ ...brand, rhythm: value as typeof rhythm })} />
             </div>
           </div>
-          <RadioGroup label="Corners" name="corners" value={corner} onChange={(value) => changeCorners(value as Corners)} options={corners.map((value) => ({ value, label: value }))} />
+          <RadioGroup label="Corners" name="corners" value={brand.shape && brand.radius ? null : brand.shape ?? corner}
+            help={brand.radius ? `Using your corner radius of ${brand.radius}.` : undefined}
+            onChange={changeCorners} options={cornerOptions} />
           <h2>Your product’s identity</h2>
-          <Field label="Corner radius" help="In rem or px; replaces the corner steps." error={refused("radius") ? "Use a length such as 10px or 0.625rem." : undefined}>
+          <Field label="Corner radius" help="Enter a length in rem or px to override the selected shape." error={refused("radius") ? "Use a length such as 10px or 0.625rem." : undefined}>
             {(control) => <Input {...control} placeholder="0.625rem" value={draft.radius} invalid={refused("radius")} onChange={(event) => changeFree("radius", event.currentTarget.value)} />}
           </Field>
           <Field label="Interface font" help="Any CSS font stack your product loads." error={refused("font") ? "Use font names, quotes, commas and var() only." : undefined}>

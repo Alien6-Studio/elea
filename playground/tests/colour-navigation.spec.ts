@@ -245,7 +245,7 @@ test("choosing a colour theme in the mobile Studio updates the preview and survi
   await expect(preview).toHaveCSS("background-color", surfaces.light.paper);
 });
 
-test("each Studio profile sets its reading typeface, density and corners", async ({ page }) => {
+test("each Studio profile sets its reading typeface, density and shape", async ({ page }) => {
   await page.goto("/elea/playground/#/theme");
   const selector = page.getByRole("combobox", { name: "Theme", exact: true });
   await expect(page.getByRole("group", { name: "Theme presets" })).toHaveCount(0);
@@ -255,8 +255,59 @@ test("each Studio profile sets its reading typeface, density and corners", async
     await expect(selector).toHaveText(profile.name);
     await expect(page.getByRole("combobox", { name: "Reading typeface" })).toHaveText(profile.type);
     await expect(page.getByRole("combobox", { name: "Reading density" })).toHaveText(profile.density);
-    await expect(page.getByRole("radio", { name: profile.corners })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Theme shape" })).toBeChecked();
+    await expect(page.getByRole("radio", { name: profile.corners })).not.toBeChecked();
   }
+});
+
+test("a classic corner or custom radius overrides a profile shape and survives sharing", async ({ page }) => {
+  await page.goto("/elea/playground/#/theme?scheme=reserve");
+  const signature = page.getByRole("radio", { name: "Theme shape" });
+  const square = page.getByRole("radio", { name: "Square", exact: true });
+  const radius = page.getByRole("textbox", { name: "Corner radius" });
+  const gallery = page.getByRole("link", { name: "Open themed gallery" });
+  const imprint = await gallery.evaluate(el => getComputedStyle(el).borderRadius);
+  expect(imprint).not.toBe("0px");
+
+  await square.check();
+  await expect(page).toHaveURL(/scheme=reserve&corners=Square$/);
+  await expect(gallery).toHaveCSS("border-radius", "0px");
+  await gallery.click();
+  await page.getByRole("link", { name: "Button", exact: true }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Primary", exact: true })).toHaveCSS("border-radius", "0px");
+  await page.getByRole("link", { name: "Edit theme", exact: true }).click();
+  await expect(square).toBeChecked();
+  await signature.check();
+  await expect(page).toHaveURL(/scheme=reserve$/);
+
+  await radius.fill("12px");
+  await expect(page).toHaveURL(/scheme=reserve&radius=12px$/);
+  await page.reload();
+  await expect(signature).not.toBeChecked();
+  await expect(radius).toHaveValue("12px");
+  await expect(gallery).toHaveCSS("border-radius", "9px");
+  await radius.fill("");
+  await expect(signature).toBeChecked();
+  await expect(gallery).toHaveCSS("border-radius", imprint);
+});
+
+test("a shared colour scheme can carry an independent shape without changing its legacy edition", async ({ page }) => {
+  const studio = "/elea/playground/#/theme?edition=precision&scheme=braise";
+  const gallery = page.getByRole("link", { name: "Open themed gallery" });
+  await page.goto(studio);
+  await expect(page.getByRole("radio", { name: "Soft" })).toBeChecked();
+  await expect(gallery).toHaveCSS("border-radius", "6px");
+  await page.goto(studio + "&shape=reserve");
+  await expect(page.getByRole("radio", { name: "Réserve" })).toBeChecked();
+  await expect(gallery).toHaveCSS("background-color", "rgb(240, 170, 112)");
+  const imprint = await gallery.evaluate(el => getComputedStyle(el).borderRadius);
+  expect(imprint).not.toBe("6px");
+  await gallery.click();
+  await page.getByRole("link", { name: "Button", exact: true }).click();
+  await expect(page).toHaveURL(/edition=precision&scheme=braise&shape=reserve$/);
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Primary", exact: true })).toHaveCSS("border-radius", imprint);
 });
 
 test("earlier shared colour schemes still render their own primary and keep their studio link", async ({ page }) => {

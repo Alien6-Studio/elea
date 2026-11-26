@@ -352,7 +352,8 @@ test("a host utility and a plain host rule win over a component default without 
   await page.goto("/elea/playground/#/ui/button");
   const button = page.getByRole("button", { name: "Primary", exact: true });
   await expect(button).toBeVisible();
-  await expect(button).toHaveCSS("border-top-left-radius", "0px");
+  await button.evaluate((element) => element.parentElement!.style.setProperty("--elea-shape-action", "3px / 7px"));
+  await expect(button).toHaveCSS("border-top-left-radius", "3px 7px");
   // Tailwind v4 keeps its utilities in a layer; one class there, and one outside any layer.
   await page.addStyleTag({ content: "@layer utilities { .rounded-xl { border-radius: 12px; } } .host-wide { letter-spacing: 0.2em; }" });
   await button.evaluate((element) => element.classList.add("rounded-xl", "host-wide"));

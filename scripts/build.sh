@@ -28,6 +28,13 @@ cp "$site_root/docs/assets/elea-mark.svg" "$playground/public/favicon.svg"
 )
 
 site_dir="$site_root/.build/elea"
+export ELEA_SOURCE_REVISION ELEA_DOCS_REVISION
+ELEA_SOURCE_REVISION=$(git -C "$source_root" rev-parse --verify HEAD 2>/dev/null || true)
+ELEA_DOCS_REVISION=$(git -C "$site_root" rev-parse --verify HEAD 2>/dev/null || true)
 "${MKDOCS:-mkdocs}" build --strict --config-file "$site_root/mkdocs.yml" --site-dir "$site_dir"
 mkdir -p "$site_dir/playground"
 cp -R "$playground/dist/." "$site_dir/playground/"
+
+node "$source_root/docs/examples/theme-shapes.mjs"
+mkdir -p "$site_dir/examples/theme-shapes"
+cp -R "$source_root/artifacts/examples/theme-shapes/." "$site_dir/examples/theme-shapes/"

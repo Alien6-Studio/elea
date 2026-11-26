@@ -45,7 +45,7 @@
 .catalog-filters button {
   padding: .45rem .7rem;
   border: 1px solid transparent;
-  border-radius: var(--elea-radius-md);
+  border-radius: var(--elea-shape-control, var(--elea-radius-md));
   background: transparent;
   color: var(--elea-color-text-muted);
   cursor: pointer;
@@ -53,12 +53,12 @@
   font-size: var(--elea-font-size-sm);
   font-weight: 550;
 }
-.catalog-filters button[aria-pressed="true"] { color: var(--elea-color-text-inverse); background: var(--elea-color-surface-inverse); }
+.catalog-filters button[aria-pressed="true"] { border-radius: var(--elea-shape-indicator, var(--elea-radius-md)); color: var(--elea-color-text-inverse); background: var(--elea-color-surface-inverse); }
 .catalog-filters button:hover:not([aria-pressed="true"]) { background: var(--elea-color-surface-muted); }
 .catalog-results, .catalog-category, .catalog-index h2 { color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
 .catalog-results { margin: 0 0 .9rem; }
 .gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(.85rem, 2vw, 1.5rem); }
-.gallery__card { position: relative; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-xl); padding: .4rem; }
+.gallery__card { position: relative; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-shape-surface, var(--elea-radius-xl)); padding: .4rem; }
 .gallery__card:hover { border-color: var(--elea-color-text-link); }
 .gallery__card:has(.gallery__name:focus-visible) { border-color: transparent; outline: 2px solid var(--elea-color-focus); outline-offset: -2px; }
 .gallery__preview {
@@ -70,7 +70,7 @@
   gap: .45rem;
   min-height: 10.25rem;
   padding: .8rem;
-  border-radius: var(--elea-radius-lg);
+  border-radius: var(--elea-shape-surface, var(--elea-radius-lg));
   background: var(--elea-color-surface-subtle);
   background-image: radial-gradient(color-mix(in srgb, var(--elea-color-border-default), transparent 35%) 1px, transparent 1px);
   background-size: 12px 12px;
@@ -78,21 +78,21 @@
 }
 .gallery__notebook { inline-size: 11rem; }
 .gallery__calendar { zoom: .56; }
-.gallery__crop { inline-size: 11rem; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--elea-radius-md); }
+.gallery__crop { inline-size: 11rem; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--elea-shape-surface, var(--elea-radius-md)); }
 .gallery__preview > * { max-inline-size: 100%; }
 .catalog-card__body { padding: .9rem .8rem 1rem; }
 .catalog-card__body h2 { margin: .2rem 0 .3rem; font-size: clamp(1.1rem, 1.9vw, 1.34rem); }
 .catalog-card__body p { margin: 0; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); line-height: 1.45; }
 .catalog-category { font-size: .75rem; font-weight: 550; }
 .gallery__name { color: inherit; text-decoration: none; }
-.gallery__name::after { content: ""; position: absolute; inset: 0; border-radius: var(--elea-radius-xl); }
+.gallery__name::after { content: ""; position: absolute; inset: 0; border-radius: var(--elea-shape-surface, var(--elea-radius-xl)); }
 .gallery__name:focus-visible { outline: none; }
 .gallery__dialog, .catalog-footer-preview {
   display: grid;
   gap: .35rem;
   padding: .8rem 1rem;
   border: 1px solid var(--elea-color-border-default);
-  border-radius: var(--elea-radius-lg);
+  border-radius: var(--elea-shape-surface, var(--elea-radius-lg));
   background: var(--elea-color-surface-default);
   box-shadow: var(--elea-shadow-sm);
   font-size: var(--elea-font-size-sm);
@@ -127,16 +127,16 @@
 .catalog-measure { margin: 0; padding: .75rem 1rem; border-inline-start: 2px solid var(--elea-color-border-default); color: var(--elea-color-text-muted); }
 .catalog-popover-form { display: grid; gap: .75rem; inline-size: 15rem; max-inline-size: 100%; }
 .catalog-popover-actions { display: flex; justify-content: flex-end; gap: .5rem; }
-.catalog-popover-scroll { overflow: auto; inline-size: 100%; max-block-size: 9.5rem; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-md); }
-.catalog-popover-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; inline-size: 100%; padding: .6rem .9rem; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-md); cursor: pointer; }
+.catalog-popover-scroll { overflow: auto; inline-size: 100%; max-block-size: 9.5rem; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-shape-surface, var(--elea-radius-md)); }
+.catalog-popover-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; inline-size: 100%; padding: .6rem .9rem; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-shape-control, var(--elea-radius-md)); cursor: pointer; }
 .catalog-popover-row:hover { background: var(--elea-color-surface-muted); }
 .catalog-skeleton-brand { background-color: color-mix(in srgb, var(--elea-color-primary-500) 30%, transparent); border-radius: var(--elea-radius-full); }
-.catalog-popover-zone { inline-size: 100%; min-block-size: 6rem; border: 1px dashed var(--elea-color-border-default); border-radius: var(--elea-radius-md); background: var(--elea-color-surface-muted); color: var(--elea-color-text-muted); font: inherit; cursor: crosshair; }
+.catalog-popover-zone { inline-size: 100%; min-block-size: 6rem; border: 1px dashed var(--elea-color-border-default); border-radius: var(--elea-shape-control, var(--elea-radius-md)); background: var(--elea-color-surface-muted); color: var(--elea-color-text-muted); font: inherit; cursor: crosshair; }
 .catalog-popover-zone:focus-visible { border-color: transparent; outline: 2px solid var(--elea-color-focus); outline-offset: -2px; }
 .catalog-popover-preview { display: grid; justify-items: start; gap: .4rem; }
 .gallery__preview .catalog-popover-preview .elea-popover__panel { position: static; display: grid; gap: .15rem; padding: .6rem .8rem; animation: none; }
 .catalog-popover-preview .elea-popover__panel span { color: var(--elea-color-text-muted); font-size: .75rem; }
-.catalog-sheet-preview { display: grid; grid-template-columns: 1fr 1.6fr; inline-size: min(100%, 15rem); border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-radius-lg); overflow: hidden; font-size: var(--elea-font-size-sm); }
+.catalog-sheet-preview { display: grid; grid-template-columns: 1fr 1.6fr; inline-size: min(100%, 15rem); border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-shape-surface, var(--elea-radius-lg)); overflow: hidden; font-size: var(--elea-font-size-sm); }
 .catalog-sheet-preview > span { background: color-mix(in srgb, var(--elea-color-neutral-950) 35%, var(--elea-color-surface-subtle)); }
 .catalog-sheet-preview > div { display: grid; gap: .35rem; padding: .7rem .8rem; background: var(--elea-color-surface-default); }
 .catalog-sheet-preview > div span { color: var(--elea-color-text-muted); font-size: .75rem; }
@@ -153,13 +153,13 @@
 .catalog-footer-preview { width: min(100%, 14rem); grid-template-columns: 1fr 1fr; align-items: start; }
 .catalog-footer-preview strong { font-family: var(--elea-font-family-content); font-size: 1rem; }
 .catalog-footer-preview small { grid-column: 1 / -1; border-top: 1px solid var(--elea-color-border-default); padding-top: .4rem; }
-.catalog-empty { text-align: center; padding: 2rem 1rem; border: 1px dashed var(--elea-color-border-default); border-radius: var(--elea-radius-lg); }
+.catalog-empty { text-align: center; padding: 2rem 1rem; border: 1px dashed var(--elea-color-border-default); border-radius: var(--elea-shape-surface, var(--elea-radius-lg)); }
 .catalog-empty h2, .catalog-empty p { margin: 0 0 .8rem; }
 .catalog-layout { display: grid; grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5.5rem); align-items: start; }
 .catalog-index nav { border-inline-end: 1px solid var(--elea-color-border-default); padding-inline-end: 1rem; }
 .catalog-index nav > div { margin-top: 1.2rem; }
 .catalog-index h2 { margin: 0 0 .2rem; padding-inline: .6rem; font-size: .75rem; }
-.catalog-index a { display: block; padding: .25rem .6rem; color: var(--elea-color-text-default); border-radius: var(--elea-radius-sm); text-decoration: none; font-size: var(--elea-font-size-sm); }
+.catalog-index a { display: block; padding: .25rem .6rem; color: var(--elea-color-text-default); border-radius: var(--elea-shape-control, var(--elea-radius-sm)); text-decoration: none; font-size: var(--elea-font-size-sm); }
 .catalog-index a[aria-current], .catalog-index a:hover { background: var(--elea-color-surface-muted); color: var(--elea-color-text-link); }
 .catalog-index__all, .catalog-index a[aria-current] { font-weight: 650; }
 .catalog-guide__bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1rem; margin-bottom: .8rem; }
@@ -183,16 +183,18 @@
   gap: var(--elea-space-3);
   padding: clamp(1rem, 4vw, 2.1rem);
   border: 1px solid var(--elea-color-border-default);
-  border-radius: var(--elea-radius-lg) var(--elea-radius-lg) 0 0;
+  border-radius: var(--elea-shape-surface, var(--elea-radius-lg));
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   background: var(--elea-color-surface-subtle);
 }
 .demo__stage > * { max-width: 100%; min-width: 0; }
 .demo__stage .elea-pagination__list { flex-wrap: wrap; }
 .demo__stage > .elea-footer { width: 100%; }
-.catalog-source { min-width: 0; border: 1px solid var(--elea-color-border-default); border-top: 0; border-radius: 0 0 var(--elea-radius-lg) var(--elea-radius-lg); }
+.catalog-source { min-width: 0; border: 1px solid var(--elea-color-border-default); border-top: 0; border-radius: var(--elea-shape-surface, var(--elea-radius-lg)); border-top-left-radius: 0; border-top-right-radius: 0; }
 .catalog-source summary { padding: .65rem 1rem; cursor: pointer; color: var(--elea-color-text-link); font-size: var(--elea-font-size-sm); font-weight: 600; }
 .catalog-source__bar { display: flex; align-items: center; justify-content: end; gap: .6rem; padding: .4rem .75rem; font-size: var(--elea-font-size-sm); }
-.demo__code { border-radius: 0 0 var(--elea-radius-lg) var(--elea-radius-lg); }
+.demo__code { border-radius: var(--elea-shape-surface, var(--elea-radius-lg)); border-top-left-radius: 0; border-top-right-radius: 0; }
 .catalog-form { display: grid; justify-items: start; gap: 1rem; }
 .catalog-form output:empty { display: none; }
 .catalog-form output { font-size: var(--elea-font-size-sm); }

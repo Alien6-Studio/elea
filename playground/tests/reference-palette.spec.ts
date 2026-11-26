@@ -58,6 +58,7 @@ test("the colour atlas is one keyboard stop and preserves separate role assignme
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await expect(page.getByRole("radio", { name: "Round" })).toBeChecked();
   await expect(page.getByRole("textbox", { name: "Corner radius" })).toHaveValue("10px");
+  await expect(page.getByText("Using your corner radius of 10px.")).toBeVisible();
 });
 
 test("a custom warning travels to feedback controls without changing the primary", async ({ page }) => {

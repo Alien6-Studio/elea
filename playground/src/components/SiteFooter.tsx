@@ -5,6 +5,7 @@ import { Logo } from "./Logo.js";
 const project = {
   label: "Project",
   links: [
+    { label: "Versions and changes", href: sitePath + "versions/" },
     { label: "Source on GitHub", href: repositoryUrl },
     { label: "Apache 2.0 license", href: `${repositoryUrl}/blob/main/LICENSE` },
   ],

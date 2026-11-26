@@ -106,7 +106,18 @@ function withPalette(brand: BrandTheme, params: URLSearchParams): BrandTheme {
   return next;
 }
 
+function readCorners(brand: BrandTheme, params: URLSearchParams) {
+  const corner = corners.find(value => value === params.get("corners"));
+  const shape = featuredColourThemes.find(id => id === params.get("shape"));
+  if (shape) {
+    const reference = colorThemes[shape].profile.corner;
+    if (!corner || corner === reference) return { corner: reference, shape };
+  }
+  return corner ? { corner, shape: undefined } : { corner: brand.corner, shape: brand.shape };
+}
+
 function legacyPalette(brand: BrandTheme, params: URLSearchParams) {
+  if (params.has("shape")) brand = { ...brand, ...readCorners(brand, params) };
   const scheme = params.get("scheme");
   const source = params.get("source");
   if (scheme && Object.hasOwn(colorThemes, scheme)) {
@@ -122,9 +133,9 @@ function readProfile(id: StudioThemeId, params: URLSearchParams) {
   const accent = params.get("accent");
   const brand = {
     ...base,
+    ...readCorners(base, params),
     seed: seed && /^[\da-f]{6}$/i.test(seed) ? "#" + seed : base.seed,
     accent: accent && /^[\da-f]{6}$/i.test(accent) ? "#" + accent : base.accent,
-    corner: corners.find(value => value === params.get("corners")) ?? base.corner,
     typeface: typefaces.find(value => value === params.get("type")) ?? base.typeface,
     rhythm: rhythms.find(value => value === params.get("rhythm")) ?? base.rhythm,
     radius: params.get("radius") ?? base.radius,
@@ -165,11 +176,13 @@ export function readBrandTheme(): BrandTheme | undefined {
 export function brandRoute(route: "colours" | "theme" | "playground" | "ui" | `ui/${string}`, brand?: BrandTheme) {
   const path = href(route);
   if (!brand) return path;
-  const { edition, seed, corner, typeface, rhythm, accent, radius, font, palette } = brand;
+  const { edition, seed, corner, shape, typeface, rhythm, accent, radius, font, palette } = brand;
   if (brand.profile) {
     const base = studioTheme(brand.profile);
     const params = new URLSearchParams({ scheme: brand.profile });
-    if (corner !== base.corner) params.set("corners", corner);
+    // An explicit corner selects the classic shape, even when its scale matches the profile.
+    if (!shape || corner !== base.corner) params.set("corners", corner);
+    if (shape && (shape !== base.shape || corner !== base.corner)) params.set("shape", shape);
     if (typeface !== base.typeface) params.set("type", typeface);
     if (rhythm !== base.rhythm) params.set("rhythm", rhythm);
     if (font) params.set("font", font);
@@ -185,14 +198,16 @@ export function brandRoute(route: "colours" | "theme" | "playground" | "ui" | `u
   }
   const preset: BrandTheme | undefined = edition && editions[edition];
   const scheme = matchingColorTheme(brand);
-  if (edition && preset && corner === preset.corner && typeface === preset.typeface && rhythm === preset.rhythm &&
+  if (edition && preset && corner === (shape ? colorThemes[shape].profile.corner : preset.corner) && typeface === preset.typeface && rhythm === preset.rhythm &&
     radius === preset.radius && font === preset.font) {
-    const base = `${path}?edition=${edition.toLowerCase()}`;
-    if (scheme) return `${base}&scheme=${scheme}`;
-    if (!palette && seed === preset.seed && (accent ?? preset.accent) === preset.accent) return base;
+    const base = new URLSearchParams({ edition: edition.toLowerCase() });
+    if (scheme) base.set("scheme", scheme);
+    if (shape) base.set("shape", shape);
+    if (scheme || (!palette && seed === preset.seed && (accent ?? preset.accent) === preset.accent)) return `${path}?${base}`;
   }
 
   const params = new URLSearchParams({ brand: seed.slice(1), corners: corner, type: typeface, rhythm });
+  if (shape) params.set("shape", shape);
   if (accent) params.set("accent", accent.slice(1));
   if (radius) params.set("radius", radius);
   if (font) params.set("font", font);

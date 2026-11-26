@@ -17,7 +17,7 @@ export function DraftActions({ saveDraft }: { saveDraft: () => void }) {
 
 Use the UI and tokens packages at the same version. The UI bundle loads both stylesheets.
 
-For a checkout, [build the npm archives](https://github.com/Alien6-Studio/elea/blob/main/docs/release.md#attestation) with `npm run check -- --pack-destination artifacts`. Run `npm install` in your app with the paths to both the UI and tokens `.tgz` files.
+For a checkout, [build the npm archives](https://github.com/Alien6-Studio/elea/blob/main/docs/release.md) with `npm run check -- --pack-destination artifacts`. Run `npm install` in your app with the paths to both the UI and tokens `.tgz` files.
 
 ## Theme
 

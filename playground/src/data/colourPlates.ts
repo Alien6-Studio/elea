@@ -1,6 +1,6 @@
 import type { SurfaceFamily, ThemeProfileId } from "@alien6-studio/elea-tokens/palette";
 import rasance from "../assets/colour-themes/rasance.webp";
-import reserve from "../assets/colour-themes/reserve.webp";
+import reserve from "../assets/colour-themes/reserve-relief.webp";
 import braise from "../assets/colour-themes/braise.webp";
 import horsChamp from "../assets/colour-themes/hors-champ.webp";
 import horsRegistre from "../assets/colour-themes/hors-registre.webp";
@@ -34,16 +34,16 @@ export const colourPlates: Record<ThemeProfileId, ColourPlate> = {
     reference: {
       title: "Outrenoir", artist: "Pierre Soulages", date: "from 1979",
       url: "https://www.pierre-soulages.com/document/pierre-soulages-la-lumiere-comme-matiere/",
-      note: "Light catches the ridges in Soulages’s black paint. Rasance sets carbon beside ivory for the same jump in brightness, with graphite between them.",
+      note: "Light catches the ridges in Soulages’s black paint. Rasance pairs carbon with ivory and draws two shallow curves across opposite corners of each action.",
     },
   },
   reserve: {
-    src: reserve, alt: "A curved ridge rises from a field of ultramarine pigment.",
+    src: reserve, alt: "An ultramarine sponge relief casts a soft shadow on a white surface.",
     paper: "Porcelain", stock: "primary", ink: "paper",
     reference: {
-      title: "Blue Monochrome", artist: "Yves Klein", date: "1961",
-      url: "https://www.moma.org/collection/works/80103",
-      note: "Klein covers the canvas in ultramarine pigment. Réserve gives that blue the primary role and adds two quieter neighbours, chalk blue and ink violet.",
+      title: "L’Arbre, grande éponge bleue", artist: "Yves Klein", date: "1962",
+      url: "https://www.centrepompidou.fr/fr/ressources/oeuvre/cpjqdr",
+      note: "Klein’s sculpture holds ultramarine pigment in a sponge. The generated ELEA study explores that porous surface. Four unequal curves give actions and selections their own blue imprint.",
     },
   },
   braise: {
@@ -52,7 +52,7 @@ export const colourPlates: Record<ThemeProfileId, ColourPlate> = {
     reference: {
       title: "Walls of Light", artist: "Mark Rothko", date: "2004 exhibition",
       url: "https://www.guggenheim.org/exhibition/mark-rothko-walls-of-light",
-      note: "In the Guggenheim Bilbao exhibition, Rothko’s fields of colour seem to glow at their edges. Braise places apricot against deep madder and carries their warmth into dusty rose.",
+      note: "Rothko’s fields of colour seem to glow along their margins. Braise sets apricot against deep madder and softens its panels with wide, shallow curves.",
     },
   },
   "hors-champ": {
@@ -61,7 +61,7 @@ export const colourPlates: Record<ThemeProfileId, ColourPlate> = {
     reference: {
       title: "Cartes et territoires", artist: "Luigi Ghirri", date: "2019 exhibition",
       url: "https://jeudepaume.org/evenement/luigi-ghirri-2/",
-      note: "Ghirri’s photographs at the Jeu de Paume draw the eye to signs in everyday landscapes. In the ELEA study, a vermilion sign interrupts a pale blue wall. Petrol blue anchors the palette.",
+      note: "Ghirri finds signs within the everyday landscape. Hors champ gives panels the square edges of a photographic frame and gently rounds its small, sign-like controls.",
     },
   },
   "hors-registre": {
@@ -70,7 +70,7 @@ export const colourPlates: Record<ThemeProfileId, ColourPlate> = {
     reference: {
       title: "Marilyn Diptych", artist: "Andy Warhol", date: "1962",
       url: "https://www.tate.org.uk/art/artworks/warhol-marilyn-diptych-t03093",
-      note: "Orange leads the palette, while pink and turquoise pick out the separate inks in the diptych’s colour panel.",
+      note: "The repeated screenprint places orange, pink and turquoise side by side. Hors registre offsets opposite pairs of corners like successive impressions.",
     },
   },
   echappee: {
@@ -79,7 +79,7 @@ export const colourPlates: Record<ThemeProfileId, ColourPlate> = {
     reference: {
       title: "Girl with Balloon", artist: "Banksy", date: "2002 mural",
       url: "https://www.sothebys.com/en/auctions/ecatalogue/2018/contemporary-art-evening-auction-l18024/lot.67.html",
-      note: "The balloon supplies the red for primary actions, the stencil gives the secondary its black, and the wall lends the tertiary its soft grey.",
+      note: "The red balloon lifts away from the black stencil. Échappée rounds three corners and leaves the lower left sharp, like the point where a string meets the balloon.",
     },
   },
   "grand-bain": {
@@ -88,7 +88,7 @@ export const colourPlates: Record<ThemeProfileId, ColourPlate> = {
     reference: {
       title: "A Bigger Splash", artist: "David Hockney", date: "1967",
       url: "https://www.tate.org.uk/art/artworks/hockney-a-bigger-splash-t03254",
-      note: "Pool blue carries the primary actions, the warm façade supplies the secondary, and the diving board lends its yellow to small accents.",
+      note: "Hockney sets a splash against the straight edges of the pool. Grand bain lifts the upper corners of its blue actions in a shallow arc above a level base.",
     },
   },
   ponctuation: {
@@ -97,7 +97,7 @@ export const colourPlates: Record<ThemeProfileId, ColourPlate> = {
     reference: {
       title: "Pumpkin", artist: "Yayoi Kusama", date: "1994",
       url: "https://benesse-artsite.jp/en/story/20210611-1661.html",
-      note: "Pumpkin yellow and the black of the dots form the two action colours, with a quieter blue-grey drawn from the sea at Naoshima.",
+      note: "Kusama’s black dots follow the curve of a yellow pumpkin. Ponctuation carries those circles into small selections and lengthens them into capsules around action labels.",
     },
   },
   lisiere: {
@@ -106,7 +106,7 @@ export const colourPlates: Record<ThemeProfileId, ColourPlate> = {
     reference: {
       title: "Surrounded Islands", artist: "Christo and Jeanne-Claude", date: "1983",
       url: "https://www.pamm.org/en/exhibition/christo-and-jeanne-claude-surrounded-islands-biscayne-bay-greater-miami-florida-1980-83-a-documentary-exhibition/",
-      note: "Biscayne Bay sets the primary green, the floating fabric supplies a pink secondary, and the islands’ foliage deepens the tertiary.",
+      note: "Pink fabric follows the irregular shorelines in Biscayne Bay. Lisière wraps its bay-green actions in four unequal curves.",
     },
   },
 };

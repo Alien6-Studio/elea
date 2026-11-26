@@ -3,6 +3,9 @@ site_description: Elea is an open-source React design system for rendering, edit
 site_url: https://alien6-studio.github.io/elea/
 repo_name: Alien6-Studio/elea
 repo_url: https://github.com/Alien6-Studio/elea
+extra:
+  source_revision: !ENV ELEA_SOURCE_REVISION
+  docs_revision: !ENV ELEA_DOCS_REVISION
 theme:
   name: null
   custom_dir: overrides
@@ -14,6 +17,7 @@ nav:
   - Getting started: getting-started.md
   - Content: content.md
   - UI integration: components.md
+  - Versions: versions.md
 not_in_nav: |
   /typography.md
 extra_css:
