@@ -1,9 +1,10 @@
 "use client";
 
-import { generateId, htmlToText, type BlockData, type BlockLike, type EleaBlock } from "@alien6-studio/elea-content";
+import { en, formatMessage, generateId, htmlToText, type BlockData, type BlockLike, type EleaBlock } from "@alien6-studio/elea-content";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent, type FocusEvent, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import { AddBlockButton } from "./AddBlockButton.js";
 import type { BlockEditorMap } from "./BlockEditor.js";
+import { TextLimitContext, fitPastedBlocks, useEditorTextLimit } from "./editorTextLimit.js";
 import { fieldFullySelected } from "./caret.js";
 import type { MarkdownDraft } from "./MarkdownEditor.js";
 import type { ListCommand } from "./listCommands.js";
@@ -33,8 +34,8 @@ function historyAction(event: KeyboardEvent) {
   return key === "y" ? "redo" : null;
 }
 
-function editorClasses(mode: EditorMode, className: string | undefined, selecting: boolean) {
-  return ["elea-content-editor", `elea-content-editor--${mode}`, className, selecting ? "elea-content-editor--selecting" : ""].filter(Boolean).join(" ");
+function editorClasses(mode: EditorMode, width: ContentEditorProps["width"], className: string | undefined, selecting: boolean) {
+  return ["elea-content-editor", `elea-content-editor--${mode}`, width === "full" && "elea-content-editor--full", className, selecting && "elea-content-editor--selecting"].filter(Boolean).join(" ");
 }
 
 function sameBlocks(left: EleaBlock[], right: EleaBlock[]) {
@@ -52,6 +53,8 @@ export interface ContentEditorProps {
   onSummaryChange?: ((summary: string) => void) | undefined;
   /** Hides the summary field; the title field hides when `onTitleChange` is absent. */
   summaryDisabled?: boolean | undefined;
+  /** Hard limit on the document body’s plain-text UTF-16 length, with a localized counter. */
+  maxLength?: number | undefined;
   /** Read-only rendering of the current content, through the viewer. */
   showPreview?: boolean | undefined;
   /** Passed to the host's upload and attachment services. */
@@ -62,6 +65,8 @@ export interface ContentEditorProps {
   blockTypes?: readonly string[] | undefined;
   enableVirtualization?: boolean | undefined;
   virtualizationThreshold?: number | undefined;
+  /** Keep the reading measure (default), or fill the host's available width. */
+  width?: "measure" | "full" | undefined;
   className?: string | undefined;
   /** Called whenever the multi-block selection changes, with the selected blocks in order. */
   onSelectionChange?: ((selection: BlockSelection, blocks: EleaBlock[]) => void) | undefined;
@@ -101,12 +106,14 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   summary = "",
   onSummaryChange,
   summaryDisabled = false,
+  maxLength,
   showPreview = false,
   context = NO_CONTEXT,
   editors,
   blockTypes,
   enableVirtualization = true,
   virtualizationThreshold = 50,
+  width,
   className,
   onSelectionChange,
   renderSelectionActions,
@@ -116,7 +123,8 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   mode = "default",
   onModeChange,
 }, ref) {
-  const { registry, sanitizer, resolveAssetUrl } = useContentServices();
+  const { registry, sanitizer, resolveAssetUrl, messages } = useContentServices();
+  const textLimit = useEditorTextLimit(blocks, maxLength, registry);
   // The source view and the preview load when first asked for; the blocks stay until they are there
   const [source, sourceWaiting] = usePart(sourcePart, mode === "markdown");
   const [preview, previewWaiting] = usePart(previewPart, showPreview);
@@ -125,7 +133,7 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   const [markdownDraft, setMarkdownDraft] = useState<MarkdownDraft>();
   const documentHistory = useDocumentHistory({ blocks, title, summary }, { onBlocksChange, onTitleChange, onSummaryChange, groupWithinMs: historyGroupWithinMs });
   useImperativeHandle(ref, () => documentHistory, [documentHistory]);
-  const { addBlock, updateBlock, removeBlock, insertBlocks, convertBlock, moveBlocks, shiftBlocks } = useBlockManagement({ blocks, onBlocksChange, registry });
+  const { addBlock, updateBlock, removeBlock, insertBlocks, convertBlock, moveBlocks, shiftBlocks } = useBlockManagement({ blocks, onBlocksChange, registry, acceptChange: textLimit?.accepts });
   const rootRef = useRef<HTMLDivElement>(null);
   const blocksRef = useRef<HTMLDivElement>(null);
   const { focusedBlock, setFocusedBlock, scheduleBlockFocus } = useBlockFocus(rootRef);
@@ -229,14 +237,22 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     if (!site || !payload) return;
     event.preventDefault();
     event.stopPropagation();
-    const created = payload.incoming.map(copyBlock);
+    let created = payload.incoming.map(copyBlock);
     const lastCopy = copiedRun.current;
     const raw = payload.copied && JSON.stringify(payload.copied);
     // The clipboard format of blocks can be forged by any page: clean them once compared with the last copy
     if (payload.copied) cleanBlocks(created, sanitizer);
     const duplicate = lastCopy?.ids === selection.ids && raw === lastCopy.raw && sameBlocks(lastCopy.document, blocks);
     const after = duplicate ? blocks.indexOf(selectedBlocks.at(-1)!) + 1 : undefined;
-    const next = selectedBlocks.length > 0 && !duplicate ? replaceSelection(created) : insertPasted(blocks, created, after, site);
+    const paste = (incoming: EleaBlock[]) => selectedBlocks.length > 0 && !duplicate
+      ? replaceSelection(incoming) : insertPasted(blocks, incoming, after, site);
+    let next = paste(created);
+    if (textLimit && !textLimit.accepts(next)) {
+      const usedWithoutPaste = paste([]).reduce((sum, block) => sum + textLimit.text(block).length, 0);
+      created = fitPastedBlocks(created, Math.max(textLimit.max, textLimit.count) - usedWithoutPaste, textLimit.text);
+      if (!created.length) return;
+      next = paste(created);
+    }
     onBlocksChange(next);
     const ids = created.map(block => block.id);
     copiedRun.current = raw ? { document: next, ids, raw } : null;
@@ -373,7 +389,9 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   /** The selected blocks give way to one paragraph holding `text`, with the caret at its end. */
   function replaceSelectionWith(text: string) {
     const paragraph = copyBlock({ type: "paragraph", data: { ...registry.defaults("paragraph"), text } });
-    onBlocksChange(replaceSelection([paragraph]));
+    const next = replaceSelection([paragraph]);
+    if (textLimit && !textLimit.accepts(next)) return;
+    onBlocksChange(next);
     blockSelection.clear();
     setFocusedBlock(paragraph.id);
     scheduleBlockFocus(paragraph.id, "end");
@@ -436,12 +454,14 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
         type: block.type,
         data: registry.normalizeData(block.type, typeof block.data === "object" && block.data !== null ? (block.data as BlockData) : {}),
       }));
-      onBlocksChange([...blocks.slice(0, index), ...replacements, ...blocks.slice(index + 1)]);
+      const next = [...blocks.slice(0, index), ...replacements, ...blocks.slice(index + 1)];
+      if (textLimit && !textLimit.accepts(next)) return;
+      onBlocksChange(next);
       const target = replacements[Math.min(focus, replacements.length - 1)] as EleaBlock;
       setFocusedBlock(target.id);
       scheduleBlockFocus(target.id, position);
     },
-    [blocks, registry, onBlocksChange, setFocusedBlock, scheduleBlockFocus],
+    [blocks, registry, onBlocksChange, setFocusedBlock, scheduleBlockFocus, textLimit],
   );
   /** Dragging selected text between fields moves words around by accident; only the grips drag. */
   const handleRootDragStart = useCallback((event: React.DragEvent) => {
@@ -505,7 +525,7 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     insertBlocks([{ type: "image", data }]);
   }, [insertBlocks]);
 
-  const classes = editorClasses(mode, className, blockSelection.dragging);
+  const classes = editorClasses(mode, width, className, blockSelection.dragging);
   const historyButtons = <HistoryButtons documentHistory={documentHistory} history={history} controls={historyControls} />;
   const insertBlock = (type: string) => {
     if (mode === "markdown") onModeChange?.("default");
@@ -590,7 +610,12 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
       {mode === "toolbar" && documentToolbar}
       {selectionBar}
       <TitleFields title={title} summary={summary} onTitleChange={onTitleChange} onSummaryChange={onSummaryChange} summaryDisabled={summaryDisabled} titleRef={titleRef} summaryRef={summaryRef} />
-      {mode === "classic" ? <ClassicShell toolbar={documentToolbar} empty={!blocks.length} onEnd={focusDocumentEnd}>{blockArea}</ClassicShell> : blockArea}
+      <TextLimitContext.Provider value={textLimit}>
+        {mode === "classic" ? <ClassicShell toolbar={documentToolbar} empty={!blocks.length} onEnd={focusDocumentEnd}>{blockArea}</ClassicShell> : blockArea}
+      </TextLimitContext.Provider>
+      {textLimit && <output id={textLimit.counterId} className="elea-field__counter" aria-live="polite" aria-atomic="true">
+        {formatMessage(messages.editor.characterCount ?? en.editor.characterCount, { count: textLimit.count, max: textLimit.max })}
+      </output>}
       {addModes.includes(mode) && (
         <div className="elea-content-editor__add">
           <AddBlockButton onAdd={onModeChange ? insertBlock : handleAddBlock} types={blockTypes} />

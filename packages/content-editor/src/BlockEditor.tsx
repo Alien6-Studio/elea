@@ -1,5 +1,7 @@
 "use client";
 
+import { useTextLimitAttributes } from "./editorTextLimit.js";
+
 import { asListMarker, asListStyle, htmlToText, listStyleForMarker, type BlockData, type BlockLike, type EleaBlock, type HeaderData, type ListData, type ListItem, type QuoteData } from "@alien6-studio/elea-content";
 import { memo, useCallback, useEffect, useImperativeHandle, useRef, useState, type ComponentType, type FocusEvent, type SyntheticEvent, type KeyboardEvent, type RefObject } from "react";
 import { htmlToItems, htmlToList, itemsToHtml, sameItems } from "./listHtml.js";
@@ -311,9 +313,11 @@ function joinWithPrevious(item: HTMLLIElement) {
 function CodeEditor({ block, onUpdate, onFocus, onBlur, onNavigate, onMergeBackward }: Readonly<Pick<BlockEditorProps, "block" | "onUpdate" | "onFocus" | "onBlur" | "onNavigate" | "onMergeBackward">>) {
   const { messages } = useContentServices();
   const code = typeof block.data.code === "string" ? block.data.code : "";
+  const lengthAttributes = useTextLimitAttributes(code);
   return (
     <div className="elea-code">
       <textarea
+        {...lengthAttributes}
         className="elea-textarea elea-code-editor"
         placeholder={messages.editor.codePlaceholder}
         aria-label={messages.editor.codePlaceholder}
@@ -350,6 +354,7 @@ type QuoteEditorProps = HeaderEditorProps & { onBodyFocus: (active: boolean) => 
 function QuoteEditor({ block, onUpdate, onFocus, onBlur, onNavigate, onMergeBackward, onAddBlockAfter, fieldRef, onSelectionChange, onBodyFocus }: QuoteEditorProps) {
   const { messages } = useContentServices();
   const data = block.data as QuoteData;
+  const captionAttributes = useTextLimitAttributes(data.caption ?? "");
   return (
     <div className="elea-quote-editor">
       <RichTextField
@@ -367,6 +372,7 @@ function QuoteEditor({ block, onUpdate, onFocus, onBlur, onNavigate, onMergeBack
       />
       <input
         type="text"
+        {...captionAttributes}
         className="elea-input elea-quote-editor__caption"
         placeholder={messages.editor.quoteAuthorPlaceholder}
         aria-label={messages.editor.quoteAuthorPlaceholder}

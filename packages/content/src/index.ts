@@ -77,3 +77,4 @@ export { en, fr, formatMessage, withDefaultMessages, type DeepPartial, type Elea
 export { looksLikeMarkdown, markdownInlineToHtml, markdownToBlocks, type MarkdownParseOptions } from "./markdown.js";
 export { blockToMarkdown, documentToMarkdown, inlineHtmlToMarkdown, type MarkdownExportOptions } from "./markdownExport.js";
 export { documentToHtml, type HtmlSerializerOptions } from "./serialize.js";
+export { blocksToHtml, htmlToBlocks, type HtmlImportOptions, type HtmlExportOptions } from "./html/conversion.js";

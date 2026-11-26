@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { CropIcon, UploadIcon } from "../icons.js";
 import { cropperPart, usePart } from "../parts.js";
 import { useContentServices, type EditorContextInfo, type ImageCropSource, type ImageUploadOptions, type ImageUploadStatus } from "../provider.js";
+import { useTextLimitAttributes } from "../editorTextLimit.js";
 import { MediaActions } from "./MediaActions.js";
 
 export interface MediaBlockProps {
@@ -45,6 +46,7 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: Readonly<Media
   const { messages, uploadImage, resolveAssetUrl, imageCrop, allowSvgUpload } = useContentServices();
   const data = block.data;
   const { file, caption, alt } = imageBlock.normalize(data);
+  const lengthAttributes = useTextLimitAttributes(caption);
   const [activity, setActivity] = useState<ImageUploadStatus | "uploading" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<{ input: ImageCropSource; fallback?: File } | null>(null);
@@ -190,6 +192,7 @@ export function ImageBlock({ block, onUpdate, onFocus, context }: Readonly<Media
       <UploadStatus status={status} quiet={!showPicture} />
       {showPicture && <input
         type="text"
+        {...lengthAttributes}
         className="elea-media-block__caption"
         placeholder={messages.image.captionPlaceholder}
         aria-label={messages.image.captionPlaceholder}

@@ -18,6 +18,20 @@ afterEach(() => {
 
 const paragraph = (id: string, text: string): EleaBlock => ({ id, type: "paragraph", data: { text } });
 
+test("full width follows the editor into the preview and the reading measure is restored on request", () => {
+  const props = { blocks: [paragraph("p", "A note")], onBlocksChange: () => {}, className: "article-form" };
+  const { container, rerender } = render(<ContentEditor {...props} />);
+  const root = () => container.querySelector<HTMLElement>(".article-form")!;
+  assert.ok(!root().classList.contains("elea-content-editor--full"));
+  rerender(<ContentEditor {...props} mode="classic" width="full" />);
+  assert.ok(root().classList.contains("elea-content-editor--full"));
+  rerender(<ContentEditor {...props} mode="markdown" width="full" showPreview />);
+  assert.ok(root().classList.contains("elea-content-editor--full"));
+  assert.ok(root().querySelector(".elea-content"));
+  rerender(<ContentEditor {...props} width="measure" />);
+  assert.ok(!root().classList.contains("elea-content-editor--full"));
+});
+
 test("a host with its own history buttons can keep undo and redo shortcuts for the draft", () => {
   const blocks: EleaBlock[] = [];
   function Editor() {

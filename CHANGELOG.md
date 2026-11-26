@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- The classic editor draws its focus ring around the complete frame. Set `--elea-color-focus` and `--elea-color-selection` to brand focus and text selection. Use `width="full"` and `--elea-editor-canvas-height` to fit a form field.
+- `ContentEditor` accepts a plain-text `maxLength` and shows a character counter. Use `htmlToBlocks` when opening an HTML field and `blocksToHtml` when saving it.
+
 ## 0.1.2 - 2026-11-26
 
 - The UI package adds `SirenInput`, `SiretInput`, `IbanInput` and `CardNumberInput` with individually editable blocks, whole-value paste and compact form values. IBAN block sizes follow the country prefix and the card number field recognizes Visa, Mastercard and American Express. The `/formats` entry also provides the four presets for single-field entry with `Input`.

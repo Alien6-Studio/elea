@@ -20,6 +20,7 @@ export const LinkIcon = (props: IconProps) => <Icon {...props}><path d="M10 13a5
 export const EraserIcon = (props: IconProps) => <Icon {...props}><path d="m7 21-4-4a2 2 0 0 1 0-3L14 3a2 2 0 0 1 3 0l4 4a2 2 0 0 1 0 3l-9 9M22 21H7M5 12l7 7" /></Icon>;
 export const QuoteIcon = (props: IconProps) => <Icon {...props}><path d="M4 16h5V9H5a4 4 0 0 1 4-4M13 16h5V9h-4a4 4 0 0 1 4-4" /></Icon>;
 export const ListIcon = (props: IconProps) => <Icon {...props}><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></Icon>;
+export const OrderedListIcon = (props: IconProps) => <Icon {...props}><path d="M10 7h11M10 17h11M3 5l2-1v6M3 10h4M3 15a2 2 0 0 1 4 0c0 1-1 2-4 5h4" /></Icon>;
 export const HeadingIcon = (props: IconProps) => <Icon {...props}><path d="M6 4v16M18 4v16M6 12h12" /></Icon>;
 export const PilcrowIcon = (props: IconProps) => <Icon {...props}><path d="M13 4v16M17 4v16M19 4H9.5a4.5 4.5 0 0 0 0 9H13" /></Icon>;
 export const ImageIcon = (props: IconProps) => <Icon {...props}><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-5-5L5 21" /></Icon>;

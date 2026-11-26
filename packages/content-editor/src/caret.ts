@@ -2,6 +2,25 @@
 
 const isTextField = (element: Element): element is HTMLTextAreaElement | HTMLInputElement => element instanceof HTMLTextAreaElement || element instanceof HTMLInputElement;
 
+/** Resolve a plain-text offset in a rich field, including split text nodes and inline marks. */
+export function textPoint(root: Element | DocumentFragment, offset: number): [Node, number] {
+  const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode() as Text | null; node; node = walker.nextNode() as Text | null) {
+    if (offset <= node.length) return [node, Math.max(0, offset)];
+    offset -= node.length;
+  }
+  return [root, root.childNodes.length];
+}
+
+export function selectionOffsets(root: HTMLElement, range: Range | null): [number, number] | undefined {
+  if (!range) return undefined;
+  const before = range.cloneRange();
+  before.selectNodeContents(root);
+  before.setEnd(range.startContainer, range.startOffset);
+  const start = before.toString().length;
+  return [start, start + range.toString().length];
+}
+
 /** The extra BR used to draw a caret at the end of a line is never part of a document. */
 export function editableHtml(element: HTMLElement): string {
   return element.innerHTML.replaceAll('<br data-elea-caret="">', "");

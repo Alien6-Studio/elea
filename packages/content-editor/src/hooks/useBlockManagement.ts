@@ -7,6 +7,8 @@ export interface UseBlockManagementOptions {
   blocks: EleaBlock[];
   onBlocksChange: (blocks: EleaBlock[]) => void;
   registry: BlockRegistry;
+  /** Optionally reject a candidate before it becomes the next edit’s starting point. */
+  acceptChange?: ((next: EleaBlock[]) => boolean) | undefined;
 }
 
 export interface BlockManagement {
@@ -47,11 +49,18 @@ function textPieces(data: BlockData): string[] {
  * Block operations over a controlled list. A ref tracks the latest blocks so that
  * successive operations in one tick compose instead of overwriting each other.
  */
-export function useBlockManagement({ blocks, onBlocksChange, registry }: UseBlockManagementOptions): BlockManagement {
+export function useBlockManagement({ blocks, onBlocksChange, registry, acceptChange }: UseBlockManagementOptions): BlockManagement {
   const blocksRef = useRef(blocks);
   useEffect(() => {
     blocksRef.current = blocks;
   }, [blocks]);
+
+  const commit = useCallback((next: EleaBlock[]) => {
+    if (acceptChange && !acceptChange(next)) return false;
+    blocksRef.current = next;
+    onBlocksChange(next);
+    return true;
+  }, [onBlocksChange, acceptChange]);
 
   const addBlock = useCallback(
     (type: string, afterId?: string, initialText?: string): string => {
@@ -61,20 +70,18 @@ export function useBlockManagement({ blocks, onBlocksChange, registry }: UseBloc
       const current = blocksRef.current;
       const index = afterId ? current.findIndex((candidate) => candidate.id === afterId) : -1;
       const next = index === -1 ? [...current, block] : [...current.slice(0, index + 1), block, ...current.slice(index + 1)];
-      blocksRef.current = next;
-      onBlocksChange(next);
+      commit(next);
       return block.id;
     },
-    [onBlocksChange, registry],
+    [commit, registry],
   );
 
   const updateBlock = useCallback(
     (id: string, data: BlockData) => {
       const next = blocksRef.current.map((block) => (block.id === id ? { ...block, data } : block));
-      blocksRef.current = next;
-      onBlocksChange(next);
+      commit(next);
     },
-    [onBlocksChange],
+    [commit],
   );
 
   const removeBlock = useCallback(
@@ -82,10 +89,9 @@ export function useBlockManagement({ blocks, onBlocksChange, registry }: UseBloc
       const current = blocksRef.current;
       if (current.length <= 1) return;
       const next = current.filter((block) => block.id !== id);
-      blocksRef.current = next;
-      onBlocksChange(next);
+      commit(next);
     },
-    [onBlocksChange],
+    [commit],
   );
 
   const convertBlock = useCallback(
@@ -101,10 +107,9 @@ export function useBlockManagement({ blocks, onBlocksChange, registry }: UseBloc
         }
         return { ...block, type, data: registry.normalizeData(type, { ...data, ...overrides }) };
       });
-      blocksRef.current = next;
-      onBlocksChange(next);
+      commit(next);
     },
-    [onBlocksChange, registry],
+    [commit, registry],
   );
 
   const insertBlocks = useCallback(
@@ -118,11 +123,10 @@ export function useBlockManagement({ blocks, onBlocksChange, registry }: UseBloc
       const current = blocksRef.current;
       const index = afterId ? current.findIndex((candidate) => candidate.id === afterId) : -1;
       const next = index === -1 ? [...current, ...created] : [...current.slice(0, index + 1), ...created, ...current.slice(index + 1)];
-      blocksRef.current = next;
-      onBlocksChange(next);
+      if (!commit(next)) return [];
       return created.map((block) => block.id);
     },
-    [onBlocksChange, registry],
+    [commit, registry],
   );
 
   const moveBlocks = useCallback(
@@ -136,11 +140,9 @@ export function useBlockManagement({ blocks, onBlocksChange, registry }: UseBloc
       const at = position === "before" ? index : index + 1;
       const next = [...remaining.slice(0, at), ...moving, ...remaining.slice(at)];
       if (next.every((block, position) => block === current[position])) return false;
-      blocksRef.current = next;
-      onBlocksChange(next);
-      return true;
+      return commit(next);
     },
-    [onBlocksChange],
+    [commit],
   );
 
   const shiftBlocks = useCallback(

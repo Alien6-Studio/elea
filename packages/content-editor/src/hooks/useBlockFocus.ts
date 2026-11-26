@@ -1,5 +1,6 @@
 "use client";
 
+import { textPoint } from "../caret.js";
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 
 /** Where the caret lands: the start, the end, or a character offset of the field's text. */
@@ -32,20 +33,8 @@ function placeCaret(element: HTMLElement, position: CaretPosition): void {
     else range.setStart(element, 0);
     range.collapse(true);
   } else {
-    // Walk the text nodes to the character offset; past the end means the end
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-    let remaining = position;
-    let placed = false;
-    for (let node = walker.nextNode() as Text | null; node; node = walker.nextNode() as Text | null) {
-      if (remaining <= node.data.length) {
-        range.setStart(node, remaining);
-        placed = true;
-        break;
-      }
-      remaining -= node.data.length;
-    }
-    if (!placed) range.selectNodeContents(element);
-    range.collapse(placed);
+    range.setStart(...textPoint(element, position));
+    range.collapse(true);
   }
   selection.removeAllRanges();
   selection.addRange(range);

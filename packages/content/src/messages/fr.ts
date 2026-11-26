@@ -2,6 +2,7 @@ import type { EleaMessages } from "./types.js";
 
 export const fr: EleaMessages = {
   editor: {
+    characterCount: "{count} / {max} caractères",
     titlePlaceholder: "Titre de votre contenu...",
     summaryPlaceholder: "Décrivez votre contenu en quelques mots...",
     startWriting: "Commencez à écrire...",

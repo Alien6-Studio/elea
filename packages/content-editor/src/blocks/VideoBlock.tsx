@@ -6,11 +6,13 @@ import { useRef, useState } from "react";
 import { LinkIcon, VideoIcon } from "../icons.js";
 import { useContentServices } from "../provider.js";
 import type { MediaBlockProps } from "./ImageBlock.js";
+import { useTextLimitAttributes } from "../editorTextLimit.js";
 import { MediaActions } from "./MediaActions.js";
 
 export function VideoBlock({ block, onUpdate, onFocus }: Readonly<Omit<MediaBlockProps, "context">>) {
   const { messages } = useContentServices();
   const data = block.data as VideoData;
+  const lengthAttributes = useTextLimitAttributes(data.caption ?? "");
   const [urlInput, setUrlInput] = useState<string | null>(null);
   const [error, setError] = useState("");
   const changeButton = useRef<HTMLButtonElement>(null);
@@ -70,6 +72,7 @@ export function VideoBlock({ block, onUpdate, onFocus }: Readonly<Omit<MediaBloc
       </div>
       <input
         type="text"
+        {...lengthAttributes}
         className="elea-media-block__caption"
         placeholder={messages.video.captionPlaceholder}
         aria-label={messages.video.captionPlaceholder}

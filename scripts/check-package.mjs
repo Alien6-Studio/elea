@@ -132,8 +132,8 @@ function checkTailwindHost(consumer) {
 }
 
 const VITE = "8.3.8";
-// Includes the image's Adjust crop entry point. Framing and format controls load on demand.
-const EDITOR_FIRST_LOAD = 59_100;
+// Includes the clipboard HTML parser and document length checks. Preview, Markdown and crop controls load on demand.
+const EDITOR_FIRST_LOAD = 62_000;
 
 /**
  * Vite must emit the UI stylesheet and its fonts at the host's base URL. The editor's first load is
@@ -374,7 +374,7 @@ const CONSUMER_TYPES = `
 import { createElement } from "react";
 import { ContentView as CoreContentView, type ContentViewProps as CoreContentViewProps } from "@alien6-studio/elea-content-viewer/core";
 import type { EleaDocument, EleaBlock, BlockRegistry } from "@alien6-studio/elea-content";
-import { parseDocument, defaultRegistry } from "@alien6-studio/elea-content";
+import { blocksToHtml, htmlToBlocks, parseDocument, defaultRegistry } from "@alien6-studio/elea-content";
 import { ContentView, type ContentViewProps } from "@alien6-studio/elea-content-viewer";
 import { ContentEditor, ContentProvider, type ContentEditorProps, type ImageCropOptions } from "@alien6-studio/elea-content-editor";
 import { tokens, type FlatToken } from "@alien6-studio/elea-tokens";
@@ -395,7 +395,10 @@ const block: EleaBlock | undefined = document.blocks[0];
 const viewerProps: ContentViewProps = { data: document, siteHostnames: ["members.example.org"] };
 // @ts-expect-error the core entry has no sanitizer of its own
 const withoutSanitizer: CoreContentViewProps = { data: document };
-const editorProps: ContentEditorProps = { blocks: document.blocks, onBlocksChange: () => {} };
+const editorProps: ContentEditorProps = {
+  mode: "classic", width: "full", maxLength: 350, blocks: htmlToBlocks("<p>Draft</p>"),
+  onBlocksChange: blocksToHtml,
+};
 const imageCrop: ImageCropOptions = {
   formats: { defaultValue: "cover", presets: [{ value: "cover", label: "Cover", aspect: 16 / 9 }] },
   resolveOriginal: file => file.url ? { source: file.url } : undefined,

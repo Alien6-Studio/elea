@@ -1,6 +1,6 @@
 "use client";
 
-import { isSafeUrl, isSiteRelativeUrl, looksLikeMarkdown, markdownToBlocks, type BlockLike, type HtmlSanitizer, type ListItem } from "@alien6-studio/elea-content";
+import { htmlToBlocks, looksLikeMarkdown, markdownToBlocks, type BlockLike, type HtmlSanitizer, type ListItem } from "@alien6-studio/elea-content";
 import { readBlocksFromClipboard } from "./selection.js";
 import { clipboardBody } from "./clipboardHtml.js";
 
@@ -13,8 +13,6 @@ export interface PastedContent {
 }
 
 const BLOCK_TAGS = new Set(["P", "DIV", "H1", "H2", "H3", "H4", "H5", "H6", "UL", "OL", "BLOCKQUOTE", "PRE", "TABLE", "IMG", "FIGURE", "HR", "SECTION", "ARTICLE", "HEADER", "FOOTER", "MAIN", "ASIDE", "NAV", "LI", "DL", "DD", "DT"]);
-const CONTAINER_TAGS = new Set(["DIV", "SECTION", "ARTICLE", "HEADER", "FOOTER", "MAIN", "ASIDE", "NAV", "BODY", "SPAN", "FONT", "CENTER"]);
-
 /**
  * Lifts the noise of office clipboards before sanitization: Google Docs wraps everything in a
  * bold tag with a normal font weight, Word adds classes, empty spans and `o:p` tags, both use
@@ -79,124 +77,15 @@ function hasBlockDescendant(node: Node): boolean {
   return Array.from(element.childNodes).some(hasBlockDescendant);
 }
 
-function listItems(list: Element): ListItem[] {
-  const items: ListItem[] = [];
-  for (const item of Array.from(list.children)) {
-    if (item.tagName !== "LI") continue;
-    const nested = Array.from(item.children).filter((child) => child.tagName === "UL" || child.tagName === "OL");
-    for (const child of nested) child.remove();
-    const content = inlineHtml(item);
-    const nestedItems = nested.flatMap(listItems);
-    items.push(nestedItems.length > 0 ? { content, items: nestedItems } : content);
-  }
-  return items;
-}
-
-/** The inline HTML of a node, nested containers flattened and blank edges trimmed. */
-function inlineHtml(node: Node): string {
-  const parts = Array.from(node.childNodes, child => {
-    if (child.nodeType === Node.TEXT_NODE) return escapeHtml(child.textContent ?? "").replaceAll("\u00a0", "&nbsp;");
-    if (child.nodeType !== Node.ELEMENT_NODE) return "";
-    const element = child as Element;
-    if (CONTAINER_TAGS.has(element.tagName)) return inlineHtml(element);
-    if (element.tagName === "P") return `${inlineHtml(element)}<br>`;
-    return element.outerHTML;
-  });
-  return trimEdges(parts.join(""));
-}
-
 // Edges are scanned, not matched: nothing backtracks
-function stripEdges(text: string, pieces: string[], spaces = false): string {
+function stripEdges(text: string, pieces: string[]): string {
   let rest = text;
   for (;;) {
-    if (spaces) rest = rest.trim();
     const head = pieces.find((piece) => rest.startsWith(piece));
     const tail = pieces.find((piece) => rest.endsWith(piece));
     if (!head && !tail) return rest;
     rest = rest.slice(head?.length ?? 0, tail ? -tail.length : undefined);
   }
-}
-
-const trimEdges = (html: string) => stripEdges(html, ["<br>", "&nbsp;"], true);
-
-function paragraphBlock(html: string): BlockLike | null {
-  const text = trimEdges(html);
-  return text ? { type: "paragraph", data: { text } } : null;
-}
-
-/** The block a top-level element becomes: null when it carries nothing, undefined for a container to walk into. */
-function elementBlock(element: Element): BlockLike | null | undefined {
-  const tag = element.tagName;
-  if (/^H[1-6]$/.test(tag)) {
-    const text = inlineHtml(element);
-    return text ? { type: "header", data: { text, level: Number(tag[1]) } } : null;
-  }
-  switch (tag) {
-    case "UL":
-    case "OL": {
-      const items = listItems(element);
-      return items.length > 0 ? { type: "list", data: { style: tag === "OL" ? "ordered" : "unordered", items } } : null;
-    }
-    case "BLOCKQUOTE": {
-      const text = inlineHtml(element);
-      return text ? { type: "quote", data: { text, caption: "" } } : null;
-    }
-    case "PRE": {
-      const code = element.textContent ?? "";
-      return code.trim() ? { type: "code", data: { code } } : null;
-    }
-    case "TABLE": {
-      const content = Array.from(element.querySelectorAll("tr")).map((row) => Array.from(row.children).map((cell) => inlineHtml(cell)));
-      return content.length > 0 ? { type: "table", data: { content } } : null;
-    }
-    case "HR":
-      return { type: "delimiter", data: {} };
-    case "IMG":
-    case "FIGURE":
-      return imageBlock(element);
-    case "P":
-      return paragraphBlock(inlineHtml(element));
-    default:
-      return undefined;
-  }
-}
-
-function imageBlock(element: Element): BlockLike | null {
-  const image = element.tagName === "IMG" ? element : element.querySelector("img");
-  const src = image?.getAttribute("src") ?? "";
-  const caption = element.tagName === "FIGURE" ? (element.querySelector("figcaption")?.textContent ?? "") : "";
-  if (!isSafeUrl(src) && !isSiteRelativeUrl(src)) return null;
-  return { type: "image", data: { file: { url: src, id: "" }, caption: caption.trim(), alt: image?.getAttribute("alt") ?? "" } };
-}
-
-/** Turns the top-level nodes of a cleaned clipboard tree into blocks. */
-function nodesToBlocks(nodes: Node[], blocks: BlockLike[], pending: string[]): void {
-  const flushPending = () => {
-    const paragraph = pending.length > 0 ? paragraphBlock(pending.join("")) : null;
-    if (paragraph) blocks.push(paragraph);
-    pending.length = 0;
-  };
-  for (const node of nodes) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      if (node.textContent) pending.push(escapeHtml(node.textContent));
-      continue;
-    }
-    if (node.nodeType !== Node.ELEMENT_NODE) continue;
-    const element = node as Element;
-    if (!hasBlockDescendant(element)) {
-      pending.push(element.outerHTML);
-      continue;
-    }
-    flushPending();
-    const block = elementBlock(element);
-    if (block) blocks.push(block);
-    else if (block === undefined) {
-      // Containers: recurse into their children
-      nodesToBlocks(Array.from(element.childNodes), blocks, pending);
-      flushPending();
-    }
-  }
-  flushPending();
 }
 
 /** Parses clipboard HTML into either an inline fragment or blocks, every piece sanitized. */
@@ -209,10 +98,9 @@ export function parsePastedHtml(html: string, sanitizer: HtmlSanitizer): PastedC
     const inline = stripEdges(sanitizer.sanitize(body.innerHTML), ["\n", "<br>"]);
     return { inline, blocks: [] };
   }
-  const blocks: BlockLike[] = [];
-  nodesToBlocks(nodes, blocks, []);
-  cleanBlocks(blocks, sanitizer);
-  return { inline: null, blocks };
+  const blocks = htmlToBlocks(body, { listNesting: "alternate", sanitize: html => sanitizer.sanitize(html) });
+  return { inline: null, blocks: blocks.filter(block => block.type !== "paragraph" || block.data.text)
+    .map(({ type, data }) => ({ type, data })) };
 }
 
 /** Cleans in place every rich text a block carries: text, list items, table cells, raw HTML. */

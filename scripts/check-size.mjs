@@ -7,11 +7,11 @@ import { gzipSync } from "node:zlib";
 // tokens: 23.9 KB including the scoped shapes and opt-in profile Button radius scale, the ELEA Sans declarations, scoped colour roles, local feedback aliases and the optional brand generator, three
 // prebuilt CSS editions with paired palettes and control proportions and depth, motion tokens, the Tailwind v3 presets, the shadcn/ui aliases and the
 // cascade layer every sheet states, with scoped appearance color pairs and portal-compatible brand classes.
-// content: 29.3 KB including the English and French crop format and corner labels. The Markdown parser and
+// content includes HTML field conversion, the clipboard block parser and both message catalogues. The Markdown parser and
 // serializer compress separately so the editor can load the serializer with its Markdown mode.
 // content-viewer: 12.75 KB including checklists, the core entry, the viewer without a bundled sanitizer and the
 // one-import bundle beside the layered sheet.
-// content-editor: 76.3 KB including original-image editing, the lazy crop format adapter, checklists that tick, the animated mode picker and add menu, direct toolbar insertion,
+// content-editor includes the document character limit, original-image editing, the lazy crop format adapter, checklists that tick, the animated mode picker and add menu, direct toolbar insertion,
 // inline media editing, upload status reported by the host and sanitized clipboard blocks trimmed
 // without backtracking, in small modules that each compress alone, the one-import bundle and the
 // theme its open body surfaces track from the editor. It also holds the parts loaded on demand and what
@@ -21,7 +21,7 @@ import { gzipSync } from "node:zlib";
 // the package can grow by components without any of them growing unnoticed. This includes scoped
 // control tokens, independent feedback fills and foregrounds with local host fallbacks,
 // the font on standalone controls and surfaces, and the optional Tabs presentations.
-const BUDGETS = { tokens: 23_900, content: 29_300, "content-viewer": 12_800, media: 8_200, "content-editor": 76_300 };
+const BUDGETS = { tokens: 23_900, content: 32_800, "content-viewer": 12_800, media: 8_200, "content-editor": 78_850 };
 const referencePaletteFiles = new Set(["palette.js", "palette.css", "color-themes.js"]);
 // The optional atlas includes nine sets of component shapes, thirteen colour schemes and five surface scales.
 const referencePaletteBudget = 6_225;

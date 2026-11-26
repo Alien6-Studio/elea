@@ -26,7 +26,7 @@ const LINE_BREAKING_TAG = /^(?:br\b|\/(?:p|div|li|h[1-6]|blockquote|tr|pre)\b)/;
  * catastrophic backtracking). Line-breaking tags become newlines so that text keeps its
  * paragraphs. A `<` that does not start a tag, or never closes, is kept as text.
  */
-export function stripHtmlTags(html: string): string {
+export function stripHtmlTags(html: string, lineBreaks = true): string {
   let out = "";
   let index = 0;
   while (index < html.length) {
@@ -43,7 +43,7 @@ export function stripHtmlTags(html: string): string {
       break;
     }
     const tag = html.slice(index + 1, end).trim().toLowerCase();
-    if (LINE_BREAKING_TAG.test(tag)) out += "\n";
+    if (lineBreaks && LINE_BREAKING_TAG.test(tag)) out += "\n";
     index = end + 1;
   }
   return out;
@@ -52,11 +52,13 @@ export function stripHtmlTags(html: string): string {
 export interface HtmlToTextOptions {
   /** Collapse runs of whitespace into one space and trim; defaults to true. */
   collapseWhitespace?: boolean;
+  /** Include line breaks introduced by HTML elements. Defaults to true. */
+  lineBreaks?: boolean;
 }
 
 /** Plain text of an HTML fragment: tags removed, entities decoded. */
 export function htmlToText(html: string, options: HtmlToTextOptions = {}): string {
-  const text = decodeHtmlEntities(stripHtmlTags(html));
+  const text = decodeHtmlEntities(stripHtmlTags(html, options.lineBreaks));
   return options.collapseWhitespace === false ? text : text.replaceAll(/\s+/g, " ").trim();
 }
 

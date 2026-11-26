@@ -3,7 +3,7 @@
 import { en } from "@alien6-studio/elea-content";
 import { Select } from "@alien6-studio/elea-ui";
 import type { ReactNode, RefObject } from "react";
-import { BoldIcon, EraserIcon, ItalicIcon, LinkIcon, QuoteIcon, UnderlineIcon } from "./icons.js";
+import { BoldIcon, EraserIcon, ItalicIcon, LinkIcon, ListIcon, OrderedListIcon, QuoteIcon, UnderlineIcon } from "./icons.js";
 import type { ListCommand } from "./listCommands.js";
 import { useContentServices } from "./provider.js";
 import type { ActiveFormats, RichTextFieldHandle } from "./RichTextField.js";
@@ -81,8 +81,8 @@ export function Toolbar({ editorRef, activeFormats, inline = false, compactHeadi
       {button(messages.toolbar.italic, () => editorRef.current?.applyInlineFormat("em"), <ItalicIcon />, activeFormats.italic)}
       {button(messages.toolbar.underline, () => editorRef.current?.applyInlineFormat("u"), <UnderlineIcon />, activeFormats.underline)}
       <span className="elea-toolbar__separator" />
-      {button(messages.toolbar.bulletList, () => editorRef.current?.applyListFormat("ul"), <span className="elea-toolbar__text">●</span>, activeFormats.ul)}
-      {button(messages.toolbar.orderedList, () => editorRef.current?.applyListFormat("ol"), <span className="elea-toolbar__text">1.</span>, activeFormats.ol)}
+      {button(messages.toolbar.bulletList, () => editorRef.current?.applyListFormat("ul"), <ListIcon />, activeFormats.ul)}
+      {button(messages.toolbar.orderedList, () => editorRef.current?.applyListFormat("ol"), <OrderedListIcon />, activeFormats.ol)}
       <span className="elea-toolbar__separator" />
       {!compactHeadings && HEADINGS.map(tag =>
         button(messages.toolbar[tag], () => editorRef.current?.applyBlockFormat(tag), <span className="elea-toolbar__text">{tag.toUpperCase()}</span>, activeFormats[tag]),

@@ -18,7 +18,7 @@ export interface HtmlSerializerOptions {
   registry?: BlockRegistry;
 }
 
-function escapeHtml(text: string): string {
+export function escapeHtml(text: string): string {
   return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 
@@ -27,7 +27,7 @@ function plainText(html: string): string {
   return escapeHtml(htmlToText(html, { collapseWhitespace: false }).trim()).replaceAll("\n", "<br>");
 }
 
-function safe(url: string | undefined): string | null {
+export function safeUrl(url: string | undefined): string | null {
   if (!url) return null;
   const trimmed = url.trim();
   return isSafeUrl(trimmed) || isSiteRelativeUrl(trimmed) ? trimmed : null;
@@ -62,14 +62,18 @@ function listHtml(items: readonly ListItem[], style: ListStyle, clean: (html: st
  * `sanitize`, and is reduced to plain text when no sanitizer is given.
  */
 export function documentToHtml(document: Pick<EleaDocument, "blocks">, options: HtmlSerializerOptions = {}): string {
+  return `<div class="elea-content">${serializeBlocks(document.blocks, options, true)}</div>`;
+}
+
+export function serializeBlocks(blocks: readonly BlockLike[], options: HtmlSerializerOptions, viewer: boolean): string {
   const clean = options.sanitize ?? plainText;
   const resolve = options.resolveAssetUrl ?? ((file: { url: string; id: string }) => file.url || file.id);
   const parts: string[] = [];
-  for (const block of document.blocks as BlockLike[]) {
-    const html = blockToHtml(block, clean, resolve, options.registry);
-    if (html) parts.push(`<div class="elea-block elea-block--${escapeHtml(block.type)}" data-elea-block-type="${escapeHtml(block.type)}">${html}</div>`);
+  for (const block of blocks) {
+    const html = blockToHtml(block, clean, resolve, options.registry, viewer);
+    if (html) parts.push(viewer ? `<div class="elea-block elea-block--${escapeHtml(block.type)}" data-elea-block-type="${escapeHtml(block.type)}">${html}</div>` : html);
   }
-  return `<div class="elea-content">${parts.join("")}</div>`;
+  return !viewer && parts.length === 1 && parts[0] === "<p></p>" ? "" : parts.join("");
 }
 
 type Clean = (html: string) => string;
@@ -78,6 +82,11 @@ type Data = Record<string, unknown>;
 
 const figcaption = (caption: string | undefined) => caption ? `<figcaption class="elea-caption">${escapeHtml(caption)}</figcaption>` : "";
 
+function paragraphHtml(text: string, viewer: boolean): string | null {
+  if (!viewer) return `<p>${text}</p>`;
+  return text ? `<div class="elea-paragraph">${text}</div>` : null;
+}
+
 function quoteHtml(quote: QuoteData, clean: Clean): string | null {
   if (!quote.text && !quote.caption) return null;
   const caption = quote.caption ? `<cite class="elea-quote__caption">— ${escapeHtml(quote.caption)}</cite>` : "";
@@ -85,20 +94,20 @@ function quoteHtml(quote: QuoteData, clean: Clean): string | null {
 }
 
 function imageHtml(image: ImageData, resolve: Resolve): string | null {
-  const source = image.file?.url || image.file?.id ? safe(resolve(image.file)) : null;
+  const source = image.file?.url || image.file?.id ? safeUrl(resolve(image.file)) : null;
   if (!source) return null;
   return `<figure class="elea-figure elea-figure--image"><img src="${escapeHtml(source)}" alt="${escapeHtml(image.alt ?? image.caption ?? "")}" class="elea-image" loading="lazy">${figcaption(image.caption)}</figure>`;
 }
 
 function videoHtml(video: VideoData): string | null {
-  const url = safe(video.url);
+  const url = safeUrl(video.url);
   if (!url || !getVideoEmbedUrl(url)) return null;
   return `<figure class="elea-figure elea-figure--video"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(video.caption || url)}</a>${figcaption(video.caption)}</figure>`;
 }
 
 function attachmentHtml(attachment: AttachmentData, resolve: Resolve): string | null {
   if (!attachment.resourceId || !attachment.title) return null;
-  const href = safe(attachment.url) ?? (attachment.file && (attachment.file.url || attachment.file.id) ? safe(resolve(attachment.file)) : null);
+  const href = safeUrl(attachment.url) ?? (attachment.file && (attachment.file.url || attachment.file.id) ? safeUrl(resolve(attachment.file)) : null);
   const description = attachment.description ? `<span class="elea-attachment__description">${escapeHtml(attachment.description)}</span>` : "";
   const body = `<span class="elea-attachment__title">${escapeHtml(attachment.title)}</span>${description}`;
   const link = href
@@ -120,13 +129,11 @@ function tableHtml(data: Data, clean: Clean): string | null {
 
 const dataOf = (block: BlockLike) => (typeof block.data === "object" && block.data !== null ? block.data : {}) as Data;
 
-function blockToHtml(block: BlockLike, clean: Clean, resolve: Resolve, registry: BlockRegistry | undefined): string | null {
+function blockToHtml(block: BlockLike, clean: Clean, resolve: Resolve, registry: BlockRegistry | undefined, viewer: boolean): string | null {
   const data = dataOf(block);
   switch (block.type) {
-    case "paragraph": {
-      const text = clean(asText(data.text));
-      return text ? `<div class="elea-paragraph">${text}</div>` : null;
-    }
+    case "paragraph":
+      return paragraphHtml(clean(asText(data.text)), viewer);
     case "header": {
       const level = Math.min(6, Math.max(1, Number(data.level) || 2));
       const text = clean(asText(data.text));

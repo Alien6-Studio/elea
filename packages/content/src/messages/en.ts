@@ -1,6 +1,7 @@
 /** English messages of the viewer and editor; the reference shape of `EleaMessages`. */
 export const en = {
   editor: {
+    characterCount: "{count} / {max} characters",
     titlePlaceholder: "Your content title...",
     summaryPlaceholder: "Describe your content in a few words...",
     startWriting: "Start writing...",

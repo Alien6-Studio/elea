@@ -1,10 +1,11 @@
 "use client";
 
-import { applyLinkTarget, documentToHtml, resolveLinkUrl, type BlockLike } from "@alien6-studio/elea-content";
-import { parseClipboard } from "./paste.js";
+import { applyLinkTarget, documentToHtml, resolveLinkUrl, type HtmlSanitizer, type BlockLike } from "@alien6-studio/elea-content";
+import { parseClipboard, type PastedContent } from "./paste.js";
 import { copyBlock } from "./selection.js";
-import { editableHtml } from "./caret.js";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState, type ClipboardEvent, type CompositionEvent, type CSSProperties, type FocusEvent, type KeyboardEvent } from "react";
+import { TextLimitContext, clipMarkup, fitPastedBlocks, inputText } from "./editorTextLimit.js";
+import { editableHtml, selectionOffsets, textPoint } from "./caret.js";
+import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef, useState, type ClipboardEvent, type CompositionEvent, type CSSProperties, type FocusEvent, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import { useSurfaceScope } from "@alien6-studio/elea-ui";
 import { CheckIcon, CloseIcon } from "./icons.js";
@@ -280,6 +281,20 @@ function splitFragmentIntoLines(fragment: DocumentFragment): Node[][] {
   return lines;
 }
 
+function paragraphText(block: BlockLike | undefined) {
+  return block?.type === "paragraph" ? (block.data as { text?: string } | undefined)?.text : undefined;
+}
+
+function inlinePaste(paste: PastedContent, acceptsBlocks: boolean, sanitizer: HtmlSanitizer) {
+  if (paste.inline !== null) return paste.inline;
+  const first = paragraphText(paste.blocks[0]);
+  if (paste.blocks.length === 1 && first !== undefined) return first;
+  if (acceptsBlocks || !paste.blocks.length) return null;
+  // A list or standalone rich field keeps the whole paste inside its editable surface.
+  if (paste.blocks.every(block => paragraphText(block) !== undefined)) return paste.blocks.map(paragraphText).join("<br>");
+  return documentToHtml({ blocks: paste.blocks.map(copyBlock) }, { sanitize: html => sanitizer.sanitize(html) });
+}
+
 /** Pasted lines join in a field of one line. */
 const pastedLine = (html: string, single?: boolean) => (single ? html.replaceAll(/<br\s*\/?>/gi, " ") : html);
 
@@ -297,6 +312,10 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
   const effectivePlaceholder = placeholder ?? messages.editor.startWriting;
   const editorRef = useRef<HTMLDivElement>(null);
   const isComposingRef = useRef(false);
+  const beforeEdit = useRef<[number, number] | undefined>(undefined);
+  const textLimit = useContext(TextLimitContext);
+  const limitRef = useRef(textLimit);
+  limitRef.current = textLimit;
   const lastValueRef = useRef(value);
   const lastSelectionRef = useRef<Range | null>(null);
   // Commands run from memoized callbacks and from the imperative handle: they read the
@@ -439,8 +458,24 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
   const handleInput = () => {
     const editor = editorRef.current;
     if (!editor) return;
-    if (applyInputRule(editor)) return;
+    const limit = limitRef.current;
+    if (limit && isComposingRef.current) return;
     const html = editableHtml(editor);
+    if (limit && inputText(html).length > inputText(lastValueRef.current).length + limit.remaining) {
+      applyValue(lastValueRef.current);
+      const selection = editor.ownerDocument.getSelection();
+      if (beforeEdit.current && selection) {
+        const range = editor.ownerDocument.createRange();
+        range.setStart(...textPoint(editor, beforeEdit.current[0]));
+        range.setEnd(...textPoint(editor, beforeEdit.current[1]));
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+      beforeEdit.current = undefined;
+      return;
+    }
+    beforeEdit.current = undefined;
+    if (applyInputRule(editor)) return;
     lastValueRef.current = html;
     latest.current.onChange(html);
     reportSlash(editor);
@@ -479,18 +514,14 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
     if (!editor || !selection || !range) return;
     const { sanitizer: currentSanitizer, onInsertBlocks: insertBlocks } = latest.current;
     const pasted = parseClipboard(event.clipboardData, currentSanitizer);
+    const limit = limitRef.current;
+    const capacity = (limit?.remaining ?? Infinity) + range.toString().length;
+    if (limit) pasted.blocks = fitPastedBlocks(pasted.blocks, capacity, limit.text);
     const [first, ...rest] = pasted.blocks;
-    const text = (block: BlockLike | undefined) => block?.type === "paragraph" ? (block.data as { text?: string } | undefined)?.text : undefined;
-    const firstText = text(first);
-    let inline = pasted.inline;
-    if (first && !rest.length && typeof firstText === "string") inline = firstText;
-    if (inline === null && first && !insertBlocks) {
-      // A list item or standalone rich field has no sibling block insertion callback.
-      inline = pasted.blocks.every(block => typeof text(block) === "string")
-        ? pasted.blocks.map(text).join("<br>")
-        : documentToHtml({ blocks: pasted.blocks.map(copyBlock) }, { sanitize: html => currentSanitizer.sanitize(html) });
-    }
+    const firstText = paragraphText(first);
+    let inline = inlinePaste(pasted, !!insertBlocks, currentSanitizer);
     if (inline !== null) {
+      if (limit && inputText(inline).length > capacity) inline = clipMarkup(inline, capacity);
       if (!inline) return;
       insertInlineHtml(currentSanitizer.sanitize(pastedLine(inline, latest.current.singleLine)), range, selection);
       handleInput();
@@ -927,6 +958,12 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
     if (!editor) return;
     const onBeforeInput = (event: InputEvent) => {
       if (!event.cancelable || event.defaultPrevented || event.isComposing || isComposingRef.current) return;
+      const limit = limitRef.current;
+      if (limit) beforeEdit.current = selectionOffsets(editor, editorRange());
+      if (limit && event.inputType === "insertText" && event.data && event.data.length > limit.remaining + (editorRange()?.toString().length ?? 0)) {
+        event.preventDefault();
+        return;
+      }
       if (event.inputType !== "insertParagraph" && event.inputType !== "insertLineBreak") return;
       event.preventDefault();
       handleReturn(event.inputType === "insertLineBreak");
@@ -979,7 +1016,10 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
     handleFormattingShortcut(event);
   };
 
-  const handleCompositionStart = () => { isComposingRef.current = true; };
+  const handleCompositionStart = () => {
+    isComposingRef.current = true;
+    if (limitRef.current && editorRef.current) beforeEdit.current = selectionOffsets(editorRef.current, editorRange());
+  };
   const handleCompositionEnd = (event: CompositionEvent) => {
     isComposingRef.current = false;
     if (event.data) handleInput();
@@ -1041,6 +1081,7 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
           aria-multiline="true"
           aria-label={effectivePlaceholder}
           tabIndex={0}
+          aria-describedby={textLimit?.counterId}
           onInput={handleInput}
           onFocus={onFocus}
           onPaste={handlePaste}

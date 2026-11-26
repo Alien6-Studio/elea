@@ -45,6 +45,15 @@ document in Elea's schema, or use the host's save adapter for existing records.
 to the provider and the viewer to keep the default link policy consistent, and the `renderers`
 the published page gives to `ContentView`, so a block of your own previews as it will be read.
 
+### Limit the document body
+
+Set `maxLength={350}` to enforce a plain-text limit across the blocks and show a live character
+counter. The editor counts UTF-16 units like an HTML text input. Spaces count, while rich-text
+markup, block boundaries, the title and the summary are excluded. A paste fills the remaining
+space and accounts for the selection it replaces. If a saved document already exceeds a new
+limit, its content stays available for edits that shorten it. The counter uses the provider’s
+`messages.editor.characterCount` template with `{count}` and `{max}`.
+
 ## Jest in Next.js
 
 This package ships ES modules only. For Jest with `next/jest`, include the editor and the Elea packages it loads in your Next.js config. Browser tests can use the viewer’s [Jest setup for the sanitizer](../content-viewer/README.md#jest-in-nextjs).
@@ -166,6 +175,37 @@ with its `items`, empty when it has no sub-task, as the EditorJS list tool reads
 A heading is one line of rich text: its emphasis and links show as they read and are kept when
 it is saved, and Enter starts a paragraph with what follows the caret. Its selector goes from H1
 to H6 and shows the level the heading came with.
+
+## Editor fields and theming
+
+`width="measure"` is the default reading width. Set `width="full"` when a form or grid
+controls the available space. The same width applies when switching modes or previewing the document.
+
+Set these CSS custom properties on the editor’s container to match the surrounding fields.
+
+| Property | Where it applies | Default |
+| --- | --- | --- |
+| `--elea-control-border` | Resting border on Classic, Markdown and `RichTextInput` | `--elea-color-border-strong` |
+| `--elea-control-radius` | Corners of those frames, including the top of the Classic toolbar | `--elea-radius-lg` |
+| `--elea-color-focus` | Focus ring while editing | Theme focus colour |
+| `--elea-color-selection` | Text selection and selected blocks in the document, mixed at 28% and 12% respectively | `--elea-color-action-primary-ink` |
+| `--elea-editor-canvas-height` | Scrollable Classic canvas and Markdown source area | `clamp(14rem, 52vh, 32rem)` |
+
+```tsx
+<div className="article-form">
+  <ContentEditor mode="classic" width="full" blocks={blocks} onBlocksChange={setBlocks} />
+</div>
+```
+
+```css
+.article-form {
+  --elea-control-border: #8c806e;
+  --elea-control-radius: 12px 4px 12px 4px;
+  --elea-color-focus: #075f60;
+  --elea-color-selection: #268677;
+  --elea-editor-canvas-height: clamp(8rem, 25vh, 15rem);
+}
+```
 
 ## What loads when
 
