@@ -217,7 +217,11 @@ import { createRequire } from "node:module";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { createDocument, defaultRegistry, documentToText, parseDocument, fr } from "@alien6-studio/elea-content";
-import { tokens, toStylesheet, cssVar } from "@alien6-studio/elea-tokens";
+import { tokens, lightTokens, darkTokenOverrides, toStylesheet, cssVar } from "@alien6-studio/elea-tokens";
+import sourceLight from "@alien6-studio/elea-tokens/tokens/elea.tokens.json" with { type: "json" };
+import sourceDark from "@alien6-studio/elea-tokens/tokens/elea.dark.tokens.json" with { type: "json" };
+import exchangeLight from "@alien6-studio/elea-tokens/dtcg/2025.10/elea.tokens.json" with { type: "json" };
+import exchangeDark from "@alien6-studio/elea-tokens/dtcg/2025.10/elea.dark.tokens.json" with { type: "json" };
 import { colorFamilies } from "@alien6-studio/elea-tokens/palette";
 import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ContentView, ContentExcerpt, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
@@ -233,6 +237,19 @@ console.log("react", require("react/package.json").version);
 const doc = parseDocument({ blocks: [{ type: "paragraph", data: { text: "<p>Hi <b>there</b> <img src=\"data:image/png;base64,AA\"></p>" } }, { type: "header", data: { text: "T", level: 2 } }] }, { registry: defaultRegistry });
 assert.equal(documentToText(doc, defaultRegistry), "Hi there\n\nT");
 assert.ok(tokens.length > 50 && toStylesheet(tokens).includes("--elea-color-text-default") && cssVar("space.4") === "var(--elea-space-4)");
+assert.deepEqual(lightTokens, sourceLight);
+assert.deepEqual(darkTokenOverrides, sourceDark);
+assert.equal(sourceLight.space[3].$value, "0.75rem");
+assert.equal(sourceLight.motion.duration.fast.$value, "100ms");
+assert.equal(typeof sourceLight.shadow.md.$value, "string");
+assert.equal(sourceDark.space, undefined);
+for (const exchange of [exchangeLight, exchangeDark]) {
+  assert.deepEqual(exchange.space[3].$value, { value: 0.75, unit: "rem" });
+  assert.deepEqual(exchange.motion.duration.fast.$value, { value: 100, unit: "ms" });
+  assert.equal(exchange.shadow.md.$value.length, 2);
+}
+assert.equal(exchangeLight.color.focus.$value, sourceLight.color.focus.$value);
+assert.equal(exchangeDark.color.focus.$value, sourceDark.color.focus.$value);
 const baseSheet = readFileSync(require.resolve("@alien6-studio/elea-tokens/elea.css"), "utf8");
 for (const role of ["primary", "secondary"]) {
   assert.ok(baseSheet.includes("--elea-color-action-" + role + ": var(--elea-color-" + role + "-500);"));

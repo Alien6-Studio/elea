@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The tokens package adds standalone light and dark DTCG 2025.10 documents under `dtcg/2025.10/`. The [Style Dictionary example](docs/examples/dtcg/qualify.test.mjs) builds CSS from both and checks alias resolution.
 - The classic editor draws its focus ring around the complete frame. Set `--elea-color-focus` and `--elea-color-selection` to brand focus and text selection. Use `width="full"` and `--elea-editor-canvas-height` to fit a form field.
 - `ContentEditor` accepts a plain-text `maxLength` and shows a character counter. Use `htmlToBlocks` when opening an HTML field and `blocksToHtml` when saving it.
 

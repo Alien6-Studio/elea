@@ -1,14 +1,13 @@
 # @alien6-studio/elea-tokens
 
-Design tokens of the Elea design system. The source is a [DTCG](https://tr.designtokens.org/format/)
-JSON file; the package resolves its aliases and emits every form a project needs.
+Design tokens for ELEA, available as CSS, JavaScript and DTCG 2025.10 interchange files.
 
 The JavaScript entry points are ES modules. For Jest with `next/jest`, add `@alien6-studio/elea-tokens` to `transpilePackages` when testing a JavaScript import such as `@alien6-studio/elea-tokens/brand`.
 
 ## What you get
 
-- `tokens/elea.tokens.json` and `tokens/elea.dark.tokens.json`: the light and dark source files
-  for tooling that transforms Elea tokens.
+- `dtcg/2025.10/elea.tokens.json` and `dtcg/2025.10/elea.dark.tokens.json` each contain a complete theme for external design-token tools.
+- `tokens/elea.tokens.json` and `tokens/elea.dark.tokens.json` expose ELEA's original CSS-oriented JSON. The second file contains only overrides and refers back to the first. Existing integrations can keep using these paths.
 - `elea.css`: the runtime stylesheet. Every token is a custom property on `:root`
   (`--elea-color-text-default`, `--elea-space-4`, `--elea-radius-lg`,
   `--elea-motion-duration-base`, `--elea-motion-easing-standard`...); the dark overrides apply
@@ -26,6 +25,35 @@ The JavaScript entry points are ES modules. For Jest with `next/jest`, add `@ali
 - TypeScript: `tokens`, `darkTokens`, `cssVar("color.text.default")` and the functions that
   produce all of the above (`toStylesheet`, `toTailwindTheme`, `toTailwindPreset`,
   `toShadcnAliases`, `toShadcnPreset`) for custom themes.
+
+## DTCG 2025.10 interchange
+
+Choose one document as the input to your tool. Dimensions carry a number and a unit, colors carry sRGB components and alpha, and each shadow layer has its own offsets, blur, spread and color. Aliases retain their named targets so editing a primitive updates the roles that reference it. Both exports target the [DTCG Format](https://www.designtokens.org/tr/2025.10/format/) and [Color](https://www.designtokens.org/tr/2025.10/color/) modules for October 2025.
+
+These export paths were added after 0.1.2. To reproduce the check, use Node.js 22 or later at the root of a checkout that contains them.
+
+```sh
+npm ci
+npm run export:dtcg -w packages/tokens
+npm run test:dtcg
+```
+
+`export:dtcg` writes both JSON files to `packages/tokens/dist/dtcg/2025.10/`. The test installs Style Dictionary 5.8.0 from the example's lockfile, reads the package exports and writes `light.css` and `dark.css` under `artifacts/examples/dtcg/`. It compares every token path, type, computed CSS value and alias target with the source. For example, the `100ms` duration becomes the equivalent `0.1s`, and both layers of `shadow.md` retain their negative spreads.
+
+In the generated light CSS, two declarations show how a primary swatch reaches a button. The example changes that swatch and verifies that both roles take its new color. [Runnable example](../../docs/examples/dtcg/qualify.test.mjs)
+
+```css
+--color-info: var(--color-primary-600);
+--color-action-info: var(--color-info);
+```
+
+The following command uses `uvx` to validate both files against the pinned JSON Schema.
+
+```sh
+uvx --from check-jsonschema==0.39.0 check-jsonschema \
+  --schemafile https://www.designtokens.org/schemas/2025.10/format.json \
+  packages/tokens/dist/dtcg/2025.10/*.tokens.json
+```
 
 ## Use
 

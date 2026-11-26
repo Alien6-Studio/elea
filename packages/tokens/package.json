@@ -1,7 +1,7 @@
 {
   "name": "@alien6-studio/elea-tokens",
   "version": "0.1.2",
-  "description": "Elea design tokens: DTCG source, CSS custom properties, Tailwind v3 preset and v4 theme, shadcn/ui aliases and TypeScript constants",
+  "description": "Elea design tokens: DTCG 2025.10 exports, CSS custom properties, Tailwind v3 preset and v4 theme, shadcn/ui aliases and TypeScript constants",
   "type": "module",
   "sideEffects": [
     "*.css"
@@ -51,12 +51,15 @@
     "./shadcn.css": "./dist/shadcn.css",
     "./tokens/elea.tokens.json": "./tokens/elea.tokens.json",
     "./tokens/elea.dark.tokens.json": "./tokens/elea.dark.tokens.json",
+    "./dtcg/2025.10/elea.tokens.json": "./dist/dtcg/2025.10/elea.tokens.json",
+    "./dtcg/2025.10/elea.dark.tokens.json": "./dist/dtcg/2025.10/elea.dark.tokens.json",
     "./package.json": "./package.json"
   },
   "types": "./dist/src/index.d.ts",
   "main": "./dist/src/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node --import tsx scripts/build-css.ts",
+    "export:dtcg": "node --import tsx scripts/export-dtcg.ts",
+    "build": "tsc -p tsconfig.build.json && node --import tsx scripts/build-css.ts && npm run export:dtcg",
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {},

@@ -1,0 +1,11 @@
+{
+  "name": "elea-dtcg-qualification",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test qualify.test.mjs"
+  },
+  "devDependencies": {
+    "style-dictionary": "5.8.0"
+  }
+}

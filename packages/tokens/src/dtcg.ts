@@ -1,11 +1,11 @@
-/** A leaf of a DTCG token file: `$value` with an optional `$type`. */
+/** An ELEA source token with an optional explicit type. */
 export interface TokenLeaf {
   $type?: string;
   $value: unknown;
   $description?: string;
 }
 
-/** A DTCG token tree: groups nest, leaves carry `$value`. `$schema` and other `$` keys are metadata. */
+/** ELEA's source tree: groups nest, leaves carry `$value` and other `$` keys hold metadata. */
 export interface TokenGroup {
   [key: string]: TokenGroup | TokenLeaf | string | undefined;
 }

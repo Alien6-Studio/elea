@@ -6,9 +6,9 @@ import { cssReference } from "./css.js";
 export { cssDeclarations, cssValue, cssVariableName, inLayer, tailwindVariableName, toShadcnAliases, toShadcnPreset, toStylesheet, toTailwindPreset, toTailwindTheme, type StylesheetOptions, type TailwindPreset } from "./css.js";
 export { flattenTokens, mergeTokens, resolveReference, type FlatToken, type TokenGroup, type TokenLeaf } from "./dtcg.js";
 
-/** The DTCG source of the light theme. */
+/** Light theme, in ELEA's source format. */
 export const lightTokens = base as unknown as TokenGroup;
-/** The DTCG overrides of the dark theme; references resolve against the light tree. */
+/** Dark overrides reference the light tree. */
 export const darkTokenOverrides = dark as unknown as TokenGroup;
 
 /** Every light token, flat, references resolved. */
