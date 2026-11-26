@@ -1,0 +1,119 @@
+.elea-navbar {
+  container: elea-navbar / inline-size;
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  border-block-end: 1px solid var(--elea-color-border-default);
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+  font: var(--elea-font-weight-medium) var(--elea-font-size-sm)/var(--elea-font-leading-normal) var(--elea-font-family-sans);
+}
+.elea-navbar__bar {
+  --_elea-navbar-compact: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--elea-space-2) var(--elea-space-5);
+  padding: var(--elea-space-2) var(--elea-space-4);
+}
+.elea-navbar__brand { min-inline-size: 0; max-inline-size: 100%; overflow-wrap: anywhere; }
+.elea-navbar__panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--elea-space-2) var(--elea-space-4);
+  min-inline-size: 0;
+}
+.elea-navbar .elea-navigation-list { flex-wrap: wrap; gap: var(--elea-space-1); min-inline-size: 0; }
+.elea-navbar .elea-navigation-list__link[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: .13em;
+  text-underline-offset: .35em;
+}
+.elea-navbar__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--elea-space-2);
+  margin-inline-start: auto;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.elea-navbar__persistent {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--elea-space-2);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.elea-navbar__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--elea-space-2);
+  min-block-size: 2.75rem;
+  padding-inline: var(--elea-space-3);
+  border: 1px solid var(--elea-color-border-default);
+  border-radius: var(--elea-shape-control, var(--elea-radius-sm));
+  background: var(--elea-color-surface-default);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.elea-navbar__toggle:hover { background: var(--elea-color-surface-subtle); }
+.elea-navbar__toggle:focus-visible {
+  outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus));
+  outline-offset: 2px;
+}
+.elea-navbar__toggle[hidden], .elea-navbar__panel[hidden] { display: none; }
+
+@container elea-navbar (max-width: 42rem) {
+  .elea-navbar[data-collapse="auto"] > .elea-navbar__bar {
+    --_elea-navbar-compact: 1;
+    column-gap: var(--elea-space-2);
+  }
+  .elea-navbar[data-collapse="auto"] .elea-navbar__brand { flex: 1 1 auto; }
+  .elea-navbar[data-collapse="auto"] .elea-navbar__toggle { margin-inline-start: auto; }
+  .elea-navbar[data-collapse="auto"] .elea-navbar__panel { flex: 1 1 100%; flex-direction: column; align-items: stretch; }
+  .elea-navbar[data-collapse="auto"] .elea-navigation-list { flex-direction: column; }
+  .elea-navbar[data-collapse="auto"] .elea-navbar__actions { margin-inline-start: 0; }
+}
+@container elea-navbar (width > 42rem) {
+  .elea-navbar__panel > .elea-navigation-list > .elea-navigation-list__branch {
+    position: static;
+    display: flex;
+    align-items: flex-start;
+  }
+  .elea-navbar__panel > .elea-navigation-list > .elea-navigation-list__branch > a { margin-inline-end: 0; }
+  .elea-navbar__panel > .elea-navigation-list > li > details > summary:not(.elea-navigation-list__group) { position: static; inline-size: 2rem; }
+  .elea-navbar__panel > .elea-navigation-list > li > details > .elea-navigation-list {
+    --_elea-navbar-list-width: min(100%, 16rem);
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 40;
+    inline-size: var(--_elea-navbar-list-width);
+    inset-inline-start: clamp(0px, var(--_elea-navbar-group-start, 0px), 100% - var(--_elea-navbar-list-width));
+    inset-block-start: calc(var(--_elea-navbar-group-bottom, 100%) + var(--elea-space-1));
+    flex-wrap: nowrap;
+    max-block-size: min(24rem, 60dvh);
+    overflow: auto;
+    margin: 0;
+    padding: var(--elea-space-1);
+    border: 1px solid var(--elea-color-border-default);
+    border-radius: var(--elea-shape-surface, var(--elea-radius-md));
+    background: var(--elea-color-surface-default);
+    box-shadow: var(--elea-shadow-md);
+  }
+  .elea-navbar[data-submenu-layout="columns"] .elea-navbar__panel > .elea-navigation-list > li > details > .elea-navigation-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    align-items: start;
+    inline-size: 100%;
+    inset-inline-start: 0;
+    inset-block-start: 100%;
+    padding: var(--elea-space-3);
+  }
+}

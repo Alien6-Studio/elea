@@ -1,0 +1,36 @@
+.elea-search-field {
+  position: relative;
+  min-inline-size: 0;
+  --_elea-search-inset: var(--elea-control-padding-inline, var(--elea-space-3));
+}
+.elea-search-field .elea-ui-input {
+  appearance: none;
+  padding-inline-start: calc(var(--_elea-search-inset) + 1em + var(--elea-space-2));
+}
+.elea-search-field--clearable .elea-ui-input { padding-inline-end: calc(2rem + var(--elea-space-2)); }
+.elea-search-field input::-webkit-search-cancel-button,
+.elea-search-field input::-webkit-search-decoration { appearance: none; }
+.elea-search-field__icon, .elea-search-field__clear {
+  position: absolute;
+  inset-block: 0;
+  margin-block: auto;
+  color: var(--elea-color-text-muted);
+}
+.elea-search-field__icon { inset-inline-start: var(--_elea-search-inset); pointer-events: none; }
+.elea-search-field__clear {
+  display: grid;
+  place-items: center;
+  inset-inline-end: var(--elea-space-1);
+  inline-size: 2rem;
+  block-size: min(2rem, 100%);
+  border: 0;
+  border-radius: var(--elea-shape-control, var(--elea-radius-sm));
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.elea-search-field__clear:hover { background: var(--elea-color-surface-muted); color: var(--elea-color-text-default); }
+.elea-search-field__clear:focus-visible {
+  outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus));
+  outline-offset: -2px;
+}

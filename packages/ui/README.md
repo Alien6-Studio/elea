@@ -273,6 +273,102 @@ export function ContactNumber() {
 
 The same entry exports `getCountries`, `getCountryCallingCode`, `phoneFormat(country)` and `phoneToE164(value, country)` for custom controls. `phoneToE164` returns `undefined` for an incomplete number. Reachability requires separate verification.
 
+## Page introductions and navigation
+
+Use `Hero` to introduce a page with a heading, supporting copy and optional actions and media.
+The default layout stacks the content. A split hero places the media beside the text when the
+container has room. Use `mediaPosition="start"` to place the image on the leading side of a split.
+For a photographic cover, pass `layout="cover"` and `image`. The copy sits over a theme-aware
+contrast layer. Use the `media` slot for a video, figure or interactive preview. Use `headingLevel`
+when the page already has its main heading.
+
+```tsx
+import { Button, Hero, Navbar, Sidebar } from "@alien6-studio/elea-ui";
+import "@alien6-studio/elea-ui/bundle.css";
+
+const issues = [
+  { id: "current", href: "/issues/current", label: "Current issue" },
+  { id: "archive", href: "/issues", label: "Archive" },
+];
+
+export function IssuePage() {
+  return <>
+    <Navbar label="Primary" menuLabel="Menu" brand={<a href="/">Field notes</a>}
+      items={issues} current="current" />
+    <main>
+      <Hero layout="split" eyebrow="Field notes" heading="At the ice edge"
+        description="A field journal from the glacier."
+        actions={<Button href="#dispatches">Read the dispatches</Button>}
+        image={{ src: "/images/glacier-960.webp", alt: "A blue crevasse in the ice",
+          width: 960, height: 540, srcSet: "/images/glacier-480.webp 480w, /images/glacier-960.webp 960w",
+          sizes: "(min-width: 48rem) 40vw, 100vw" }} />
+      <Sidebar label="In this issue" current="overview"
+        groups={[{ id: "contents", label: "Contents", collapsible: true,
+          items: [{ id: "overview", href: "/issues/current", label: "Overview" },
+                  { id: "map", href: "/issues/current/map", label: "Survey map" }] }]} />
+      <section id="dispatches"><h2>Dispatches</h2></section>
+    </main>
+  </>;
+}
+```
+
+`ResponsiveImage` is also available on its own. Its ref targets the native image. Supply intrinsic
+`width` and `height` to reserve space during loading. Set `srcSet` and `sizes` to describe
+available widths. For a different crop on a phone, pass `sources={[{ media: "(max-width: 36rem)",
+srcSet: "/images/portrait.webp", width: 480, height: 640 }]}`. Use `alt=""` for a decorative image.
+For the initial page's principal image, the host can opt into `fetchPriority="high"`.
+
+Give each navigation landmark a distinct label. When the host changes route, pass the active
+link's ID as `current` so ELEA marks the corresponding link with `aria-current="page"`.
+Supply `children` on a navigation item to create a branch. Omit its `href` to open the group by
+clicking its label or pressing Enter or Space. Add an `href` when the parent is also a destination.
+It then has a separate disclosure which you can name with `disclosureLabel`. Sidebar opens the
+ancestors of the current page.
+On wide bars, Navbar opens a vertical list under its group. Use `submenuLayout="columns"` for a
+full-width panel of destinations. In narrow containers both layouts show subsections in one column.
+Navbar keeps `persistentActions` visible when a narrow layout folds its links into a menu.
+Use `collapse="never"` for a short list that should wrap even before JavaScript loads.
+Both navigation components accept the same `render` link adapter as Button. A ref targets
+the native `nav` for Navbar and Sidebar, and the `section` for Hero. For selective CSS imports,
+load `css/hero.css`, `css/navbar.css` and `css/sidebar.css` from the UI package.
+
+### Search
+
+`SearchField` supplies a native search input, a leading icon and an optional clear button. To filter
+as the user types, pass `value` and `onValueChange`. For a standard GET request, use a named input
+in a form. Clearing an editable query returns focus to the input. The ref and native input attributes
+target the searchbox. Use `className` or `style` to size the wrapper. Import `css/search-field.css`
+when loading individual styles.
+
+```tsx
+import { SearchField } from "@alien6-studio/elea-ui";
+
+<form role="search" action="/search">
+  <SearchField name="q" label="Search the library" placeholder="Find an article" clearLabel="Clear query" />
+</form>
+```
+
+For destination search, use `SearchAutocomplete` and import `css/search-autocomplete.css`.
+The host filters or fetches results and supplies a localized `status` for the pending, empty and
+populated states. The component anchors results at the field. Arrow keys highlight a destination,
+Enter follows it and Escape dismisses the list while preserving the query. Tab leaves the search
+in document order. Destinations are real links and accept Button’s `render` router adapter.
+Set `autoSelectFirst` to highlight the first match as the user types.
+
+```tsx
+import { useState } from "react";
+import { SearchAutocomplete, type SearchResult } from "@alien6-studio/elea-ui";
+
+export function PublicationSearch({ editions }: { editions: SearchResult[] }) {
+  const [query, setQuery] = useState("");
+  const results = editions.filter(item => item.label.toLowerCase().includes(query.toLowerCase()));
+  return <SearchAutocomplete label="Find an edition" clearLabel="Clear query"
+    value={query} onValueChange={setQuery} results={results}
+    status={results.length === 1 ? "1 edition" : results.length + " editions"}
+    autoSelectFirst />;
+}
+```
+
 ## Breadcrumbs
 
 Provide an ordered trail with stable IDs. The last item identifies the current page. Longer trails keep the first and nearest ancestors visible. The disclosure opens the intervening links in order. Use the same `render` adapter as a Button link for client-side navigation.
@@ -462,7 +558,7 @@ companion, built from its own markup so the two cannot drift apart, and a page l
 out the way it lays out the loaded components. The library holds no page-level skeleton, since the
 shape of a page belongs to the application.
 
-`Accordion`, `Avatar`, `Breadcrumb`, `Calendar`, `Carousel`, `ColorPicker`, `Combobox`, `DateField`, `Dialog`, `Input`, `Menu`, `MultiSelect`, `Popover`, `Select`, `Sheet`, `SkeletonRegion`, `Slider`, `Stepper`, `Tabs`, `Textarea`, `ToastProvider` and `Tooltip` carry a `"use client"` boundary. With
+`Accordion`, `Avatar`, `Breadcrumb`, `Calendar`, `Carousel`, `ColorPicker`, `Combobox`, `DateField`, `Dialog`, `Input`, `Menu`, `MultiSelect`, `Navbar`, `Popover`, `SearchAutocomplete`, `SearchField`, `Select`, `Sheet`, `Sidebar`, `SkeletonRegion`, `Slider`, `Stepper`, `Tabs`, `Textarea`, `ToastProvider` and `Tooltip` carry a `"use client"` boundary. With
 React Server Components, keep components with interaction callbacks in a client
 component. Display-only elements like `Badge` can render on the server.
 

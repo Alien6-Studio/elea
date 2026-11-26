@@ -1,0 +1,44 @@
+.elea-sidebar {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  gap: var(--elea-space-5);
+  min-inline-size: 0;
+  padding: var(--elea-space-4);
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-default);
+  font: var(--elea-font-weight-regular) var(--elea-font-size-sm)/var(--elea-font-leading-normal) var(--elea-font-family-sans);
+}
+.elea-sidebar__header, .elea-sidebar__footer { overflow-wrap: anywhere; }
+.elea-sidebar__footer { margin-block-start: auto; padding-block-start: var(--elea-space-3); border-block-start: 1px solid var(--elea-color-border-default); }
+.elea-sidebar__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--elea-space-2);
+  margin: 0;
+  padding: var(--elea-space-2) var(--elea-space-3);
+  color: var(--elea-color-text-muted);
+  font-size: var(--elea-font-size-xs);
+  font-weight: var(--elea-font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+summary.elea-sidebar__label { list-style: none; cursor: pointer; border-radius: var(--elea-shape-control, var(--elea-radius-sm)); }
+summary.elea-sidebar__label::-webkit-details-marker { display: none; }
+summary.elea-sidebar__label:hover { background: var(--elea-color-surface-subtle); }
+summary.elea-sidebar__label:focus-visible {
+  outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus));
+  outline-offset: 2px;
+}
+.elea-sidebar__label > svg { flex: none; }
+.elea-sidebar__group:not([open]) > summary svg { transform: rotate(-90deg); }
+.elea-sidebar__group:not([open]) > summary:dir(rtl) svg { transform: rotate(90deg); }
+.elea-sidebar .elea-navigation-list { flex-direction: column; gap: var(--elea-space-1); }
+.elea-sidebar .elea-navigation-list__link { border-inline-start: 2px solid transparent; }
+.elea-sidebar .elea-navigation-list__link[aria-current="page"] {
+  background: var(--elea-color-surface-subtle);
+  border-inline-start-color: currentColor;
+}
+@media (pointer: coarse) {
+  summary.elea-sidebar__label { box-sizing: border-box; min-block-size: 2.75rem; }
+}

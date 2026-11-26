@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-ui",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Elea UI primitives for React: buttons, fields, cards, tables, alerts, toasts, dialogs, sheets, popovers, menus, tabs and more, styled with Elea tokens only",
   "type": "module",
   "sideEffects": [
@@ -55,17 +55,24 @@
     "./css/field.css": "./dist/css/field.css",
     "./css/identifier-input.css": "./dist/css/identifier-input.css",
     "./css/footer.css": "./dist/css/footer.css",
+    "./css/hero.css": "./dist/css/hero.css",
     "./css/menu.css": "./dist/css/menu.css",
     "./css/motion.css": "./dist/css/motion.css",
     "./css/multi-select.css": "./dist/css/multi-select.css",
+    "./css/navbar.css": "./dist/css/navbar.css",
+    "./css/navigation-list.css": "./dist/css/navigation-list.css",
     "./css/pagination.css": "./dist/css/pagination.css",
     "./css/phone-input.css": "./dist/css/phone-input.css",
     "./css/popover.css": "./dist/css/popover.css",
     "./css/progress.css": "./dist/css/progress.css",
     "./css/radio-group.css": "./dist/css/radio-group.css",
+    "./css/responsive-image.css": "./dist/css/responsive-image.css",
+    "./css/search-autocomplete.css": "./dist/css/search-autocomplete.css",
+    "./css/search-field.css": "./dist/css/search-field.css",
     "./css/select.css": "./dist/css/select.css",
     "./css/separator.css": "./dist/css/separator.css",
     "./css/sheet.css": "./dist/css/sheet.css",
+    "./css/sidebar.css": "./dist/css/sidebar.css",
     "./css/skeleton.css": "./dist/css/skeleton.css",
     "./css/slider.css": "./dist/css/slider.css",
     "./css/stepper.css": "./dist/css/stepper.css",
@@ -82,7 +89,7 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-tokens": "^0.1.2"
+    "@alien6-studio/elea-tokens": "^0.1.3"
   },
   "peerDependencies": {
     "libphonenumber-js": "^1.13.17",

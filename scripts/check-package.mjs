@@ -227,7 +227,7 @@ import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ContentView, ContentExcerpt, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { DropZone, cropRect } from "@alien6-studio/elea-media";
 import { ibanFormat, paymentCardFormat, sirenFormat, siretFormat } from "@alien6-studio/elea-ui/formats";
-import { Breadcrumb, Button, Calendar, CardNumberInput, Carousel, ColorPicker, Combobox, DateField, Dialog, Footer, IbanInput, Input, MultiSelect, SirenInput, SiretInput, Stepper, Textarea, StepperPanel, StepperSkeleton } from "@alien6-studio/elea-ui";
+import { Breadcrumb, Button, Calendar, CardNumberInput, Carousel, ColorPicker, Combobox, DateField, Dialog, Footer, Hero, IbanInput, Input, MultiSelect, Navbar, ResponsiveImage, SearchAutocomplete, SearchField, Sidebar, SirenInput, SiretInput, Stepper, Textarea, StepperPanel, StepperSkeleton } from "@alien6-studio/elea-ui";
 import { JSDOM } from "jsdom";
 
 const require = createRequire(import.meta.url);
@@ -333,6 +333,34 @@ const overLimit = renderToString(React.createElement(Textarea, { defaultValue: "
 assert.ok(overLimit.includes('aria-invalid="true"') && overLimit.includes("5 / 2"), overLimit);
 const footer = renderToString(React.createElement(Footer, { groups: [{ label: "Project", links: [{ label: "Docs", href: "/docs" }] }] }));
 assert.ok(footer.startsWith("<footer") && footer.includes('aria-label="Project"') && footer.includes('href="/docs"'), footer);
+const guideLinks = [{ id: "guide", label: "Guide", href: "/guide" }];
+const layout = new JSDOM(renderToString(React.createElement(React.Fragment, null,
+  React.createElement(Navbar, { label: "Primary", menuLabel: "Menu", items: guideLinks, current: "guide" }),
+  React.createElement(Hero, { heading: "Guide", headingLevel: "h2" }),
+  React.createElement(ResponsiveImage, { src: "/cover.jpg", alt: "Cover", width: 800, height: 450,
+    fetchPriority: "high", sources: [{ media: "(max-width: 32rem)", srcSet: "/portrait.jpg", width: 400, height: 600 }] }),
+  React.createElement(SearchAutocomplete, { label: "Find editions", value: "", results: [], status: "", onValueChange() {} }),
+  React.createElement(SearchField, { name: "q", label: "Search the guide", defaultValue: "guide" }),
+  React.createElement(Sidebar, { label: "Contents", groups: [{ id: "start", label: "Start here", items: guideLinks }], current: "guide" }),
+)));
+const layoutDocument = layout.window.document;
+assert.equal(layoutDocument.querySelector('input[type="search"][name="q"]').value, "guide");
+assert.equal(layoutDocument.querySelector("picture source").getAttribute("srcset"), "/portrait.jpg");
+assert.equal(layoutDocument.querySelector("picture img").getAttribute("fetchpriority"), "high");
+assert.equal(layoutDocument.querySelector('input[role="combobox"]').getAttribute("aria-expanded"), "false");
+const headingId = layoutDocument.querySelector("section").getAttribute("aria-labelledby");
+assert.equal(layoutDocument.getElementById(headingId).tagName, "H2");
+for (const name of ["Primary", "Contents"]) {
+  const active = layoutDocument.querySelector('nav[aria-label="' + name + '"] a[aria-current="page"]');
+  assert.equal(active?.getAttribute("href"), "/guide");
+}
+layout.window.close();
+for (const component of ["hero", "navbar", "sidebar", "search-autocomplete", "responsive-image"]) {
+  const css = readFileSync(require.resolve("@alien6-studio/elea-ui/css/" + component + ".css"), "utf8");
+  assert.ok(css.includes(".elea-" + component));
+  if (component === "navbar" || component === "sidebar") assert.ok(css.includes(".elea-navigation-list__link"));
+  if (component === "search-autocomplete") assert.ok(css.includes(".elea-search-field__icon"));
+}
 
 // ContentEditor in a browser-like DOM, the client entry points behind "use client"
 const dom = new JSDOM("<!doctype html><html><body><div id=root></div></body></html>", { url: "https://example.org/" });

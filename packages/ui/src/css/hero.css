@@ -1,0 +1,100 @@
+.elea-hero {
+  container: elea-hero / inline-size;
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  font-family: var(--elea-font-family-sans);
+  color: var(--elea-color-text-default);
+}
+.elea-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(var(--elea-space-5), 5cqi, var(--elea-space-12));
+  padding-block: clamp(var(--elea-space-6), 5cqi, var(--elea-space-12));
+}
+@container elea-hero (min-width: 36rem) {
+  .elea-hero--split > .elea-hero__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+  .elea-hero--media-start .elea-hero__copy { grid-area: 1 / 2; }
+  .elea-hero--media-start .elea-hero__media { grid-area: 1 / 1; }
+}
+.elea-hero__copy {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--elea-space-4);
+  overflow-wrap: anywhere;
+}
+.elea-hero__eyebrow {
+  color: var(--elea-color-text-link);
+  font-size: var(--elea-font-size-sm);
+  font-weight: var(--elea-font-weight-semibold);
+}
+.elea-hero__heading {
+  margin: 0;
+  max-inline-size: 18ch;
+  font-size: clamp(var(--elea-font-size-3xl), 7.5cqi, calc(var(--elea-font-size-5xl) * 1.5));
+  line-height: 1.05;
+  letter-spacing: -.045em;
+  font-weight: var(--elea-font-weight-semibold);
+  text-wrap: balance;
+}
+.elea-hero__description {
+  max-inline-size: 54ch;
+  font-size: var(--elea-font-size-lg);
+  line-height: var(--elea-font-leading-relaxed);
+  color: var(--elea-color-text-muted);
+}
+.elea-hero__description > :first-child { margin-block-start: 0; }
+.elea-hero__description > :last-child { margin-block-end: 0; }
+.elea-hero__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--elea-density-action-gap, var(--elea-space-3));
+  margin-block-start: var(--elea-space-2);
+}
+.elea-hero__media { min-inline-size: 0; }
+.elea-hero__media > figure { margin: 0; }
+.elea-hero__media > :where(img, video, picture),
+.elea-hero__media > figure > :where(img, video, picture),
+.elea-hero__media > picture > img,
+.elea-hero__media > figure > picture > img {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+.elea-hero--cover > .elea-hero__inner {
+  position: relative;
+  isolation: isolate;
+  padding: 0;
+  grid-template-rows: minmax(clamp(6rem, 18cqi, 12rem), 1fr) auto;
+  gap: 0;
+  min-block-size: clamp(23rem, 60cqi, 38rem);
+  align-items: end;
+  overflow: clip;
+  border-radius: var(--elea-shape-surface, var(--elea-radius-lg));
+  background: var(--elea-color-surface-inverse);
+}
+.elea-hero--cover .elea-hero__media { position: absolute; inset: 0; z-index: -1; }
+.elea-hero--cover .elea-hero__media :is(picture, img) { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
+.elea-hero--cover .elea-hero__copy {
+  grid-row: 2;
+  --_elea-hero-shade: color-mix(in srgb, var(--elea-color-surface-inverse) 90%, transparent);
+  position: relative;
+  padding: clamp(var(--elea-space-4), 4cqi, var(--elea-space-10));
+  background: linear-gradient(to top, var(--elea-color-surface-inverse), var(--_elea-hero-shade));
+  color: var(--elea-color-text-inverse);
+}
+.elea-hero--cover .elea-hero__copy::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 100%;
+  block-size: clamp(var(--elea-space-8), 12cqi, 7rem);
+  background: linear-gradient(to top, var(--_elea-hero-shade), transparent);
+  pointer-events: none;
+}
+.elea-hero--cover :is(.elea-hero__eyebrow, .elea-hero__heading, .elea-hero__description, .elea-hero__description a) { color: inherit; }

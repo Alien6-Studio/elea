@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.1.3 - 2026-11-26
+
+- Add `Hero`, `Navbar` and `Sidebar` to the UI package, with photographic covers, nested links, disclosure-only groups and host router adapters. Navbar submenus open as vertical lists or optional full-width columns.
+- Add `SearchField` for live filtering and native search forms, with an optional localized clear button, and `SearchAutocomplete` for inline destination suggestions.
+- Add `ResponsiveImage` for responsive sources and art direction, usable directly or through Hero and CardImage.
 
 - Set `data-elea-density` on a region to coordinate controls, field spacing, menus and table rows. The optional `@alien6-studio/elea-tokens/typography.css` stylesheet adds seven interface type roles.
 - Stepper, StepperPanel and StepperSkeleton forward native root attributes and refs. With motion on, Dialog and Sheet animate their exit. Focus and page scroll return immediately, and reopening interrupts the exit. Six motion intentions can be tuned independently.

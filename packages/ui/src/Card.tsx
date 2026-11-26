@@ -1,6 +1,7 @@
 import { forwardRef, type HTMLAttributes, type ImgHTMLAttributes, type ReactNode } from "react";
 import { cx } from "./cx.js";
 import { Skeleton } from "./Skeleton.js";
+import { renderImage, type ResponsiveImageSource } from "./ResponsiveImage.js";
 
 export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, "className"> {
   variant?: "outline" | "elevated" | "subtle" | undefined;
@@ -21,10 +22,11 @@ export interface CardPartProps extends Omit<HTMLAttributes<HTMLElement>, "classN
 
 export interface CardImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   alt: string;
+  sources?: readonly ResponsiveImageSource[] | undefined;
 }
 
 export const CardImage = forwardRef<HTMLImageElement, CardImageProps>(function CardImage({ className, alt, ...rest }, ref) {
-  return <img {...rest} alt={alt} ref={ref} className={cx("elea-card__image", className)} />;
+  return renderImage({ ...rest, alt, className: cx("elea-card__image", className) }, ref);
 });
 
 export interface CardTitleProps extends CardPartProps {

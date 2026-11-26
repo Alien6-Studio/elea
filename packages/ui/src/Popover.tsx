@@ -4,13 +4,11 @@ import { useEffect, useId, useRef, useState, type FocusEvent, type KeyboardEvent
 import { Button } from "./Button.js";
 import { useConfirmField, type ConfirmField } from "./ConfirmField.js";
 import { cycleFocus, entryOf, type ConfirmTone } from "./Dialog.js";
+import { asElement, isAnchorGone, placePanel, type PopoverAnchor, type Side, type Align } from "./panelPosition.js";
 import { cx } from "./cx.js";
 
 /** What a panel is placed against: an element, or the rectangle of one for hosts that only kept coordinates. */
-export type PopoverAnchor = HTMLElement | { getBoundingClientRect(): DOMRect };
-
-type Side = "bottom" | "top";
-type Align = "start" | "center" | "end";
+export type { PopoverAnchor } from "./panelPosition.js";
 
 interface PopoverPlacement {
   /** Preferred side: the panel moves to the other one when this one lacks room. */
@@ -45,48 +43,10 @@ export interface PopoverAnchorProps extends PopoverContent {
 
 export type PopoverProps = PopoverTriggerProps | PopoverAnchorProps;
 
-// Pixels between the panel and its anchor, and between the panel and the viewport edges.
-const GAP = 8;
-const EDGE = 8;
-
-const asElement = (anchor: PopoverAnchor | null | undefined) => (anchor && "nodeType" in anchor ? anchor : null);
-
 /** The anchor the host gave, or the trigger rendered next to the panel. */
 function anchorOf(panel: HTMLElement, anchor: PopoverAnchor | null | undefined) {
   if (anchor !== undefined) return anchor;
   return panel.parentElement?.querySelector<HTMLElement>(`[aria-controls="${panel.id}"]`) ?? panel.parentElement;
-}
-
-/** Puts the panel against its anchor, flipped and shifted to stay inside the viewport. */
-function place(panel: HTMLElement, anchor: PopoverAnchor, side: Side, align: Align) {
-  // The top layer escapes every clipping ancestor; without it the fixed position escapes most.
-  if ("showPopover" in panel && !panel.hasAttribute("popover")) {
-    panel.setAttribute("popover", "manual");
-    panel.showPopover();
-  }
-  const rect = anchor.getBoundingClientRect();
-  const { offsetWidth: width, offsetHeight: height } = panel;
-  const above = rect.top - height - GAP;
-  const below = rect.bottom + GAP;
-  const roomAbove = above >= EDGE;
-  const roomBelow = below + height <= window.innerHeight - EDGE;
-  const top = side === "top" ? roomAbove || !roomBelow : roomAbove && !roomBelow;
-  const fromLeft = (align === "start") === (getComputedStyle(panel).direction !== "rtl");
-  let left = fromLeft ? rect.left : rect.right - width;
-  if (align === "center") left = (rect.left + rect.right) / 2 - width / 2;
-  panel.dataset.side = top ? "top" : "bottom";
-  panel.style.top = `${Math.max(EDGE, Math.min(top ? above : below, window.innerHeight - height - EDGE))}px`;
-  panel.style.left = `${Math.max(EDGE, Math.min(left, window.innerWidth - width - EDGE))}px`;
-}
-
-/** Whether the anchor left the page, the viewport, or the visible part of the container that just scrolled. */
-function isGone(anchor: PopoverAnchor, scroller: EventTarget | null) {
-  const element = asElement(anchor);
-  if (element && !element.isConnected) return true;
-  const rect = anchor.getBoundingClientRect();
-  const container = element && scroller && "getBoundingClientRect" in scroller && (scroller as Element).contains(element) ? (scroller as Element) : null;
-  const clip = container?.getBoundingClientRect() ?? { top: 0, left: 0, bottom: window.innerHeight, right: window.innerWidth };
-  return rect.bottom < clip.top || rect.top > clip.bottom || rect.right < clip.left || rect.left > clip.right;
 }
 
 interface Anchoring {
@@ -123,8 +83,8 @@ function useAnchoredPanel({ open, anchor, side, align, onDismiss, modal = false 
     };
     const follow = (event?: Event) => {
       const target = anchorOf(panel, live.current.anchor);
-      if (!target || (event && isGone(target, event.target))) live.current.onDismiss();
-      else place(panel, target, live.current.side, live.current.align);
+      if (!target || (event && isAnchorGone(target, event.target))) live.current.onDismiss();
+      else placePanel(panel, target, live.current.side, live.current.align);
     };
     // Async content, such as the local month in a date field, can change which side fits.
     const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(() => follow());
@@ -148,7 +108,7 @@ function useAnchoredPanel({ open, anchor, side, align, onDismiss, modal = false 
     const target = panel && anchorOf(panel, anchor);
     if (!panel || !target) return;
     originRef.current = asElement(target);
-    place(panel, target, side, align);
+    placePanel(panel, target, side, align);
   };
 
   const onKeyDown = (event: KeyboardEvent) => {

@@ -30,7 +30,7 @@ The JavaScript entry points are ES modules. For Jest with `next/jest`, add `@ali
 
 Choose one document as the input to your tool. Dimensions carry a number and a unit, colors carry sRGB components and alpha, and each shadow layer has its own offsets, blur, spread and color. Aliases retain their named targets so editing a primitive updates the roles that reference it. Both exports target the [DTCG Format](https://www.designtokens.org/tr/2025.10/format/) and [Color](https://www.designtokens.org/tr/2025.10/color/) modules for October 2025.
 
-These export paths were added after 0.1.2. To reproduce the check, use Node.js 22 or later at the root of a checkout that contains them.
+These export paths were added in 0.1.3. To reproduce the check, use Node.js 22 or later at the root of a checkout.
 
 ```sh
 npm ci

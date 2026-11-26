@@ -6,6 +6,8 @@ export { Button, ButtonSkeleton, IconButton, type ButtonSkeletonProps, type Butt
 export { Breadcrumb, type BreadcrumbItem, type BreadcrumbProps } from "./Breadcrumb.js";
 export { Badge, BadgeSkeleton, type BadgeProps, type BadgeSkeletonProps, type BadgeTone, type BadgeVariant } from "./Badge.js";
 export { Field, FieldSkeleton, Input, Label, Textarea, type CharacterCounter, type FieldProps, type FieldSkeletonProps, type InputProps, type LabelProps, type TextareaProps } from "./Field.js";
+export { SearchAutocomplete, type SearchAutocompleteProps, type SearchResult } from "./SearchAutocomplete.js";
+export { SearchField, type SearchFieldProps } from "./SearchField.js";
 export { Calendar, type CalendarProps } from "./Calendar.js";
 export { Carousel, type CarouselGap, type CarouselNavigation, type CarouselProps } from "./Carousel.js";
 export { ColorPicker, type ColorPickerProps } from "./ColorPicker.js";
@@ -24,6 +26,10 @@ export { Pagination, paginationRange, type PaginationLabels, type PaginationProp
 export { Stepper, StepperPanel, StepperSkeleton, type StepperOrientation, type StepperPanelProps, type StepperProps, type StepperSkeletonProps, type StepperStep } from "./Stepper.js";
 export { Select, type MultipleSelectProps, type SelectOption, type SelectProps, type SingleSelectProps } from "./Select.js";
 export { Footer, type FooterGroup, type FooterLink, type FooterProps } from "./Footer.js";
+export { ResponsiveImage, type ResponsiveImageProps, type ResponsiveImageSource } from "./ResponsiveImage.js";
+export { Hero, type HeroProps } from "./Hero.js";
+export { Navbar, type NavbarProps, type NavigationItem } from "./Navbar.js";
+export { Sidebar, type SidebarGroup, type SidebarProps } from "./Sidebar.js";
 export { Tab, TabList, TabPanel, Tabs, TabsRoot, type TabItem, type TabListProps, type TabPanelProps, type TabPresentation, type TabProps, type TabsProps, type TabsRootProps } from "./Tabs.js";
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardImage, CardSkeleton, CardTitle, type CardImageProps, type CardSkeletonProps, type CardPartProps, type CardProps, type CardTitleProps } from "./Card.js";
 export { Separator, type SeparatorProps } from "./Separator.js";

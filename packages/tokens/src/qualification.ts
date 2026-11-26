@@ -40,10 +40,10 @@ export type ThemeReport = ReturnType<typeof qualifyTheme>;
 export function compareThemeReports(previous: ThemeReport, current: ThemeReport) {
   const before = new Map(previous.checks.map(check => [check.id, check]));
   const after = new Map(current.checks.map(check => [check.id, check]));
-  return [...new Set([...before.keys(), ...after.keys()])].sort().flatMap(id => {
+  return [...new Set([...before.keys(), ...after.keys()])].sort((a, b) => (a < b ? -1 : 1)).flatMap(id => {
     const old = before.get(id);
     const next = after.get(id);
-    if (old && next && old.foreground === next.foreground && old.background === next.background && old.minimum === next.minimum && old.ratio === next.ratio) return [];
+    if (old && next && (["foreground", "background", "minimum", "ratio"] as const).every(key => old[key] === next[key])) return [];
     return [{ id, before: old ?? null, after: next ?? null }];
   });
 }
