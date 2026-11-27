@@ -69,3 +69,16 @@ test("the step examples fit a phone and the loading preview stays outside the ta
   await nav.getByRole("button", { name: /Credits/ }).click();
   await expect(page.getByRole("region", { name: "Proof notes" })).toContainText("All credits have been checked.");
 });
+
+test("the correction round fills its markers, dots the line ahead and tones its badge", async ({ page }) => {
+  await page.goto(catalog + "/stepper");
+  const nav = page.getByRole("navigation", { name: "Correction round" });
+  await expect(nav).toHaveAttribute("data-indicator", "solid");
+  await expect(nav).toHaveAttribute("data-connector", "dotted");
+  await expect(nav.getByRole("button", { name: "Images", exact: true })).toHaveAccessibleDescription("2 points to fix");
+  const badge = nav.locator('.elea-stepper__badge[data-tone="danger"]');
+  await expect(badge).toHaveText("2");
+  const neutral = page.getByRole("navigation", { name: "Proof sections" }).locator(".elea-stepper__badge").first();
+  expect(await badge.evaluate(element => getComputedStyle(element).backgroundColor))
+    .not.toBe(await neutral.evaluate(element => getComputedStyle(element).backgroundColor));
+});

@@ -214,3 +214,17 @@ test("a searchable country field formats national and international telephone nu
   await country.press("Escape");
   await expect(country).toHaveValue("United States (+1)");
 });
+
+test("a restricted note keeps the text of a saved heading, reports the rule left out and edits its link", async ({ page }) => {
+  await page.goto("/playground/#/ui/field");
+  const note = page.locator(".review-note");
+  await expect(note.locator("[data-elea-block-type]")).toHaveCount(2);
+  await expect(note.locator('[data-elea-block-type="paragraph"]').first()).toHaveText("Cover");
+  await expect(note.getByRole("status")).toContainText("Blocks without text this field cannot store: 1.");
+  await expect(note.getByRole("button", { name: "Bold (Ctrl+B)" })).toBeVisible();
+  await expect(note.getByRole("button", { name: "Underlined (Ctrl+U)" })).toHaveCount(0);
+  await note.getByRole("link", { name: "brief" }).click();
+  await note.getByRole("button", { name: "Link (Ctrl+K)" }).click();
+  await expect(page.getByRole("textbox", { name: "Enter the link URL:" })).toHaveValue("https://example.org/brief");
+  await expect(page.getByRole("button", { name: "Remove link" })).toBeVisible();
+});

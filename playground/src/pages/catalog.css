@@ -276,4 +276,5 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
 }
 .demo__stage .telephone-form { display: grid; gap: var(--elea-space-4); width: min(100%, 32rem); }
-.demo__stage .caption-form { --elea-editor-canvas-height: 8rem; display: grid; gap: .65rem; inline-size: 100%; }
+.demo__stage .caption-form,
+.demo__stage .review-note { --elea-editor-canvas-height: 8rem; display: grid; gap: .65rem; inline-size: 100%; }

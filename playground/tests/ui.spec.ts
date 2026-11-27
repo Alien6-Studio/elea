@@ -410,3 +410,47 @@ test("the info variant reads the info colour, which a host can set apart from it
   expect(await fill("Info")).toBe("rgb(71, 101, 164)");
   expect(await fill("Teal info")).toBe("rgb(14, 116, 144)");
 });
+
+test("a menu describes itself with its header and opens a link item", async ({ page }) => {
+  await page.goto("/playground/#/ui/menu");
+  await page.getByRole("button", { name: "Account", exact: true }).click();
+  const menu = page.getByRole("menu", { name: "Account" });
+  await expect(menu).toHaveAccessibleDescription(/Maya Okafor\s*Harbour Press/);
+  const billing = menu.getByRole("menuitem", { name: "Billing" });
+  await expect(billing).toHaveAttribute("aria-disabled", "true");
+  await expect(billing).not.toHaveAttribute("href");
+  await menu.getByRole("menuitem", { name: "Colours" }).click();
+  await expect(page).toHaveURL(/#\/colours/);
+});
+
+test("a wide dialog keeps its title and actions in place while its body scrolls", async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 600 });
+  await page.goto("/playground/#/ui/dialog");
+  await page.getByRole("button", { name: "Read the proof" }).click();
+  const dialog = page.getByRole("dialog", { name: "Proof of the harbour issue" });
+  const body = dialog.locator(".elea-dialog__body");
+  const approve = dialog.getByRole("button", { name: "Approve" });
+  await dialog.evaluate(element => Promise.all(element.getAnimations().map(animation => animation.finished)));
+  const before = (await approve.boundingBox())!;
+  await body.evaluate(element => element.scrollTo(0, element.scrollHeight));
+  expect(await body.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+  expect(await dialog.evaluate(element => element.scrollTop)).toBe(0);
+  expect((await approve.boundingBox())!.y).toBe(before.y);
+  await expect(dialog.getByRole("heading", { name: "Proof of the harbour issue" })).toBeInViewport();
+  await approve.click();
+  await page.getByRole("button", { name: "Read in the full window" }).click();
+  const margin = await dialog.evaluate(element => (innerHeight - element.getBoundingClientRect().height) / 2);
+  expect(margin).toBeCloseTo(16, 0);
+  expect((await dialog.boundingBox())!.width).toBeGreaterThan(1000);
+});
+
+test("an alert takes the host colours of its tone and leaves the other tones to the theme", async ({ page }) => {
+  await page.goto("/playground/#/ui/alert");
+  const host = page.locator(".house-alerts");
+  const published = host.locator(".elea-alert--success");
+  await expect(published).toHaveCSS("background-color", "rgb(227, 241, 231)");
+  await expect(published).toHaveCSS("border-top-color", "rgb(47, 125, 79)");
+  await expect(published).toHaveCSS("color", "rgb(19, 61, 38)");
+  const themed = page.locator(".elea-alert--info").first();
+  await expect(host.locator(".elea-alert--info")).toHaveCSS("background-color", await themed.evaluate(element => getComputedStyle(element).backgroundColor));
+});

@@ -5,10 +5,12 @@ import { IdentifierFields } from "../examples/text-field/IdentifierFields.js";
 import identifierSource from "../examples/text-field/IdentifierFields.tsx?raw";
 import telephoneSource from "../examples/text-field/CountryTelephone.tsx?raw";
 import captionSource from "../examples/text-field/CaptionEditor.tsx?raw";
+import reviewNoteSource from "../examples/text-field/ReviewNote.tsx?raw";
 import photoCaptionSource from "../examples/text-field/PhotoCaption.tsx?raw";
 import archiveNumberSource from "../examples/text-field/ArchiveNumber.tsx?raw";
 
 const CountryTelephone = lazy(() => import("../examples/text-field/CountryTelephone.js").then(module => ({ default: module.CountryTelephone })));
+const ReviewNote = lazy(() => import("../examples/text-field/ReviewNote.js").then(module => ({ default: module.ReviewNote })));
 const CaptionEditor = lazy(() => import("../examples/text-field/CaptionEditor.js").then(module => ({ default: module.CaptionEditor })));
 
 export function TextFieldExamples() {
@@ -39,6 +41,11 @@ export function TextFieldExamples() {
     </Demo>
     <Demo title="Formatted caption" description="Edit a caption of up to 140 characters, then save it to see the HTML your form can store." code={captionSource}>
       <Suspense fallback={<FieldSkeleton />}><CaptionEditor /></Suspense>
+    </Demo>
+    <Demo title="A field that accepts part of the editor"
+      description={<>This note accepts paragraphs and lists, with bold, italic and links. The saved heading is shown as a paragraph, its rule is left out and reported through <code>onBlocksLeftOut</code>. Place the caret in the link and use the link control to change, remove or open its address.</>}
+      code={reviewNoteSource}>
+      <Suspense fallback={<FieldSkeleton />}><ReviewNote /></Suspense>
     </Demo>
   </>;
 }

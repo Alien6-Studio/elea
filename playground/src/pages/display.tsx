@@ -27,6 +27,8 @@ import avatarSizes from "../examples/avatar/AvatarSizes.tsx?raw";
 import editors from "../examples/avatar/Editors.tsx?raw";
 import alertTones from "../examples/alert/AlertTones.tsx?raw";
 import editingNotice from "../examples/alert/EditingNotice.tsx?raw";
+import { HouseAlerts } from "../examples/alert/HouseAlerts.js";
+import houseAlerts from "../examples/alert/HouseAlerts.tsx?raw";
 import uploadProgress from "../examples/progress/UploadProgress.tsx?raw";
 import exportProgress from "../examples/progress/ExportProgress.tsx?raw";
 import progressTones from "../examples/progress/ProgressTones.tsx?raw";
@@ -383,6 +385,9 @@ export function AlertPage() {
               Your changes merge as you type.
             </Alert>}
         </div>
+      </Demo>
+      <Demo title="Host colours per tone" description={<>Each tone reads <code>--elea-alert-&lt;tone&gt;-surface</code>, <code>-border</code> and <code>-text</code>. Success and danger take the colours of the host here; info keeps the theme. The host keeps the contrast between surface and text.</>} code={houseAlerts}>
+        <div className="catalog-fill"><HouseAlerts /></div>
       </Demo>
       <h2>Props</h2>
       <PropsTable rows={[

@@ -8,6 +8,7 @@ import { ArticleSearch } from "../examples/field/ArticleSearch.js";
 import { NotificationToggles } from "../examples/choice/NotificationToggles.js";
 import { ShareArticle } from "../examples/dialog/ShareArticle.js";
 import { PublishArticle } from "../examples/dialog/PublishArticle.js";
+import { ProofReading } from "../examples/dialog/ProofReading.js";
 import { SaveDraftTooltips } from "../examples/tooltip/SaveDraftTooltips.js";
 import { SegmentedTabs } from "../examples/tabs/SegmentedTabs.js";
 import { TrashIcon } from "../examples/icons.js";
@@ -30,6 +31,8 @@ import shareArticleSource from "../examples/dialog/ShareArticle.tsx?raw";
 import deleteProjectSource from "../examples/dialog/DeleteProject.tsx?raw";
 import themedDialogSource from "../examples/dialog/ThemedDialog.tsx?raw";
 import publishArticleSource from "../examples/dialog/PublishArticle.tsx?raw";
+import proofReadingSource from "../examples/dialog/ProofReading.tsx?raw";
+import accountMenuSource from "../examples/menu/AccountMenu.tsx?raw";
 import articleActionsSource from "../examples/menu/ArticleActions.tsx?raw";
 import moreActionsSource from "../examples/menu/MoreActions.tsx?raw";
 import saveDraftTooltipsSource from "../examples/tooltip/SaveDraftTooltips.tsx?raw";
@@ -306,20 +309,24 @@ export function DialogPage({ brand }: Readonly<{ brand?: BrandTheme }>) {
       <Demo title="Composed from its parts" description="DialogRoot keeps the focus trap, Escape and the backdrop; the parts give the header, the body and the footer another shape." code={publishArticleSource}>
         <PublishArticle />
       </Demo>
+      <Demo title="Wide content and a scrolling body" description={<>The <code>xl</code> size gives a long document room, and <code>full</code> takes the window less its margin. With <code>scroll="body"</code> the title and the actions stay in place while the content scrolls.</>} code={proofReadingSource}>
+        <ProofReading />
+      </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
         { name: "open, onClose", type: "boolean, () => void", description: "Controlled visibility." },
         { name: "title, description", type: "ReactNode", description: "Named and described through ARIA." },
         { name: "closeLabel", type: "string", description: "Accessible name of the close control." },
         { name: "actions", type: "ReactNode", description: "Footer buttons." },
-        { name: "size", type: '"sm" | "md" | "lg"', defaultValue: '"md"', description: "Maximum width." },
+        { name: "size", type: '"sm" | "md" | "lg" | "xl" | "full"', defaultValue: '"md"', description: "Maximum width. full takes the window, less its margin." },
+        { name: "scroll", type: '"surface" | "body"', defaultValue: '"surface"', description: "What scrolls when the content outgrows the window. With body, the header and the actions stay in place." },
         { name: "dismissOnBackdrop", type: "boolean", defaultValue: "true", description: "A click outside closes the dialog." },
         { name: "motion", type: "boolean", description: "Turns the entrance on or off for this dialog. A dialog is rendered in a portal, so by default it follows data-elea-motion on the page, not on its container." },
       ]} />
       <p>ConfirmDialog adds <code>onConfirm</code>, <code>onCancel</code>, the two labels, <code>tone</code>, <code>icon</code>, <code>loading</code> and an optional <code>field</code> that collects a value with the answer: see <a href={brandRoute("ui/popover", brand)}>ConfirmField</a>.</p>
       <h2>Parts</h2>
       <PropsTable parts rows={[
-        { name: "DialogRoot", type: "open, onClose, size, dismissOnBackdrop, motion", description: "The modal surface alone. Its DialogTitle names it." },
+        { name: "DialogRoot", type: "open, onClose, size, scroll, dismissOnBackdrop, motion", description: "The modal surface alone. Its DialogTitle names it." },
         { name: "DialogHeader", type: "children", description: "The row that holds the title and the close control." },
         { name: "DialogTitle", type: "children", description: "The heading that names the dialog." },
         { name: "DialogClose", type: "label: string", description: "The close control, with its accessible name." },
@@ -364,19 +371,32 @@ export function MenuPage() {
           </MenuContent>
         </MenuRoot>
       </Demo>
+      <Demo title="Links and a header" description={<>An item with <code>href</code> is a link: here the first two open the Typography and Colours pages of this site. Pass <code>render</code> to hand it to your router link, as with Button. The header names the account and describes the menu to assistive technology.</>} code={accountMenuSource}>
+        <MenuRoot>
+          <MenuTrigger>{(props) => <Button variant="outline" {...props}>Account</Button>}</MenuTrigger>
+          <MenuContent label="Account" header={<><strong>Maya Okafor</strong><br />Harbour Press</>}>
+            <MenuItem href={`${sitePath}typography/`} render={renderGuideLink}>Typography</MenuItem>
+            <MenuItem href={`${sitePath}playground/#/colours`} render={renderGuideLink}>Colours</MenuItem>
+            <MenuItem href={`${sitePath}playground/#/colours`} render={renderGuideLink} disabled>Billing</MenuItem>
+            <MenuSeparator />
+            <MenuItem onSelect={() => setLast("sign out")}>Sign out</MenuItem>
+          </MenuContent>
+        </MenuRoot>
+      </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
         { name: "label", type: "string", description: "Accessible name of the menu." },
         { name: "trigger", type: "(props) => ReactNode", description: "Render the trigger and spread its keyboard, click and ARIA props." },
-        { name: "items", type: "MenuItemData[]", description: "Each action has an id, label and onSelect callback. It may also be destructive or disabled." },
+        { name: "items", type: "MenuItemData[]", description: "Each item has an id and a label, then an onSelect callback for an action or an href for a link, with an optional render for your router. It may also be destructive or disabled." },
+        { name: "header", type: "ReactNode", description: "Content above the items, such as a name and a company. It describes the menu." },
         { name: "align", type: '"start" | "end"', defaultValue: '"start"', description: "Align the menu to an edge of its trigger." },
       ]} />
       <h2>Parts</h2>
       <PropsTable parts rows={[
         { name: "MenuRoot", type: "children", description: "Holds the open state; a click outside closes the menu." },
         { name: "MenuTrigger", type: "(props) => ReactNode", description: "Render the trigger and spread its keyboard, click and ARIA props." },
-        { name: "MenuContent", type: "label, align", description: "The list, present while the menu is open." },
-        { name: "MenuItem", type: "onSelect, icon, disabled, danger", description: "One action. Choosing it closes the menu and returns the focus to the trigger." },
+        { name: "MenuContent", type: "label, align, header", description: "The list, present while the menu is open." },
+        { name: "MenuItem", type: "onSelect, href, render, icon, disabled, danger", description: "One action, or a link when href is given. Choosing it closes the menu and returns the focus to the trigger." },
         { name: "MenuSeparator", type: "—", description: "A line between two sets of actions." },
         { name: "MenuGroup", type: "label: ReactNode", description: "Actions that belong together, under the heading that names them." },
       ]} />

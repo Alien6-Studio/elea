@@ -1,6 +1,6 @@
 import { lazy, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { brandPalettes } from "@alien6-studio/elea-tokens/brand";
-import { Accordion, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, Button, Calendar, ColorPicker, Combobox, DateField, MultiSelect, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Hero, Input, Pagination, Progress, RadioGroup, SearchField, Select, Separator, Sidebar, Skeleton, Slider, Stepper, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
+import { Accordion, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, Button, Calendar, ColorPicker, Combobox, DateField, MultiSelect, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Hero, Input, Pagination, Progress, RadioGroup, SaveStatus, SearchField, Select, Separator, Sidebar, Skeleton, Slider, Stepper, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
 import { NotFound } from "../components/NotFound.js";
 import { GuideRoute, sectionHref, sectionId, visitSection } from "../components/Demo.js";
 import { sitePath } from "../links.js";
@@ -15,6 +15,7 @@ import { AccordionPage, SliderPage, TablePage, ToastExampleIcon, ToastPage } fro
 import { PopoverPage, SheetPage } from "./overlay.js";
 import { CalendarPage, collections, ColorPickerPage, ComboboxPage, monthLabels } from "./form-guides.js";
 import { StepperPage } from "./stepper.js";
+import { ContentComparisonPage, SaveStatusPage } from "./RevisionGuides.js";
 import { BreadcrumbPage } from "./BreadcrumbGuide.js";
 import { DateFieldPage } from "./DateFieldGuide.js";
 import { MultiSelectPage } from "./MultiSelectGuide.js";
@@ -25,6 +26,7 @@ import { colourPlates } from "../data/colourPlates.js";
 import { HandbookLayout } from "./layout/LibrarySidebar.js";
 import { reviewSteps } from "../examples/stepper/ReviewSteps.js";
 import { categories, componentGuides, type Category, type GuideSummary } from "../data/componentGuides.js";
+import "@alien6-studio/elea-content-viewer/styles.css";
 import "./catalog.css";
 
 const MediaPage = lazy(async () => ({ default: (await import("./media.js")).MediaPage }));
@@ -149,6 +151,16 @@ const examples: Record<(typeof componentGuides)[number]["slug"], Presentation> =
     page: ProgressPage,
     interaction: <>The bar is a <code>progressbar</code> named by its label. Word the value with <code>formatValue</code> when a percentage says too little, such as “3 of 8 files”.</>,
     preview: <div className="catalog-fill"><Progress label="Uploading" value={62} showValue /></div>,
+  },
+  "save-status": {
+    page: SaveStatusPage,
+    interaction: <>The text sits in a <code>status</code> region that stays mounted, so each change is announced without taking focus. The retry button is outside it and is reached with <kbd>Tab</kbd>.</>,
+    preview: <SaveStatus state="saved">Saved at 12:12</SaveStatus>,
+  },
+  "content-comparison": {
+    page: ContentComparisonPage,
+    interaction: <>Insertions are <code>ins</code> elements and deletions <code>del</code> elements, underlined and struck through, so the difference does not rest on colour.</>,
+    preview: <p className="elea-content elea-comparison">Printed on <del className="elea-change elea-change--removed">Monday</del><ins className="elea-change elea-change--added">Tuesday</ins></p>,
   },
   "skeleton": {
     page: SkeletonPage,

@@ -6,7 +6,7 @@ test("the catalogue combines category and search and recovers from an empty resu
   await page.goto(catalog);
   const main = page.getByRole("main");
   const results = main.getByRole("status").filter({ hasText: /component guide/ });
-  await expect(results).toHaveText("36 component guides");
+  await expect(results).toHaveText("38 component guides");
   await main.getByRole("button", { name: "Forms" }).click();
   await expect(results).toHaveText("10 component guides");
   const search = main.getByRole("searchbox", { name: "Search components" });
@@ -18,7 +18,7 @@ test("the catalogue combines category and search and recovers from an empty resu
   await main.getByRole("button", { name: "Clear filters" }).press("Enter");
   await expect(search).toBeFocused();
   await expect(search).toHaveValue("");
-  await expect(results).toHaveText("36 component guides");
+  await expect(results).toHaveText("38 component guides");
 });
 
 test("the mobile catalogue opens the Carousel guide and its three layouts fit the screen", async ({ page }) => {
@@ -216,7 +216,7 @@ test("the display guides show cards, avatars and separators with their fallbacks
   await page.goto(catalog);
   const main = page.getByRole("main");
   await main.getByRole("button", { name: "Display" }).click();
-  await expect(main.getByRole("status")).toHaveText("3 component guides");
+  await expect(main.getByRole("status")).toHaveText("4 component guides");
   await main.getByRole("link", { name: "Card", exact: true }).click();
   const notebook = page.locator(".elea-card").filter({ has: page.getByRole("heading", { name: "The glacier notebook", level: 3 }) });
   const cover = notebook.getByRole("img", { name: /crevasses/ });
@@ -260,6 +260,34 @@ test("the feedback guides dismiss an alert, advance a progress bar and swap a sk
   await expect(bar).toHaveAttribute("aria-valuenow", "4");
   await expect(page.getByText("4 of 8 files")).toBeVisible();
   await expect(page.getByRole("progressbar", { name: "Preparing the export" })).not.toHaveAttribute("aria-valuenow");
+
+  await page.goto(`${catalog}/save-status`);
+  const autosave = page.locator(".demo", { hasText: "Lose the connection" });
+  const status = autosave.getByRole("status");
+  await expect(status).toHaveText("No changes yet");
+  await autosave.getByRole("textbox", { name: "Standfirst" }).pressSequentially(" Again.");
+  await expect(status).toHaveText("Saving");
+  await expect(status).toHaveText(/^Saved at \d\d:\d\d$/);
+  await autosave.getByRole("switch", { name: "Lose the connection" }).press("Space");
+  await autosave.getByRole("textbox", { name: "Standfirst" }).pressSequentially(" More.");
+  await expect(status).toHaveText("Not saved");
+  await autosave.getByRole("switch", { name: "Lose the connection" }).press("Space");
+  await autosave.getByRole("button", { name: "Retry" }).click();
+  await expect(status).toHaveText(/^Saved at/);
+  await expect(autosave.getByRole("button", { name: "Retry" })).toHaveCount(0);
+
+  await page.goto(`${catalog}/content-comparison`);
+  const colophon = page.locator(".elea-comparison", { hasText: "Colophon" });
+  await expect(colophon.locator('[data-elea-change="changed"] strong ins.elea-change')).toHaveText("bound");
+  await expect(colophon.locator('[data-elea-change="changed"] del.elea-change')).toHaveText("printed");
+  await expect(colophon.locator('[data-elea-change="changed"] a')).toHaveAttribute("href", "/papers/munken");
+  await expect(colophon.locator("del.elea-block")).toHaveText("First printing: 800 copies.");
+  await expect(colophon.locator("ins.elea-block li")).toHaveCount(2);
+  await page.getByRole("button", { name: "Compare with the published version" }).click();
+  const review = page.getByRole("dialog", { name: "Draft and published version" });
+  await expect(review.locator("ins.elea-change").first()).toHaveText("February");
+  await expect(review.locator("li del.elea-change")).toHaveText(["One", "reading", "A camera at the foot of the icefall"]);
+  await expect(review.locator('ins.elea-block[data-elea-block-type="quote"]')).toBeVisible();
 
   await page.goto(`${catalog}/skeleton`);
   const article = page.getByRole("article", { name: "Article preview" });
@@ -326,7 +354,7 @@ test("a wrapping skeleton keeps the box of its children, and a region waits out 
 
 test("the new guides fit a narrow viewport", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 760 });
-  for (const slug of ["card", "separator", "skeleton", "avatar", "alert", "progress", "table", "accordion", "slider", "toast", "popover", "sheet"]) {
+  for (const slug of ["card", "separator", "skeleton", "avatar", "alert", "progress", "save-status", "content-comparison", "table", "accordion", "slider", "toast", "popover", "sheet"]) {
     await page.goto(`${catalog}/${slug}`);
     await expect(page.getByRole("region", { name: "Component props" }).first()).toBeVisible();
     expect(await page.locator("body").evaluate((element) => element.scrollWidth), slug).toBeLessThanOrEqual(320);

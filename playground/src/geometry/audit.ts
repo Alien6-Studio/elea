@@ -63,7 +63,8 @@ const KEYWORDS: Record<string, number> = { round: 1, squircle: 2, bevel: 0, scoo
 
 /** The `superellipse()` parameter of a computed `corner-shape` value; a circular arc when the value is unknown. */
 export function curveOf(shape = "round") {
-  const value = shape.trim().split(/\s+(?![^(]*\))/)[0] ?? "round";
+  // The first value, with its arguments when it is a function
+  const value = /^[^\s(]+(?:\([^)]*\))?/.exec(shape.trim())?.[0] ?? "round";
   const parameter = /^superellipse\(\s*(-?infinity|[-+\d.e]+)\s*\)$/i.exec(value)?.[1];
   if (parameter === undefined) return KEYWORDS[value] ?? 1;
   if (!/infinity/i.test(parameter)) return Number(parameter);
@@ -211,11 +212,27 @@ export function collectBoxes(selector = "body"): AuditedBox[] {
       if (indexes.has(element) || !element.checkVisibility() || element.closest("[data-geometry-specimen]")) continue;
       const style = getComputedStyle(element);
       const rect = element.getBoundingClientRect();
-      const painted = !/^(rgba\(.*,\s*0\)|transparent)$/.test(style.backgroundColor) || style.backgroundImage !== "none"
+      const colour = style.backgroundColor.replaceAll(" ", "");
+      const painted = !(colour === "transparent" || (colour.startsWith("rgba(") && colour.endsWith(",0)"))) || style.backgroundImage !== "none"
         || style.boxShadow !== "none" || (Number.parseFloat(style.borderTopWidth) > 0 && style.borderTopStyle !== "none");
       if (!painted || rect.width === 0 || rect.height === 0) continue;
       const corners = [style.borderTopLeftRadius, style.borderTopRightRadius, style.borderBottomRightRadius, style.borderBottomLeftRadius]
-        .map(value => value.trim().split(/\s+(?![^(]*\))/));
+        .map(value => {
+          // Splits on the spaces outside parentheses, one character at a time
+          const parts: string[] = [];
+          let depth = 0;
+          let part = "";
+          for (const char of value.trim()) {
+            if (char === "(") depth += 1;
+            else if (char === ")") depth -= 1;
+            if (depth > 0 || char !== " ") part += char;
+            else if (part) {
+              parts.push(part);
+              part = "";
+            }
+          }
+          return part ? [...parts, part] : parts;
+        });
       // Horizontal then vertical radius of each corner. No helper is named here: the function travels as source.
       const resolved = corners.flatMap(([horizontal = "0px", second = horizontal]) => [
         [horizontal, rect.width] as const,
