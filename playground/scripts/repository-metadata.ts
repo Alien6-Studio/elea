@@ -6,7 +6,7 @@ const endpoint = "https://api.github.com/repos/Alien6-Studio/elea";
 
 export function documentedRelease() {
   const versions = readFileSync(new URL("../../docs/versions.md", import.meta.url), "utf8");
-  return versions.match(/https:\/\/github\.com\/Alien6-Studio\/elea\/releases\/tag\/(v[\w.-]+)\)/)?.[1];
+  return /https:\/\/github\.com\/Alien6-Studio\/elea\/releases\/tag\/(v[\w.-]+)\)/.exec(versions)?.[1];
 }
 
 export async function loadRepositoryMetadata(request = fetch) {

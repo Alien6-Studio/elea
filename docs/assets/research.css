@@ -1,0 +1,91 @@
+/* Figures and live demonstrations of the research pages. */
+.docs-article .ledger-scroll { overflow-x: auto; }
+
+.geo-figure {
+  margin: var(--elea-space-8, 2rem) 0;
+  overflow-x: auto;
+}
+
+.geo-figure svg {
+  display: block;
+  width: 100%;
+  min-width: 34rem;
+  height: auto;
+  color: inherit;
+}
+
+.geo-figure text {
+  fill: currentColor;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.geo-figure text.geo-note,
+.geo-figure figcaption,
+.geo-demo figcaption {
+  fill: var(--elea-color-text-muted);
+  color: var(--elea-color-text-muted);
+}
+
+.geo-figure figcaption,
+.geo-demo figcaption {
+  margin-top: var(--elea-space-3, 0.75rem);
+  font-size: 0.875rem;
+}
+
+.geo-rule,
+.geo-tick,
+.geo-guide,
+.geo-measure,
+.geo-curve {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.geo-rule { stroke: var(--elea-color-border-default); }
+.geo-guide { stroke: var(--elea-color-text-muted); stroke-dasharray: 2 4; }
+.geo-measure { stroke: var(--elea-color-action-primary); stroke-width: 1.5; }
+.geo-dot,
+.geo-fill { fill: currentColor; }
+
+.geo-curve { stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.geo-curve--circle { stroke-dasharray: 6 5; }
+.geo-curve--squircle { stroke: var(--elea-color-action-primary); stroke-width: 2.5; }
+.geo-curve--spiral { stroke: var(--elea-color-text-link); stroke-width: 2.5; stroke-dasharray: 0.1 5; }
+.geo-curve--cubic { stroke-width: 1; }
+
+.geo-demo {
+  margin: var(--elea-space-8, 2rem) 0;
+}
+
+.geo-demo__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--elea-space-5, 1.25rem);
+}
+
+.geo-demo__row p {
+  margin: var(--elea-space-3, 0.75rem) 0 0;
+  font-size: 0.875rem;
+}
+
+.geo-box {
+  --geo-radius: 1.25rem;
+  --geo-curve: 1;
+  /* Radius factor that keeps the depth of the corner when the curve changes. */
+  --geo-keep-cut: calc((1 - pow(2, -0.5)) / (1 - pow(2, -1 / pow(2, var(--geo-curve)))));
+  height: 6rem;
+  border: 1.5px solid currentColor;
+  border-radius: var(--geo-radius);
+}
+
+@supports (corner-shape: superellipse(2)) {
+  .geo-box { corner-shape: superellipse(var(--geo-curve)); }
+  .geo-box--kept { border-radius: calc(var(--geo-radius) * var(--geo-keep-cut)); }
+  .geo-unsupported { display: none; }
+}
+
+/* The parts of the study being read sit under the list of studies. */
+.docs-guidebar--study { background: var(--elea-color-surface-default); }

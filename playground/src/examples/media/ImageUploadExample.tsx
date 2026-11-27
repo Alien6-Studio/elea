@@ -117,12 +117,12 @@ function Placement({
   source,
   saved,
   onEdit,
-}: {
+}: Readonly<{
   slot: Destination;
   source: Original;
   saved?: Saved;
   onEdit: () => void;
-}) {
+}>) {
   const result = useObjectUrl(saved?.blob);
   const initial = initialCrop(source, slot);
   const mask = initial.mask!;
@@ -198,11 +198,11 @@ function CropSession({
   source,
   replace,
   focusOnMount,
-}: {
+}: Readonly<{
   source: Original;
   replace: () => void;
   focusOnMount: boolean;
-}) {
+}>) {
   const [active, setActive] = useState<Destination | null>("cover");
   const [saved, setSaved] = useState<Partial<Record<Destination, Saved>>>({});
   const [error, setError] = useState("");
@@ -311,7 +311,9 @@ function CropSession({
   );
 }
 
-export function ImageUploadExample({ sampleUrl }: { sampleUrl: string }) {
+export function ImageUploadExample({
+  sampleUrl,
+}: Readonly<{ sampleUrl: string }>) {
   const [request, setRequest] = useState<File | "sample" | null>("sample");
   const [source, setSource] = useState<Original>();
   const [choosing, setChoosing] = useState(false);

@@ -36,9 +36,9 @@ function statusFor(count: number) {
 
 export function GuideSearch({
   destinations = guides,
-}: {
+}: Readonly<{
   destinations?: readonly Destination[];
-}) {
+}>) {
   const [query, setQuery] = useState("");
   const needle = query.trim().toLowerCase();
   const results = destinations.filter((item) =>

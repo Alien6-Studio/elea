@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /** Icons an application brings from its own icon set. */
-function Icon({ children }: { children: ReactNode }) {
+function Icon({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <svg
       viewBox="0 0 24 24"

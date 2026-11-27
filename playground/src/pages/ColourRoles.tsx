@@ -11,7 +11,7 @@ export const colourRoleLabels = {
 } as const satisfies Record<BrandColorRole, string>;
 const options = brandColorRoles.map(value => ({ value, label: colourRoleLabels[value] }));
 
-function ColourScale({ label, shades }: { label: string; shades: readonly { step: number; value: string }[] }) {
+function ColourScale({ label, shades }: Readonly<{ label: string; shades: readonly { step: number; value: string }[] }>) {
   return (
     <details className="studio-scale">
       <summary>
@@ -42,7 +42,7 @@ function renderedHex(element: HTMLElement) {
   return "#" + Array.from(channels.subarray(0, 3), channel => channel.toString(16).padStart(2, "0")).join("");
 }
 
-export function ColourRoleEditor({ brand, onChange, selection, hex, role, onRoleChange, palettes }: {
+export function ColourRoleEditor({ brand, onChange, selection, hex, role, onRoleChange, palettes }: Readonly<{
   brand: BrandTheme;
   onChange: (brand: BrandTheme) => void;
   selection: PaletteSelection | undefined;
@@ -50,7 +50,7 @@ export function ColourRoleEditor({ brand, onChange, selection, hex, role, onRole
   role: BrandColorRole;
   onRoleChange: (role: BrandColorRole) => void;
   palettes: ReturnType<typeof makeBrandTheme>["palettes"];
-}) {
+}>) {
   const fillSample = useRef<HTMLSpanElement>(null);
   const [value, setValue] = useState<string>();
   const base = resetStudioColours(brand);
@@ -117,7 +117,7 @@ function roleSource(brand: BrandTheme, role: BrandColorRole) {
   return role === "primary" || role === "secondary" ? `Tone ${defaultColorStep}` : "Theme default";
 }
 
-export function ColourRoles({ brand, activeRole }: { brand: BrandTheme; activeRole: BrandColorRole }) {
+export function ColourRoles({ brand, activeRole }: Readonly<{ brand: BrandTheme; activeRole: BrandColorRole }>) {
   const container = `color.action.${activeRole}`;
   const renderRole = (role: BrandColorRole) => (
     <div key={role} className={`atlas-role--${role}`}

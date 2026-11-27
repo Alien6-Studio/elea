@@ -85,7 +85,7 @@ export function CarouselPage() {
   </>;
 }
 
-export function CardPage({ brand }: { brand?: BrandTheme }) {
+export function CardPage({ brand }: Readonly<{ brand?: BrandTheme }>) {
   return (
     <>
       <h1>Card</h1>

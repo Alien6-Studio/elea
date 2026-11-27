@@ -20,7 +20,6 @@ if (search) hydrateRoot(search, createElement(SiteSearch));
 
 const comparison = document.getElementById("theme-comparison");
 if (comparison) {
-  import("./src/components/ThemeComparison.tsx").then(({ ThemeComparison }) => {
-    createRoot(comparison).render(createElement(ThemeComparison));
-  });
+  const { ThemeComparison } = await import("./src/components/ThemeComparison.tsx");
+  createRoot(comparison).render(createElement(ThemeComparison));
 }

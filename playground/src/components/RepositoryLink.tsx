@@ -21,7 +21,7 @@ const icons = {
 };
 
 /** Static on both surfaces. A build without GitHub access still links to the repository. */
-export function RepositoryLink({ snapshot = builtSnapshot }: { snapshot?: RepositorySnapshot }) {
+export function RepositoryLink({ snapshot = builtSnapshot }: Readonly<{ snapshot?: RepositorySnapshot }>) {
   const facts = [
     { id: "release", value: snapshot.release, label: "Latest release " + snapshot.release },
     { id: "stars", value: snapshot.stars, label: snapshot.stars === 1 ? "1 star" : exact.format(snapshot.stars ?? 0) + " stars" },

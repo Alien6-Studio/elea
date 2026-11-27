@@ -5,7 +5,7 @@ import { Button } from "@alien6-studio/elea-ui";
 export const GuideRoute = createContext("");
 
 export function sectionId(label: string) {
-  return label.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return label.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replaceAll(/(?:^-)|(?:-$)/g, "");
 }
 
 export function sectionHref(guide: string, id: string) {
@@ -27,7 +27,7 @@ export interface DemoProps {
 }
 
 /** A live example with its source. */
-export function Demo({ title, description, children, code }: DemoProps) {
+export function Demo({ title, description, children, code }: Readonly<DemoProps>) {
   const guide = useContext(GuideRoute);
   const id = title && sectionId(title);
   const source = code.trim();
@@ -38,7 +38,7 @@ export function Demo({ title, description, children, code }: DemoProps) {
       await navigator.clipboard.writeText(source);
       setMessage("Copied");
     } catch {
-      const selection = window.getSelection();
+      const selection = globalThis.getSelection();
       if (selection && block.current) {
         const range = document.createRange();
         range.selectNodeContents(block.current);
@@ -79,7 +79,7 @@ export interface PropRow {
 }
 
 /** The props of a component, or the parts it is composed from, as a table. */
-export function PropsTable({ rows, parts = false }: { rows: PropRow[]; parts?: boolean }) {
+export function PropsTable({ rows, parts = false }: Readonly<{ rows: PropRow[]; parts?: boolean }>) {
   return (
     <div className="catalog-props" role="region" aria-label={parts ? "Component parts" : "Component props"} tabIndex={0}>
       <table className="props">

@@ -11,6 +11,7 @@ export const siteNavigation = [
   { id: "colours", route: "colours", label: "Colours", href: `${sitePath}playground/#/colours` },
   { id: "studio", route: "theme", label: "Theme studio", href: `${sitePath}playground/#/theme` },
   { id: "workspace", route: "playground", label: "Editorial workspace", href: `${sitePath}playground/#/playground` },
+  { id: "research", label: "Research", href: `${sitePath}research/` },
 ] as const;
 export type SiteSection = (typeof siteNavigation)[number]["id"];
 export type SiteNavigation = readonly { id: SiteSection; label: string; href: string }[];

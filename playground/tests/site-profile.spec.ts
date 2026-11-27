@@ -115,7 +115,8 @@ test("the Button guide shows the selected profile’s corners at equal widths", 
     Rasance: ["7px 2px", "0px", "7px 2px", "0px"],
     Réserve: ["min(15%, 30px) 24%", "min(8.5%, 17px) 20%", "min(14.5%, 29px) 27%", "min(10.5%, 21px) 19%"],
     Braise: Array(4).fill("7px 3px"),
-    "Hors champ": Array(4).fill("1.5px"),
+    // A 3px silhouette is too fine for steps a pixel apart: the theme's radius scale takes over.
+    "Hors champ": Array(4).fill("4px"),
     "Hors registre": ["1px", "7px", "1px", "7px"],
     "Échappée": ["9px", "9px", "9px", "0px"],
     "Grand bain": ["9px 5px", "9px 5px", "0px", "0px"],
@@ -128,8 +129,14 @@ test("the Button guide shows the selected profile’s corners at equal widths", 
     await expect(picker).toHaveText(name);
     await expect.poll(() => cornerValues(sample("Small"))).toEqual(small);
     const inherited = await cornerValues(sample("Inherited"));
-    expect(await cornerValues(sample("Large"))).toEqual(inherited);
     const medium = await cornerValues(sample("Medium"));
+    if (name === "Hors champ") {
+      expect(inherited).toEqual(Array(4).fill("3px"));
+      expect(medium).toEqual(Array(4).fill("6px"));
+      expect(await cornerValues(sample("Large"))).toEqual(Array(4).fill("12px"));
+    } else {
+      expect(await cornerValues(sample("Large"))).toEqual(inherited);
+    }
     expect(medium).not.toEqual(small);
     expect(medium).not.toEqual(inherited);
     await expect(sample("None")).toHaveCSS("border-radius", "0px");
@@ -149,31 +156,36 @@ test("the Button guide shows the selected profile’s corners at equal widths", 
   expect(Math.max(...widths) - Math.min(...widths)).toBeLessThan(1);
 });
 
-test("Studio exports the same scaled action shape as a shared Button guide", async ({ page }) => {
-  await page.goto("/playground/#/theme?edition=precision&scheme=braise&shape=reserve");
-  const [download] = await Promise.all([
-    page.waitForEvent("download"),
-    page.getByRole("link", { name: "Download CSS" }).click(),
-  ]);
-  const file = await download.path();
-  if (!file) throw new Error("Expected the exported CSS file");
-  const css = await readFile(file, "utf8");
-  await page.getByRole("link", { name: "Open themed gallery" }).click();
-  await page.getByRole("link", { name: "Button", exact: true }).click();
-  await page.reload();
-  const small = page.getByRole("button", { name: "Publish (Small)", exact: true });
-  await expect(small).toHaveCSS("background-color", "rgb(240, 170, 112)");
-  await expect(small).toHaveCSS("border-top-left-radius", "min(15%, 30px) 24%");
-  const corners = await cornerValues(small);
+for (const { shape, query, radius } of [
+  { shape: "Réserve", query: "edition=precision&scheme=braise&shape=reserve", radius: "min(15%, 30px) 24%" },
+  { shape: "Hors champ", query: "scheme=braise&shape=hors-champ", radius: "4px" },
+]) {
+  test(`Studio and a shared Button guide agree on the small radius for ${shape}`, async ({ page }) => {
+    await page.goto("/playground/#/theme?" + query);
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("link", { name: "Download CSS" }).click(),
+    ]);
+    const file = await download.path();
+    if (!file) throw new Error("Expected the exported CSS file");
+    const css = await readFile(file, "utf8");
+    await page.getByRole("link", { name: "Open themed gallery" }).click();
+    await page.getByRole("link", { name: "Button", exact: true }).click();
+    await page.reload();
+    const small = page.getByRole("button", { name: "Publish (Small)", exact: true });
+    await expect(small).toHaveCSS("background-color", "rgb(240, 170, 112)");
+    await expect(small).toHaveCSS("border-top-left-radius", radius);
+    const corners = await cornerValues(small);
 
-  const consumer = await page.context().newPage();
-  await consumer.setContent('<section data-elea-theme="brand"><button class="elea-button elea-button--primary elea-button--md elea-button--radius-sm">Publish</button></section>');
-  for (const asset of ["@alien6-studio/elea-tokens/elea.css", "@alien6-studio/elea-ui/styles.css"]) {
-    await consumer.addStyleTag({ content: await readFile(new URL(import.meta.resolve(asset)), "utf8") });
-  }
-  await consumer.addStyleTag({ content: css });
-  const exported = consumer.getByRole("button", { name: "Publish" });
-  await expect(exported).toHaveCSS("background-color", "rgb(240, 170, 112)");
-  expect(await cornerValues(exported)).toEqual(corners);
-  await consumer.close();
-});
+    const consumer = await page.context().newPage();
+    await consumer.setContent('<section data-elea-theme="brand"><button class="elea-button elea-button--primary elea-button--md elea-button--radius-sm">Publish</button></section>');
+    for (const asset of ["@alien6-studio/elea-tokens/elea.css", "@alien6-studio/elea-ui/styles.css"]) {
+      await consumer.addStyleTag({ content: await readFile(new URL(import.meta.resolve(asset)), "utf8") });
+    }
+    await consumer.addStyleTag({ content: css });
+    const exported = consumer.getByRole("button", { name: "Publish" });
+    await expect(exported).toHaveCSS("background-color", "rgb(240, 170, 112)");
+    expect(await cornerValues(exported)).toEqual(corners);
+    await consumer.close();
+  });
+}

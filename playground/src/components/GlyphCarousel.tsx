@@ -22,11 +22,17 @@ const upper = Math.max(capHeight, ...glyphs.map(g => g.bounds[3]!)) + 36;
 const measureY = -Math.min(0, ...glyphs.map(g => g.bounds[1]!)) + 55;
 const viewBox = `${labelX - 12} ${-upper} ${edge - labelX + 28} ${upper + measureY + 65}`;
 
-function GlyphDiagram({ letter }: { letter: keyof typeof glyphData }) {
+function kindOf(letter: string) {
+  if (/\p{Lu}/u.test(letter)) return "uppercase";
+  if (/\p{Ll}/u.test(letter)) return "lowercase";
+  return /\p{N}/u.test(letter) ? "figure" : "symbol";
+}
+
+function GlyphDiagram({ letter }: Readonly<{ letter: keyof typeof glyphData }>) {
   const { d, advance, bounds, curve } = glyphData[letter];
   const [left, bottom, right, top] = bounds as [number, number, number, number];
-  const uppercase = /\p{Lu}/u.test(letter);
-  const kind = uppercase ? "uppercase" : /\p{Ll}/u.test(letter) ? "lowercase" : /\p{N}/u.test(letter) ? "figure" : "symbol";
+  const kind = kindOf(letter);
+  const uppercase = kind === "uppercase";
   // Optical overshoot is part of a round letter, not a descender.
   const descends = bottom < -50;
   const guides = [
@@ -35,7 +41,9 @@ function GlyphDiagram({ letter }: { letter: keyof typeof glyphData }) {
   ];
   if (uppercase) guides.unshift({ y: -capHeight, label: "Cap height" });
   if (descends && (kind === "lowercase" || uppercase)) {
-    const label = letter.toLowerCase() === "ç" ? "Cedilla" : letter === "Q" ? "Tail" : "Descender";
+    let label = "Descender";
+    if (letter.toLowerCase() === "ç") label = "Cedilla";
+    else if (letter === "Q") label = "Tail";
     guides.push({ y: -bottom, label });
   }
 
@@ -59,8 +67,8 @@ function GlyphDiagram({ letter }: { letter: keyof typeof glyphData }) {
           <polyline className="type-plate__handles" points={curve.map(point => point.join(",")).join(" ")}/>
           <g className="type-plate__nodes">
             {curve.map(([x, y], i) => i === 1
-              ? <circle key={i} cx={x} cy={y} r="5"/>
-              : <rect key={i} x={x! - 6} y={y! - 6} width="12" height="12"/>)}
+              ? <circle key={`${x},${y}`} cx={x} cy={y} r="5"/>
+              : <rect key={`${x},${y}`} x={x! - 6} y={y! - 6} width="12" height="12"/>)}
           </g>
         </>}
       </g>

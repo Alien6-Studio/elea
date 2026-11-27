@@ -327,6 +327,7 @@ for (const width of [1440, 320]) {
         { label: "Colours", heading: "Colours", url: /#\/colours$/ },
         { label: "Theme studio", heading: "Theme studio", url: /#\/theme\?scheme=reserve$/ },
         { label: "Editorial workspace", heading: "Editorial workspace", url: /#\/playground\?scheme=reserve$/ },
+        { label: "Research", heading: "Research", url: /\/research\/$/ },
       ] as const;
       const labels = destinations.map(destination => destination.label);
       for (const destination of destinations) {
@@ -345,9 +346,9 @@ for (const width of [1440, 320]) {
       }
 
       await page.goBack();
-      await expect(page).toHaveURL(/#\/theme\?scheme=reserve$/);
-      await expect(main.getByRole("heading", { name: "Theme studio", exact: true, level: 1 })).toBeVisible();
-      await expect(nav.locator("a[aria-current]")).toHaveText(["Theme studio"]);
+      await expect(page).toHaveURL(/#\/playground\?scheme=reserve$/);
+      await expect(main.getByRole("heading", { name: "Editorial workspace", exact: true, level: 1 })).toBeVisible();
+      await expect(nav.locator("a[aria-current]")).toHaveText(["Editorial workspace"]);
       await page.getByRole("contentinfo").getByRole("link", { name: "Elea", exact: true }).press("Enter");
       await expect(page).toHaveURL(/\/$/);
     });

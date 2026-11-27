@@ -86,9 +86,9 @@ const tealInfo = {
   "--elea-color-action-info-pressed": "color-mix(in srgb, var(--elea-color-action-info) 80%, light-dark(black, white))",
 } as CSSProperties;
 
-export function ButtonsPage({ brand = defaultSiteTheme }: { brand?: BrandTheme }) {
+export function ButtonsPage({ brand = defaultSiteTheme }: Readonly<{ brand?: BrandTheme }>) {
   const radiusDescription = brand.buttonRadiusScale === "profile" && brand.shape && !brand.radius
-    ? "Small and Medium tighten each curve of the theme’s silhouette. Large matches Inherited. None gives square corners and Full gives a pill."
+    ? "Small and Medium tighten each curve of the theme’s silhouette and Large matches Inherited. None gives square corners and Full gives a pill."
     : "Inherited follows the current theme. Small, Medium and Large use its corner radius values. None gives square corners and Full gives a pill.";
   return (
     <>
@@ -276,7 +276,7 @@ export function ChoicesPage() {
   );
 }
 
-export function DialogPage({ brand }: { brand?: BrandTheme }) {
+export function DialogPage({ brand }: Readonly<{ brand?: BrandTheme }>) {
   const theme = brand ? "brand" : "editorial";
   const themeOpener = brand ? "Open themed dialog" : "Open in Editorial";
   const themeTitle = brand ? "Themed dialog" : "Editorial edition";
@@ -504,7 +504,8 @@ export function RadiosPage() {
       <Demo title="Notification preferences" description="Choose a delivery schedule and save to read the submitted form value." code={emailDeliverySource}>
         <form className="catalog-form" onSubmit={(event) => {
           event.preventDefault();
-          setSaved(String(new FormData(event.currentTarget).get("delivery")));
+          const delivery = new FormData(event.currentTarget).get("delivery");
+          if (typeof delivery === "string") setSaved(delivery);
         }}>
           <RadioGroup label="Email delivery" name="delivery" defaultValue="weekly" options={deliveryOptions} />
           <Button type="submit">Save preferences</Button>
@@ -538,7 +539,7 @@ export function TabsPage() {
       <Demo title="Document inspector" description="The theme chooses the presentation. Use the arrow keys to move between tabs." code={documentInspectorSource}>
         <Tabs className="catalog-tabs" label="Article information" defaultValue="details" items={publicationTabs} />
       </Demo>
-      <Demo title="Segmented tabs" description="The selected view sits in a capsule."
+      <Demo title="Segmented tabs" description="The selected view is inset from the border of the list."
         code={segmentedTabsSource}>
         <SegmentedTabs />
       </Demo>

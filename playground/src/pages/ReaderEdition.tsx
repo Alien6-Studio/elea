@@ -6,13 +6,13 @@ import { siteHostnames } from "../links.js";
 import "@alien6-studio/elea-content-viewer/styles.css";
 import "./reader-edition.css";
 
-export function ReaderEdition({ document, title, summary, audience, messages }: {
+export function ReaderEdition({ document, title, summary, audience, messages }: Readonly<{
   document: EleaDocument;
   title: string;
   summary: string;
   audience?: string;
   messages: EleaMessages;
-}) {
+}>) {
   const cover = document.blocks[0]?.type === "image" ? document.blocks[0] : undefined;
   return (
     <article className="workspace-edition">

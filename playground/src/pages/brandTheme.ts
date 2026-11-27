@@ -3,8 +3,7 @@ import { colorFamilies, colorThemes, surfaceFamilies, type ColorFamily, type Col
 
 import { href } from "../router.js";
 
-export { editions, makeBrandTheme, typeFamilies } from "@alien6-studio/elea-tokens/brand";
-export { matchingColorTheme as matchingColourTheme };
+export { editions, makeBrandTheme, matchingColorTheme as matchingColourTheme, typeFamilies } from "@alien6-studio/elea-tokens/brand";
 
 export type StudioThemeId = ThemeProfileId;
 export const featuredColourThemes = (Object.keys(colorThemes) as ColorThemeId[])
@@ -176,55 +175,77 @@ export function readBrandTheme(query = globalThis.location?.hash.split("?")[1]):
   return legacyPalette(brand, params);
 }
 
+/** Sets each parameter that has a value, in the order given. */
+function assign(params: URLSearchParams, values: Record<string, string | false | null | undefined>) {
+  for (const [name, value] of Object.entries(values)) {
+    if (value) params.set(name, value);
+  }
+}
+
+/** Sets the colour roles and the neutral family that differ from a base palette, or all of them without one. */
+function assignPalette(params: URLSearchParams, palette: BrandTheme["palette"], base?: BrandTheme["palette"]) {
+  for (const role of brandColorRoles) {
+    const value = assignmentValue(palette?.[role]);
+    if (value && value !== assignmentValue(base?.[role])) params.set(role, value);
+  }
+  const neutral = palette?.neutral;
+  if (neutral && neutral !== base?.neutral) params.set("neutral", neutral.toLowerCase());
+}
+
+/** A profile and what was changed from it. */
+function profileParams(brand: BrandTheme, profile: StudioThemeId) {
+  const { seed, corner, shape, typeface, rhythm, accent, radius, font, palette } = brand;
+  const base = studioTheme(profile);
+  const reshaped = corner !== base.corner;
+  const params = new URLSearchParams({ scheme: profile });
+  assign(params, {
+    // An explicit corner selects the classic shape, even when its scale matches the profile.
+    corners: (!shape || reshaped) && corner,
+    shape: (shape !== base.shape || reshaped) && shape,
+    type: typeface !== base.typeface && typeface,
+    rhythm: rhythm !== base.rhythm && rhythm,
+    font,
+    radius,
+    seed: !palette?.primary && seed.toLowerCase() !== base.seed && seed.slice(1),
+    accent: !palette?.secondary && accent?.toLowerCase() !== base.accent && accent?.slice(1),
+  });
+  assignPalette(params, palette, base.palette);
+  return params;
+}
+
+/** The short form of an edition whose settings are untouched, when the brand is one. */
+function editionParams(brand: BrandTheme, scheme: ColorThemeId | undefined) {
+  const { edition, seed, corner, shape, typeface, rhythm, accent, radius, font, palette } = brand;
+  const preset: BrandTheme | undefined = edition && editions[edition];
+  if (!edition || !preset) return undefined;
+  const presetCorner = shape ? colorThemes[shape].profile.corner : preset.corner;
+  const untouched = corner === presetCorner && typeface === preset.typeface && rhythm === preset.rhythm &&
+    radius === preset.radius && font === preset.font;
+  if (!untouched) return undefined;
+  const presetColours = !palette && seed === preset.seed && (accent ?? preset.accent) === preset.accent;
+  if (!scheme && !presetColours) return undefined;
+  const params = new URLSearchParams({ edition: edition.toLowerCase() });
+  assign(params, { scheme, shape });
+  return params;
+}
+
+function customParams(brand: BrandTheme, scheme: ColorThemeId | undefined) {
+  const { edition, seed, corner, shape, typeface, rhythm, accent, radius, font, palette } = brand;
+  const params = new URLSearchParams({ brand: seed.slice(1), corners: corner, type: typeface, rhythm });
+  assign(params, { shape, accent: accent?.slice(1), radius, font, edition: edition?.toLowerCase(), scheme });
+  if (!scheme && palette) {
+    assign(params, { source: brand.paletteOrigin });
+    assignPalette(params, palette);
+  }
+  return params;
+}
+
 export function brandRoute(route: "colours" | "theme" | "playground" | "ui" | `ui/${string}`, brand?: BrandTheme) {
   const path = href(route);
   if (!brand) return path;
-  const { edition, seed, corner, shape, typeface, rhythm, accent, radius, font, palette } = brand;
-  if (brand.profile) {
-    const base = studioTheme(brand.profile);
-    const params = new URLSearchParams({ scheme: brand.profile });
-    // An explicit corner selects the classic shape, even when its scale matches the profile.
-    if (!shape || corner !== base.corner) params.set("corners", corner);
-    if (shape && (shape !== base.shape || corner !== base.corner)) params.set("shape", shape);
-    if (typeface !== base.typeface) params.set("type", typeface);
-    if (rhythm !== base.rhythm) params.set("rhythm", rhythm);
-    if (font) params.set("font", font);
-    if (radius) params.set("radius", radius);
-    if (!palette?.primary && seed.toLowerCase() !== base.seed) params.set("seed", seed.slice(1));
-    if (!palette?.secondary && accent && accent.toLowerCase() !== base.accent) params.set("accent", accent.slice(1));
-    for (const role of brandColorRoles) {
-      const value = assignmentValue(palette?.[role]);
-      if (value && value !== assignmentValue(base.palette?.[role])) params.set(role, value);
-    }
-    if (palette?.neutral && palette.neutral !== base.palette?.neutral) params.set("neutral", palette.neutral.toLowerCase());
-    return path + "?" + params;
-  }
-  const preset: BrandTheme | undefined = edition && editions[edition];
+  if (brand.profile) return `${path}?${profileParams(brand, brand.profile)}`;
   const scheme = matchingColorTheme(brand);
-  if (edition && preset && corner === (shape ? colorThemes[shape].profile.corner : preset.corner) && typeface === preset.typeface && rhythm === preset.rhythm &&
-    radius === preset.radius && font === preset.font) {
-    const base = new URLSearchParams({ edition: edition.toLowerCase() });
-    if (scheme) base.set("scheme", scheme);
-    if (shape) base.set("shape", shape);
-    if (scheme || (!palette && seed === preset.seed && (accent ?? preset.accent) === preset.accent)) return `${path}?${base}`;
-  }
-
-  const params = new URLSearchParams({ brand: seed.slice(1), corners: corner, type: typeface, rhythm });
-  if (shape) params.set("shape", shape);
-  if (accent) params.set("accent", accent.slice(1));
-  if (radius) params.set("radius", radius);
-  if (font) params.set("font", font);
-  if (edition) params.set("edition", edition.toLowerCase());
-  if (scheme) params.set("scheme", scheme);
-  else if (palette) {
-    if (brand.paletteOrigin) params.set("source", brand.paletteOrigin);
-    for (const role of brandColorRoles) {
-      const value = assignmentValue(palette[role]);
-      if (value) params.set(role, value);
-    }
-    if (palette.neutral) params.set("neutral", palette.neutral.toLowerCase());
-  }
-  return `${path}?${params}`;
+  return `${path}?${editionParams(brand, scheme) ?? customParams(brand, scheme)}`;
 }
 
 /** The untouched profile represented by a shared brand, or null for a custom design. */

@@ -38,13 +38,13 @@ const chapters: Record<string, { title: string; text: string }> = {
   footer: { title: "Footer", text: "At the end of the page, group links by destination so readers can find a related story or return to the publication." },
 };
 
-export function LibrarySidebar({ navigation }: { navigation: HandbookNavigation }) {
+export function LibrarySidebar({ navigation }: Readonly<{ navigation: HandbookNavigation }>) {
   return <Sidebar label="Library sections" header={<strong>Contents</strong>} groups={groups}
     current={navigation.current} render={navigation.render}
     footer={navigation.render({ href: "#guides", children: "All chapters" })} />;
 }
 
-export function SpecimenPage({ navigation }: { navigation: HandbookNavigation }) {
+export function SpecimenPage({ navigation }: Readonly<{ navigation: HandbookNavigation }>) {
   const chapter = chapters[navigation.current];
   if (!chapter) return null;
   return <article aria-live="polite" style={{ flex: "1 1 15rem", minWidth: 0, padding: "var(--elea-space-4)" }}>
@@ -60,8 +60,9 @@ export function SpecimenPage({ navigation }: { navigation: HandbookNavigation })
 
 export function HandbookLayout() {
   const navigation = usePreviewNavigation("letterforms");
-  const collection = ["type", "letterforms", "sizes"].includes(navigation.current) ? "type"
-    : navigation.current === "colours" ? "colours" : "guides";
+  let collection = "guides";
+  if (["type", "letterforms", "sizes"].includes(navigation.current)) collection = "type";
+  else if (navigation.current === "colours") collection = "colours";
   return <div style={{ width: "100%", background: "var(--elea-color-surface-default)" }}>
     <Navbar label="Design handbook" menuLabel="Handbook menu" brand={<strong>Design handbook</strong>}
       items={[

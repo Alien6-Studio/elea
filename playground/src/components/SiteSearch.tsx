@@ -11,7 +11,7 @@ export function SiteSearch() {
   const field = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (/Mac|iPhone|iPad/i.test(navigator.platform)) setShortcut("⌘ K");
+    if (/Mac|iPhone|iPad/i.test(navigator.userAgent)) setShortcut("⌘ K");
     function focusSearch(event: KeyboardEvent) {
       if (event.defaultPrevented || event.isComposing || event.key.toLowerCase() !== "k" ||
           !(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) return;

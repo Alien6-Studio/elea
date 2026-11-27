@@ -1,0 +1,110 @@
+.research-lab { padding-block: var(--site-page-inset) clamp(3rem, 7vw, 6rem); }
+.geo-page { --geo-rule: 1px solid var(--elea-color-border-default); --geo-mono: var(--elea-font-family-mono); }
+.geo-eyebrow, .geo-plate__number, .geo-plate__block, .geo-table caption, .geo-table thead th, .geo-lab__readout dt {
+  font-family: var(--geo-mono);
+  font-size: .75rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--elea-color-text-muted);
+}
+.geo-eyebrow { margin: 0 0 .75rem; }
+.geo-lead { max-width: 60ch; margin: 1.25rem 0 0; color: var(--elea-color-text-muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.55; }
+.geo-intro__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.75rem; }
+.geo-note { color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
+
+.geo-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem 2rem; margin: clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3.5rem); padding-top: 1.25rem; border-top: var(--geo-rule); padding-bottom: 1.25rem; border-bottom: var(--geo-rule); }
+.geo-legend dt { margin-bottom: .4rem; }
+.geo-legend dd { margin: 0; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
+
+/* Plates */
+.geo-instrument { margin-top: clamp(2.5rem, 6vw, 4rem); padding-top: 1.75rem; border-top: var(--geo-rule); }
+.geo-atlas { display: grid; gap: clamp(3rem, 8vw, 6rem); }
+.geo-plate__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 1.25rem; margin-bottom: 1rem; }
+.geo-plate__number { flex: 1 0 100%; margin: 0; }
+.geo-plate__head h3 { flex: 1 1 14rem; margin: 0; font-size: clamp(1.5rem, 3.2vw, 2.5rem); font-weight: 600; line-height: 1.1; letter-spacing: -.04em; }
+.geo-plate__body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(17rem, 24rem); border: var(--geo-rule); }
+.geo-plate__body--wide { grid-template-columns: minmax(0, 1fr); }
+.geo-plate__sheet { min-width: 0; overflow-x: auto; background: var(--elea-color-surface-subtle); }
+.geo-plate__sheet:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+.geo-plate__notes { padding: clamp(1rem, 2.5vw, 1.75rem); border-inline-start: var(--geo-rule); }
+.geo-plate__body--wide .geo-plate__notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0 2.5rem; border-inline-start: 0; border-block-start: var(--geo-rule); }
+.geo-plate__notes > :first-child { margin-top: 0; }
+.geo-plate__notes > :last-child { margin-bottom: 0; }
+.geo-plate__notes p { max-width: 62ch; }
+.geo-plate__block { display: flex; flex-wrap: wrap; border: var(--geo-rule); border-top: 0; }
+.geo-plate__block span { flex: 1 1 auto; padding: .45rem .75rem; border-inline-end: var(--geo-rule); }
+.geo-plate__block span:last-child { border-inline-end: 0; }
+@media (max-width: 60rem) {
+  .geo-plate__body { grid-template-columns: minmax(0, 1fr); }
+  .geo-plate__notes { border-inline-start: 0; border-block-start: var(--geo-rule); }
+}
+
+/* Drawings */
+.gp { display: block; width: 100%; min-width: var(--gp-min, 0); height: auto; color: var(--elea-color-text-default); }
+.gp text { font-family: var(--geo-mono); font-size: 12.5px; fill: currentColor; font-variant-numeric: tabular-nums; }
+.gp text.gp-muted { fill: var(--elea-color-text-muted); }
+.gp text.gp-halo { paint-order: stroke; stroke: var(--elea-color-surface-subtle); stroke-width: 6px; stroke-linejoin: round; }
+.gp-edge, .gp-guide, .gp-dim, .gp-comb, .gp-curve, .gp-mark, .gp-ring { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.gp-guide { stroke: var(--elea-color-text-muted); stroke-dasharray: 1 4; stroke-linecap: round; }
+.gp-dim, .gp-comb, .gp-ring { stroke: var(--elea-color-text-muted); }
+.gp-comb { stroke-width: .75; }
+.gp-mark { fill: var(--elea-color-surface-subtle); stroke-width: 1.5; }
+.gp-body { fill: var(--elea-color-surface-muted); }
+.gp-shape { fill: var(--elea-color-text-default); }
+.gp-band { fill: var(--elea-color-action-primary); opacity: .22; }
+.gp-curve { stroke-width: 1.5; stroke-linejoin: round; }
+.gp-curve--thin { stroke-width: 1; }
+.gp-curve--circle { stroke-width: 2.5; }
+.gp-curve--squircle { stroke: var(--elea-color-action-primary); stroke-width: 2.5; }
+.gp-curve--spiral { stroke-dasharray: 10 5; }
+.gp-curve--cubic { stroke-dasharray: 1.5 5; stroke-linecap: round; stroke-width: 2; }
+.gp-swatch { display: inline-block; width: 1.75rem; min-width: 0; margin-inline-end: .5rem; vertical-align: middle; }
+
+.geo-table { width: 100%; margin-block: 1.25rem; border-collapse: collapse; font-size: var(--elea-font-size-sm); font-variant-numeric: tabular-nums; }
+.geo-table caption { padding-bottom: .5rem; text-align: start; }
+.geo-table th, .geo-table td { padding: .45rem .5rem .45rem 0; border-top: var(--geo-rule); text-align: start; vertical-align: baseline; }
+.geo-table tbody th { font-weight: 500; }
+
+.geo-specimens { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 1px; margin: 0; padding: 1px; list-style: none; }
+.geo-specimens li { padding: 1.25rem; outline: var(--geo-rule); }
+.geo-specimens h4 { margin: 0; font-size: 1.15rem; letter-spacing: -.02em; }
+.geo-specimens p { margin: .1rem 0 1rem; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
+.geo-specimens dl { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem .75rem; margin: 0; }
+.geo-specimens dt { display: grid; gap: .4rem; font-family: var(--geo-mono); font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; }
+.geo-specimens dd { margin: .2rem 0 0; }
+.geo-specimens code { padding: 0; background: none; color: var(--elea-color-text-muted); font-size: .7rem; overflow-wrap: anywhere; }
+.geo-specimen { display: block; height: 3rem; border: 1.5px solid var(--elea-color-text-default); }
+.geo-specimen--surface { background: var(--elea-color-surface-muted); }
+.geo-specimen--action { background: var(--elea-color-text-default); }
+.geo-specimen--indicator { width: 4rem; height: 1.5rem; margin-top: 1.5rem; }
+
+/* Laboratory */
+.geo-lab { display: grid; grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr); gap: 2rem clamp(1.5rem, 4vw, 3rem); align-items: start; }
+.geo-lab__controls { display: grid; gap: 1.25rem; }
+.geo-lab__stage { min-width: 0; }
+.geo-lab__stage > svg { max-height: 26rem; border: var(--geo-rule); background: var(--elea-color-surface-subtle); }
+.geo-lab__stage .gp-body { fill: var(--elea-color-surface-default); }
+.geo-lab__readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0 1.5rem; margin: 0; }
+.geo-lab__readout div { padding-block: .6rem; border-bottom: var(--geo-rule); }
+.geo-lab__readout dd { margin: .15rem 0 0; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.geo-lab__compare { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 2rem clamp(1.5rem, 4vw, 3rem); padding-top: 2rem; border-top: var(--geo-rule); }
+.geo-lab__compare h4 { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: 0 0 1rem; font-size: 1.1rem; letter-spacing: -.02em; }
+.geo-lab__compare .elea-card { max-width: 26rem; }
+.geo-lab > .elea-alert { grid-column: 1 / -1; }
+.geo-lab__nested { display: grid; gap: .75rem; }
+.geo-lab__nested p { margin: 0; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
+.geo-lab__media { display: flex; align-items: start; height: 7rem; padding: 8px; background: var(--elea-color-surface-muted); border-radius: var(--elea-shape-surface, var(--elea-radius-md)); }
+.geo-lab__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+/* The experiment only sets shape variables: the components read them as they do in a profile. */
+.geo-lab__experiment .geo-lab__nested {
+  --elea-shape-action: var(--geo-inner);
+  --elea-shape-control: var(--geo-inner);
+  --elea-shape-surface: var(--geo-inner);
+  --elea-shape-indicator: var(--geo-innermost);
+}
+@supports (corner-shape: superellipse(2)) {
+  .geo-lab__experiment :is(.elea-card, .elea-button, .elea-ui-input, .geo-lab__media) { corner-shape: superellipse(var(--geo-curve)); }
+}
+@media (max-width: 52rem) {
+  .geo-lab { grid-template-columns: minmax(0, 1fr); }
+}

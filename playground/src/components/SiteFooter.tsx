@@ -11,7 +11,7 @@ const project = {
   ],
 };
 
-export function SiteFooter({ navigation = siteNavigation }: { navigation?: SiteNavigation }) {
+export function SiteFooter({ navigation = siteNavigation }: Readonly<{ navigation?: SiteNavigation }>) {
   return (
     <Footer role="contentinfo" className="site-footer" groups={[{ label: "Explore Elea", links: navigation }, project]} brand={
       <>

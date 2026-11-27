@@ -13,7 +13,7 @@ import "./studio.css";
 
 const notebook = createDocument(notebookBlocks);
 
-export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChange: (next: BrandTheme) => void }) {
+export function ThemeStudioPage({ brand, onChange }: Readonly<{ brand: BrandTheme; onChange: (next: BrandTheme) => void }>) {
   const [mobileView, setMobileView] = useState<"preview" | "settings">("preview");
   // What is being typed for the free values; the theme takes them once the generator accepts them.
   const [draft, setDraft] = useState(() => ({ radius: brand.radius ?? "", font: brand.font ?? "" }));
@@ -22,8 +22,8 @@ export function ThemeStudioPage({ brand, onChange }: { brand: BrandTheme; onChan
       const next = readBrandTheme();
       setDraft({ radius: next?.radius ?? "", font: next?.font ?? "" });
     };
-    window.addEventListener("hashchange", followLocation);
-    return () => window.removeEventListener("hashchange", followLocation);
+    globalThis.addEventListener("hashchange", followLocation);
+    return () => globalThis.removeEventListener("hashchange", followLocation);
   }, []);
   const { corner, typeface, rhythm } = brand;
   const { css } = useMemo(() => makeBrandTheme(brand), [brand]);

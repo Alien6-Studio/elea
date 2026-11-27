@@ -241,7 +241,7 @@ const toastIconShapes = {
   danger: <><circle cx="12" cy="12" r="9" /><path d="m9 9 6 6m0-6-6 6" /></>,
 };
 
-export function ToastExampleIcon({ name }: { name: keyof typeof toastIconShapes }) {
+export function ToastExampleIcon({ name }: Readonly<{ name: keyof typeof toastIconShapes }>) {
   return (
     <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       {toastIconShapes[name]}
@@ -257,7 +257,7 @@ const toastExamples = [
   { label: "Danger", tone: "danger", title: "The article could not be saved", description: "Check your connection and try again." },
 ] as const;
 
-function ToastDemos({ position, onPosition }: { position: ToastPosition; onPosition: (position: ToastPosition) => void }) {
+function ToastDemos({ position, onPosition }: Readonly<{ position: ToastPosition; onPosition: (position: ToastPosition) => void }>) {
   const { toast, dismiss } = useToast();
   return (
     <>

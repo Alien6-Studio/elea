@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { NotFound } from "./components/NotFound.js";
 import { SiteFooter } from "./components/SiteFooter.js";
 import { SiteHeader } from "./components/SiteHeader.js";
 import { siteNavigation, sitePath } from "./links.js";
@@ -12,22 +13,86 @@ const ColoursPage = lazy(async () => ({ default: (await import("./pages/ColoursP
 const PlaygroundPage = lazy(async () => ({ default: (await import("./pages/Playground.js")).PlaygroundPage }));
 const ThemeStudioPage = lazy(async () => ({ default: (await import("./pages/ThemeStudio.js")).ThemeStudioPage }));
 
-export function App() {
-  const [route, replaceRoute] = useHashRoute();
+type View = "archive" | "missing" | "catalog" | "studio" | "colours" | "workspace";
+
+/** What a route shows. A retired study of the design lab opens the catalog; an archived one leaves the site. */
+function readRoute(route: string) {
   const [requestedPath = "playground"] = route.split("?", 1);
   const lab = requestedPath === "design-lab" || requestedPath.startsWith("design-lab/");
   const archive = lab ? archivedWorkspace(requestedPath) : undefined;
   const retiredStudy = lab && !archive;
   const path = retiredStudy ? "ui" : requestedPath;
-  const catalog = path === "ui" || path.startsWith("ui/");
-  const studio = path === "theme";
-  const colours = path === "colours";
-  const section = archive ? undefined : catalog ? "catalog" : studio ? "studio" : colours ? "colours" : "workspace";
+  return { lab, archive, retiredStudy, path, view: viewOf(path, archive) };
+}
+
+function viewOf(path: string, archive: string | undefined): View {
+  if (archive) return "archive";
+  if (path === "ui" || path.startsWith("ui/")) return "catalog";
+  if (path === "theme") return "studio";
+  if (path === "colours") return "colours";
+  // Only a route written as #/… can be wrong: a bare fragment is an anchor of the current page.
+  if (path !== "playground" && globalThis.location.hash.startsWith("#/")) return "missing";
+  return "workspace";
+}
+
+/** The route that keeps the current page when the theme changes. */
+function destinationOf(view: View, path: string) {
+  if (view === "studio") return "theme";
+  if (view === "colours") return "colours";
+  if (view === "catalog") return path as "ui" | `ui/${string}`;
+  return "playground";
+}
+
+function layoutOf(view: View) {
+  if (view === "archive" || view === "workspace") return "full";
+  return view;
+}
+
+function navigationFor(brand: BrandTheme | undefined) {
+  if (!brand) return siteNavigation;
+  return siteNavigation.map(link => "route" in link ? { ...link, href: `${sitePath}playground/${brandRoute(link.route, brand)}` } : link);
+}
+
+function useRedirects(retiredStudy: boolean, archive: string | undefined, replaceRoute: (route: string) => void) {
+  useEffect(() => {
+    if (retiredStudy) replaceRoute(href("ui"));
+  }, [retiredStudy, replaceRoute]);
+  useEffect(() => {
+    if (archive) globalThis.location.replace(archive);
+  }, [archive]);
+}
+
+function Page({ view, archive, path, brand, preferred, session, onChange }: Readonly<{
+  view: View;
+  archive: string | undefined;
+  path: string;
+  brand: BrandTheme | undefined;
+  preferred: BrandTheme;
+  session: number;
+  onChange: (next: BrandTheme) => void;
+}>) {
+  switch (view) {
+    case "archive": return <p className="site-container"><a href={archive}>View the archived Workspace capture on GitHub</a>.</p>;
+    case "missing": return <NotFound />;
+    case "catalog": return <CatalogPage route={path} brand={brand} />;
+    case "colours": return <ColoursPage key={session} brand={brand ?? preferred} onChange={onChange} />;
+    case "studio": return <ThemeStudioPage key={session} brand={brand ?? preferred} onChange={onChange} />;
+    default: return <PlaygroundPage brand={brand} />;
+  }
+}
+
+export function App() {
+  const [route, replaceRoute] = useHashRoute();
+  const { lab, archive, retiredStudy, path, view } = readRoute(route);
+  const missing = view === "missing";
+  const editing = view === "studio" || view === "colours";
+  const section = view === "archive" || missing ? undefined : view;
   const [editorSession, setEditorSession] = useState(0);
   const saved = useSyncExternalStore(siteProfile.subscribe, siteProfile.get);
   const shared = useMemo(() => lab ? undefined : readBrandTheme(route.split("?")[1] ?? ""), [lab, route]);
   const preferred = useMemo(() => studioTheme(saved), [saved]);
-  const brand = shared ?? (!lab && (saved !== "reserve" || studio || colours) ? preferred : undefined);
+  const followsProfile = !lab && (saved !== "reserve" || editing);
+  const brand = shared ?? (followsProfile ? preferred : undefined);
   const profile = shared ? exactProfile(shared) : saved;
   const scope = siteScope(profile ?? saved);
   useLayoutEffect(() => {
@@ -37,40 +102,26 @@ export function App() {
   function selectProfile(id: StudioThemeId) {
     siteProfile.set(id);
     setEditorSession(session => session + 1);
-    const destination = studio ? "theme" : colours ? "colours" : catalog ? path as "ui" | `ui/${string}` : "playground";
-    replaceRoute(brandRoute(destination, studioTheme(id)));
+    if (!missing) replaceRoute(brandRoute(destinationOf(view, path), studioTheme(id)));
   }
   function editBrand(next: BrandTheme) {
     const profile = exactProfile(next);
     if (profile) siteProfile.set(profile);
-    replaceRoute(brandRoute(studio ? "theme" : "colours", next));
+    replaceRoute(brandRoute(view === "studio" ? "theme" : "colours", next));
   }
-  const navigation = brand ? siteNavigation.map((link) =>
-    "route" in link
-      ? { ...link, href: `${sitePath}playground/${brandRoute(link.route, brand)}` }
-      : link,
-  ) : siteNavigation;
-  const title = siteNavigation.find(link => link.id === section)?.label ?? "Archived workspace";
+  const navigation = navigationFor(brand);
+  const title = missing ? "Page not found" : siteNavigation.find(link => link.id === section)?.label ?? "Archived workspace";
+  useRedirects(retiredStudy, archive, replaceRoute);
   useEffect(() => {
-    if (retiredStudy) replaceRoute(href("ui"));
-  }, [retiredStudy, replaceRoute]);
-  useEffect(() => {
-    if (archive) globalThis.location.replace(archive);
-  }, [archive]);
-  useEffect(() => {
-    if (!catalog) document.title = `${title} · Elea`;
-  }, [catalog, title]);
+    if (view !== "catalog") document.title = `${title} · Elea`;
+  }, [view, title]);
 
   return (
     <div className="site">
       <SiteHeader navigation={navigation} section={section} profile={profile} onProfileChange={selectProfile} />
-      <main id="main" tabIndex={-1} className={`site__content site__content--${section === "workspace" || !section ? "full" : section}`}>
+      <main id="main" tabIndex={-1} className={`site__content site__content--${layoutOf(view)}`}>
         <Suspense fallback={<p className="site-container" role="status">Loading…</p>}>
-          {archive ? <p className="site-container"><a href={archive}>View the archived Workspace capture on GitHub</a>.</p>
-            : catalog ? <CatalogPage route={path} brand={brand} />
-            : colours ? <ColoursPage key={editorSession} brand={brand ?? preferred} onChange={editBrand} />
-            : studio ? <ThemeStudioPage key={editorSession} brand={brand ?? preferred} onChange={editBrand} />
-            : <PlaygroundPage brand={brand} />}
+          <Page view={view} archive={archive} path={path} brand={brand} preferred={preferred} session={editorSession} onChange={editBrand} />
         </Suspense>
       </main>
       <SiteFooter navigation={navigation} />

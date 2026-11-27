@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { Button, RadioGroup } from "@alien6-studio/elea-ui";
 
 const options = [
@@ -18,10 +18,10 @@ const options = [
 export function EmailDelivery() {
   const [saved, setSaved] = useState<string>();
 
-  function save(event: FormEvent<HTMLFormElement>) {
+  function save(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    setSaved(String(form.get("delivery")));
+    const delivery = new FormData(event.currentTarget).get("delivery");
+    if (typeof delivery === "string") setSaved(delivery);
   }
 
   return (

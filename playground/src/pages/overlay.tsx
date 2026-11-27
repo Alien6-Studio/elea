@@ -29,6 +29,11 @@ export function PopoverPage() {
   const [articles, setArticles] = useState(drafts);
   const [row, setRow] = useState<{ name: string; anchor: HTMLElement } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  function removeRow() {
+    setArticles((all) => all.filter((name) => name !== row?.name));
+    setDeleting(false);
+    setRow(null);
+  }
   const [point, setPoint] = useState<PopoverAnchor | null>(null);
   const [asked, setAsked] = useState<{ tone: ConfirmTone; title: string; action: string; anchor: HTMLElement } | null>(null);
   const [answer, setAnswer] = useState("nothing yet");
@@ -106,11 +111,7 @@ export function PopoverPage() {
           title={`Delete ${row?.name ?? "it"}?`} description="This cannot be undone." confirmLabel="Delete" cancelLabel="Keep"
           onConfirm={() => {
             setDeleting(true);
-            setTimeout(() => {
-              setArticles((all) => all.filter((name) => name !== row?.name));
-              setDeleting(false);
-              setRow(null);
-            }, 900);
+            setTimeout(removeRow, 900);
           }}
           onCancel={() => setRow(null)} />
       </Demo>

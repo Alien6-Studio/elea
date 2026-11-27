@@ -18,8 +18,10 @@
   {% for path in config.extra_css %}
     <link rel="stylesheet" href="{{ path | url }}">
   {% endfor %}
+  {% if page.meta.lab %}<link rel="stylesheet" href="{{ ('assets/' ~ page.meta.lab ~ '.css') | url }}">{% endif %}
 </head>
 {% set typography_page = page.file.src_uri == 'typography.md' %}
+{% set research_page = page.file.src_uri.startswith('research/') %}
 <body{% if typography_page %} class="typography-page"{% endif %}>
   {% if page.is_homepage %}
     {% include "header-home.html" %}
@@ -33,6 +35,36 @@
       {{ page.content }}
     </main>
     <script type="module" src="{{ 'playground/glyph-carousel.js' | url }}"></script>
+  {% elif research_page %}
+    {% include "header-research.html" %}
+    <div class="docs-guidebar">
+      <div class="site-container docs-guidebar__inner">
+        <span class="docs-guidebar__label">Research</span>
+        <nav class="docs-guidebar__links" aria-label="Research">
+          <a href="{{ 'research/' | url }}"{% if page.file.src_uri == 'research/index.md' %} aria-current="page"{% endif %}>All studies</a>
+          {% for study in config.extra.research %}
+            {% set root = 'research/' ~ study.slug %}
+            <a href="{{ (root ~ '/') | url }}"{% if page.file.src_uri == root ~ '.md' %} aria-current="page"{% elif page.file.src_uri.startswith(root ~ '/') %} aria-current="true"{% endif %}>{{ study.title | e }}</a>
+          {% endfor %}
+        </nav>
+      </div>
+    </div>
+    {% for study in config.extra.research %}
+      {% set root = 'research/' ~ study.slug %}
+      {% if study.parts and (page.file.src_uri == root ~ '.md' or page.file.src_uri.startswith(root ~ '/')) %}
+        <div class="docs-guidebar docs-guidebar--study">
+          <div class="site-container docs-guidebar__inner">
+            <span class="docs-guidebar__label">{{ study.title | e }}</span>
+            <nav class="docs-guidebar__links" aria-label="{{ study.title | e }}">
+              <a href="{{ (root ~ '/') | url }}"{% if page.file.src_uri == root ~ '.md' %} aria-current="page"{% endif %}>Study</a>
+              {% for part in study.parts %}
+                <a href="{{ (root ~ '/' ~ part.slug ~ '/') | url }}"{% if page.file.src_uri == root ~ '/' ~ part.slug ~ '.md' %} aria-current="page"{% endif %}>{{ part.title | e }}</a>
+              {% endfor %}
+            </nav>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
   {% else %}
     {% include "header-docs.html" %}
     <div class="docs-guidebar">
@@ -45,6 +77,13 @@
         </nav>
       </div>
     </div>
+  {% endif %}
+  {% if page.meta.lab %}
+    <main id="main" class="site-container research-lab" tabindex="-1">
+      <div id="research-lab" data-view="{{ page.meta.view | e }}">{{ page.content }}</div>
+    </main>
+    <script type="module" src="{{ ('playground/' ~ page.meta.lab ~ '.js') | url }}"></script>
+  {% elif not page.is_homepage and not typography_page %}
     <main id="main" class="site-container docs-layout" tabindex="-1">
       {% if page.toc.items and page.toc.items[0].children %}
         <nav class="docs-toc" aria-label="On this page">

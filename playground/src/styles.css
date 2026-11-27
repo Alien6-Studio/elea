@@ -40,6 +40,7 @@ pre code { background: transparent; padding: 0; font-size: inherit; color: inher
   padding: var(--elea-space-8) var(--site-gutter);
 }
 .site__content--full { width: 100%; padding: 0; }
+.site__content--missing { width: min(var(--site-width), calc(100% - var(--site-gutter) * 2)); padding: 0; }
 .site__content > h1 { font-size: clamp(2.25rem, 5vw, 3.75rem); font-weight: 650; line-height: 1.06; letter-spacing: -0.042em; margin: var(--elea-space-4) 0 var(--elea-space-3); }
 .site__content > h2 { font-size: var(--elea-font-size-2xl); margin: var(--elea-space-10) 0 var(--elea-space-3); }
 .lead { font-size: var(--elea-font-size-lg); color: var(--elea-color-text-muted); margin: 0 0 var(--elea-space-6); }

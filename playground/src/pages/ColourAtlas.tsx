@@ -18,7 +18,7 @@ type AtlasControls = {
 interface AtlasRow {
   label: string;
   shades: readonly { step: ColorStep; value: string }[];
-  family?: ColorFamily | undefined;
+  family?: ColorFamily;
 }
 
 const referenceRows: AtlasRow[] = (Object.keys(colorFamilies) as ColorFamily[]).map(family =>
@@ -89,14 +89,15 @@ function AtlasPanel({ rows, mode, initialRow, initialStep, ...controls }: AtlasC
 export function ColourAtlas({ roleScales, themeName, reference, ...controls }: AtlasControls & {
   roleScales: Theme["roleScales"];
   themeName: string;
-  reference?: ArtworkReference | undefined;
+  reference?: ArtworkReference;
 }) {
   const { palette, edition } = controls.brand;
   const themeRows: AtlasRow[] = brandColorRoles.flatMap(role => {
     const shades = roleScales[role];
     const assignment = palette?.[role];
-    const family = assignment && "family" in assignment ? assignment.family
-      : role === "tertiary" && !assignment && edition ? defaultTertiaryFamily : undefined;
+    let family: ColorFamily | undefined;
+    if (assignment && "family" in assignment) family = assignment.family;
+    else if (role === "tertiary" && !assignment && edition) family = defaultTertiaryFamily;
     return shades ? [{ label: colourRoleLabels[role], shades, family }] : [];
   });
   if (palette?.neutral) {

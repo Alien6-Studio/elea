@@ -20,9 +20,11 @@ class Quadratics(BasePen):
         self.segments = []
 
     def _moveTo(self, point):
+        # Only curves are collected; the pen tracks the current point itself.
         pass
 
     def _lineTo(self, point):
+        # Straight segments carry no curve to collect.
         pass
 
     def _qCurveToOne(self, control, end):
@@ -50,7 +52,7 @@ def representative_curve(glyphs, commands):
             continue
         left, bottom, right, top = bounds.bounds
 
-        def score(segment):
+        def score(segment, left=left, bottom=bottom, right=right, top=top):
             # Evaluate the actual midpoint on the quadratic, not its control handle.
             p, c, q = segment
             x, y = ((p[k] + 2*c[k] + q[k]) / 4 for k in range(2))

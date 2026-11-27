@@ -2,6 +2,7 @@ import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { renderToStaticMarkup, renderToString } from "react-dom/server";
 import { Button } from "@alien6-studio/elea-ui";
 import { sitePath } from "../src/links.js";
+import { NotFound } from "../src/components/NotFound.js";
 import { GlyphCarousel } from "../src/components/GlyphCarousel.js";
 import { SiteHeader } from "../src/components/SiteHeader.js";
 import { SiteFooter } from "../src/components/SiteFooter.js";
@@ -52,6 +53,8 @@ for (const family of ["instrument-sans", "roboto"]) {
 
 writeFileSync(new URL("header-home.html", templates), renderToStaticMarkup(<SiteHeader />));
 writeFileSync(new URL("header-docs.html", templates), renderToStaticMarkup(<SiteHeader section="docs" />));
+writeFileSync(new URL("header-research.html", templates), renderToStaticMarkup(<SiteHeader section="research" />));
+writeFileSync(new URL("not-found.html", templates), renderToStaticMarkup(<NotFound />));
 writeFileSync(new URL("header-typography.html", templates), renderToStaticMarkup(<SiteHeader section="typography" />));
 writeFileSync(new URL("typography-cover.html", templates), renderToString(
   <header className="type-cover">

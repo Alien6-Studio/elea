@@ -79,8 +79,7 @@
   border-radius: var(--elea-radius-md);
 }
 .colour-atlas__readout { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .25rem .5rem; }
-.colour-atlas__readout h3 { margin: 0; font-weight: 600; }
-.colour-atlas__readout h3 { font-size: 1.2rem; line-height: 1.2; letter-spacing: -.025em; }
+.colour-atlas__readout h3 { margin: 0; font-weight: 600; font-size: 1.2rem; line-height: 1.2; letter-spacing: -.025em; }
 .colour-atlas__readout code { padding: 0; color: var(--elea-color-text-muted); background: transparent; font-size: .85rem; }
 .colour-atlas__actions { display: flex; gap: .375rem; flex-wrap: wrap; }
 .colour-atlas__actions .elea-button { flex: 1 1 auto; }

@@ -35,7 +35,7 @@ const uploadImage: NonNullable<ContentEditorServices["uploadImage"]> = (file, _c
         if (signal.aborted) return;
         const id = crypto.randomUUID();
         if (crop) crops.set(id, crop);
-        resolve({ url: String(reader.result), id });
+        resolve({ url: reader.result as string, id });
       }, 600);
       signal.addEventListener("abort", () => clearTimeout(check));
     };
@@ -50,7 +50,7 @@ const LIBRARY: PickedAttachment[] = [
   { id: "doc-3", title: "Launch deck", type: "application/vnd.openxmlformats-officedocument.presentationml.presentation", url: "https://example.org/files/deck.pptx" },
 ];
 
-function Picker({ onSelect }: { onSelect: (attachment: PickedAttachment) => void }) {
+function Picker({ onSelect }: Readonly<{ onSelect: (attachment: PickedAttachment) => void }>) {
   return (
     <div className="picker" data-testid="picker">
       {LIBRARY.map((item) => (
@@ -79,7 +79,7 @@ const formats = {
   json: { extension: "json", mime: "application/json" },
 } as const;
 
-function DocumentExport({ document, format, title }: { document: EleaDocument; format: Format; title: string }) {
+function DocumentExport({ document, format, title }: Readonly<{ document: EleaDocument; format: Format; title: string }>) {
   const source = useMemo(() => {
     if (format === "html") return documentToHtml(document, { sanitize: (html) => sanitizer.sanitize(html) });
     if (format === "markdown") return documentToMarkdown(document);
@@ -88,9 +88,9 @@ function DocumentExport({ document, format, title }: { document: EleaDocument; f
   const { extension, mime } = formats[format];
   function download() {
     const url = URL.createObjectURL(new Blob([source], { type: mime + ";charset=utf-8" }));
-    const link = window.document.createElement("a");
+    const link = globalThis.document.createElement("a");
     link.href = url;
-    const slug = title.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "");
+    const slug = title.toLowerCase().trim().replaceAll(/[^\p{L}\p{N}]+/gu, "-").replaceAll(/(?:^-)|(?:-$)/g, "");
     link.download = `${slug || "article"}.${extension}`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 0);
@@ -120,13 +120,13 @@ let session: { sample: Sample; drafts: Record<Sample, Draft> } = {
 
 const compact = "(max-width: 55rem)";
 function subscribeLayout(update: () => void) {
-  const query = window.matchMedia(compact);
+  const query = globalThis.matchMedia(compact);
   query.addEventListener("change", update);
   return () => query.removeEventListener("change", update);
 }
-const compactLayout = () => window.matchMedia(compact).matches;
+const compactLayout = () => globalThis.matchMedia(compact).matches;
 
-export function PlaygroundPage({ brand }: { brand?: BrandTheme }) {
+export function PlaygroundPage({ brand }: Readonly<{ brand?: BrandTheme }>) {
   const [sample, setSample] = useState<Sample>(() => session.sample);
   const [drafts, setDrafts] = useState(() => session.drafts);
   useEffect(() => { session = { sample, drafts }; }, [sample, drafts]);

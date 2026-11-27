@@ -61,9 +61,9 @@ export const siteProfile = {
   },
 };
 
-if (typeof window !== "undefined") {
+if (globalThis.window !== undefined) {
   apply(read());
-  window.addEventListener("storage", event => {
+  globalThis.addEventListener("storage", event => {
     if (event.key !== storageKey && event.key !== null) return;
     if (event.storageArea === localStorage) {
       try { sessionStorage.removeItem(storageKey); } catch { /* Optional in private browsing. */ }

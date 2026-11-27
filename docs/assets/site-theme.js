@@ -1,7 +1,7 @@
 // Runs before styles are painted on both the documentation and interactive pages.
 (() => {
   const key = "elea-theme";
-  const system = window.matchMedia("(prefers-color-scheme: dark)");
+  const system = globalThis.matchMedia("(prefers-color-scheme: dark)");
   function savedTheme() {
     try {
       const value = localStorage.getItem(key);
@@ -17,7 +17,7 @@
   }
   apply();
   system.addEventListener("change", apply);
-  window.addEventListener("storage", (event) => {
+  globalThis.addEventListener("storage", (event) => {
     if (event.key === key || event.key === null) {
       preference = savedTheme();
       apply();
@@ -84,7 +84,7 @@
     try { sessionStorage.removeItem(sessionKey); } catch { /* Storage is optional. */ }
   }
 
-  window.eleaSiteFont = {
+  globalThis.eleaSiteFont = {
     options,
     get: () => current.value,
     set(value) {
@@ -102,7 +102,7 @@
     },
   };
   applyFont(readFont());
-  window.addEventListener("storage", (event) => {
+  globalThis.addEventListener("storage", (event) => {
     if (event.key === key || event.key === null) {
       usePersistentChoice();
       applyFont(readFont());

@@ -71,7 +71,7 @@ export function ComboboxPage() {
   );
 }
 
-export function ColorPickerPage({ brand }: { brand?: BrandTheme }) {
+export function ColorPickerPage({ brand }: Readonly<{ brand?: BrandTheme }>) {
   const [ink, setInk] = useState<string>(brand?.seed ?? brandPalettes.Emerald.seed);
   return (
     <>

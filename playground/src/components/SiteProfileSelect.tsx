@@ -8,8 +8,8 @@ export const siteProfileOptions = featuredColourThemes.map(value => {
     value,
     label: <span className="site-profile-option">
       <span className="site-profile-option__swatches" aria-hidden="true">
-        {[colours.primary, colours.secondary, colours.tertiary].map((colour, index) =>
-          <span key={index} style={{ backgroundColor: colour }} />)}
+        {(["primary", "secondary", "tertiary"] as const).map(role =>
+          <span key={role} style={{ backgroundColor: colours[role] }} />)}
       </span>
       <span>{name}</span>
     </span>,
@@ -21,7 +21,7 @@ export interface SiteProfileProps {
   onProfileChange?: (id: StudioThemeId) => void;
 }
 
-export function SiteProfileSelect({ profile = "reserve", onProfileChange }: SiteProfileProps) {
+export function SiteProfileSelect({ profile = "reserve", onProfileChange }: Readonly<SiteProfileProps>) {
   return <Select
     id="site-profile"
     label="Site theme"

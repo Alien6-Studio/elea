@@ -8,7 +8,7 @@ import { ColourAtlas } from "./ColourAtlas.js";
 import { ColourRoles } from "./ColourRoles.js";
 import "./studio.css";
 
-function ThemePlate({ id, selected, onSelect }: { id: StudioThemeId; selected: boolean; onSelect: () => void }) {
+function ThemePlate({ id, selected, onSelect }: Readonly<{ id: StudioThemeId; selected: boolean; onSelect: () => void }>) {
   const { name, style, colours } = colorThemes[id];
   const plate = colourPlates[id];
   const paper = surfaceFamilies[plate.paper];
@@ -36,7 +36,7 @@ function ThemePlate({ id, selected, onSelect }: { id: StudioThemeId; selected: b
   );
 }
 
-export function ColoursPage({ brand, onChange }: { brand: BrandTheme; onChange: (next: BrandTheme) => void }) {
+export function ColoursPage({ brand, onChange }: Readonly<{ brand: BrandTheme; onChange: (next: BrandTheme) => void }>) {
   const { css, palettes, roleScales } = makeBrandTheme(brand);
   const [role, setRole] = useState<BrandColorRole>("primary");
   const [atlasVersion, setAtlasVersion] = useState(0);
@@ -69,7 +69,7 @@ export function ColoursPage({ brand, onChange }: { brand: BrandTheme; onChange: 
         items={featuredColourThemes} itemKey={id => id} itemsPerView={3} minItemWidth={320} gap="md"
         navigation="both" controlsPosition="bottom" controlsAlign="center" showCounter={false}
         getDotLabel={index => `Show themes starting at ${colorThemes[featuredColourThemes[index]!].name}`}
-        defaultIndex={Math.max(0, featuredColourThemes.findIndex(id => id === (activeTheme ?? brand.profile)))}
+        defaultIndex={Math.max(0, (featuredColourThemes as readonly string[]).indexOf(activeTheme ?? brand.profile ?? ""))}
         renderItem={id => <ThemePlate id={id} selected={id === activeTheme} onSelect={() => chooseTheme(id)} />}
       />
       <ColourRoles brand={brand} activeRole={role} />

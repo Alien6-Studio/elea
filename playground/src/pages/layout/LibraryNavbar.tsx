@@ -13,16 +13,16 @@ const studies = ["rasance", "reserve", "braise"] as const;
 type Study = typeof studies[number];
 type Artwork = { src: string };
 
-function Swatches({ study }: { study: Study }) {
+function Swatches({ study }: Readonly<{ study: Study }>) {
   const colours = colorThemes[study].colours;
   return <span aria-hidden="true" style={{ display: "flex", flex: 1 }}>
-    {[colours.primary, colours.secondary, colours.tertiary].map((colour, index) =>
-      <span key={index} style={{ flex: 1, background: colour }} />
+    {(["primary", "secondary", "tertiary"] as const).map(role =>
+      <span key={role} style={{ flex: 1, background: colours[role] }} />
     )}
   </span>;
 }
 
-export function HandbookCollection({ artworks = {} }: { artworks?: Partial<Record<Study, Artwork>> }) {
+export function HandbookCollection({ artworks = {} }: Readonly<{ artworks?: Partial<Record<Study, Artwork>> }>) {
   const preview = usePreviewNavigation("colours");
   const study = studies.find(id => id === preview.current);
   const chapter = chapters.find(item => item.id === preview.current);

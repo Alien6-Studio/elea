@@ -6,7 +6,7 @@ import { brandRoute, studioTheme, type StudioThemeId } from "../pages/brandTheme
 import { siteScope } from "../siteProfile.js";
 import { siteProfileOptions } from "./SiteProfileSelect.js";
 
-function Edition({ id }: { id: StudioThemeId }) {
+function Edition({ id }: Readonly<{ id: StudioThemeId }>) {
   const theme = studioTheme(id);
   return <article className="comparison-edition" data-elea-theme={siteScope(id)} aria-label={colorThemes[id].name}>
     <img src={sitePath + "assets/harbour-light.webp"} width="1536" height="1024" loading="lazy" alt="A red lighthouse on a concrete breakwater" />
@@ -19,7 +19,7 @@ function Edition({ id }: { id: StudioThemeId }) {
   </article>;
 }
 
-export function ThemeComparison({ interactive = true }: { interactive?: boolean }) {
+export function ThemeComparison({ interactive = true }: Readonly<{ interactive?: boolean }>) {
   const [challenger, setChallenger] = useState<StudioThemeId>("braise");
   const reference = studioTheme("reserve");
   const other = studioTheme(challenger);

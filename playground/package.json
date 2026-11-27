@@ -6,9 +6,11 @@
     "node": ">=22 <25"
   },
   "scripts": {
+    "audit:geometry": "tsx scripts/audit-geometry.ts",
     "build": "vite build",
-    "lint": "tsc -p tsconfig.json --noEmit && tsx scripts/check-examples.ts",
+    "lint": "tsc -p tsconfig.json --noEmit && tsx scripts/check-examples.ts && npm run test:geometry",
     "test": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:geometry": "node --import tsx --test src/geometry/geometry.test.ts",
     "test:next": "next build tests/fixtures/next"
   },
   "dependencies": {

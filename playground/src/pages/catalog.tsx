@@ -1,6 +1,7 @@
 import { lazy, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { brandPalettes } from "@alien6-studio/elea-tokens/brand";
 import { Accordion, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, Button, Calendar, ColorPicker, Combobox, DateField, MultiSelect, Card, CardHeader, CardImage, CardTitle, Checkbox, Field, Hero, Input, Pagination, Progress, RadioGroup, SearchField, Select, Separator, Sidebar, Skeleton, Slider, Stepper, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Tabs, Toggle } from "@alien6-studio/elea-ui";
+import { NotFound } from "../components/NotFound.js";
 import { GuideRoute, sectionHref, sectionId, visitSection } from "../components/Demo.js";
 import { sitePath } from "../links.js";
 import { glacierImage, notebookTitle } from "../notebook.js";
@@ -240,7 +241,7 @@ function storedMotion() {
   }
 }
 
-function ExampleLinks({ brand }: { brand?: BrandTheme }) {
+function ExampleLinks({ brand }: Readonly<{ brand?: BrandTheme }>) {
   return (
     <nav aria-label="Composed examples" className="catalog-examples">
       <a href={brandRoute("theme", brand)}>
@@ -255,7 +256,7 @@ function ExampleLinks({ brand }: { brand?: BrandTheme }) {
   );
 }
 
-function Overview({ brand, motionSwitch }: { brand?: BrandTheme; motionSwitch: ReactNode }) {
+function Overview({ brand, motionSwitch }: Readonly<{ brand?: BrandTheme; motionSwitch: ReactNode }>) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | "All">("All");
   const searchRef = useRef<HTMLInputElement>(null);
@@ -305,7 +306,7 @@ function Overview({ brand, motionSwitch }: { brand?: BrandTheme; motionSwitch: R
   );
 }
 
-function ComponentGuide({ entry, brand, motionSwitch, section }: { entry: Entry; brand?: BrandTheme; motionSwitch: ReactNode; section?: string }) {
+function ComponentGuide({ entry, brand, motionSwitch, section }: Readonly<{ entry: Entry; brand?: BrandTheme; motionSwitch: ReactNode; section?: string }>) {
   const Page = entry.page;
   const guide = brandRoute(`ui/${entry.slug}`, brand);
   const article = useRef<HTMLElement>(null);
@@ -378,12 +379,12 @@ function ComponentGuide({ entry, brand, motionSwitch, section }: { entry: Entry;
   );
 }
 
-export default function CatalogPage({ route, brand }: { route: string; brand?: BrandTheme }) {
+export default function CatalogPage({ route, brand }: Readonly<{ route: string; brand?: BrandTheme }>) {
   const [, slug, section] = route.split("/");
   const current = entries.find((entry) => slug === entry.slug);
   useEffect(() => {
-    document.title = `${current?.name ?? "Components"} · Elea`;
-  }, [current]);
+    document.title = `${current?.name ?? (slug ? "Page not found" : "Components")} · Elea`;
+  }, [current, slug]);
   const [motion, setMotion] = useState(storedMotion);
   const css = useMemo(() => brand && makeBrandTheme(brand).css, [brand]);
   useEffect(() => {
@@ -397,9 +398,9 @@ export default function CatalogPage({ route, brand }: { route: string; brand?: B
   return (
     <div className="catalog" data-elea-motion={motion ? "on" : "off"}>
       {css && <style>{css}</style>}
-      {current
-        ? <ComponentGuide key={current.slug} entry={current} brand={brand} motionSwitch={motionSwitch} section={section} />
-        : <Overview brand={brand} motionSwitch={motionSwitch} />}
+      {current && <ComponentGuide key={current.slug} entry={current} brand={brand} motionSwitch={motionSwitch} section={section} />}
+      {!current && slug && <NotFound />}
+      {!current && !slug && <Overview brand={brand} motionSwitch={motionSwitch} />}
     </div>
   );
 }

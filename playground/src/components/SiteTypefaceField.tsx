@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 import { sitePath } from "../links.js";
 
 export function SiteTypefaceField() {
-  const fonts = window.eleaSiteFont;
+  const fonts = globalThis.eleaSiteFont;
   const value = useSyncExternalStore(fonts.subscribe, fonts.get);
   return (
     <Field

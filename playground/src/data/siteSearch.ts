@@ -33,7 +33,7 @@ const palettes = featuredColourThemes.map(id => ({
 }));
 
 const builtIn = [home, ...sections, ...guides, ...palettes];
-const fold = (text: string) => text.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
+const fold = (text: string) => text.toLowerCase().normalize("NFD").replaceAll(/\p{M}/gu, "");
 
 export function searchSite(query: string, docs: readonly SearchEntry[]) {
   const phrase = fold(query.trim());
@@ -52,7 +52,8 @@ export function searchSite(query: string, docs: readonly SearchEntry[]) {
     else if (words.some(word => title.includes(word))) rank = 1;
     matches.push({ entry, rank });
   }
-  return matches.sort((a, b) => b.rank - a.rank).map(match => match.entry);
+  matches.sort((a, b) => b.rank - a.rank);
+  return matches.map(match => match.entry);
 }
 
 // Documentation headings and anchors come from the same MkDocs build as the pages.
