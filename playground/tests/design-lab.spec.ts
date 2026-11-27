@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const path = "/elea/playground/#/design-lab";
+const path = "/playground/#/design-lab";
 const modes = ["light", "dark"] as const;
 
 test("old Workspace links lead to the pinned capture for each direction and appearance", async ({ page }) => {
@@ -21,7 +21,7 @@ test("old Workspace links lead to the pinned capture for each direction and appe
 });
 
 test("a host opts in a single region without changing its identity or neighboring controls", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button");
   const guide = page.locator(".demo").first();
   await expect(guide.getByRole("button", { name: "Primary", exact: true })).toBeVisible();
   await guide.evaluate(element => {

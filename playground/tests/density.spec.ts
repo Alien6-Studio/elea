@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("one regional density coordinates a field, rows and portaled actions", async ({ page }, testInfo) => {
-  await page.goto("/elea/playground/#/ui/table");
+  await page.goto("/playground/#/ui/table");
   const region = page.getByRole("region", { name: "Article workspace" });
   const field = region.getByRole("searchbox", { name: "Filter articles" });
   const rowHeader = region.getByRole("rowheader", { name: "Autumn field notes" });

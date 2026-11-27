@@ -71,7 +71,7 @@ carry through to the writing surface.
 Import the stored HTML with `htmlToBlocks` once when opening a record. Keep the
 blocks in state while editing, then call `blocksToHtml` when saving. Both functions
 come from `@alien6-studio/elea-content`. Set `maxLength` to limit the plain text and
-display the character counter. Try the formatted caption in the [field guide](/elea/playground/#/ui/field).
+display the character counter. Try the formatted caption in the [field guide](/playground/#/ui/field).
 
 ### What loads when
 
@@ -92,4 +92,4 @@ before rendering, and again in the browser before hydrating.
 For a migration, compare the stored document before and after an edit. Keep
 application metadata and custom fields in your save adapter.
 
-Open the [editorial workspace](/elea/playground/#/playground) to edit the notebook, inspect its blocks and export the result.
+Open the [editorial workspace](/playground/#/playground) to edit the notebook, inspect its blocks and export the result.

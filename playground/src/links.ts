@@ -1,5 +1,5 @@
-export const sitePath = "/elea/";
-export const siteHostnames = ["localhost", "alien6-studio.github.io"];
+export const sitePath = "/";
+export const siteHostnames = ["localhost", "elea.alien6.com"];
 export const repositoryUrl = "https://github.com/Alien6-Studio/elea";
 export const alien6Url = "https://alien6.com";
 export const alien6ContactUrl = `${alien6Url}/en/contact/`;

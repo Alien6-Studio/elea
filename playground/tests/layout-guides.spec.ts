@@ -1,19 +1,19 @@
 import { expect, test } from "@playwright/test";
 
-const catalog = "/elea/playground/#/ui";
+const catalog = "/playground/#/ui";
 
 for (const width of [320, 1440]) {
   test(`hero photography selects the right source at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(`${catalog}/hero`);
     const cover = page.getByRole("img", { name: /crevasses/ });
-    await expect(cover).toHaveAttribute("srcset", "/elea/assets/glacier-560.webp 560w, /elea/assets/glacier.webp 1050w");
+    await expect(cover).toHaveAttribute("srcset", "/assets/glacier-560.webp 560w, /assets/glacier.webp 1050w");
     await expect(cover).toHaveAttribute("sizes", "(min-width: 75rem) 52rem, (min-width: 55rem) 65vw, 100vw");
     await cover.scrollIntoViewIfNeeded();
     // Browsers choose a resolution based on density, available resources and cache state.
     await expect.poll(() => cover.evaluate((img: HTMLImageElement) =>
       img.complete && img.naturalWidth > 0 ? new URL(img.currentSrc).pathname : ""
-    )).toMatch(/^\/elea\/assets\/glacier(?:-560)?\.webp$/);
+    )).toMatch(/^\/assets\/glacier(?:-560)?\.webp$/);
     const availableWidths = await cover.evaluate((img: HTMLImageElement) => Promise.all(
       img.srcset.split(",").map(async candidate => {
         const rendition = new Image();
@@ -29,7 +29,7 @@ for (const width of [320, 1440]) {
     await feature.scrollIntoViewIfNeeded();
     await expect.poll(() => feature.evaluate((img: HTMLImageElement) =>
       img.complete && img.naturalWidth > 0 ? new URL(img.currentSrc).pathname : ""
-    )).toBe(`/elea/assets/${expectedCrop}`);
+    )).toBe(`/assets/${expectedCrop}`);
   });
 }
 
@@ -57,7 +57,7 @@ test("the catalogue links to a photographic cover and a responsive image-led fea
   expect((await photo.boundingBox())!.y).toBeGreaterThan(button.y + button.height);
   await action.click();
   await expect(action).toHaveAttribute("aria-pressed", "true");
-  await expect.poll(() => photo.evaluate((img: HTMLImageElement) => new URL(img.currentSrc).pathname)).toBe("/elea/assets/harbour-light.webp");
+  await expect.poll(() => photo.evaluate((img: HTMLImageElement) => new URL(img.currentSrc).pathname)).toBe("/assets/harbour-light.webp");
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   await cover.getByRole("button", { name: "Open the notebook" }).press("Enter");
   await expect(cover.getByRole("button", { name: "Close the notebook" })).toBeVisible();

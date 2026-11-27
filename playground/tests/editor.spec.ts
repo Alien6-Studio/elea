@@ -51,7 +51,7 @@ async function selectInEditable(page: Page, locator: ReturnType<Page["locator"]>
 test.beforeEach(async ({ page }) => {
   // A static frame keeps the video provider's overlays from taking keyboard focus.
   await page.route("https://www.youtube.com/embed/**", (route) => route.fulfill({ contentType: "text/html", body: "<!doctype html>" }));
-  await page.goto("/elea/playground/");
+  await page.goto("/playground/");
   await expect(page.getByRole("heading", { name: "Editorial workspace" })).toBeVisible();
   await pick(page.getByRole("combobox", { name: "Document", exact: true }), "Block reference");
 });
@@ -63,7 +63,7 @@ test("the sample document renders in both panes", async ({ page }) => {
   await expect(viewerPane(page).locator(".elea-table")).toBeVisible();
   const external = viewerPane(page).locator('a[href="https://github.com/Alien6-Studio/elea"]');
   await expect(external).toHaveAttribute("target", "_blank");
-  await expect(viewerPane(page).locator('a[href="/elea/content/"]')).not.toHaveAttribute("target", "_blank");
+  await expect(viewerPane(page).locator('a[href="/content/"]')).not.toHaveAttribute("target", "_blank");
 });
 
 test("the writing controls align with the manuscript in split, focus and mobile layouts", async ({ page }) => {

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const catalog = "/elea/playground/#/ui";
+const catalog = "/playground/#/ui";
 
 test("the Stepper gallery entry opens a working proof with keyboard navigation", async ({ page }) => {
   await page.goto(catalog);

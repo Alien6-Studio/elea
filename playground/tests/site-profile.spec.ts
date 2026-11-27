@@ -6,7 +6,7 @@ import { textContrast } from "./contrast";
 for (const reducedMotion of ["reduce", "no-preference"] as const) {
   test(`navbar switches legible colour pairs together with ${reducedMotion} motion`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion });
-    await page.goto("/elea/playground/#/ui/button?scheme=reserve");
+    await page.goto("/playground/#/ui/button?scheme=reserve");
     const picker = page.getByRole("combobox", { name: "Site theme", exact: true });
     const sample = page.getByRole("button", { name: "info solid", exact: true });
     await picker.click();
@@ -44,7 +44,7 @@ for (const reducedMotion of ["reduce", "no-preference"] as const) {
 }
 
 test("the navbar applies each complete theme, including the static notebook and the button guide", async ({ page }) => {
-  await page.goto("/elea/");
+  await page.goto("/");
   const picker = page.getByRole("combobox", { name: "Site theme", exact: true });
   const cta = page.getByRole("link", { name: "Explore components" });
   async function checkPrimary(id: keyof typeof colorThemes) {
@@ -79,10 +79,10 @@ test("the navbar applies each complete theme, including the static notebook and 
 
 test("shared settings survive navigation and take priority over the saved navbar theme", async ({ page }) => {
   const picker = page.getByRole("combobox", { name: "Site theme", exact: true });
-  await page.goto("/elea/typography/");
+  await page.goto("/typography/");
   await picker.click();
   await page.getByRole("option", { name: "Braise", exact: true }).click();
-  await page.goto("/elea/playground/#/theme?scheme=reserve&radius=12px");
+  await page.goto("/playground/#/theme?scheme=reserve&radius=12px");
   await expect(picker).toHaveText("Custom theme");
   await expect(page.getByRole("textbox", { name: "Corner radius" })).toHaveValue("12px");
   const open = page.getByRole("link", { name: "Open themed gallery" });
@@ -107,7 +107,7 @@ function cornerValues(button: Locator) {
 
 test("the Button guide shows the selected profile’s corners at equal widths", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/elea/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button");
   const picker = page.getByRole("combobox", { name: "Site theme", exact: true });
   const demo = page.locator("section.demo").filter({ has: page.getByRole("heading", { name: "Radius", exact: true }) });
   const sample = (label: string) => demo.getByRole("button", { name: `Publish (${label})`, exact: true });
@@ -150,7 +150,7 @@ test("the Button guide shows the selected profile’s corners at equal widths", 
 });
 
 test("Studio exports the same scaled action shape as a shared Button guide", async ({ page }) => {
-  await page.goto("/elea/playground/#/theme?edition=precision&scheme=braise&shape=reserve");
+  await page.goto("/playground/#/theme?edition=precision&scheme=braise&shape=reserve");
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     page.getByRole("link", { name: "Download CSS" }).click(),

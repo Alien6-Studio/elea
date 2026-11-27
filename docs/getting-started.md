@@ -1,6 +1,6 @@
 # Getting started
 
-The [editorial workspace](/elea/playground/#/playground) shows how Elea renders and edits the glacier notebook. To build a read-only view of your own document, start with the tokens and content viewer.
+The [editorial workspace](/playground/#/playground) shows how Elea renders and edits the glacier notebook. To build a read-only view of your own document, start with the tokens and content viewer.
 
 ## Install the reader
 

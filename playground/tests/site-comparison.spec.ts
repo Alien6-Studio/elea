@@ -8,7 +8,7 @@ async function capture(region: Locator, info: TestInfo, name: string) {
 }
 
 test("publication comparison changes only the second edition across site preferences", async ({ page }, info) => {
-  await page.goto("/elea/#home-theme");
+  await page.goto("/#home-theme");
   const comparison = page.locator("#theme-comparison");
   const reference = comparison.getByRole("article", { name: "Réserve" });
   const alternate = comparison.getByRole("article", { name: "Braise" });
@@ -36,7 +36,7 @@ test("publication comparison changes only the second edition across site prefere
 });
 
 test("ELEA keeps its signature and the specimen renders the interface roles", async ({ page }, info) => {
-  await page.goto("/elea/");
+  await page.goto("/");
   const wordmark = page.locator(".site__masthead .site__wordmark");
   await page.evaluate(() => document.fonts.ready);
   const initial = await wordmark.boundingBox();
@@ -44,7 +44,7 @@ test("ELEA keeps its signature and the specimen renders the interface roles", as
   await expect(wordmark).toHaveCSS("font-family", /^"ELEA Sans"/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("font-family", /Roboto/);
   expect(await wordmark.boundingBox()).toEqual(initial);
-  await page.goto("/elea/typography/");
+  await page.goto("/typography/");
   const section = page.getByRole("region", { name: "Typography in use" });
   await expect(section.locator("dd[data-elea-type]")).toHaveCount(7);
   await expect(section.locator('[data-elea-type="data"]').first()).toHaveCSS("font-variant-numeric", /tabular-nums/);
@@ -53,7 +53,7 @@ test("ELEA keeps its signature and the specimen renders the interface roles", as
 });
 
 test("the Studio exports a reproducible report for the active brand", async ({ page }) => {
-  await page.goto("/elea/playground/#/theme?scheme=braise");
+  await page.goto("/playground/#/theme?scheme=braise");
   const download = page.waitForEvent("download");
   await page.getByRole("link", { name: "Download contrast report" }).click();
   const report = JSON.parse(await readFile((await (await download).path())!, "utf8"));

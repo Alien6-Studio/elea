@@ -6,7 +6,7 @@ function stage(page: Page, title: string) {
 
 async function openGuide(page: Page, path: string, scheme: string, mode: "light" | "dark") {
   await page.emulateMedia({ colorScheme: mode });
-  await page.goto("/elea/playground/#/ui/" + path + "?scheme=" + scheme);
+  await page.goto("/playground/#/ui/" + path + "?scheme=" + scheme);
   await expect(page.locator("html")).toHaveAttribute("data-theme", mode);
   await expect(page.getByRole("combobox", { name: "Site theme", exact: true })).toHaveText(scheme === "reserve" ? "Réserve" : "Rasance");
   await page.evaluate(() => document.fonts.ready);

@@ -2,7 +2,7 @@ import { expect, test, type Locator } from "@playwright/test";
 import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { textContrast } from "./contrast.js";
 
-const lab = "/elea/playground/#/ui/";
+const lab = "/playground/#/ui/";
 const brand = makeBrandTheme(editions.Editorial, "journal");
 const opposite = (mode: "light" | "dark") => mode === "light" ? "dark" : "light";
 const roles = [

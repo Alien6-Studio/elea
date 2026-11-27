@@ -11,10 +11,10 @@ checkout, then build the site from this branch.
 npm --prefix /path/to/elea ci
 python -m pip install -r requirements.txt
 scripts/build.sh /path/to/elea
-python -m http.server 4174 --bind 127.0.0.1 --directory .build
+python -m http.server 4174 --bind 127.0.0.1 --directory .build/elea
 ```
 
-Open `/elea/` on port 4174. The build installs local archives made from the
+Open port 4174. The build installs local archives made from the
 specified checkout and compiles the private Next.js fixture in
 `playground/tests/fixtures/next` against those archives.
 

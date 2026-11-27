@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("territories can be filtered, grouped, removed and submitted with the keyboard", async ({ page, browserName }) => {
-  await page.goto("/elea/playground/#/ui/multi-select");
+  await page.goto("/playground/#/ui/multi-select");
   const field = page.getByRole("combobox", { name: "Territories" });
   await field.click();
   const list = page.getByRole("listbox", { name: "Territories" });
@@ -27,7 +27,7 @@ test("territories can be filtered, grouped, removed and submitted with the keybo
 
 test("free tags wrap at phone sizes and can be removed through their named buttons", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 750 });
-  await page.goto("/elea/playground/#/ui/multi-select");
+  await page.goto("/playground/#/ui/multi-select");
   const field = page.getByRole("combobox", { name: "Subjects" });
   const subject = "Underwater".repeat(8);
   await field.fill(subject);

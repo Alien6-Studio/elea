@@ -36,7 +36,7 @@ test("shared theme plates keep their titles legible and identify their artwork o
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const theme of works) {
     await test.step(theme.name, async () => {
-      await page.goto("/elea/colours/?scheme=" + theme.id);
+      await page.goto("/colours/?scheme=" + theme.id);
       const plate = page.getByRole("button", { name: theme.name, exact: true });
       await expect(plate).toHaveAttribute("aria-pressed", "true");
       const credit = plate.locator("small");

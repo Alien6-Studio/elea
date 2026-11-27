@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("the disclosure keeps focus and revealed ancestors navigate within the archive", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/elea/playground/#/ui/breadcrumb");
+  await page.goto("/playground/#/ui/breadcrumb");
   const trail = page.getByRole("navigation", { name: "Archive location" });
   const disclosure = trail.getByRole("button", { name: "Earlier sections" });
   await disclosure.focus();

@@ -15,9 +15,9 @@ export function HarbourHero() {
       description="A red beacon interrupts the long line of the sea. Where you place the horizon changes the weight of the photograph."
       actions={<Button variant="outline" aria-pressed={alternate} onClick={() => setAlternate(!alternate)}>Compare crops</Button>}
       image={{
-        src: "/elea/assets/harbour-light.webp",
+        src: "/assets/harbour-light.webp",
         sources: [{
-          media: alternate ? "(width > 40rem)" : "(max-width: 40rem)", srcSet: "/elea/assets/harbour-light-square.webp",
+          media: alternate ? "(width > 40rem)" : "(max-width: 40rem)", srcSet: "/assets/harbour-light-square.webp",
           width: 600, height: 600,
         }],
         alt: "A red lighthouse on the far end of a breakwater under an overcast sky",

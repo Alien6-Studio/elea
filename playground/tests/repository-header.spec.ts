@@ -27,11 +27,11 @@ test("an unavailable API leaves a working repository link and preserves known fa
 
 test("the static and playground headers carry the same repository facts", async ({ page }) => {
   const link = page.locator("header").getByRole("link", { name: /^Alien6-Studio\/elea on GitHub/ });
-  await page.goto("/elea/");
+  await page.goto("/");
   await expect(link).toBeVisible();
   await expect(link.locator(".site-repo__fact").first()).toHaveText(/^v\d+\.\d+\.\d+/);
   const staticLabel = await link.getAttribute("aria-label");
-  await page.goto("/elea/playground/#/ui");
+  await page.goto("/playground/#/ui");
   await expect(link).toHaveAttribute("aria-label", staticLabel!);
   await expect(link).toHaveAttribute("href", "https://github.com/Alien6-Studio/elea");
 });

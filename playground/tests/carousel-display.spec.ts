@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("the Carousel guide presents three independent layouts with their own navigation", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/elea/playground/#/ui/carousel");
+  await page.goto("/playground/#/ui/carousel");
   const single = page.getByRole("region", { name: "Single plate", exact: true });
   const sheet = page.getByRole("region", { name: "Contact sheet", exact: true });
   const film = page.getByRole("region", { name: "Filmstrip", exact: true });

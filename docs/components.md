@@ -1,6 +1,6 @@
 # <span id="components">UI integration</span>
 
-Add ELEA's React components to your app. [Browse the component gallery](/elea/playground/#/ui).
+Add ELEA's React components to your app. [Browse the component gallery](/playground/#/ui).
 
 ## Add a button
 
@@ -13,7 +13,7 @@ export function DraftActions({ saveDraft }: { saveDraft: () => void }) {
 }
 ```
 
-This button inherits its outline from the active theme and uses its primary colour. Set `variant="secondary"` to give it a secondary role, or `effect="ripple"` to change its press gesture. Compare the same button across themes with **Site theme** in the header. [Try Button states](/elea/playground/#/ui/button).
+This button inherits its outline from the active theme and uses its primary colour. Set `variant="secondary"` to give it a secondary role, or `effect="ripple"` to change its press gesture. Compare the same button across themes with **Site theme** in the header. [Try Button states](/playground/#/ui/button).
 
 Use the UI and tokens packages at the same version. The UI bundle loads both stylesheets.
 
@@ -21,7 +21,7 @@ For a checkout, [build the npm archives](https://github.com/Alien6-Studio/elea/b
 
 ## Theme
 
-Browse the [colour atlas](/elea/colours/) to explore each theme’s photography and colour scales. The themes set the palette, typography, spacing and control shapes. Reading surfaces are white and light grey, with neutral greys in dark mode. Adjust the theme and download its CSS in [Theme Studio](/elea/playground/#/theme).
+Browse the [colour atlas](/colours/) to explore each theme’s photography and colour scales. The themes set the palette, typography, spacing and control shapes. Reading surfaces are white and light grey, with neutral greys in dark mode. Adjust the theme and download its CSS in [Theme Studio](/playground/#/theme).
 
 Load the downloaded stylesheet after the UI bundle, then set `data-elea-theme="brand"` on your app container. See [how themes reach dialogs, sheets and toasts](https://github.com/Alien6-Studio/elea/tree/main/packages/ui#themes-and-surfaces-outside-their-container).
 
@@ -50,8 +50,8 @@ See the [stylesheet reference](https://github.com/Alien6-Studio/elea/tree/main/p
 
 ## Motion
 
-Set `data-elea-motion="on"` on a container to enable expressive motion. It respects the visitor's reduced-motion setting. If you import individual sheets, add `@alien6-studio/elea-ui/css/motion.css`. Try the Expressive motion switch in the [gallery](/elea/playground/#/ui).
+Set `data-elea-motion="on"` on a container to enable expressive motion. It respects the visitor's reduced-motion setting. If you import individual sheets, add `@alien6-studio/elea-ui/css/motion.css`. Try the Expressive motion switch in the [gallery](/playground/#/ui).
 
 ## Footer
 
-The site uses ELEA's `Footer` component. See the [Footer example](/elea/playground/#/ui/footer) for passing your own brand, link groups and signature.
+The site uses ELEA's `Footer` component. See the [Footer example](/playground/#/ui/footer) for passing your own brand, link groups and signature.

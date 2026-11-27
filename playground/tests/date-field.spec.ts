@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("typed and calendar dates share bounds and the calendar restores focus", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/elea/playground/#/ui/date-field");
+  await page.goto("/playground/#/ui/date-field");
   const day = page.getByRole("textbox", { name: "Day", exact: true });
   const month = page.getByRole("textbox", { name: "Month", exact: true });
   const iso = page.getByRole("status", { name: "ISO date" });

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { expect, test, type Locator } from "@playwright/test";
 import { textContrast } from "./contrast.js";
 
-const colours = "/elea/playground/#/colours?edition=editorial";
+const colours = "/playground/#/colours?edition=editorial";
 const background = (element: Locator) => element.evaluate(node => getComputedStyle(node).backgroundColor);
 
 test("the colour atlas is one keyboard stop and preserves separate role assignments", async ({ page }) => {

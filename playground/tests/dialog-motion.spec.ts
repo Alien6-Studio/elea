@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 for (const preference of ["no-preference", "reduce"] as const) {
   test("dialog focus and interrupted exit with " + preference + " motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: preference });
-    await page.goto("/elea/playground/#/ui/dialog");
+    await page.goto("/playground/#/ui/dialog");
     const motion = page.getByRole("switch", { name: "Expressive motion" });
     if (await motion.getAttribute("aria-checked") !== "true") await motion.click();
     await page.addStyleTag({ content: ".elea-dialog-backdrop { --elea-motion-intent-open: 900ms; --elea-motion-intent-close: 900ms; }" });
@@ -34,7 +34,7 @@ for (const preference of ["no-preference", "reduce"] as const) {
 
 test("a bottom sheet exits through the edge that opened it", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/elea/playground/#/ui/sheet");
+  await page.goto("/playground/#/ui/sheet");
   const motion = page.getByRole("switch", { name: "Expressive motion" });
   if (await motion.getAttribute("aria-checked") !== "true") await motion.click();
   await page.addStyleTag({ content: ".elea-sheet-backdrop { --elea-motion-intent-close: 900ms; }" });

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const catalog = "/elea/playground/#/ui";
+const catalog = "/playground/#/ui";
 
 for (const colorScheme of ["light", "dark"] as const) {
   test(`calendar selection crosses a leap day in ${colorScheme}`, async ({ page }) => {

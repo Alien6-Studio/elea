@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function openReference(page: Page) {
   await page.route("https://www.youtube.com/embed/**", route => route.fulfill({ contentType: "text/html", body: "<!doctype html>" }));
-  await page.goto("/elea/playground/");
+  await page.goto("/playground/");
   await page.getByRole("combobox", { name: "Document", exact: true }).click();
   await page.getByRole("option", { name: "Block reference" }).click();
 }

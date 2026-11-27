@@ -28,7 +28,7 @@ for (const [theme, label] of [["reserve", "Réserve"], ["rasance", "Rasance"]] a
   for (const appearance of ["light", "dark"] as const) {
     test(`rendered theme proof for ${theme} in ${appearance}`, async ({ page, browser }, testInfo) => {
       await page.emulateMedia({ colorScheme: appearance, reducedMotion: "reduce" });
-      const path = (guide: string) => `/elea/playground/#/ui/${guide}?scheme=${theme}`;
+      const path = (guide: string) => `/playground/#/ui/${guide}?scheme=${theme}`;
       await page.goto(path("button"));
       await expect(page.getByRole("combobox", { name: "Site theme", exact: true })).toHaveText(label);
       await expect(page.locator("html")).toHaveAttribute("data-theme", appearance);

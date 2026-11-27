@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const catalog = "/elea/playground/#/ui";
+const catalog = "/playground/#/ui";
 
 test("the catalogue combines category and search and recovers from an empty result", async ({ page }) => {
   await page.goto(catalog);
@@ -48,11 +48,11 @@ test("the mobile catalogue opens the Carousel guide and its three layouts fit th
 });
 
 test("retired study links open the catalogue without adding a history entry", async ({ page }) => {
-  await page.goto("/elea/playground/#/theme");
+  await page.goto("/playground/#/theme");
   const studio = page.getByRole("heading", { name: "Theme studio", exact: true });
   await expect(studio).toBeVisible();
   for (const route of ["design-lab", "design-lab/components/obsidian/dark", "design-lab/resource-library?edition=precision"]) {
-    await page.goto(`/elea/playground/#/${route}`);
+    await page.goto(`/playground/#/${route}`);
     await expect(page).toHaveURL(/#\/ui$/);
     await expect(page.getByRole("heading", { name: "Components", exact: true })).toBeVisible();
     await page.goBack();

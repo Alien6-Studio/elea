@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("guide permalinks survive reload, history and shared themes", async ({ page }) => {
-  const base = "/elea/playground/#/ui/button";
+  const base = "/playground/#/ui/button";
   await page.goto(base + "?scheme=braise");
   await page.getByText("On this page", { exact: true }).click();
   const toc = page.getByRole("navigation", { name: "On this page" });
@@ -22,7 +22,7 @@ test("guide permalinks survive reload, history and shared themes", async ({ page
 
 test("the mobile component index opens by keyboard and follows the current theme", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 760 });
-  await page.goto("/elea/playground/#/ui/table?scheme=braise");
+  await page.goto("/playground/#/ui/table?scheme=braise");
   const toggle = page.getByRole("button", { name: "Browse components" });
   const index = page.getByRole("navigation", { name: "Component index" });
   await expect(index).toBeHidden();
@@ -43,7 +43,7 @@ test("the mobile component index opens by keyboard and follows the current theme
 });
 
 test("every guide lists a unique destination for each live example", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui");
+  await page.goto("/playground/#/ui");
   const cards = page.locator(".gallery__name");
   await expect(cards.first()).toBeVisible();
   const routes = await cards.evaluateAll(links => links.map(link => (link as HTMLAnchorElement).href));

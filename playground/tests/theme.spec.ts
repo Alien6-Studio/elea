@@ -2,9 +2,9 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { textContrast } from "./contrast.js";
 
-const studioPath = "/elea/playground/#/theme";
+const studioPath = "/playground/#/theme";
 
-const coloursPath = "/elea/playground/#/colours";
+const coloursPath = "/playground/#/colours";
 
 function cssRgb(hex: string) {
   const channels = hex.slice(1).match(/../g)!.map(pair => Number.parseInt(pair, 16));
@@ -292,7 +292,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 
 test("one theme token supplies the warning colour to actions, badges, alerts and portaled toasts", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/elea/playground/#/ui/toast?edition=precision");
+  await page.goto("/playground/#/ui/toast?edition=precision");
   await page.addStyleTag({ content: '[data-elea-theme="brand"] { --elea-color-warning: #984914; }' });
   const warningColour = "rgb(152, 73, 20)";
   const warning = page.getByRole("button", { name: "Warning", exact: true });
@@ -422,7 +422,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     });
 
     const open = page.getByRole("link", { name: "Open themed gallery" });
-    await expect(header.getByRole("link", { name: "Components", exact: true })).toHaveAttribute("href", `/elea/playground/${await open.getAttribute("href")}`);
+    await expect(header.getByRole("link", { name: "Components", exact: true })).toHaveAttribute("href", `/playground/${await open.getAttribute("href")}`);
     await open.press("Enter");
     await expect(page.getByRole("heading", { name: "Components", exact: true })).toBeVisible();
     const previews = page.locator(".gallery__preview");

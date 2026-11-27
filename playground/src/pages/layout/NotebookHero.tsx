@@ -20,8 +20,8 @@ export function NotebookHero() {
         {open ? "Close the notebook" : "Open the notebook"}
       </Button>}
       image={{
-        src: "/elea/assets/glacier.webp",
-        srcSet: "/elea/assets/glacier-560.webp 560w, /elea/assets/glacier.webp 1050w",
+        src: "/assets/glacier.webp",
+        srcSet: "/assets/glacier-560.webp 560w, /assets/glacier.webp 1050w",
         sizes: "(min-width: 75rem) 52rem, (min-width: 55rem) 65vw, 100vw",
         alt: "Deep blue crevasses crossing the white surface of a glacier",
         width: 1050, height: 525, loading: "lazy",

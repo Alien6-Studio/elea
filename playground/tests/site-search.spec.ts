@@ -3,12 +3,12 @@ import { expect, test } from "@playwright/test";
 test("the header searches documentation while typing and opens the exact heading", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
-  await page.goto("/elea/");
+  await page.goto("/");
   const search = page.getByRole("search", { name: "Site", exact: true });
   const input = search.getByRole("combobox", { name: "Search the site" });
   await input.fill("Tailwind and shadcn");
   const result = search.getByRole("option", { name: /Tailwind and shadcn/ });
-  await expect(result).toHaveAttribute("href", "/elea/components/#tailwind-and-shadcnui");
+  await expect(result).toHaveAttribute("href", "/components/#tailwind-and-shadcnui");
   await expect(input).toBeFocused();
   await expect(result).toHaveAttribute("aria-selected", "true");
   await input.press("Enter");
@@ -18,7 +18,7 @@ test("the header searches documentation while typing and opens the exact heading
 });
 
 test("keyboard search, clearing and dismissal preserve the field and the shared theme", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui?scheme=braise");
+  await page.goto("/playground/#/ui?scheme=braise");
   const search = page.getByRole("search", { name: "Site", exact: true });
   const input = search.getByRole("combobox");
   await expect(input).toBeVisible();
@@ -35,7 +35,7 @@ test("keyboard search, clearing and dismissal preserve the field and the shared 
   await expect(input).toHaveValue("Sidebar");
   await expect(input).toBeFocused();
   await input.press("ArrowDown");
-  await expect(search.getByRole("option", { name: /Sidebar/ }).first()).toHaveAttribute("href", "/elea/playground/#/ui/sidebar?scheme=braise");
+  await expect(search.getByRole("option", { name: /Sidebar/ }).first()).toHaveAttribute("href", "/playground/#/ui/sidebar?scheme=braise");
   await input.press("Enter");
   await expect(page.getByRole("heading", { name: "Sidebar", level: 1 })).toBeVisible();
   await expect(page).toHaveURL(/#\/ui\/sidebar\?scheme=braise$/);
@@ -43,7 +43,7 @@ test("keyboard search, clearing and dismissal preserve the field and the shared 
 
 test("mobile inline search finds a palette without diacritics", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto("/elea/typography/");
+  await page.goto("/typography/");
   const search = page.getByRole("search", { name: "Site", exact: true });
   const input = search.getByRole("combobox");
   await input.fill("reserve");

@@ -1,7 +1,7 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { textContrast } from "./contrast.js";
 
-const coloursUrl = "/elea/colours/?edition=editorial";
+const coloursUrl = "/colours/?edition=editorial";
 const directions = [
   { name: "Rasance", id: "rasance", primary: "rgb(24, 24, 23)", type: "Sans", density: "Balanced", corners: "Square" },
   { name: "Réserve", id: "reserve", primary: "rgb(41, 38, 191)", type: "Sans", density: "Compact", corners: "Square" },
@@ -33,7 +33,7 @@ for (const mode of ["light", "dark"] as const) {
     const primary = "rgb(41, 38, 191)";
     const link = mode === "light" ? "rgb(34, 32, 159)" : "rgb(163, 162, 227)";
     const body = page.locator("body");
-    await page.goto("/elea/");
+    await page.goto("/");
     await expect(body).toHaveCSS("background-color", surfaces[mode].paper);
     await expect(page.getByRole("link", { name: "Explore components" })).toHaveCSS("background-color", primary);
     await page.getByRole("link", { name: "Read the docs" }).click();
@@ -77,7 +77,7 @@ for (const mode of ["light", "dark"] as const) {
   test(`Studio, gallery and Button guides share neutral surfaces in ${mode}`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: mode, reducedMotion: "reduce" });
     const neutral = surfaces[mode];
-    await page.goto("/elea/playground/#/theme");
+    await page.goto("/playground/#/theme");
     const theme = page.getByRole("combobox", { name: "Theme", exact: true });
     const reader = page.getByRole("region", { name: "Publication preview" }).getByRole("article");
     for (const profile of directions) {
@@ -118,7 +118,7 @@ test("a shared custom surface still takes precedence over the profile", async ({
   const reader = page.getByRole("region", { name: "Publication preview" }).getByRole("article");
   for (const [mode, colour] of [["light", "rgb(247, 232, 225)"], ["dark", "rgb(50, 31, 46)"]] as const) {
     await page.emulateMedia({ colorScheme: mode });
-    await page.goto("/elea/playground/#/theme?edition=editorial&scheme=braise&neutral=madder");
+    await page.goto("/playground/#/theme?edition=editorial&scheme=braise&neutral=madder");
     await expect(reader).toHaveCSS("background-color", colour);
     await page.getByRole("link", { name: "Open themed gallery" }).click();
     await page.getByRole("link", { name: /Edit theme in Theme Studio/i }).click();
@@ -128,7 +128,7 @@ test("a shared custom surface still takes precedence over the profile", async ({
 
 test("a shared direction opens in the studio, and editing one ink preserves the other roles and the surface", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
-  await page.goto("/elea/colours/?scheme=braise");
+  await page.goto("/colours/?scheme=braise");
   const braise = page.getByRole("button", { name: "Braise", exact: true });
   await expect(braise).toHaveAttribute("aria-pressed", "true");
   const roles = page.getByRole("region", { name: "Colour roles" });
@@ -222,7 +222,7 @@ test("the mobile theme carousel browses independently of the applied theme", asy
 test("choosing a colour theme in the mobile Studio updates the preview and survives navigation", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/elea/playground/#/theme");
+  await page.goto("/playground/#/theme");
   const selector = page.getByRole("combobox", { name: "Theme", exact: true });
   const preview = page.getByRole("region", { name: "Publication preview" }).getByRole("article");
   await expect(selector).toHaveText("Réserve");
@@ -246,7 +246,7 @@ test("choosing a colour theme in the mobile Studio updates the preview and survi
 });
 
 test("each Studio profile sets its reading typeface, density and shape", async ({ page }) => {
-  await page.goto("/elea/playground/#/theme");
+  await page.goto("/playground/#/theme");
   const selector = page.getByRole("combobox", { name: "Theme", exact: true });
   await expect(page.getByRole("group", { name: "Theme presets" })).toHaveCount(0);
   for (const profile of directions) {
@@ -261,7 +261,7 @@ test("each Studio profile sets its reading typeface, density and shape", async (
 });
 
 test("a classic corner or custom radius overrides a profile shape and survives sharing", async ({ page }) => {
-  await page.goto("/elea/playground/#/theme?scheme=reserve");
+  await page.goto("/playground/#/theme?scheme=reserve");
   const signature = page.getByRole("radio", { name: "Theme shape" });
   const square = page.getByRole("radio", { name: "Square", exact: true });
   const radius = page.getByRole("textbox", { name: "Corner radius" });
@@ -293,7 +293,7 @@ test("a classic corner or custom radius overrides a profile shape and survives s
 });
 
 test("a shared colour scheme can carry an independent shape without changing its legacy edition", async ({ page }) => {
-  const studio = "/elea/playground/#/theme?edition=precision&scheme=braise";
+  const studio = "/playground/#/theme?edition=precision&scheme=braise";
   const gallery = page.getByRole("link", { name: "Open themed gallery" });
   await page.goto(studio);
   await expect(page.getByRole("radio", { name: "Soft" })).toBeChecked();
@@ -325,8 +325,8 @@ test("earlier shared colour schemes still render their own primary and keep thei
 
 test("the Colours public URL keeps the palette through navigation and browser history", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
-  await page.goto("/elea/typography/");
-  await page.goto("/elea/colours/?edition=editorial&primary=ruby-700");
+  await page.goto("/typography/");
+  await page.goto("/colours/?edition=editorial&primary=ruby-700");
 
   const nav = page.getByRole("navigation", { name: "Main", exact: true });
   const colours = nav.getByRole("link", { name: "Colours", exact: true });
@@ -345,5 +345,5 @@ test("the Colours public URL keeps the palette through navigation and browser hi
   await expect(nav.getByRole("link", { name: "Components", exact: true })).toHaveAttribute("aria-current", "true");
   await page.goBack();
   await page.goBack();
-  await expect(page).toHaveURL(/\/elea\/typography\/$/);
+  await expect(page).toHaveURL(/\/typography\/$/);
 });

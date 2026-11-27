@@ -5,7 +5,7 @@ import { readFile } from "node:fs/promises";
 for (const colorScheme of ["light", "dark"] as const) {
   test(`button states and badge examples meet text contrast in ${colorScheme} mode`, async ({ page }) => {
     await page.emulateMedia({ colorScheme });
-    await page.goto("/elea/playground/#/ui/button");
+    await page.goto("/playground/#/ui/button");
     await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
     await page.addStyleTag({ content: "* { transition: none !important; }" });
     for (const name of ["Primary", "Secondary", "Outline", "Ghost", "Danger", "Success", "Info", "Warning"]) {
@@ -15,7 +15,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(await textContrast(button), `${name} hovered`).toBeGreaterThanOrEqual(4.5);
     }
 
-    await page.goto("/elea/playground/#/ui/badge");
+    await page.goto("/playground/#/ui/badge");
     await expect(page.getByRole("heading", { name: "Badge", exact: true })).toBeVisible();
     const badges = page.locator(".elea-badge");
     await expect(badges).toHaveCount(7);
@@ -26,7 +26,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 }
 
 test("loading the editor stylesheet after UI keeps standalone button styling", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button");
   const button = page.getByRole("button", { name: "Outline", exact: true });
   const styling = () => button.evaluate((element) => {
     const { backgroundColor, padding, fontSize } = getComputedStyle(element);
@@ -39,7 +39,7 @@ test("loading the editor stylesheet after UI keeps standalone button styling", a
 });
 
 test("button motion follows its container, the prop and the visitor preference", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button");
   await page.addStyleTag({ content: "* { transition: none !important; }" });
   const follows = page.getByRole("button", { name: "Follows the page", exact: true });
   const still = page.getByRole("button", { name: "Always still", exact: true });
@@ -59,7 +59,7 @@ test("button motion follows its container, the prop and the visitor preference",
 });
 
 test("Réserve previews every button effect on the same primary action", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui/button?scheme=reserve");
+  await page.goto("/playground/#/ui/button?scheme=reserve");
   const demo = page.locator("section.demo").filter({ has: page.getByRole("heading", { name: "Effects", exact: true }) });
   const buttons = demo.getByRole("button");
   await expect(buttons).toHaveText(["Lift", "Scale", "Push", "Shine", "Ripple", "Spotlight", "Magnetic", "Tilt"]);
@@ -85,7 +85,7 @@ test("Réserve previews every button effect on the same primary action", async (
 });
 
 test("buttons take a size, a radius, a shadow and an effect that follows the pointer", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button");
   await page.addStyleTag({ content: "* { transition: none !important; }" });
   const named = (name: string) => page.getByRole("button", { name, exact: true });
   const style = (name: string, property: string) => named(name).evaluate((element, key) => getComputedStyle(element).getPropertyValue(key), property);
@@ -126,13 +126,13 @@ test("buttons take a size, a radius, a shadow and an effect that follows the poi
 });
 
 test("the gallery switch sets motion for every guide and leaves the other pages alone", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui");
+  await page.goto("/playground/#/ui");
   const html = page.locator("html");
   const gallery = page.locator(".catalog");
   await expect(page.getByRole("switch", { name: "Expressive motion" })).toBeChecked();
   await expect(gallery).toHaveAttribute("data-elea-motion", "on");
   await expect(html).not.toHaveAttribute("data-elea-motion");
-  await page.goto("/elea/playground/#/ui/choice");
+  await page.goto("/playground/#/ui/choice");
   await page.addStyleTag({ content: "* { transition: none !important; }" });
   const toggle = page.locator(".elea-toggle", { hasText: "Notifications" });
   const pressedWidth = async () => {
@@ -146,7 +146,7 @@ test("the gallery switch sets motion for every guide and leaves the other pages 
   await page.getByText("Expressive motion", { exact: true }).click();
   await expect(gallery).toHaveAttribute("data-elea-motion", "off");
   expect(await pressedWidth()).toBe("20px");
-  await page.goto("/elea/playground/#/ui/menu");
+  await page.goto("/playground/#/ui/menu");
   await expect(page.getByRole("switch", { name: "Expressive motion" })).not.toBeChecked();
   // Each component has its own gesture, and every one of them scales to nothing with the switch.
   // Reloading drops the style that froze transitions above; the switch is remembered.
@@ -166,12 +166,12 @@ test("the gallery switch sets motion for every guide and leaves the other pages 
   await page.getByText("Expressive motion", { exact: true }).click();
   expect(await gestures()).toEqual(["0.25s", "cubic-bezier(0.34, 1.56, 0.64, 1)"]);
   await page.getByText("Expressive motion", { exact: true }).click();
-  await page.goto("/elea/playground/#/playground");
+  await page.goto("/playground/#/playground");
   await expect(html).not.toHaveAttribute("data-elea-motion");
 });
 
 test("a tooltip over truncated text escapes its clipping box and stays in the viewport", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui/tooltip");
+  await page.goto("/playground/#/ui/tooltip");
   const label = page.getByText("Quarterly revenue by region", { exact: true }).first();
   // The wrapper leaves the label truncated inside its 120 px box.
   expect(await label.evaluate((element) => [getComputedStyle(element.parentElement!).display, element.scrollWidth > element.clientWidth])).toEqual(["contents", true]);
@@ -205,7 +205,7 @@ test("a tooltip over truncated text escapes its clipping box and stays in the vi
 });
 
 test("the gallery opens component examples without focusing their static previews", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui");
+  await page.goto("/playground/#/ui");
   const button = page.getByRole("link", { name: "Button", exact: true });
   const badge = page.getByRole("link", { name: "Badge", exact: true });
   await button.focus();
@@ -216,7 +216,7 @@ test("the gallery opens component examples without focusing their static preview
 });
 
 test("the Elea overview shows a rendered document, its blocks, and the Alien6 contact link", async ({ page }) => {
-  await page.goto("/elea/");
+  await page.goto("/");
   const main = page.getByRole("main");
   await expect(main.getByRole("heading", { name: "A design system for rich content." })).toBeVisible();
   const documentTitle = main.getByRole("heading", { name: "The glacier notebook" });
@@ -259,7 +259,7 @@ test("the Elea overview shows a rendered document, its blocks, and the Alien6 co
 });
 
 test("the notebook cover and block view fill the same frame", async ({ page }) => {
-  await page.goto("/elea/");
+  await page.goto("/");
   const notebook = page.getByRole("group", { name: "Document view" });
   const preview = notebook.getByRole("radio", { name: "Preview" });
   const json = notebook.getByRole("radio", { name: "Block JSON" });
@@ -288,15 +288,15 @@ test("the notebook cover and block view fill the same frame", async ({ page }) =
 
 test("the documentation fits a mobile screen and can be navigated", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 760 });
-  await page.goto("/elea/");
+  await page.goto("/");
   await expect(page.getByRole("main").getByRole("link", { name: "Explore components" })).toBeVisible();
   expect(await page.locator("body").evaluate((body) => body.scrollWidth)).toBeLessThanOrEqual(320);
   // A button that is a link keeps the colour of a button, not that of the links of the page
   expect(await textContrast(page.getByRole("main").getByRole("link", { name: "Explore components" }))).toBeGreaterThanOrEqual(4.5);
-  await page.goto("/elea/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button");
   const outline = page.getByRole("button", { name: "Outline", exact: true });
   await expect(page.getByRole("link", { name: "A link" })).toHaveCSS("color", await outline.evaluate((button) => getComputedStyle(button).color));
-  await page.goto("/elea/");
+  await page.goto("/");
 
   await page.getByRole("navigation", { name: "Main", exact: true }).getByRole("link", { name: "Docs", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Getting started", exact: true })).toBeVisible();
@@ -309,7 +309,7 @@ test("the documentation fits a mobile screen and can be navigated", async ({ pag
 
 test("a theme choice and the site navigation carry from the home page into the tools and docs", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/elea/");
+  await page.goto("/");
   await page.getByRole("button", { name: "Switch to the dark theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
@@ -329,7 +329,7 @@ test("a theme choice and the site navigation carry from the home page into the t
 });
 
 test("quote attributions are legible on both sides of the editorial workspace", async ({ page }) => {
-  await page.goto("/elea/playground/");
+  await page.goto("/playground/");
   const authorField = page.getByRole("textbox", { name: "— Author" });
   const attribution = page.getByTestId("viewer-pane").locator("cite");
   await expect(authorField).toHaveValue("From the field notebook");
@@ -344,7 +344,7 @@ test("quote attributions are legible on both sides of the editorial workspace", 
 });
 
 test("the static notebook links to the same theme in the editor", async ({ page }) => {
-  await page.goto("/elea/");
+  await page.goto("/");
   await expect(page.locator("#home-title span")).toHaveCSS("font-style", "normal");
   const main = page.getByRole("main");
   await expect(main.getByRole("group", { name: "Preview a publication theme" })).toHaveCount(0);
@@ -363,9 +363,9 @@ test("the notebook and links to the studio and editor remain visible without Jav
   const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
   try {
     const page = await context.newPage();
-    await page.goto("/elea/#home-theme");
+    await page.goto("/#home-theme");
     const main = page.getByRole("main");
-    await expect(main.getByRole("link", { name: "Open theme studio" })).toHaveAttribute("href", "/elea/playground/#/theme");
+    await expect(main.getByRole("link", { name: "Open theme studio" })).toHaveAttribute("href", "/playground/#/theme");
     await expect(main.getByRole("link", { name: "Edit this notebook" })).toHaveAttribute("href", /#\/playground\?scheme=reserve$/);
     await expect(main.getByRole("heading", { name: "The glacier notebook" })).toBeVisible();
     await expect(main.getByRole("heading", { name: "Publication themes" })).toHaveAttribute("id", "home-theme");
@@ -375,7 +375,7 @@ test("the notebook and links to the studio and editor remain visible without Jav
 });
 
 test("a host utility and a plain host rule win over a component default without raising specificity", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button");
   const button = page.getByRole("button", { name: "Primary", exact: true });
   await expect(button).toBeVisible();
   await button.evaluate((element) => element.parentElement!.style.setProperty("--elea-shape-action", "3px / 7px"));
@@ -388,7 +388,7 @@ test("a host utility and a plain host rule win over a component default without 
 });
 
 test("a dialog opened from a themed container uses the tokens of that container", async ({ page }) => {
-  await page.goto("/elea/playground/#/ui/dialog");
+  await page.goto("/playground/#/ui/dialog");
   const fill = (name: string) => page.getByRole("button", { name, exact: true }).evaluate((element) => getComputedStyle(element).backgroundColor);
   const opener = page.getByRole("button", { name: "Open in Editorial", exact: true });
   await opener.click();
@@ -404,7 +404,7 @@ test("a dialog opened from a themed container uses the tokens of that container"
 
 test("the info variant reads the info colour, which a host can set apart from its links", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/elea/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button");
   const fill = (name: string) => page.getByRole("button", { name, exact: true }).evaluate((element) => getComputedStyle(element).backgroundColor);
   await expect(page.getByRole("button", { name: "Teal info", exact: true })).toBeVisible();
   expect(await fill("Info")).toBe("rgb(71, 101, 164)");

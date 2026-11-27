@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
-const route = "/elea/playground/#/ui/media";
+const route = "/playground/#/ui/media";
 const glacier = fileURLToPath(new URL("../../docs/assets/glacier.webp", import.meta.url));
 
 async function chooseFormat(page: Page, label: string) {
