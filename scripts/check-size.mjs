@@ -21,7 +21,7 @@ import { gzipSync } from "node:zlib";
 // the package can grow by components without any of them growing unnoticed. This includes scoped
 // control tokens, independent feedback fills and foregrounds with local host fallbacks,
 // the font on standalone controls and surfaces, and the optional Tabs presentations.
-const BUDGETS = { tokens: 24_300, content: 32_800, "content-viewer": 12_800, media: 8_200, "content-editor": 79_100 };
+const BUDGETS = { tokens: 25_000, content: 32_800, "content-viewer": 12_800, media: 8_200, "content-editor": 79_200 };
 const referencePaletteFiles = new Set(["palette.js", "palette.css", "color-themes.js"]);
 // The optional atlas includes nine sets of component shapes, thirteen colour schemes and five surface scales.
 const referencePaletteBudget = 6_225;
@@ -42,11 +42,11 @@ const UI_BUDGETS = {
   breadcrumb: 1_375, "date-field": 7_025, "multi-select": 5_475, "input-formats": 1_600, "input-mask": 1_500, "phone-format": 525, "text-controls": 1_700,
   "card-network": 325, "identifier-input": 5_000, phone: 175, "phone-input": 3_200,
   calendar: 3_600, carousel: 5_575, "color-picker": 2_400, combobox: 4_200,
-  accordion: 2_500, alert: 1_700, avatar: 1_500, badge: 1_125, button: 3_950, "button-effects": 1_500, card: 1_650, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
+  accordion: 2_500, alert: 1_700, avatar: 1_500, badge: 1_125, button: 3_950, "button-effects": 1_500, card: 1_700, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
   dialog: 4_100, field: 2_025, footer: 1_250, hero: 1_900, index: 750, menu: 2_700, motion: 1_350, navbar: 3_750, "navigation-list": 1_950,
   "panel-position": 1_025, "responsive-image": 800, "search-autocomplete": 3_925,
   pagination: 2_050, popover: 4_300, progress: 1_500, "search-field": 2_750, sidebar: 1_975,
-  "radio-group": 1_750, select: 5_025, separator: 750, sheet: 1_775, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, stepper: 6_300, table: 2_275, tabs: 3_125, toast: 3_425, tooltip: 2_300,
+  "radio-group": 1_750, select: 5_025, separator: 750, sheet: 1_775, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, stepper: 6_300, table: 2_275, tabs: 3_200, toast: 3_425, tooltip: 2_300,
 };
 
 function files(dir) {

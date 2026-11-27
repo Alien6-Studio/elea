@@ -275,9 +275,38 @@ function assignedAction(scale: readonly Swatch[], step: ColorStep, surfaces: Sur
   return { light: appearance(0), dark: appearance(1) };
 }
 
+/** Horizontal and vertical radii of a profile shape written in rem, clockwise from the top left. */
+function shapeRadii(shape: string) {
+  const [horizontal = "", vertical = horizontal] = shape.split("/").map(part => part.trim());
+  const expand = (part: string) => {
+    const [first = 0, second = first, third = first, fourth = second] = part.split(/\s+/).map(value => (value === "0" ? 0 : Number(/^([\d.]+)rem$/.exec(value)?.[1])));
+    return [first, second, third, fourth];
+  };
+  const radii = [expand(horizontal), expand(vertical)] as const;
+  return radii.flat().every(Number.isFinite) ? radii : undefined;
+}
+
+const rem = (value: number) => (value > 0 ? `${Number(value.toFixed(4))}rem` : "0");
+
+/** The shape that shares its centres with `shape` when drawn `inset` rem inside it. */
+function nestedShape(shape: string | undefined, inset: number) {
+  const radii = shape === undefined ? undefined : shapeRadii(shape);
+  return radii?.map(axis => axis.map(radius => rem(radius - inset)).join(" ")).join(" / ");
+}
+
+/** The padding from which a box inside `shape` stays clear of every corner: a corner ends at its shorter radius. */
+function shapeClearance(shape: string | undefined) {
+  const radii = shape === undefined ? undefined : shapeRadii(shape);
+  return radii && rem(Math.max(...radii[0].map((radius, corner) => Math.min(radius, radii[1][corner]!))));
+}
+
 function buttonRadii(action: string | undefined, corner: Corners, scale: "uniform" | "profile") {
   if (scale !== "uniform" && scale !== "profile") throw new RangeError("Unknown Button radius scale");
-  if (action && scale === "profile") {
+  // Small and Medium sit a quarter of the silhouette apart. Below 0.25rem that is less than a pixel,
+  // so a silhouette that fine takes the scalar radius scale.
+  const radii = action === undefined ? undefined : shapeRadii(action);
+  const fine = radii !== undefined && Math.max(...radii.flat()) < 0.25;
+  if (action && scale === "profile" && !fine) {
     const scaled = (factor: number) => {
       // A full radius is deliberately oversized. Bound it before scaling the two smaller capsules.
       if (action.startsWith("var(--elea-radius-full")) return `calc(min(${action}, 1.5em) * ${factor})`;
@@ -351,6 +380,9 @@ function brandTokens({ palettes, palette, radii, shapes, corner, buttonRadiusSca
       `  --elea-button-radius-${size}: ${value ?? "initial"};`),
     // Reset each role at the brand boundary so nested uniform themes use their scalar radii.
     ...(["action", "control", "surface", "indicator"] as const).map(role => `  --elea-shape-${role}: ${shapes?.[role] ?? "initial"};`),
+    // A segmented tab sits 0.25rem inside its list; a card pads its content clear of its corners.
+    `  --elea-_shape-control-nested: ${nestedShape(shapes?.control, 0.25) ?? "initial"};`,
+    `  --elea-_shape-surface-clearance: ${shapeClearance(shapes?.surface) ?? "initial"};`,
     ...(font === undefined ? [] : [`  --elea-font-family-sans: ${font};`]),
     `  --elea-font-family-content: ${typeFamilies[typeface]};`,
     `  --elea-font-size-lg: ${reading.size};`,

@@ -4,7 +4,9 @@
   flex-direction: column;
   gap: var(--elea-space-4);
   min-width: 0;
-  padding: var(--elea-space-5);
+  /* Padding at least as long as the corners keeps the content clear of them. */
+  --_elea-card-padding: var(--elea-space-5);
+  padding: max(var(--_elea-card-padding), var(--elea-_shape-surface-clearance, var(--elea-radius-xl)));
   border: 1px solid var(--elea-color-border-default);
   border-radius: var(--elea-shape-surface, var(--elea-radius-xl));
   background: var(--elea-color-surface-default);
@@ -13,8 +15,8 @@
 .elea-card--elevated { border-color: transparent; box-shadow: var(--elea-shadow-md); }
 .elea-card--subtle { border-color: transparent; background: var(--elea-color-surface-subtle); }
 .elea-card--pad-none { padding: 0; }
-.elea-card--pad-sm { padding: var(--elea-space-3); gap: var(--elea-space-3); }
-.elea-card--pad-lg { padding: var(--elea-space-8); gap: var(--elea-space-5); }
+.elea-card--pad-sm { --_elea-card-padding: var(--elea-space-3); gap: var(--elea-space-3); }
+.elea-card--pad-lg { --_elea-card-padding: var(--elea-space-8); gap: var(--elea-space-5); }
 .elea-card__image { display: block; width: 100%; height: auto; object-fit: cover; border-radius: var(--elea-shape-surface, var(--elea-radius-md)); }
 .elea-card > .elea-responsive-picture { display: block; border-radius: inherit; }
 .elea-card--pad-none > .elea-card__image:first-child,

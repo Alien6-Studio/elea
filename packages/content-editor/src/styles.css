@@ -549,7 +549,11 @@
   max-width: none;
 }
 .elea-content-editor--full > .elea-content-editor__preview > .elea-content { max-width: none; }
-.elea-classic-editor { min-width: 0; }
+/* The toolbar takes the top corners of the frame: corners no longer than its padding leave the controls clear of them. */
+.elea-classic-editor {
+  min-width: 0;
+  border-radius: var(--elea-control-radius, min(var(--elea-radius-lg), var(--elea-space-2)));
+}
 .elea-richtext-input:has(.elea-richtext-input__editable:focus),
 .elea-markdown-editor__source:focus-within {
   border-color: transparent;
@@ -599,7 +603,8 @@
   font-family: var(--elea-font-family-sans);
   background: var(--elea-color-surface-default);
   border: 1px solid var(--elea-color-border-default);
-  border-radius: var(--elea-radius-lg);
+  /* Corners no longer than the padding leave the controls clear of them. */
+  border-radius: min(var(--elea-radius-lg), var(--elea-space-2));
   box-shadow: var(--elea-shadow-sm);
 }
 .elea-doc-toolbar .elea-toolbar { border: 0; box-shadow: none; padding: 0; background: transparent; }

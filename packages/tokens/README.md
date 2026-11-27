@@ -232,7 +232,8 @@ makeBrandTheme({ ...createThemeProfile("reserve"), buttonRadiusScale: "profile" 
 
 Small and medium scale each axis and cap to 50% and 75% of its original value.
 Large uses the profile’s action shape. For a full capsule the smaller steps
-scale from a maximum of 1.5em. To supply your own shapes, set
+scale from a maximum of 1.5em. A silhouette below 0.25rem would put these steps
+less than a pixel apart, so it keeps the uniform scale. To supply your own shapes, set
 `--elea-button-radius-sm`, `--elea-button-radius-md` and `--elea-button-radius-lg`
 as complete CSS corner values on your scope or Button.
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.4 - Unreleased
+
+These changes correct default rendering. Compare screens that use segmented tabs, cards, the classic editor or `buttonRadiusScale: "profile"` before upgrading.
+
+- Segmented tabs share the centres of their list’s corners: a tab’s radius is the list’s radius minus the 0.25rem inset, where it was the same radius. A host `--elea-control-radius` still applies to both.
+- A card pads its content clear of its corners. The padding grows to the corner length in themes whose surface corners are longer than the padding, such as Ponctuation and Lisière at the default padding and round themes at `padding="sm"`.
+- The document toolbar and the classic editor frame limit their corners to the toolbar padding, 0.5rem, in themes with longer corners. A host `--elea-control-radius` still applies to the classic editor.
+- With `buttonRadiusScale: "profile"`, a silhouette below 0.25rem, such as Hors champ, keeps the uniform `sm`, `md` and `lg` radii: its profile steps were less than a pixel apart.
+- `brandTokens` emits two derived shape tokens for the stylesheets, `--elea-_shape-control-nested` and `--elea-_shape-surface-clearance`. They are private and may change.
+
 ## 0.1.3 - 2026-11-26
 
 - Add `Hero`, `Navbar` and `Sidebar` to the UI package, with photographic covers, nested links, disclosure-only groups and host router adapters. Navbar submenus open as vertical lists or optional full-width columns.

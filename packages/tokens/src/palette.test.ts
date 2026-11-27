@@ -92,6 +92,11 @@ test("profile Button radii scale the geometry of all nine actions, including ell
     const brand = createThemeProfile(id);
     const { css } = makeBrandTheme({ ...brand, buttonRadiusScale: "profile" });
     const action = colorThemes[id].shapes.action;
+    if (id === "hors-champ") {
+      // Half and three quarters of a 3 px silhouette are less than a pixel apart: the scalar scale applies.
+      for (const size of ["sm", "md", "lg"]) assert.ok(css.includes(`--elea-button-radius-${size}: initial;`), size);
+      continue;
+    }
     assert.ok(css.includes("--elea-button-radius-lg: var(--elea-shape-action);"), id);
     assert.ok(css.includes(`--elea-shape-action: ${action};`), id);
     for (const [size, factor] of Object.entries({ sm: 0.5, md: 0.75 })) {
@@ -108,6 +113,21 @@ test("profile Button radii scale the geometry of all nine actions, including ell
     assert.equal(makeBrandTheme(brand).css, makeBrandTheme({ ...brand, buttonRadiusScale: "uniform" }).css, id);
   }
   assert.throws(() => makeBrandTheme({ ...editions.Precision, buttonRadiusScale: "invalid" as never }), /Button radius scale/);
+});
+
+test("a profile derives the shape nested in a control and the padding that clears a surface", () => {
+  const derived = (id: (typeof profiles)[number]) => {
+    const { css } = makeBrandTheme(createThemeProfile(id));
+    return ["control-nested", "surface-clearance"].map(name => css.match(new RegExp(`--elea-_shape-${name}: ([^;]+);`))?.[1]);
+  };
+  assert.deepEqual(derived("ponctuation"), ["0.625rem 0.625rem 0.625rem 0.625rem / 0.625rem 0.625rem 0.625rem 0.625rem", "1.5rem"]);
+  // An ellipse loses the inset on both axes, and a corner ends at its shorter radius.
+  assert.deepEqual(derived("braise"), ["0.25rem 0.25rem 0.25rem 0.25rem / 0 0 0 0", "0.625rem"]);
+  assert.deepEqual(derived("lisiere"), ["0.375rem 0 0.25rem 0 / 0.375rem 0 0.25rem 0", "1.5rem"]);
+  for (const id of profiles) assert.ok(derived(id).every(value => value && value !== "initial"), id);
+  const uniform = makeBrandTheme(editions.Precision).css;
+  assert.ok(uniform.includes("--elea-_shape-control-nested: initial;"));
+  assert.ok(uniform.includes("--elea-_shape-surface-clearance: initial;"));
 });
 
 test("a uniform brand or an explicit corner or radius resets all inherited shape roles", () => {

@@ -42,11 +42,12 @@
   inline-size: fit-content;
   max-inline-size: 100%;
   border-radius: var(--elea-control-radius, var(--elea-shape-control, var(--elea-radius-lg)));
-  padding: 3px;
+  padding: calc(0.25rem - 1px);
 }
+/* A tab sits 0.25rem inside the list, border included, and shares the centres of its corners. */
 .elea-tabs__list[data-elea-tabs="segmented"] .elea-tabs__tab {
   border: 1px solid transparent;
-  border-radius: var(--elea-control-radius, var(--elea-shape-indicator, var(--elea-radius-md)));
+  border-radius: var(--elea-control-radius, var(--elea-_shape-control-nested, max(0px, calc(var(--elea-radius-lg) - 0.25rem))));
 }
 .elea-tabs__list[data-elea-tabs="segmented"] .elea-tabs__tab[aria-selected="true"] {
   background: var(--elea-tabs-selected-surface, var(--elea-color-surface-default));
@@ -74,11 +75,11 @@
     inline-size: fit-content;
     max-inline-size: 100%;
     border-radius: var(--elea-control-radius, var(--elea-shape-control, var(--elea-radius-lg)));
-    padding: 3px;
+    padding: calc(0.25rem - 1px);
   }
   .elea-tabs__list:not([data-elea-tabs]) .elea-tabs__tab {
     border: 1px solid transparent;
-    border-radius: var(--elea-control-radius, var(--elea-shape-indicator, var(--elea-radius-md)));
+    border-radius: var(--elea-control-radius, var(--elea-_shape-control-nested, max(0px, calc(var(--elea-radius-lg) - 0.25rem))));
   }
   .elea-tabs__list:not([data-elea-tabs]) .elea-tabs__tab[aria-selected="true"] {
     background: var(--elea-tabs-selected-surface, var(--elea-color-surface-default));
