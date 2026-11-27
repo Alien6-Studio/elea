@@ -911,8 +911,8 @@ test("the classic mode shows a fixed bar above a continuous document, nothing ar
   await expect(bar).toBeVisible();
   await expect(editorPane(page).locator(".elea-block-editor__gutter")).toHaveCount(0);
   await expect(editorPane(page).locator(".elea-block-editor__head")).toHaveCount(0);
-  // The bar idles until a paragraph has the focus, then formats it; no floating bar appears
-  await expect(bar.locator(".elea-doc-toolbar__group--idle")).toHaveCount(1);
+  // The bar is usable before any paragraph has the focus, then formats the focused one; no floating bar appears
+  await expect(bar.getByRole("button", { name: "Bold" })).toBeEnabled();
   const paragraph = firstParagraph(page);
   await paragraph.click({ position: { x: 10, y: 10 } });
   const frame = editorPane(page).locator(".elea-classic-editor");
