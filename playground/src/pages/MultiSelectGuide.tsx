@@ -1,8 +1,8 @@
 import { Demo, PropsTable } from "../components/Demo.js";
-import { TerritoryPicker } from "./TerritoryPicker.js";
-import territorySource from "./TerritoryPicker.tsx?raw";
-import { SubjectTags } from "./SubjectTags.js";
-import subjectSource from "./SubjectTags.tsx?raw";
+import { TerritoryPicker } from "../examples/multi-select/TerritoryPicker.js";
+import territorySource from "../examples/multi-select/TerritoryPicker.tsx?raw";
+import { SubjectTags } from "../examples/multi-select/SubjectTags.js";
+import subjectSource from "../examples/multi-select/SubjectTags.tsx?raw";
 
 export function MultiSelectPage() {
   return <>

@@ -38,7 +38,7 @@
     <div class="docs-guidebar">
       <div class="site-container docs-guidebar__inner">
         <span class="docs-guidebar__label">Guides</span>
-        <nav class="site__nav-links docs-guidebar__links" aria-label="Documentation">
+        <nav class="docs-guidebar__links" aria-label="Documentation">
           {% for item in nav if not item.is_homepage %}
             <a href="{{ item.url | url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.title | e }}</a>
           {% endfor %}

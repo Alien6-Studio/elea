@@ -246,7 +246,7 @@ test("the header and footer retain the Galet mark and ELEA lettering across site
   }
 });
 
-for (const width of [1440, 850, 320]) {
+for (const width of [1571, 1440, 850, 390, 320]) {
   test(`the guides and tools share a navigation grid at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/elea/getting-started/");
@@ -266,8 +266,18 @@ for (const width of [1440, 850, 320]) {
     await expect(main.getByRole("link", { name: "Typography", exact: true })).toHaveAttribute("href", "/elea/typography/");
     await expect(guides.getByRole("link", { name: "Typography", exact: true })).toHaveCount(0);
     expect(Math.abs(await left(docs) - await left(firstGuide))).toBeLessThan(1);
+    const wordmark = (await page.getByRole("banner").getByRole("link", { name: "Elea", exact: true }).boundingBox())!;
+    const searchBox = (await page.locator("#site-search input").boundingBox())!;
+    expect(searchBox.x - wordmark.x - wordmark.width).toBeGreaterThanOrEqual(4);
     if (width >= 1024) {
-      expect(Math.abs(await left(docs) - await left(page.getByRole("heading", { level: 1 })))).toBeLessThan(1);
+      const title = page.getByRole("heading", { level: 1 });
+      const search = page.locator("#site-search");
+      expect(Math.abs(await left(docs) - await left(title))).toBeLessThan(1);
+      expect(Math.abs(await left(search) - await left(title))).toBeLessThan(1);
+      expect((await search.boundingBox())!.width).toBeGreaterThan(400);
+      const guideBar = (await guides.boundingBox())!;
+      expect(guideBar.height).toBeLessThanOrEqual(40);
+      expect((await title.boundingBox())!.y - guideBar.y - guideBar.height).toBeLessThan(50);
     }
     const integration = guides.getByRole("link", { name: "UI integration" });
     const box = await integration.boundingBox();

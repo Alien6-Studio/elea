@@ -426,7 +426,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await open.press("Enter");
     await expect(page.getByRole("heading", { name: "Components", exact: true })).toBeVisible();
     const previews = page.locator(".gallery__preview");
-    await expect(previews).toHaveCount(33);
+    await expect(previews).toHaveCount(36);
     const guideCount = await previews.count();
     await expect(previews.first()).toHaveCSS("--elea-color-primary-500", "#6750a4");
     await page.getByRole("link", { name: "Button", exact: true }).click();

@@ -1,29 +1,23 @@
 import { StepperSkeleton } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
-import { IssueWorkflow } from "./IssueWorkflow.js";
-import issueSource from "./IssueWorkflow.tsx?raw";
-import { ReviewSteps } from "./ReviewSteps.js";
-import reviewSource from "./ReviewSteps.tsx?raw";
-
-const styles = 'import "@alien6-studio/elea-ui/bundle.css";\n';
+import { IssueWorkflow } from "../examples/stepper/IssueWorkflow.js";
+import issueSource from "../examples/stepper/IssueWorkflow.tsx?raw";
+import { ReviewSteps } from "../examples/stepper/ReviewSteps.js";
+import reviewSource from "../examples/stepper/ReviewSteps.tsx?raw";
+import loadingSource from "../examples/stepper/LoadingIssue.tsx?raw";
 
 export function StepperPage() {
   return (
     <div className="stepper-guide">
       <h1>Stepper</h1>
       <p className="lead">Show where someone is in a sequence. Let them revisit a section or guide them through a task in order.</p>
-      <Demo title="Free navigation" description="Open any section of the proof. Each badge counts its outstanding notes." code={styles + reviewSource}>
+      <Demo title="Free navigation" description="Open any section of the proof. Each badge counts its outstanding notes." code={reviewSource}>
         <ReviewSteps />
       </Demo>
-      <Demo title="Linear workflow" description="Prepare an issue from details to proof. The final step replaces Next with the action that saves the draft." code={styles + issueSource}>
+      <Demo title="Linear workflow" description="Prepare an issue from details to proof. The final step replaces Next with the action that saves the draft." code={issueSource}>
         <IssueWorkflow />
       </Demo>
-      <Demo title="Loading" description="Reserve space for the steps while the issue loads." code={`import { StepperSkeleton } from "@alien6-studio/elea-ui";
-import "@alien6-studio/elea-ui/bundle.css";
-
-export function LoadingIssue() {
-  return <StepperSkeleton steps={3} />;
-}`}>
+      <Demo title="Loading" description="Reserve space for the steps while the issue loads." code={loadingSource}>
         <div className="catalog-fill"><StepperSkeleton steps={3} /></div>
       </Demo>
       <h2>Parts</h2>

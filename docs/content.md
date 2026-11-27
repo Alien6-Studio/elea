@@ -61,7 +61,7 @@ Pass `mode` with `onModeChange` to let the writer switch from the pencil menu.
 
 ### Edit an HTML form field
 
-The playground uses the version on `main`. This example requires editor and content APIs added after 0.1.2.
+The playground uses the version on `main`. This example requires editor and content APIs added in 0.1.3.
 
 Use `mode="classic"` and `width="full"` to fit a form column. A host can set
 `--elea-editor-canvas-height`, `--elea-control-radius` and `--elea-control-border`

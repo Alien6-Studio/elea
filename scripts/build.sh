@@ -23,6 +23,8 @@ mkdir -p "$playground/public"
 cp "$site_root/docs/assets/elea-mark.svg" "$playground/public/favicon.svg"
 (
   cd "$playground"
+  export VITE_ELEA_REPOSITORY_METADATA
+  VITE_ELEA_REPOSITORY_METADATA=$(node --import tsx scripts/repository-metadata.ts)
   node --import tsx scripts/render-site.tsx
   npm run build
 )

@@ -6,6 +6,30 @@ import {
 } from "@alien6-studio/elea-ui";
 import { glacierImage, notebookSummary, notebookTitle } from "../notebook.js";
 import { Demo, PropsTable } from "../components/Demo.js";
+import singlePlate from "../examples/carousel/SinglePlate.tsx?raw";
+import contactSheet from "../examples/carousel/ContactSheet.tsx?raw";
+import filmstrip from "../examples/carousel/Filmstrip.tsx?raw";
+import editorialCard from "../examples/card/EditorialCard.tsx?raw";
+import cardVariants from "../examples/card/CardVariants.tsx?raw";
+import guideCard from "../examples/card/GuideCard.tsx?raw";
+import cardPadding from "../examples/card/CardPadding.tsx?raw";
+import signInChoice from "../examples/separator/SignInChoice.tsx?raw";
+import articleFacts from "../examples/separator/ArticleFacts.tsx?raw";
+import loadingArticle from "../examples/skeleton/LoadingArticle.tsx?raw";
+import skeletonShapes from "../examples/skeleton/SkeletonShapes.tsx?raw";
+import listRows from "../examples/skeleton/ListRows.tsx?raw";
+import brandPlaceholders from "../examples/skeleton/BrandPlaceholders.tsx?raw";
+import profileHeader from "../examples/skeleton/ProfileHeader.tsx?raw";
+import companions from "../examples/skeleton/Companions.tsx?raw";
+import ordersRegion from "../examples/skeleton/OrdersRegion.tsx?raw";
+import pictureAndInitials from "../examples/avatar/PictureAndInitials.tsx?raw";
+import avatarSizes from "../examples/avatar/AvatarSizes.tsx?raw";
+import editors from "../examples/avatar/Editors.tsx?raw";
+import alertTones from "../examples/alert/AlertTones.tsx?raw";
+import editingNotice from "../examples/alert/EditingNotice.tsx?raw";
+import uploadProgress from "../examples/progress/UploadProgress.tsx?raw";
+import exportProgress from "../examples/progress/ExportProgress.tsx?raw";
+import progressTones from "../examples/progress/ProgressTones.tsx?raw";
 import { colourPlates } from "../data/colourPlates.js";
 import { brandRoute, type BrandTheme } from "./brandTheme.js";
 // A local portrait, so the guide loads no remote image.
@@ -18,14 +42,14 @@ type Plate = (typeof exhibitionPlates)[number];
 type PlateLayout = Pick<CarouselProps<Plate>, "defaultIndex" | "itemsPerView" | "minItemWidth" | "gap" | "navigation" | "controlsPosition" | "controlsAlign" | "showCounter">;
 
 const presentations = [
-  { title: "Single plate", layout: { navigation: "arrows" } },
-  { title: "Contact sheet", layout: {
+  { title: "Single plate", code: singlePlate, layout: { navigation: "arrows" } },
+  { title: "Contact sheet", code: contactSheet, layout: {
     defaultIndex: 1, itemsPerView: 2, minItemWidth: 100, gap: "sm", navigation: "dots", controlsPosition: "bottom", controlsAlign: "center",
   } },
-  { title: "Filmstrip", layout: {
+  { title: "Filmstrip", code: filmstrip, layout: {
     defaultIndex: 3, itemsPerView: 3, minItemWidth: 72, gap: "none", navigation: "both", controlsPosition: "bottom", controlsAlign: "start", showCounter: true,
   } },
-] satisfies { title: string; layout: PlateLayout }[];
+] satisfies { title: string; code: string; layout: PlateLayout }[];
 
 export function PlateCarousel({ label = "Exhibition plates", ...layout }: PlateLayout & { label?: string }) {
   return <Carousel items={exhibitionPlates} itemKey={plate => plate.src} loop className="catalog-plate-carousel"
@@ -34,24 +58,13 @@ export function PlateCarousel({ label = "Exhibition plates", ...layout }: PlateL
     renderItem={plate => <img src={plate.src} alt={plate.alt} width={840} height={plate.height ?? 560} loading="lazy" />} />;
 }
 
-function plateExample(title: string, layout: PlateLayout) {
-  const props = Object.entries(layout).map(([key, value]) =>
-    typeof value === "string" ? `${key}="${value}"` : `${key}={${value}}`);
-  return `<Carousel items={plates} itemKey={plate => plate.src} loop
-  label="${title}" roleDescription="carousel"
-  previousLabel="Previous plate" nextLabel="Next plate"
-  ${props.join("\n  ")}
-  getDotLabel={index => "Show plate " + (index + 1)}
-  renderItem={plate => <img src={plate.src} alt={plate.alt} width={840} height={560} />} />`;
-}
-
 export function CarouselPage() {
   return <>
     <h1>Carousel</h1>
     <p className="lead">Browse the plates from the colour atlas one at a time, in pairs or as a continuous strip.</p>
     <div className="carousel-gallery">
-      {presentations.map(({ title, layout }) => (
-        <Demo key={title} title={title} code={plateExample(title, layout)}>
+      {presentations.map(({ title, code, layout }) => (
+        <Demo key={title} title={title} code={code}>
           <PlateCarousel label={title} {...layout} />
         </Demo>
       ))}
@@ -77,18 +90,7 @@ export function CardPage({ brand }: { brand?: BrandTheme }) {
     <>
       <h1>Card</h1>
       <p className="lead">Group related content on one surface. Use an image, a heading and a footer action when they help someone decide what to open.</p>
-      <Demo title="Editorial card" code={`<Card>
-  <CardImage src={coverUrl} alt="Blue crevasses and white ridges seen from above a glacier"
-    width={1050} height={525} />
-  <CardHeader>
-    <CardTitle>The glacier notebook</CardTitle>
-    <CardDescription>Field notes on the shapes that ice leaves behind.</CardDescription>
-  </CardHeader>
-  <CardContent><Badge tone="warning">In review</Badge></CardContent>
-  <CardFooter>
-    <Button href={notebookUrl} size="sm">Open notebook</Button>
-  </CardFooter>
-</Card>`}>
+      <Demo title="Editorial card" code={editorialCard}>
         <Card className="catalog-card-demo">
           <CardImage src={glacierImage.data.file.url} alt={glacierImage.data.alt} width={1050} height={525} />
           <CardHeader>
@@ -101,14 +103,7 @@ export function CardPage({ brand }: { brand?: BrandTheme }) {
           </CardFooter>
         </Card>
       </Demo>
-      <Demo title="Variants" description="An outline for lists, an elevation for content that floats, a subtle fill for secondary information." code={`<Card>
-  <CardHeader>
-    <CardTitle>Outline</CardTitle>
-    <CardDescription>A border on the page surface.</CardDescription>
-  </CardHeader>
-</Card>
-<Card variant="elevated">…</Card>
-<Card variant="subtle">…</Card>`}>
+      <Demo title="Variants" description="An outline for lists, an elevation for content that floats, a subtle fill for secondary information." code={cardVariants}>
         <div className="catalog-cards">
           <Card>
             <CardHeader><CardTitle>Outline</CardTitle><CardDescription>A border on the page surface.</CardDescription></CardHeader>
@@ -121,12 +116,7 @@ export function CardPage({ brand }: { brand?: BrandTheme }) {
           </Card>
         </div>
       </Demo>
-      <Demo title="Interactive card" description="The link in the title covers the whole card. Under expressive motion the card lifts on hover." code={`<Card interactive>
-  <CardHeader>
-    <CardTitle><a href="/ui/button">Button</a></CardTitle>
-    <CardDescription>Trigger an action or lead to another page.</CardDescription>
-  </CardHeader>
-</Card>`}>
+      <Demo title="Interactive card" description="The link in the title covers the whole card. Under expressive motion the card lifts on hover." code={guideCard}>
         <div className="catalog-cards">
           <Card interactive>
             <CardHeader><CardTitle><a href={brandRoute("ui/button", brand)}>Button</a></CardTitle><CardDescription>Trigger an action or lead to another page.</CardDescription></CardHeader>
@@ -136,10 +126,7 @@ export function CardPage({ brand }: { brand?: BrandTheme }) {
           </Card>
         </div>
       </Demo>
-      <Demo title="Padding" code={`<Card padding="sm">Small</Card>
-<Card>Medium</Card>
-<Card padding="lg">Large</Card>
-<Card padding="none"><img src="cover.jpg" alt="" /></Card>`}>
+      <Demo title="Padding" code={cardPadding}>
         <Card padding="sm">Small</Card>
         <Card>Medium</Card>
         <Card padding="lg">Large</Card>
@@ -163,20 +150,14 @@ export function SeparatorPage() {
     <>
       <h1>Separator</h1>
       <p className="lead">Draw a line between two groups of content, across the page or between inline items, with an optional label.</p>
-      <Demo title="Horizontal, with a label" code={`<Button variant="outline">Continue with a passkey</Button>
-<Separator>or</Separator>
-<Button>Sign in with email</Button>`}>
+      <Demo title="Horizontal, with a label" code={signInChoice}>
         <div className="catalog-stack catalog-fill">
           <Button variant="outline">Continue with a passkey</Button>
           <Separator>or</Separator>
           <Button>Sign in with email</Button>
         </div>
       </Demo>
-      <Demo title="Vertical" description="A vertical separator takes the height of its row." code={`<span>Draft</span>
-<Separator orientation="vertical" />
-<span>1 240 words</span>
-<Separator orientation="vertical" />
-<span>6 min read</span>`}>
+      <Demo title="Vertical" description="A vertical separator takes the height of its row." code={articleFacts}>
         <div className="catalog-row">
           <span>Draft</span>
           <Separator orientation="vertical" />
@@ -209,18 +190,7 @@ export function SkeletonPage() {
     <>
       <h1>Skeleton</h1>
       <p className="lead">Hold the shape of content while it loads, so the page does not jump when it arrives.</p>
-      <Demo title="Loading an article" description="Under expressive motion a light sweeps across the placeholders; otherwise they pulse gently." code={`<Toggle label="Loading" checked={loading} onCheckedChange={setLoading} />
-<article aria-busy={loading}>
-  {loading ? (
-    <>
-      <Skeleton variant="circle" width={40} height={40} />
-      <Skeleton width="40%" />
-      <Skeleton lines={3} />
-    </>
-  ) : (
-    <Article />
-  )}
-</article>`}>
+      <Demo title="Loading an article" description="Under expressive motion a light sweeps across the placeholders; otherwise they pulse gently." code={loadingArticle}>
         <div className="catalog-stack catalog-fill">
           <Toggle label="Loading" checked={loading} onCheckedChange={setLoading} />
           <article className="catalog-loading" aria-busy={loading} aria-label="Article preview">
@@ -240,30 +210,21 @@ export function SkeletonPage() {
           </article>
         </div>
       </Demo>
-      <Demo title="Shapes" code={`<Skeleton variant="circle" width={48} height={48} />
-<Skeleton variant="rect" width={160} height={96} />
-<Skeleton width={180} />`}>
+      <Demo title="Shapes" code={skeletonShapes}>
         <Skeleton variant="circle" width={48} height={48} />
         <Skeleton variant="rect" width={160} height={96} />
         <Skeleton width={180} />
       </Demo>
-      <Demo title="A count of blocks" description="Stack the same placeholder for the rows of a list." code={`<Skeleton variant="rect" height={44} count={3} />`}>
+      <Demo title="A count of blocks" description="Stack the same placeholder for the rows of a list." code={listRows}>
         <div className="catalog-fill" data-demo="count"><Skeleton variant="rect" height={44} count={3} /></div>
       </Demo>
-      <Demo title="A class on every placeholder" description="className names what holds the blocks or the lines; blockClassName reaches each placeholder, so a class of your theme colours and shapes all of them." code={`.brand-placeholder { background-color: color-mix(in srgb, var(--elea-color-primary-500) 30%, transparent); border-radius: var(--elea-radius-full); }
-
-<Skeleton variant="rect" height={28} count={3} blockClassName="brand-placeholder" />
-<Skeleton lines={3} blockClassName="brand-placeholder" />`}>
+      <Demo title="A class on every placeholder" description="className names what holds the blocks or the lines; blockClassName reaches each placeholder, so a class of your theme colours and shapes all of them." code={brandPlaceholders}>
         <div className="catalog-fill catalog-stack" data-demo="block-class">
           <Skeleton variant="rect" height={28} count={3} blockClassName="catalog-skeleton-brand" />
           <Skeleton lines={3} blockClassName="catalog-skeleton-brand" />
         </div>
       </Demo>
-      <Demo title="Around the real content" description="With children, the skeleton takes no size of its own: each child stays in the layout, hidden from sight and from assistive technology, and is painted as the placeholder. Nothing moves when the content arrives." code={`<Toggle label="Loading" checked={loading} onCheckedChange={setLoading} />
-<Skeleton loading={loading}><Avatar name="Ada Lovelace" /></Skeleton>
-<Skeleton loading={loading}><strong>Ada Lovelace</strong></Skeleton>
-<Skeleton loading={loading}>Member since 2019</Skeleton>
-<Skeleton loading={loading}><Button variant="secondary">Follow</Button></Skeleton>`}>
+      <Demo title="Around the real content" description="With children, the skeleton takes no size of its own: each child stays in the layout, hidden from sight and from assistive technology, and is painted as the placeholder. Nothing moves when the content arrives." code={profileHeader}>
         <div className="catalog-stack catalog-fill">
           <Toggle label="Loading the profile" checked={wrapped} onCheckedChange={setWrapped} />
           <div className="catalog-row" data-demo="wrap">
@@ -276,12 +237,7 @@ export function SkeletonPage() {
           </div>
         </div>
       </Demo>
-      <Demo title="Companions" description="A component with a stable shape exports its skeleton, built from the component itself: on each line the skeleton, then the loaded component, with the same box." code={`<AvatarSkeleton size="lg" />
-<ButtonSkeleton>Save changes</ButtonSkeleton>
-<BadgeSkeleton>Draft</BadgeSkeleton>
-<FieldSkeleton help />
-<CardSkeleton description lines={2} footer={<ButtonSkeleton size="sm">Open</ButtonSkeleton>} />
-<TableSkeleton rows={2} columns={3} />`}>
+      <Demo title="Companions" description="A component with a stable shape exports its skeleton, built from the component itself: on each line the skeleton, then the loaded component, with the same box." code={companions}>
         <div className="catalog-pairs">
           <div className="catalog-pair" data-pair="avatar"><AvatarSkeleton size="lg" /><Avatar name="Ada Lovelace" size="lg" /></div>
           <div className="catalog-pair" data-pair="button"><ButtonSkeleton>Save changes</ButtonSkeleton><Button>Save changes</Button></div>
@@ -310,9 +266,7 @@ export function SkeletonPage() {
           </div>
         </div>
       </Demo>
-      <Demo title="A region that loads" description="The region is busy while it loads and announces one label for every placeholder inside. With a delay, a fast load never flashes the placeholders, and their space is kept all along." code={`<SkeletonRegion loading={fetching} label="Loading orders" delay={300}>
-  {fetching ? <TableSkeleton rows={2} columns={2} /> : <Orders />}
-</SkeletonRegion>`}>
+      <Demo title="A region that loads" description="The region is busy while it loads and announces one label for every placeholder inside. With a delay, a fast load never flashes the placeholders, and their space is kept all along." code={ordersRegion}>
         <div className="catalog-stack catalog-fill">
           <div className="catalog-row">
             <Button variant="secondary" disabled={fetching} onClick={() => reload(1500)}>Reload slowly</Button>
@@ -368,35 +322,21 @@ export function AvatarPage() {
     <>
       <h1>Avatar</h1>
       <p className="lead">Show who wrote, edited or owns something. An avatar shows a picture and falls back to initials when there is none or when it fails to load.</p>
-      <Demo title="Picture and initials" code={`<Avatar name="Ada Lovelace" src="/people/ada.jpg" />
-<Avatar name="Ada Lovelace" />
-<Avatar name="Grace Hopper" tone="primary" />
-<Avatar name="Alan Turing" tone="secondary" />
-<Avatar name="Field notes" shape="square" />`}>
+      <Demo title="Picture and initials" code={pictureAndInitials}>
         <Avatar name="Ada Lovelace" src={portrait} />
         <Avatar name="Ada Lovelace" />
         <Avatar name="Grace Hopper" tone="primary" />
         <Avatar name="Alan Turing" tone="secondary" />
         <Avatar name="Field notes" shape="square" />
       </Demo>
-      <Demo title="Sizes" code={`<Avatar size="xs" name="Ada Lovelace" />
-<Avatar size="sm" name="Ada Lovelace" />
-<Avatar name="Ada Lovelace" />
-<Avatar size="lg" name="Ada Lovelace" />
-<Avatar size="xl" name="Ada Lovelace" />`}>
+      <Demo title="Sizes" code={avatarSizes}>
         <Avatar size="xs" name="Ada Lovelace" />
         <Avatar size="sm" name="Ada Lovelace" />
         <Avatar name="Ada Lovelace" />
         <Avatar size="lg" name="Ada Lovelace" />
         <Avatar size="xl" name="Ada Lovelace" />
       </Demo>
-      <Demo title="Group" description="Past max, the rest is counted." code={`<AvatarGroup aria-label="Editors" max={3}>
-  <Avatar name="Ada Lovelace" tone="primary" />
-  <Avatar name="Grace Hopper" />
-  <Avatar name="Alan Turing" tone="secondary" />
-  <Avatar name="Katherine Johnson" />
-  <Avatar name="Hedy Lamarr" />
-</AvatarGroup>`}>
+      <Demo title="Group" description="Past max, the rest is counted." code={editors}>
         <AvatarGroup aria-label="Editors" max={3}>
           <Avatar name="Ada Lovelace" tone="primary" />
           <Avatar name="Grace Hopper" />
@@ -425,12 +365,7 @@ export function AlertPage() {
     <>
       <h1>Alert</h1>
       <p className="lead">Tell people what happened and what they can do about it, in the flow of the page. Warnings and errors are announced at once, the other tones politely.</p>
-      <Demo title="Tones" code={`<Alert title="Draft saved">Your changes are kept on this device.</Alert>
-<Alert tone="primary" icon={<InfoIcon />} title="A new version is available" />
-<Alert tone="success" title="Article published">It is now visible to everyone.</Alert>
-<Alert tone="info" icon={<InfoIcon />} title="Maintenance is planned for Sunday" />
-<Alert tone="warning" title="Your session ends in five minutes" />
-<Alert tone="danger" title="The article could not be saved">Check your connection and try again.</Alert>`}>
+      <Demo title="Tones" code={alertTones}>
         <div className="catalog-stack catalog-fill">
           <Alert title="Draft saved">Your changes are kept on this device.</Alert>
           <Alert tone="primary" icon={<InfoIcon />} title="A new version is available" />
@@ -440,17 +375,7 @@ export function AlertPage() {
           <Alert tone="danger" role="status" title="The article could not be saved">Check your connection and try again.</Alert>
         </div>
       </Demo>
-      <Demo title="Actions and dismissal" description="A dismissible alert names its close button." code={`<Alert
-  variant="outline"
-  tone="primary"
-  icon={<InfoIcon />}
-  title="Two people are editing this article"
-  actions={<Button size="sm" variant="outline">See who</Button>}
-  onDismiss={() => setDismissed(true)}
-  dismissLabel="Dismiss"
->
-  Your changes merge as you type.
-</Alert>`}>
+      <Demo title="Actions and dismissal" description="A dismissible alert names its close button." code={editingNotice}>
         <div className="catalog-stack catalog-fill">
           {dismissed
             ? <Button variant="outline" size="sm" onClick={() => setDismissed(false)}>Show the alert again</Button>
@@ -478,27 +403,16 @@ export function ProgressPage() {
     <>
       <h1>Progress</h1>
       <p className="lead">Show how far a task has come, or that work is under way when the amount is unknown.</p>
-      <Demo title="Measured progress" description="Upload the next file to move the bar." code={`<Progress
-  label="Uploading images"
-  value={files}
-  max={8}
-  showValue
-  formatValue={(value, max) => \`\${value} of \${max} files\`}
-/>
-<Button onClick={() => setFiles((count) => (count >= 8 ? 0 : count + 1))}>Upload next file</Button>`}>
+      <Demo title="Measured progress" description="Upload the next file to move the bar." code={uploadProgress}>
         <div className="catalog-stack catalog-fill">
           <Progress label="Uploading images" value={files} max={8} showValue formatValue={(value, max) => `${value} of ${max} files`} />
           <div><Button size="sm" variant="outline" onClick={() => setFiles((count) => (count >= 8 ? 0 : count + 1))}>{files >= 8 ? "Start again" : "Upload next file"}</Button></div>
         </div>
       </Demo>
-      <Demo title="Indeterminate" description="Without a value, the bar travels along its track." code={`<Progress label="Preparing the export" />`}>
+      <Demo title="Indeterminate" description="Without a value, the bar travels along its track." code={exportProgress}>
         <div className="catalog-fill"><Progress label="Preparing the export" /></div>
       </Demo>
-      <Demo title="Sizes and tones" code={`<Progress size="sm" value={30} aria-label="Storage used" />
-<Progress tone="success" value={100} label="Published" showValue />
-<Progress tone="info" value={45} label="Import" showValue />
-<Progress tone="warning" value={82} label="Storage" showValue />
-<Progress size="lg" tone="danger" value={96} label="Quota" showValue />`}>
+      <Demo title="Sizes and tones" code={progressTones}>
         <div className="catalog-stack catalog-fill">
           <Progress size="sm" value={30} aria-label="Storage used" />
           <Progress tone="success" value={100} label="Published" showValue />

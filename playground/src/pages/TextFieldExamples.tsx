@@ -1,29 +1,26 @@
 import { lazy, Suspense } from "react";
 import { Field, FieldSkeleton, Input, Textarea } from "@alien6-studio/elea-ui";
 import { Demo } from "../components/Demo.js";
-import { IdentifierFields } from "./IdentifierFields.js";
-import identifierSource from "./IdentifierFields.tsx?raw";
-import telephoneSource from "./CountryTelephone.tsx?raw";
-import captionSource from "./CaptionEditor.tsx?raw";
+import { IdentifierFields } from "../examples/text-field/IdentifierFields.js";
+import identifierSource from "../examples/text-field/IdentifierFields.tsx?raw";
+import telephoneSource from "../examples/text-field/CountryTelephone.tsx?raw";
+import captionSource from "../examples/text-field/CaptionEditor.tsx?raw";
+import photoCaptionSource from "../examples/text-field/PhotoCaption.tsx?raw";
+import archiveNumberSource from "../examples/text-field/ArchiveNumber.tsx?raw";
 
-const CountryTelephone = lazy(() => import("./CountryTelephone.js"));
-const CaptionEditor = lazy(() => import("./CaptionEditor.js"));
+const CountryTelephone = lazy(() => import("../examples/text-field/CountryTelephone.js").then(module => ({ default: module.CountryTelephone })));
+const CaptionEditor = lazy(() => import("../examples/text-field/CaptionEditor.js").then(module => ({ default: module.CaptionEditor })));
 
 export function TextFieldExamples() {
   return <>
-    <Demo title="Character counter" description="A soft limit lets writers paste a draft and shorten it. Set maxLength as well when the form requires a hard limit." code={`<Field label="Photo caption">
-  {control => <Textarea {...control} defaultValue="Ice at dawn" counter={{ max: 80 }} />}
-</Field>`}>
+    <Demo title="Character counter" description="A soft limit lets writers paste a draft and shorten it. Set maxLength as well when the form requires a hard limit." code={photoCaptionSource}>
       <div style={{ width: "min(100%, 24rem)" }}>
         <Field label="Photo caption">
           {control => <Textarea {...control} defaultValue="Ice at dawn" counter={{ max: 80 }} />}
         </Field>
       </div>
     </Demo>
-    <Demo title="Grouped input mask" description="Each # takes one digit. Type or paste the archive number. The native input and its change event carry the formatted value." code={`<Field label="Archive number" help="Nine digits in groups of three.">
-  {control => <Input {...control} name="archive" inputMode="numeric"
-    mask="### ### ###" placeholder="123 456 789" />}
-</Field>`}>
+    <Demo title="Grouped input mask" description="Each # takes one digit. Type or paste the archive number. The native input and its change event carry the formatted value." code={archiveNumberSource}>
       <div style={{ width: "min(100%, 24rem)" }}>
         <Field label="Archive number" help="Nine digits in groups of three.">
           {control => <Input {...control} name="archive" inputMode="numeric" mask="### ### ###" placeholder="123 456 789" />}

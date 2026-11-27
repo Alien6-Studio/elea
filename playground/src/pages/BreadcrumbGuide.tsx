@@ -1,14 +1,14 @@
 import { Breadcrumb } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
-import { ArchiveBreadcrumb } from "./ArchiveBreadcrumb.js";
-import archiveSource from "./ArchiveBreadcrumb.tsx?raw";
+import { ArchiveBreadcrumb } from "../examples/breadcrumb/ArchiveBreadcrumb.js";
+import archiveSource from "../examples/breadcrumb/ArchiveBreadcrumb.tsx?raw";
+import trailSource from "../examples/breadcrumb/ComponentTrail.tsx?raw";
 
 export function BreadcrumbPage() {
   return <>
     <h1>Breadcrumb</h1>
     <p className="lead">Show where a page sits in a collection and give each parent a direct link.</p>
-    <Demo title="Component trail" code={`<Breadcrumb label="Component location" overflowLabel="Earlier pages" separator="›"
-  items={[{ id: "ui", label: "Components", href: "#/ui" }, { id: "breadcrumb", label: "Breadcrumb" }]} />`}>
+    <Demo title="Component trail" code={trailSource}>
       <Breadcrumb label="Component location" overflowLabel="Earlier pages" separator="›"
         items={[{ id: "ui", label: "Components", href: "#/ui" }, { id: "breadcrumb", label: "Breadcrumb" }]} />
     </Demo>

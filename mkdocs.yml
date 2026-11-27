@@ -9,7 +9,8 @@ extra:
 theme:
   name: null
   custom_dir: overrides
-plugins: []
+plugins:
+  - search
 hooks:
   - scripts/package_typeface.py
 nav:
@@ -28,4 +29,5 @@ extra_css:
   - assets/elea-viewer.css
   - assets/elea-ui.css
   - assets/brand.css
+  - assets/site-search.css
   - assets/site.css

@@ -4,6 +4,19 @@ import {
   ToastProvider, useToast, type TableSort, type ToastPosition,
 } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
+import sortableArticles from "../examples/table/SortableArticles.tsx?raw";
+import articleWorkspace from "../examples/table/ArticleWorkspace.tsx?raw";
+import weeklyWords from "../examples/table/WeeklyWords.tsx?raw";
+import revisionHistory from "../examples/table/RevisionHistory.tsx?raw";
+import publishingQuestions from "../examples/accordion/PublishingQuestions.tsx?raw";
+import publicationSettings from "../examples/accordion/PublicationSettings.tsx?raw";
+import volume from "../examples/slider/Volume.tsx?raw";
+import readingWidth from "../examples/slider/ReadingWidth.tsx?raw";
+import sliderStates from "../examples/slider/SliderStates.tsx?raw";
+import publishButton from "../examples/toast/PublishButton.tsx?raw";
+import archiveButton from "../examples/toast/ArchiveButton.tsx?raw";
+import exportButton from "../examples/toast/ExportButton.tsx?raw";
+import notifications from "../examples/toast/Notifications.tsx?raw";
 
 const articles = [
   { title: "Autumn field notes", author: "Ada Lovelace", status: "Published", words: 1240, readers: 3812 },
@@ -64,26 +77,7 @@ export function TablePage() {
     <>
       <h1>Table</h1>
       <p className="lead">Lay out records in rows and columns people can scan and compare. The table scrolls sideways inside its own region, so it never widens the page.</p>
-      <Demo title="Sortable columns" description="A sortable heading is a button; the column states its direction. Sorting the rows stays with you." code={`<Table label="Articles" hoverable>
-  <TableHead>
-    <TableRow>
-      <TableHeaderCell sort={sort.title} onSort={() => sortBy("title")}>Article</TableHeaderCell>
-      <TableHeaderCell>Status</TableHeaderCell>
-      <TableHeaderCell align="end" sort={sort.words} onSort={() => sortBy("words")}>Words</TableHeaderCell>
-      <TableHeaderCell align="end" sort={sort.readers} onSort={() => sortBy("readers")}>Readers</TableHeaderCell>
-    </TableRow>
-  </TableHead>
-  <TableBody>
-    {articles.map((article) => (
-      <TableRow key={article.title}>
-        <TableHeaderCell scope="row">{article.title}</TableHeaderCell>
-        <TableCell><Badge tone="success">{article.status}</Badge></TableCell>
-        <TableCell numeric>{article.words}</TableCell>
-        <TableCell numeric>{article.readers}</TableCell>
-      </TableRow>
-    ))}
-  </TableBody>
-</Table>`}>
+      <Demo title="Sortable columns" description="A sortable heading is a button; the column states its direction. Sorting the rows stays with you." code={sortableArticles}>
         <Table label="Articles" hoverable className="catalog-fill">
           <TableHead>
             <TableRow>
@@ -106,26 +100,10 @@ export function TablePage() {
         </Table>
       </Demo>
       <Demo title="Regional density" description="Change the spacing of the field, table and actions together. Open the word count to see the same density in a dialog."
-        code={`<section data-elea-density="compact">
-  <Field label="Filter articles">{control => <Input {...control} />}</Field>
-  <Table label="Search results">…</Table>
-  <Button onClick={showWordCount}>Word count</Button>
-</section>`}>
+        code={articleWorkspace}>
         <RegionalDensity />
       </Demo>
-      <Demo title="Dense, striped, with a caption and a footer" description="A caption names the table for everyone; the footer carries the totals." code={`<Table density="sm" striped>
-  <TableCaption>Words written this week</TableCaption>
-  <TableHead>…</TableHead>
-  <TableBody>
-    <TableRow selected>…</TableRow>
-  </TableBody>
-  <TableFoot>
-    <TableRow>
-      <TableHeaderCell scope="row">Total</TableHeaderCell>
-      <TableCell numeric>5 735</TableCell>
-    </TableRow>
-  </TableFoot>
-</Table>`}>
+      <Demo title="Dense, striped, with a caption and a footer" description="A caption names the table for everyone; the footer carries the totals." code={weeklyWords}>
         <Table density="sm" striped className="catalog-fill">
           <TableCaption>Words written this week</TableCaption>
           <TableHead>
@@ -145,9 +123,7 @@ export function TablePage() {
           </TableFoot>
         </Table>
       </Demo>
-      <Demo title="Sticky header" description="Give the table a height and its header stays in view while the rows scroll." code={`<Table label="Revisions" stickyHeader className="revisions">…</Table>
-
-.revisions { max-block-size: 14rem; }`}>
+      <Demo title="Sticky header" description="Give the table a height and its header stays in view while the rows scroll." code={revisionHistory}>
         <Table label="Revisions" stickyHeader density="sm" className="catalog-fill catalog-table-scroll">
           <TableHead>
             <TableRow><TableHeaderCell>Revision</TableHeaderCell><TableHeaderCell>Editor</TableHeaderCell><TableHeaderCell align="end">Words</TableHeaderCell></TableRow>
@@ -193,27 +169,10 @@ export function AccordionPage() {
     <>
       <h1>Accordion</h1>
       <p className="lead">Fold long content under headings people can scan, and open only what they need. Under expressive motion a section unfolds; otherwise it opens at once.</p>
-      <Demo title="One section at a time" description="Opening a section closes the other; the open one can be closed again." code={`<Accordion
-  defaultValue={["publish"]}
-  items={[
-    { value: "publish", label: "Who can publish an article?", panel: "Editors and owners publish…" },
-    { value: "history", label: "How long are revisions kept?", panel: "Every revision of the last ninety days…" },
-    { value: "export", label: "Can I export my articles?", panel: "Yes, as Markdown or HTML…" },
-  ]}
-/>`}>
+      <Demo title="One section at a time" description="Opening a section closes the other; the open one can be closed again." code={publishingQuestions}>
         <Accordion className="catalog-fill" defaultValue={["publish"]} items={questions} />
       </Demo>
-      <Demo title="Several sections, contained" description="With multiple, sections open independently. A controlled accordion reports the open sections." code={`<Accordion
-  variant="contained"
-  multiple
-  value={open}
-  onChange={setOpen}
-  items={[
-    { value: "members", label: "Members", panel: … },
-    { value: "billing", label: "Billing", panel: … },
-    { value: "archive", label: "Archive", panel: …, disabled: true },
-  ]}
-/>`}>
+      <Demo title="Several sections, contained" description="With multiple, sections open independently. A controlled accordion reports the open sections." code={publicationSettings}>
         <div className="catalog-stack catalog-fill">
           <Accordion variant="contained" multiple value={open} onChange={setOpen} headingLevel="h3" items={[
             { value: "members", label: "Members", panel: "Five people write for this publication. Invite more from the team page." },
@@ -242,27 +201,16 @@ export function SliderPage() {
     <>
       <h1>Slider</h1>
       <p className="lead">Pick a value along a range where the feel matters more than the exact figure. It is a native range input, so the keyboard, touch and forms work as the platform does.</p>
-      <Demo title="Label and value" description="The value shows beside the label and follows the thumb." code={`<Slider label="Volume" showValue defaultValue={40} />`}>
+      <Demo title="Label and value" description="The value shows beside the label and follows the thumb." code={volume}>
         <div className="catalog-fill"><Slider label="Volume" showValue defaultValue={40} /></div>
       </Demo>
-      <Demo title="Steps and a worded value" description="formatValue words the value for the eye and for assistive technology." code={`<Slider
-  label="Reading width"
-  min={48}
-  max={96}
-  step={4}
-  value={width}
-  onChange={setWidth}
-  showValue
-  formatValue={(value) => \`\${value} characters\`}
-/>`}>
+      <Demo title="Steps and a worded value" description="formatValue words the value for the eye and for assistive technology." code={readingWidth}>
         <div className="catalog-stack catalog-fill">
           <Slider label="Reading width" min={48} max={96} step={4} value={width} onChange={setWidth} showValue formatValue={(value) => `${value} characters`} />
           <p className="catalog-measure" style={{ maxInlineSize: `${width}ch` }}>Cranes crossed the valley at dusk, calling to one another above the reeds while the light went from the water.</p>
         </div>
       </Demo>
-      <Demo title="Sizes and states" code={`<Slider size="sm" aria-label="Zoom" defaultValue={25} />
-<Slider label="Brightness" defaultValue={70} />
-<Slider label="Locked" defaultValue={55} disabled />`}>
+      <Demo title="Sizes and states" code={sliderStates}>
         <div className="catalog-stack catalog-fill">
           <Slider size="sm" aria-label="Zoom" defaultValue={25} />
           <Slider label="Brightness" defaultValue={70} />
@@ -313,22 +261,7 @@ function ToastDemos({ position, onPosition }: { position: ToastPosition; onPosit
   const { toast, dismiss } = useToast();
   return (
     <>
-      <Demo title="Tones" description="A toast confirms what just happened and leaves by itself. Errors are announced at once, the others politely." code={`const { toast } = useToast();
-const icon = <ToastExampleIcon name="success" />;
-
-<Button
-  size="sm"
-  variant="success"
-  icon={icon}
-  onClick={() => toast({
-    tone: "success",
-    title: "Article published",
-    description: "It is now visible to everyone.",
-    icon,
-  })}
->
-  Success
-</Button>`}>
+      <Demo title="Tones" description="A toast confirms what just happened and leaves by itself. Errors are announced at once, the others politely." code={publishButton}>
         {toastExamples.map(({ label, ...message }) => {
           const icon = <ToastExampleIcon name={message.tone} />;
           return (
@@ -344,12 +277,7 @@ const icon = <ToastExampleIcon name="success" />;
           );
         })}
       </Demo>
-      <Demo title="An action, and a toast that stays" description="A lifetime of Infinity keeps the toast until it is dismissed. Its timer also waits while the pointer or the focus is on the toasts." code={`const id = toast({
-  title: "Article moved to the archive",
-  icon: <ToastExampleIcon name="archive" />,
-  duration: Infinity,
-  action: <Button size="sm" variant="ghost" onClick={() => { restore(); dismiss(id); }}>Undo</Button>,
-});`}>
+      <Demo title="An action, and a toast that stays" description="A lifetime of Infinity keeps the toast until it is dismissed. Its timer also waits while the pointer or the focus is on the toasts." code={archiveButton}>
         <Button size="sm" variant="secondary" onClick={() => {
           const id = toast({
             id: "archive",
@@ -364,17 +292,13 @@ const icon = <ToastExampleIcon name="success" />;
         }}>Archive the article</Button>
         <Button size="sm" variant="ghost" onClick={() => dismiss()}>Dismiss all</Button>
       </Demo>
-      <Demo title="Replace a toast" description="A toast shown under the id of a visible one takes its place, to follow a task from start to end." code={`toast({ id: "export", title: "Preparing the export…", duration: Infinity });
-await exportArticles();
-toast({ id: "export", tone: "success", icon: <ToastExampleIcon name="success" />, title: "Export ready" });`}>
+      <Demo title="Replace a toast" description="A toast shown under the id of a visible one takes its place, to follow a task from start to end." code={exportButton}>
         <Button size="sm" variant="secondary" onClick={() => {
           toast({ id: "export", title: "Preparing the export…", duration: Infinity });
           setTimeout(() => toast({ id: "export", tone: "success", icon: <ToastExampleIcon name="success" />, title: "Export ready", description: "42 articles as Markdown." }), 1500);
         }}>Export the articles</Button>
       </Demo>
-      <Demo title="Position" description="The provider places the stack in a corner or the middle of an edge; it follows the reading direction." code={`<ToastProvider label="Notifications" dismissLabel="Dismiss" position="top-center">
-  <App />
-</ToastProvider>`}>
+      <Demo title="Position" description="The provider places the stack in a corner or the middle of an edge; it follows the reading direction." code={notifications}>
         {(["top-start", "top-center", "top-end", "bottom-start", "bottom-center", "bottom-end"] as const).map((item) => (
           <Button key={item} size="sm" variant={item === position ? "primary" : "outline"} aria-pressed={item === position} onClick={() => {
             onPosition(item);

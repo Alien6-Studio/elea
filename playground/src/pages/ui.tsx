@@ -1,13 +1,60 @@
+import { GuideSearch } from "../examples/field/GuideSearch.js";
+import { ButtonVariants } from "../examples/button/ButtonVariants.js";
+import { ButtonSizes } from "../examples/button/ButtonSizes.js";
+import { ButtonShadows } from "../examples/button/ButtonShadows.js";
+import { LoadingButton } from "../examples/button/LoadingButton.js";
+import { BadgeTones } from "../examples/badge/BadgeTones.js";
+import { ArticleSearch } from "../examples/field/ArticleSearch.js";
+import { NotificationToggles } from "../examples/choice/NotificationToggles.js";
+import { ShareArticle } from "../examples/dialog/ShareArticle.js";
+import { PublishArticle } from "../examples/dialog/PublishArticle.js";
+import { SaveDraftTooltips } from "../examples/tooltip/SaveDraftTooltips.js";
+import { SegmentedTabs } from "../examples/tabs/SegmentedTabs.js";
+import { TrashIcon } from "../examples/icons.js";
+import buttonVariantsSource from "../examples/button/ButtonVariants.tsx?raw";
+import actionPaletteSource from "../examples/button/ActionPalette.tsx?raw";
+import tealInfoSource from "../examples/button/TealInfo.tsx?raw";
+import buttonSizesSource from "../examples/button/ButtonSizes.tsx?raw";
+import publicationActionsSource from "../examples/button/PublicationActions.tsx?raw";
+import buttonShadowsSource from "../examples/button/ButtonShadows.tsx?raw";
+import loadingButtonSource from "../examples/button/LoadingButton.tsx?raw";
+import guideLinksSource from "../examples/button/GuideLinks.tsx?raw";
+import buttonMotionSource from "../examples/button/ButtonMotion.tsx?raw";
+import badgeTonesSource from "../examples/badge/BadgeTones.tsx?raw";
+import validatedFieldSource from "../examples/field/ValidatedField.tsx?raw";
+import inputSizesSource from "../examples/field/InputSizes.tsx?raw";
+import articleSearchSource from "../examples/field/ArticleSearch.tsx?raw";
+import newsletterCheckboxesSource from "../examples/choice/NewsletterCheckboxes.tsx?raw";
+import notificationTogglesSource from "../examples/choice/NotificationToggles.tsx?raw";
+import shareArticleSource from "../examples/dialog/ShareArticle.tsx?raw";
+import deleteProjectSource from "../examples/dialog/DeleteProject.tsx?raw";
+import themedDialogSource from "../examples/dialog/ThemedDialog.tsx?raw";
+import publishArticleSource from "../examples/dialog/PublishArticle.tsx?raw";
+import articleActionsSource from "../examples/menu/ArticleActions.tsx?raw";
+import moreActionsSource from "../examples/menu/MoreActions.tsx?raw";
+import saveDraftTooltipsSource from "../examples/tooltip/SaveDraftTooltips.tsx?raw";
+import truncatedTitleSource from "../examples/tooltip/TruncatedTitle.tsx?raw";
+import articlePagesSource from "../examples/pagination/ArticlePages.tsx?raw";
+import pageLabelsSource from "../examples/pagination/PageLabels.tsx?raw";
+import languageSelectSource from "../examples/select/LanguageSelect.tsx?raw";
+import daysSelectSource from "../examples/select/DaysSelect.tsx?raw";
+import publicationLanguageSource from "../examples/select/PublicationLanguage.tsx?raw";
+import emailDeliverySource from "../examples/radio-group/EmailDelivery.tsx?raw";
+import documentInspectorSource from "../examples/tabs/DocumentInspector.tsx?raw";
+import segmentedTabsSource from "../examples/tabs/SegmentedTabs.tsx?raw";
+import commentsRailSource from "../examples/tabs/CommentsRail.tsx?raw";
+import productFooterSource from "../examples/footer/ProductFooter.tsx?raw";
+import buttonEffectsSource from "../examples/button/ButtonEffects.tsx?raw";
+import buttonRadiiSource from "../examples/button/ButtonRadii.tsx?raw";
+import guideSearchSource from "../examples/field/GuideSearch.tsx?raw";
 import { TextFieldExamples } from "./TextFieldExamples.js";
 import { useState, type CSSProperties } from "react";
 import type { ButtonLinkRenderProps } from "@alien6-studio/elea-ui";
-import { Badge, Button, Checkbox, ConfirmDialog, Dialog, DialogBody, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogRoot, DialogTitle, Field, Footer, IconButton, Input, Menu, MenuContent, MenuGroup, MenuItem, MenuRoot, MenuSeparator, MenuTrigger, Pagination, RadioGroup, Select, Tab, TabList, TabPanel, Tabs, TabsRoot, Textarea, Toggle, Tooltip } from "@alien6-studio/elea-ui";
+import { Badge, Button, Checkbox, ConfirmDialog, Dialog, Field, Footer, Input, Menu, MenuContent, MenuGroup, MenuItem, MenuRoot, MenuSeparator, MenuTrigger, Pagination, RadioGroup, Select, Tab, TabList, TabPanel, Tabs, TabsRoot, Textarea, Tooltip } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
 import { sitePath } from "../links.js";
-import { brandRoute, defaultSiteTheme, exactProfile, type BrandTheme } from "./brandTheme.js";
+import { brandRoute, defaultSiteTheme, type BrandTheme } from "./brandTheme.js";
 
-const TrashIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>;
-const PlusIcon = () => <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>;
 
 const buttonEffects = ["lift", "scale", "push", "shine", "ripple", "spotlight", "magnetic", "tilt"] as const;
 const effectLabel = (effect: typeof buttonEffects[number]) => effect[0]!.toUpperCase() + effect.slice(1);
@@ -32,30 +79,6 @@ const radiusSamples = [
   { label: "Large", radius: "lg" }, { label: "Full", radius: "full" },
 ] as const;
 
-function radiusExample(brand: BrandTheme) {
-  const id = exactProfile(brand);
-  const { profile: _profile, paletteOrigin: _origin, ...settings } = brand;
-  const config = id ? `{
-  ...createThemeProfile("${id}"),
-  buttonRadiusScale: "profile",
-}` : JSON.stringify(settings, null, 2);
-  return `import { ${id ? "createThemeProfile, " : ""}makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
-import { Button } from "@alien6-studio/elea-ui";
-import "@alien6-studio/elea-tokens/elea.css";
-import "@alien6-studio/elea-ui/styles.css";
-
-const { css } = makeBrandTheme(${config});
-
-export function ButtonRadii() {
-  return (
-    <section data-elea-theme="brand">
-      <style>{css}</style>
-${radiusSamples.map(({ radius }) => `      <Button${radius ? ` radius="${radius}"` : ""}>Publish</Button>`).join("\n")}
-    </section>
-  );
-}`;
-}
-
 const tealInfo = {
   "--elea-color-action-info": "light-dark(#0e7490, #67e8f9)",
   "--elea-color-action-info-text": "light-dark(white, black)",
@@ -64,7 +87,6 @@ const tealInfo = {
 } as CSSProperties;
 
 export function ButtonsPage({ brand = defaultSiteTheme }: { brand?: BrandTheme }) {
-  const [loading, setLoading] = useState(false);
   const radiusDescription = brand.buttonRadiusScale === "profile" && brand.shape && !brand.radius
     ? "Small and Medium tighten each curve of the theme’s silhouette. Large matches Inherited. None gives square corners and Full gives a pill."
     : "Inherited follows the current theme. Small, Medium and Large use its corner radius values. None gives square corners and Full gives a pill.";
@@ -72,38 +94,10 @@ export function ButtonsPage({ brand = defaultSiteTheme }: { brand?: BrandTheme }
     <>
       <h1>Button</h1>
       <p className="lead">A button inherits its shape and palette from the active theme. Choose its tone for meaning, its variant for emphasis and its size for the layout.</p>
-      <Demo title="Variants" description={<>A plain <code>&lt;Button&gt;</code> uses the primary colour at medium size. Each variant below draws from the same theme and inherits its action shape.</>} code={`<Button>Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="tertiary">Tertiary</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="danger">Danger</Button>
-<Button variant="success">Success</Button>
-<Button variant="info">Info</Button>
-<Button variant="warning">Warning</Button>`}>
-        <Button>Primary</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="tertiary">Tertiary</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="danger">Danger</Button>
-        <Button variant="success">Success</Button>
-        <Button variant="info">Info</Button>
-        <Button variant="warning">Warning</Button>
+      <Demo title="Variants" description={<>A plain <code>&lt;Button&gt;</code> uses the primary colour at medium size. Each variant below draws from the same theme and inherits its action shape.</>} code={buttonVariantsSource}>
+        <ButtonVariants />
       </Demo>
-      <Demo title="Tone and emphasis" description={<>Each row uses the same eight colour roles. Compare a tone across solid, outline and ghost, then switch the theme in the navbar. <code>variant="danger"</code> is shorthand for <code>variant="solid" tone="danger"</code>.</>} code={`import { Button } from "@alien6-studio/elea-ui";
-
-const tones = ${JSON.stringify(tones)} as const;
-const variants = ${JSON.stringify(surfaces)} as const;
-
-export function ActionPalette() {
-  return variants.map(variant => (
-    <fieldset key={variant}>
-      <legend>{variant}</legend>
-      {tones.map(tone => <Button key={tone} variant={variant} tone={tone}>{tone}</Button>)}
-    </fieldset>
-  ));
-}`}>
+      <Demo title="Tone and emphasis" description={<>Each row uses the same eight colour roles. Compare a tone across solid, outline and ghost, then switch the theme in the navbar. <code>variant="danger"</code> is shorthand for <code>variant="solid" tone="danger"</code>.</>} code={actionPaletteSource}>
         <div style={{ display: "grid", gap: "var(--elea-space-5)", width: "100%" }}>
           {surfaces.map(surface => (
             <div role="group" aria-label={surface} key={surface}>
@@ -115,30 +109,13 @@ export function ActionPalette() {
           ))}
         </div>
       </Demo>
-      <Demo title="An info colour of its own" description="The Info button above uses the active theme. This example gives one button a teal fill and defines its text, hover and pressed colours for light and dark appearances." code={`import type { CSSProperties } from "react";
-import { Button } from "@alien6-studio/elea-ui";
-
-const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
-
-<Button variant="info" style={tealInfo}>Teal info</Button>`}>
+      <Demo title="An info colour of its own" description="The Info button above uses the active theme. This example gives one button a teal fill and defines its text, hover and pressed colours for light and dark appearances." code={tealInfoSource}>
         <Button variant="info" style={tealInfo}>Teal info</Button>
       </Demo>
-      <Demo title="Sizes and icons" description="Five sizes, from a compact toolbar action to a landing page call to action." code={`<Button size="xs">Extra small</Button>
-<Button size="sm" icon={<PlusIcon />}>Small</Button>
-<Button icon={<PlusIcon />}>Medium</Button>
-<Button size="lg" trailingIcon={<PlusIcon />}>Large</Button>
-<Button size="xl">Extra large</Button>
-<IconButton variant="disc" label="Add"><PlusIcon /></IconButton>
-<IconButton variant="outline" radius="full" label="Add item"><PlusIcon /></IconButton>`}>
-        <Button size="xs">Extra small</Button>
-        <Button size="sm" icon={<PlusIcon />}>Small</Button>
-        <Button icon={<PlusIcon />}>Medium</Button>
-        <Button size="lg" trailingIcon={<PlusIcon />}>Large</Button>
-        <Button size="xl">Extra large</Button>
-        <IconButton variant="disc" label="Add"><PlusIcon /></IconButton>
-        <IconButton variant="outline" radius="full" label="Add item"><PlusIcon /></IconButton>
+      <Demo title="Sizes and icons" description="Five sizes, from a compact toolbar action to a landing page call to action." code={buttonSizesSource}>
+        <ButtonSizes />
       </Demo>
-      <Demo title="Radius" description={radiusDescription} code={radiusExample(brand)}>
+      <Demo title="Radius" description={radiusDescription} code={buttonRadiiSource}>
         <div className="catalog-button-radii">
           {radiusSamples.map(({ label, radius }) => (
             <figure key={label}>
@@ -148,67 +125,30 @@ const tealInfo = ${JSON.stringify(tealInfo, null, 2)} as CSSProperties;
           ))}
         </div>
       </Demo>
-      <Demo title="Asymmetric corners" description="Read the four corners clockwise from the top left. Publish uses the theme silhouette. Save draft has an explicit small radius. Filter inherits the toolbar’s control radius." code={`import type { CSSProperties } from "react";
-import { Button } from "@alien6-studio/elea-ui";
-
-const actionShape = ${JSON.stringify(actionShape, null, 2)} as CSSProperties;
-const toolbarShape = ${JSON.stringify(toolbarShape, null, 2)} as CSSProperties;
-
-export function PublicationActions() {
-  return (
-    <section style={actionShape}>
-      <Button>Publish</Button>
-      <Button size="sm" radius="sm">Save draft</Button>
-      <div style={toolbarShape}><Button>Filter</Button></div>
-    </section>
-  );
-}`}>
+      <Demo title="Asymmetric corners" description="Read the four corners clockwise from the top left. Publish uses the theme silhouette. Save draft has an explicit small radius. Filter inherits the toolbar’s control radius." code={publicationActionsSource}>
         <div className="catalog-button-radii" style={actionShape}>
           <figure><Button>Publish</Button><figcaption>Action silhouette</figcaption></figure>
           <figure><Button size="sm" radius="sm">Save draft</Button><figcaption>Small radius</figcaption></figure>
           <figure style={toolbarShape}><Button>Filter</Button><figcaption>Toolbar override</figcaption></figure>
         </div>
       </Demo>
-      <Demo title="Shadow" description="The default follows the theme. An explicit shadow adds elevation on a busy surface." code={`<Button>Theme default</Button>
-<Button shadow="sm">Small shadow</Button>
-<Button shadow="md">Medium shadow</Button>`}>
-        <Button>Theme default</Button>
-        <Button shadow="sm">Small shadow</Button>
-        <Button shadow="md">Medium shadow</Button>
+      <Demo title="Shadow" description="The default follows the theme. An explicit shadow adds elevation on a busy surface." code={buttonShadowsSource}>
+        <ButtonShadows />
       </Demo>
-      <Demo title="Loading and disabled" description="Save shows a pending state for two seconds." code={`<Button loading={loading} loadingLabel="Saving" onClick={save}>Save</Button>
-<Button disabled>Disabled</Button>
-<Button href="https://example.org" variant="outline">A link</Button>
-<Button href="https://example.org" variant="outline" disabled>Unavailable link</Button>`}>
-        <Button loading={loading} loadingLabel="Saving" onClick={() => { setLoading(true); setTimeout(() => setLoading(false), 2000); }}>Save</Button>
-        <Button disabled>Disabled</Button>
-        <Button href="https://example.org" variant="outline">A link</Button>
-        <Button href="https://example.org" variant="outline" disabled>Unavailable link</Button>
+      <Demo title="Loading and disabled" description="Save shows a pending state for two seconds." code={loadingButtonSource}>
+        <LoadingButton />
       </Demo>
-      <Demo title="Router links" description={<>The first link opens the Card guide. Pass the button’s children and event handlers to your router link, mapping <code>href</code> to <code>to</code>. When disabled or loading, ELEA renders an unfocusable anchor with <code>aria-disabled</code> and no destination.</>} code={`import { Button, type ButtonLinkRenderProps } from "@alien6-studio/elea-ui";
-import { Link } from "react-router";
-
-const renderLink = ({ href, ...props }: ButtonLinkRenderProps) => <Link {...props} to={href} />;
-
-export function GuideLinks() {
-  return <>
-    <Button href="/ui/card" render={renderLink}>Open Card guide</Button>
-    <Button href="/ui/card" render={renderLink} disabled>Guide unavailable</Button>
-  </>;
-}`}>
+      <Demo title="Router links" description={<>The first link opens the Card guide. Pass the button’s children and event handlers to your router link, mapping <code>href</code> to <code>to</code>. When disabled or loading, ELEA renders an unfocusable anchor with <code>aria-disabled</code> and no destination.</>} code={guideLinksSource}>
         <Button href={brandRoute("ui/card", brand)} render={renderGuideLink}>Open Card guide</Button>
         <Button href={brandRoute("ui/card", brand)} render={renderGuideLink} disabled>Guide unavailable</Button>
       </Demo>
-      <Demo title="Motion" description="Hover or press these two buttons. The first follows the gallery’s Expressive motion switch. The second stays still. Both respect the visitor’s reduced-motion preference." code={`<div data-elea-motion="on">
-  <Button>Follows the page</Button>
-  <Button motion={false}>Always still</Button>
-</div>`}>
+      <Demo title="Motion" description="Hover or press these two buttons. The first follows the gallery’s Expressive motion switch. The second stays still. Both respect the visitor’s reduced-motion preference." code={buttonMotionSource}>
         <Button>Follows the page</Button>
         <Button motion={false}>Always still</Button>
       </Demo>
       <Demo title="Effects"
         description="Try each gesture on the same primary button. All eight share the theme’s colour, shape and size. With expressive motion on, Push has a raised edge that sinks when pressed."
-        code={buttonEffects.map(effect => `<Button effect="${effect}">${effectLabel(effect)}</Button>`).join("\n")}>
+        code={buttonEffectsSource}>
         <div className="catalog-button-effects">
           {buttonEffects.map(effect => <Button key={effect} effect={effect}>{effectLabel(effect)}</Button>)}
         </div>
@@ -238,19 +178,8 @@ export function BadgePage() {
     <>
       <h1>Badge</h1>
       <p className="lead">A small label for a status or a count.</p>
-      <Demo title="Tones" code={`<Badge>Neutral</Badge>
-<Badge tone="primary">Primary</Badge>
-<Badge tone="success" variant="solid">Published</Badge>
-<Badge tone="info">Scheduled</Badge>
-<Badge tone="warning" variant="outline">Pending</Badge>
-<Badge tone="danger" size="sm">3</Badge>`}>
-        <Badge>Neutral</Badge>
-        <Badge tone="primary">Primary</Badge>
-        <Badge tone="secondary">Secondary</Badge>
-        <Badge tone="success" variant="solid">Published</Badge>
-        <Badge tone="info">Scheduled</Badge>
-        <Badge tone="warning" variant="outline">Pending</Badge>
-        <Badge tone="danger" size="sm">3</Badge>
+      <Demo title="Tones" code={badgeTonesSource}>
+        <BadgeTones />
       </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
@@ -263,6 +192,12 @@ export function BadgePage() {
   );
 }
 
+const guideDestinations = [
+  { id: "calendar", label: "Calendar", description: "Forms", href: "#/ui/calendar" },
+  { id: "card", label: "Card", description: "Display", href: "#/ui/card" },
+  { id: "carousel", label: "Carousel", description: "Navigation", href: "#/ui/carousel" },
+];
+
 export function FieldsPage() {
   const [email, setEmail] = useState("");
   const invalid = email.length > 0 && !email.includes("@");
@@ -270,19 +205,14 @@ export function FieldsPage() {
     <>
       <h1>Field, Input, Textarea</h1>
       <p className="lead">Pair a native control with its label, help and validation message. Spread the provided control props to associate all three.</p>
-      <Demo title="A validated field" description="Type something without an @ to see the error." code={`<Field label="Email" help="We never share it" error={invalid ? "Enter a valid address" : undefined} required requiredMarker="*">
-  {(control) => <Input {...control} type="email" value={email} onChange={(event) => setEmail(event.target.value)} invalid={invalid} />}
-</Field>`}>
+      <Demo title="A validated field" description="Type something without an @ to see the error." code={validatedFieldSource}>
         <div style={{ width: "20rem" }}>
           <Field label="Email" help="We never share it" error={invalid ? "Enter a valid address" : undefined} required requiredMarker="*">
             {(control) => <Input {...control} type="email" value={email} onChange={(event) => setEmail(event.target.value)} invalid={invalid} />}
           </Field>
         </div>
       </Demo>
-      <Demo title="Textarea and sizes" code={`<Input size="sm" placeholder="Small" />
-<Input placeholder="Medium" />
-<Input size="lg" placeholder="Large" />
-<Textarea placeholder="A longer text" />`}>
+      <Demo title="Textarea and sizes" code={inputSizesSource}>
         <div style={{ display: "grid", gap: "var(--elea-space-3)", width: "20rem" }}>
           <Input size="sm" placeholder="Small" aria-label="Small" />
           <Input placeholder="Medium" aria-label="Medium" />
@@ -291,6 +221,12 @@ export function FieldsPage() {
         </div>
       </Demo>
       <TextFieldExamples />
+      <Demo title="SearchField" description="Type a query and use the clear button to start again. Pass value and onValueChange to filter a collection as you type." code={articleSearchSource}>
+        <ArticleSearch />
+      </Demo>
+      <Demo title="SearchAutocomplete" description="Type to find a destination. Use the arrow keys to explore matches and Enter to follow a link." code={guideSearchSource}>
+        <GuideSearch destinations={guideDestinations} />
+      </Demo>
       <h2>Props of Field</h2>
       <PropsTable rows={[
         { name: "label", type: "ReactNode", description: "Visible label, linked to the control." },
@@ -314,23 +250,19 @@ export function FieldsPage() {
 
 export function ChoicesPage() {
   const [checked, setChecked] = useState(false);
-  const [on, setOn] = useState(true);
   return (
     <>
       <h1>Checkbox and Toggle</h1>
       <p className="lead">Use a checkbox for an independent choice and a toggle for an on/off setting. Both use native form controls.</p>
-      <Demo title="Checkbox" code={`<Checkbox label="Send me the newsletter" description="Once a month, no more" onCheckedChange={setChecked} />
-<Checkbox label="Partially selected" indeterminate />
-<Checkbox label="Disabled" disabled />`}>
+      <Demo title="Checkbox" code={newsletterCheckboxesSource}>
         <div style={{ display: "grid", gap: "var(--elea-space-3)" }}>
           <Checkbox label="Send me the newsletter" description="Once a month, no more" checked={checked} onCheckedChange={setChecked} />
           <Checkbox label="Partially selected" indeterminate readOnly />
           <Checkbox label="Disabled" disabled />
         </div>
       </Demo>
-      <Demo title="Toggle" code={`<Toggle checked={on} onCheckedChange={setOn} label="Notifications" />`}>
-        <Toggle checked={on} onCheckedChange={setOn} label="Notifications" />
-        <Toggle checked={false} onCheckedChange={() => {}} label="Disabled" disabled />
+      <Demo title="Toggle" code={notificationTogglesSource}>
+        <NotificationToggles />
       </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
@@ -348,9 +280,6 @@ export function DialogPage({ brand }: { brand?: BrandTheme }) {
   const theme = brand ? "brand" : "editorial";
   const themeOpener = brand ? "Open themed dialog" : "Open in Editorial";
   const themeTitle = brand ? "Themed dialog" : "Editorial edition";
-  const [open, setOpen] = useState(false);
-  const [confirm, setConfirm] = useState(false);
-  const [composed, setComposed] = useState(false);
   const [themed, setThemed] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [removed, setRemoved] = useState("nothing yet");
@@ -358,69 +287,24 @@ export function DialogPage({ brand }: { brand?: BrandTheme }) {
     <>
       <h1>Dialog</h1>
       <p className="lead">Bring a decision into focus. Ask someone to share an article or confirm its deletion before they return to the page.</p>
-      <Demo title="Dialog and ConfirmDialog" code={`<Dialog open={open} onClose={() => setOpen(false)} title="Share this article" description="Choose who can read it." closeLabel="Close"
-  actions={<><Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button><Button onClick={() => setOpen(false)}>Share</Button></>}>
-  <Field label="Link">{(control) => <Input {...control} readOnly value="https://example.org/a/1" />}</Field>
-</Dialog>
-
-<ConfirmDialog open={confirm} onConfirm={() => setConfirm(false)} onCancel={() => setConfirm(false)} title="Delete this article?" description="This cannot be undone." tone="danger" icon={<TrashIcon />}
-  confirmLabel="Delete" cancelLabel="Keep" closeLabel="Close" />`}>
-        <Button onClick={() => setOpen(true)}>Share article</Button>
-        <Button variant="danger" onClick={() => setConfirm(true)}>Delete article</Button>
-        <Dialog open={open} onClose={() => setOpen(false)} title="Share this article" description="Choose who can read it." closeLabel="Close" actions={<><Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button><Button onClick={() => setOpen(false)}>Share</Button></>}>
-          <Field label="Link">{(control) => <Input {...control} readOnly value="https://example.org/a/1" />}</Field>
-        </Dialog>
-        <ConfirmDialog open={confirm} onConfirm={() => setConfirm(false)} onCancel={() => setConfirm(false)} title="Delete this article?" description="This cannot be undone." tone="danger" icon={<TrashIcon />} confirmLabel="Delete" cancelLabel="Keep" closeLabel="Close" />
+      <Demo title="Dialog and ConfirmDialog" code={shareArticleSource}>
+        <ShareArticle />
       </Demo>
-      <Demo title="A typed confirmation" description={`Deleted: ${removed}. ConfirmDialog takes the same field as ConfirmPopover. With expected, the confirm button stays disabled until the text matches exactly, and it is described by the label of the field.`} code={`<ConfirmDialog open={open} tone="danger" icon={<TrashIcon />} title="Delete this project?" description="Type the name of the project to delete it."
-  field={{ label: "Name of the project: field-notes", expected: "field-notes" }}
-  confirmLabel="Delete" cancelLabel="Keep" closeLabel="Close"
-  onConfirm={(name) => remove(name)} onCancel={close} />`}>
+      <Demo title="A typed confirmation" description={`Deleted: ${removed}. ConfirmDialog takes the same field as ConfirmPopover. With expected, the confirm button stays disabled until the text matches exactly, and it is described by the label of the field.`} code={deleteProjectSource}>
         <Button variant="danger" onClick={() => setRemoving(true)}>Delete project</Button>
         <ConfirmDialog open={removing} tone="danger" icon={<TrashIcon />} title="Delete this project?" description="Type the name of the project to delete it."
           field={{ label: "Name of the project: field-notes", expected: "field-notes" }}
           confirmLabel="Delete" cancelLabel="Keep" closeLabel="Close"
           onConfirm={(value) => { setRemoved(value ?? ""); setRemoving(false); }} onCancel={() => setRemoving(false)} />
       </Demo>
-      <Demo title="Inside a themed container" description="A dialog leaves its container for the end of the page and keeps the theme it was opened from: it copies the nearest data-elea-theme." code={`<section data-elea-theme="${theme}">
-  <Button onClick={() => setOpen(true)}>${themeOpener}</Button>
-  <Dialog open={open} onClose={() => setOpen(false)} title="${themeTitle}" description="The tokens of the container reach this dialog." closeLabel="Close"
-    actions={<Button onClick={() => setOpen(false)}>Done</Button>} />
-</section>`}>
+      <Demo title="Inside a themed container" description="A dialog leaves its container for the end of the page and keeps the theme it was opened from: it copies the nearest data-elea-theme." code={themedDialogSource}>
         <section data-elea-theme={theme}>
           <Button onClick={() => setThemed(true)}>{themeOpener}</Button>
           <Dialog open={themed} onClose={() => setThemed(false)} title={themeTitle} description="The tokens of the container reach this dialog." closeLabel="Close" actions={<Button onClick={() => setThemed(false)}>Done</Button>} />
         </section>
       </Demo>
-      <Demo title="Composed from its parts" description="DialogRoot keeps the focus trap, Escape and the backdrop; the parts give the header, the body and the footer another shape." code={`<DialogRoot open={open} onClose={() => setOpen(false)} size="lg">
-  <DialogHeader>
-    <DialogTitle>Publish this article <Badge tone="primary" variant="subtle">Step 2 of 2</Badge></DialogTitle>
-    <DialogClose label="Close" />
-  </DialogHeader>
-  <DialogDescription>Readers see it as soon as you publish.</DialogDescription>
-  <DialogBody>
-    <Field label="Summary">{(control) => <Textarea {...control} rows={3} />}</Field>
-  </DialogBody>
-  <DialogFooter>
-    <Checkbox label="Notify subscribers" />
-    <Button onClick={() => setOpen(false)}>Publish</Button>
-  </DialogFooter>
-</DialogRoot>`}>
-        <Button variant="outline" onClick={() => setComposed(true)}>Publish article</Button>
-        <DialogRoot open={composed} onClose={() => setComposed(false)} size="lg">
-          <DialogHeader>
-            <DialogTitle>Publish this article <Badge tone="primary" variant="subtle">Step 2 of 2</Badge></DialogTitle>
-            <DialogClose label="Close" />
-          </DialogHeader>
-          <DialogDescription>Readers see it as soon as you publish.</DialogDescription>
-          <DialogBody>
-            <Field label="Summary">{(control) => <Textarea {...control} rows={3} />}</Field>
-          </DialogBody>
-          <DialogFooter>
-            <Checkbox label="Notify subscribers" />
-            <Button onClick={() => setComposed(false)}>Publish</Button>
-          </DialogFooter>
-        </DialogRoot>
+      <Demo title="Composed from its parts" description="DialogRoot keeps the focus trap, Escape and the backdrop; the parts give the header, the body and the footer another shape." code={publishArticleSource}>
+        <PublishArticle />
       </Demo>
       <h2>Props</h2>
       <PropsTable rows={[
@@ -452,12 +336,7 @@ export function MenuPage() {
     <>
       <h1>Menu</h1>
       <p className="lead">Group related article actions under one control. Keep destructive choices identifiable and disable actions that are unavailable.</p>
-      <Demo title="Actions menu" description={`Last action: ${last}`} code={`<Menu label="Article actions" items={[
-  { id: "edit", label: "Edit", onSelect: () => setLast("edit") },
-  { id: "share", label: "Share", onSelect: () => setLast("share") },
-  { id: "archive", label: "Archive", disabled: true, onSelect: () => setLast("archive") },
-  { id: "delete", label: "Delete", danger: true, onSelect: () => setLast("delete") },
-]} trigger={(props) => <Button variant="outline" {...props}>Actions</Button>} />`}>
+      <Demo title="Actions menu" description={`Last action: ${last}`} code={articleActionsSource}>
         <Menu
           label="Article actions"
           items={[
@@ -469,20 +348,7 @@ export function MenuPage() {
           trigger={(props) => <Button variant="outline" {...props}>Actions</Button>}
         />
       </Demo>
-      <Demo title="Separators and groups" description="Compose the menu from its parts when the actions need sorting. The arrow keys cross the groups and skip what is disabled." code={`<MenuRoot>
-  <MenuTrigger>{(props) => <Button variant="outline" {...props}>More</Button>}</MenuTrigger>
-  <MenuContent label="More actions">
-    <MenuItem onSelect={() => setLast("rename")}>Rename</MenuItem>
-    <MenuItem onSelect={() => setLast("duplicate")}>Duplicate</MenuItem>
-    <MenuSeparator />
-    <MenuGroup label="Share">
-      <MenuItem onSelect={() => setLast("copy link")}>Copy link</MenuItem>
-      <MenuItem onSelect={() => setLast("send by mail")} disabled>Send by mail</MenuItem>
-    </MenuGroup>
-    <MenuSeparator />
-    <MenuItem onSelect={() => setLast("delete")} danger>Delete</MenuItem>
-  </MenuContent>
-</MenuRoot>`}>
+      <Demo title="Separators and groups" description="Compose the menu from its parts when the actions need sorting. The arrow keys cross the groups and skip what is disabled." code={moreActionsSource}>
         <MenuRoot>
           <MenuTrigger>{(props) => <Button variant="outline" {...props}>More</Button>}</MenuTrigger>
           <MenuContent label="More actions">
@@ -523,19 +389,10 @@ export function TooltipPage() {
     <>
       <h1>Tooltip</h1>
       <p className="lead">A short hint on hover and focus, described to assistive technology.</p>
-      <Demo title="On a button" code={`<Tooltip content="Saves a draft without publishing">
-  <Button variant="outline">Save draft</Button>
-</Tooltip>`}>
-        <Tooltip content="Saves a draft without publishing"><Button variant="outline">Save draft</Button></Tooltip>
-        <Tooltip content="Shown below" placement="bottom"><IconButton label="Help">?</IconButton></Tooltip>
+      <Demo title="On a button" code={saveDraftTooltipsSource}>
+        <SaveDraftTooltips />
       </Demo>
-      <Demo title="Over truncated text" code={`<div style={{ width: "7.5rem", overflow: "hidden" }}>
-  <Tooltip content="Quarterly revenue by region">
-    <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-      Quarterly revenue by region
-    </span>
-  </Tooltip>
-</div>`}>
+      <Demo title="Over truncated text" code={truncatedTitleSource}>
         <div style={{ width: "7.5rem", overflow: "hidden", border: "1px solid var(--elea-color-border-default)", borderRadius: "var(--elea-radius-md)", padding: "0.25rem 0.5rem" }}>
           <Tooltip content="Quarterly revenue by region">
             <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Quarterly revenue by region</span>
@@ -563,14 +420,12 @@ export function PaginationPage() {
     <>
       <h1>Pagination</h1>
       <p className="lead">Help readers browse a long list. Show the pages around their current position, with an optional count of the results in view.</p>
-      <Demo title="Twelve pages" code={`<Pagination page={page} pageCount={12} onPageChange={setPage} totalItems={115} pageSize={10}
-  labels={{ navigation: "Pagination", previous: "Previous page", next: "Next page", page: "Page {page}", summary: "{from}–{to} of {total}" }} />`}>
+      <Demo title="Twelve pages" code={articlePagesSource}>
         <div style={{ width: "100%" }}>
           <Pagination page={page} pageCount={12} onPageChange={setPage} totalItems={115} pageSize={10} labels={{ navigation: "Pagination", previous: "Previous page", next: "Next page", page: "Page {page}", summary: "{from}–{to} of {total}" }} />
         </div>
       </Demo>
-      <Demo title="Previous and next with their labels" description="With showLabels the two buttons show labels.previous and labels.next beside an arrow the component draws, mirrors in right-to-left and hides from assistive technology. In a narrow container, like the second one, the text gives way to the arrows and the accessible names stay." code={`<Pagination showLabels page={page} pageCount={12} onPageChange={setPage}
-  labels={{ navigation: "Pagination", previous: "Previous", next: "Next", page: "Page {page}" }} />`}>
+      <Demo title="Previous and next with their labels" description="With showLabels the two buttons show labels.previous and labels.next beside an arrow the component draws, mirrors in right-to-left and hides from assistive technology. In a narrow container, like the second one, the text gives way to the arrows and the accessible names stay." code={pageLabelsSource}>
         <div style={{ width: "100%" }}>
           <Pagination showLabels page={labelled} pageCount={12} onPageChange={setLabelled} labels={stepLabels} />
         </div>
@@ -601,26 +456,16 @@ export function SelectPage() {
     <>
       <h1>Select</h1>
       <p className="lead">Offer a compact list of options. Choose a single language, or enable <code>multiple</code> to pick several days of the week.</p>
-      <Demo title="Single value" description={`Selected: ${language ?? "none"}`} code={`<Select label="Language" value={language} onChange={setLanguage} placeholder="Pick a language"
-  options={[{ value: "fr", label: "Français" }, { value: "en", label: "English" }, { value: "de", label: "Deutsch", disabled: true }]} />`}>
+      <Demo title="Single value" description={`Selected: ${language ?? "none"}`} code={languageSelectSource}>
         <Select label="Language" value={language} onChange={setLanguage} placeholder="Pick a language" options={languages} />
         <Select size="sm" label="Language, small" value={language} onChange={setLanguage} options={languages} />
         <Select label="Disabled" value="fr" onChange={() => {}} options={languages} disabled />
       </Demo>
-      <Demo title="Checklist" description={`Selected: ${days.join(", ") || "none"}`} code={`<Select multiple label="Days" value={days} onChange={setDays} placeholder="Pick days"
-  summary={(values) => \`\${values.length} day(s)\`} options={week} />`}>
+      <Demo title="Checklist" description={`Selected: ${days.join(", ") || "none"}`} code={daysSelectSource}>
         <Select multiple label="Days" value={days} onChange={setDays} placeholder="Pick days" summary={(values) => `${values.length} day(s)`} options={week} />
         <Select multiple label="Days, labels joined" value={days} onChange={setDays} placeholder="Pick days" options={week} />
       </Demo>
-      <Demo title="In a field" code={`const [fieldLanguage, setFieldLanguage] = useState<string | null>(null);
-
-<Field label="Publication language" required help="Used for publication labels."
-  error={fieldLanguage === null ? "Choose a language." : undefined}>
-  {({ id, required, ...accessibility }) => (
-    <Select id={id} triggerProps={{ ...accessibility, "aria-required": required }}
-      value={fieldLanguage} onChange={setFieldLanguage} placeholder="Pick a language" options={languages} />
-  )}
-</Field>`}>
+      <Demo title="In a field" code={publicationLanguageSource}>
         <div style={{ width: "16rem" }}>
           <Field label="Publication language" required help="Used for publication labels."
             error={fieldLanguage === null ? "Choose a language." : undefined}>
@@ -656,23 +501,7 @@ export function RadiosPage() {
     <>
       <h1>RadioGroup</h1>
       <p className="lead">Let people compare a short list of mutually exclusive choices. Each option can include a description.</p>
-      <Demo title="Notification preferences" description="Choose a delivery schedule and save to read the submitted form value." code={`<form onSubmit={(event) => {
-  event.preventDefault();
-  const form = new FormData(event.currentTarget);
-  setSaved(String(form.get("delivery")));
-}}>
-  <RadioGroup
-    label="Email delivery"
-    name="delivery"
-    defaultValue="weekly"
-    options={[
-      { value: "daily", label: "Daily digest", description: "Receive a summary each morning." },
-      { value: "weekly", label: "Weekly digest", description: "Receive one summary on Monday." },
-      { value: "instant", label: "Every update", disabled: true },
-    ]}
-  />
-  <Button type="submit">Save preferences</Button>
-</form>`}>
+      <Demo title="Notification preferences" description="Choose a delivery schedule and save to read the submitted form value." code={emailDeliverySource}>
         <form className="catalog-form" onSubmit={(event) => {
           event.preventDefault();
           setSaved(String(new FormData(event.currentTarget).get("delivery")));
@@ -706,26 +535,14 @@ export function TabsPage() {
     <>
       <h1>Tabs</h1>
       <p className="lead">Switch between related views of a document while keeping the surrounding page in place.</p>
-      <Demo title="Document inspector" description="The theme chooses the presentation. Use the arrow keys to move between tabs." code={`<Tabs label="Article information" defaultValue="details" items={[
-  { value: "details", label: "Details", panel: <p>Review the article title, author and publication date.</p> },
-  { value: "revisions", label: "Revisions", panel: <p>Two revisions are available for this article.</p> },
-  { value: "analytics", label: "Analytics", panel: null, disabled: true },
-]} />`}>
+      <Demo title="Document inspector" description="The theme chooses the presentation. Use the arrow keys to move between tabs." code={documentInspectorSource}>
         <Tabs className="catalog-tabs" label="Article information" defaultValue="details" items={publicationTabs} />
       </Demo>
       <Demo title="Segmented tabs" description="The selected view sits in a capsule."
-        code={`<Tabs presentation="segmented" label="Article sections" defaultValue="details" items={publicationTabs} />`}>
-        <Tabs presentation="segmented" label="Article sections" defaultValue="details" items={publicationTabs} />
+        code={segmentedTabsSource}>
+        <SegmentedTabs />
       </Demo>
-      <Demo title="Composed rail" description="The selected view has a top border. The list and panels can sit where the layout needs them." code={`<TabsRoot defaultValue="open">
-  <TabList label="Comments" presentation="rail">
-    <Tab value="open">Open <Badge tone="primary" variant="subtle">3</Badge></Tab>
-    <Tab value="resolved">Resolved <Badge variant="subtle">12</Badge></Tab>
-  </TabList>
-  <p>Comments on “Field notes”</p>
-  <TabPanel value="open">Three comments wait for an answer.</TabPanel>
-  <TabPanel value="resolved">Twelve comments were resolved this month.</TabPanel>
-</TabsRoot>`}>
+      <Demo title="Composed rail" description="The selected view has a top border. The list and panels can sit where the layout needs them." code={commentsRailSource}>
         <TabsRoot className="catalog-tabs" defaultValue="open">
           <TabList label="Comments" presentation="rail">
             <Tab value="open">Open <Badge tone="primary" variant="subtle">3</Badge></Tab>
@@ -762,11 +579,7 @@ export function FooterPage() {
     <>
       <h1>Footer</h1>
       <p className="lead">Bring product identity, grouped navigation and a studio signature together at the end of a page.</p>
-      <Demo title="Product footer" code={`<Footer brand={<strong>Field notes</strong>} groups={[
-  { label: "Resources", links: [{ label: "Documentation", href: "/elea/getting-started/" }] },
-]}>
-  Editorial workspace
-</Footer>`}>
+      <Demo title="Product footer" code={productFooterSource}>
         <Footer brand={<strong>Field notes</strong>} groups={links}>Editorial workspace</Footer>
       </Demo>
       <h2>Props</h2>

@@ -1,6 +1,6 @@
 import { createDocument, type EleaBlock } from "@alien6-studio/elea-content";
 import { ContentView } from "@alien6-studio/elea-content-viewer";
-import { Button, Input, Tabs } from "@alien6-studio/elea-ui";
+import { Button, Hero, Input, Navbar, Sidebar, Tabs } from "@alien6-studio/elea-ui";
 import { Editor } from "./Editor";
 
 const blocks: EleaBlock[] = [
@@ -49,7 +49,10 @@ export default function Page() {
       <Editor initialBlocks={blocks} />
       <section className="client-app" aria-label="Consumer integration">
         <style>{consumerStyles}</style>
-        <h2>Consumer integration</h2>
+        <Hero headingLevel="h2" heading="Consumer integration" />
+        <Navbar label="Primary" menuLabel="Menu" items={[{ id: "preview", label: "Preview", href: "/" }]} current="preview" />
+        <Sidebar label="Sections" groups={[{ id: "guides", label: "Guides", collapsible: true,
+          items: [{ id: "fields", label: "Fields", href: "/fields" }] }]} />
         <div className="client-regions">
           {["Standard controls", "Scoped controls"].map((name, index) => <section key={name}
             aria-label={name} className={index ? "client-adoption" : undefined}>

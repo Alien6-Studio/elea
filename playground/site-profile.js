@@ -1,6 +1,7 @@
 import "@vitejs/plugin-react/preamble";
 import { createElement, useEffect, useSyncExternalStore } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
+import { SiteSearch } from "./src/components/SiteSearch.tsx";
 import { SiteProfileSelect } from "./src/components/SiteProfileSelect.tsx";
 import { siteProfile } from "./src/siteProfile.ts";
 
@@ -13,6 +14,9 @@ function StoredProfileSelect() {
 }
 
 hydrateRoot(picker, createElement(StoredProfileSelect));
+
+const search = document.getElementById("site-search");
+if (search) hydrateRoot(search, createElement(SiteSearch));
 
 const comparison = document.getElementById("theme-comparison");
 if (comparison) {

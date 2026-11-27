@@ -1,7 +1,7 @@
 import { Demo, PropsTable } from "../components/Demo.js";
 import { sitePath } from "../links.js";
-import { ImageUploadExample } from "./ImageUploadExample.js";
-import example from "./ImageUploadExample.tsx?raw";
+import { ImageUploadExample } from "../examples/media/ImageUploadExample.js";
+import example from "../examples/media/ImageUploadExample.tsx?raw";
 import "./media.css";
 
 export function MediaPage() {

@@ -2,6 +2,9 @@ import { useState } from "react";
 import { brandPalettes, type BrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { Button, Calendar, ColorPicker, Combobox, Field } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
+import publicationCalendar from "../examples/calendar/PublicationCalendar.tsx?raw";
+import collectionPicker from "../examples/combobox/CollectionPicker.tsx?raw";
+import coverInk from "../examples/color-picker/CoverInk.tsx?raw";
 
 export const monthLabels = { previousMonth: "Previous month", nextMonth: "Next month" };
 export const collections = [
@@ -19,15 +22,7 @@ export function CalendarPage() {
     <>
       <h1>Calendar</h1>
       <p className="lead">Choose a day in a monthly grid. The application receives a calendar date that stays the same across time zones.</p>
-      <Demo title="Schedule a publication" description="Choose a date between 20 February and 10 March 2028." code={`const [date, setDate] = useState<string | null>(null);
-
-<Calendar
-  label="Publication date"
-  labels={{ previousMonth: "Previous month", nextMonth: "Next month" }}
-  locale="en-GB" defaultMonth="2028-02"
-  min="2028-02-20" max="2028-03-10"
-  value={date} onChange={setDate}
-/>`}>
+      <Demo title="Schedule a publication" description="Choose a date between 20 February and 10 March 2028." code={publicationCalendar}>
         <div className="catalog-stack catalog-card-demo">
           <Calendar label="Publication date" labels={monthLabels} locale="en-GB" defaultMonth="2028-02"
             min="2028-02-20" max="2028-03-10" value={date} onChange={setDate} />
@@ -56,17 +51,7 @@ export function ComboboxPage() {
     <>
       <h1>Combobox</h1>
       <p className="lead">Filter a list by typing, then choose a match. The form stores the selected option’s value.</p>
-      <Demo title="Choose a collection" description="Try “glacier” to find the current and archived collections." code={`const [collection, setCollection] = useState<string | null>(null);
-const options = [
-  { value: "ice", label: "Glacier notebooks" },
-  { value: "archive", label: "Glacier survey archive", disabled: true },
-];
-
-<Field label="Collection">
-  {control => <Combobox {...control} label="Collection" name="collection"
-    options={options} value={collection} onChange={setCollection}
-    placeholder="Search collections…" emptyMessage="No matching collections" />}
-</Field>`}>
+      <Demo title="Choose a collection" description="Try “glacier” to find the current and archived collections." code={collectionPicker}>
         <div className="catalog-card-demo">
           <Field label="Collection">{control => <Combobox {...control} label="Collection" name="collection"
             options={collections} value={collection} onChange={setCollection}
@@ -92,10 +77,7 @@ export function ColorPickerPage({ brand }: { brand?: BrandTheme }) {
     <>
       <h1>ColorPicker</h1>
       <p className="lead">Choose a colour from the system picker or enter an exact hex value.</p>
-      <Demo title="Cover ink" code={`const [ink, setInk] = useState<string>(brandPalettes.Emerald.seed);
-
-<ColorPicker label="Ink colour" hexLabel="Ink hex" value={ink} onChange={setInk}
-  invalidMessage="Enter a six-digit hex colour." />`}>
+      <Demo title="Cover ink" code={coverInk}>
         <div className="catalog-card-demo">
           <ColorPicker label="Ink colour" hexLabel="Ink hex" value={ink} onChange={setInk}
             invalidMessage="Enter a six-digit hex colour." />

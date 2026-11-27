@@ -1,33 +1,12 @@
 import { useState } from "react";
 import { DateField, Field } from "@alien6-studio/elea-ui";
 import { Demo, PropsTable } from "../components/Demo.js";
+import source from "../examples/date-field/PublicationDate.tsx?raw";
 
 const labels = {
   day: "Day", month: "Month", year: "Year", openCalendar: "Open calendar",
   previousMonth: "Previous month", nextMonth: "Next month",
 };
-
-const source = `import { useState } from "react";
-import { DateField, Field } from "@alien6-studio/elea-ui";
-import "@alien6-studio/elea-ui/bundle.css";
-
-const labels = {
-  day: "Day", month: "Month", year: "Year", openCalendar: "Open calendar",
-  previousMonth: "Previous month", nextMonth: "Next month",
-};
-
-export function PublicationDate() {
-  const [date, setDate] = useState<string | null>("2028-02-28");
-  return (
-    <Field label="Publication date" help="20 February to 10 March 2028">
-      {control => (
-        <DateField {...control} name="publishedOn" label="Publication date"
-          locale="en-GB" labels={labels} min="2028-02-20" max="2028-03-10"
-          value={date} onChange={setDate} />
-      )}
-    </Field>
-  );
-}`;
 
 export function DateFieldPage() {
   const [date, setDate] = useState<string | null>("2028-02-28");
