@@ -80,7 +80,7 @@
 .site__wordmark {
   display: inline-flex;
   align-items: center;
-  gap: .05em;
+  gap: .1875em;
   justify-self: start;
   min-height: 2.75rem;
   color: var(--elea-color-text-default);
@@ -89,7 +89,6 @@
   letter-spacing: normal;
   text-decoration: none;
 }
-.site__masthead .site__wordmark { gap: .1875em; }
 .site__wordmark::before {
   content: "";
   flex: none;
