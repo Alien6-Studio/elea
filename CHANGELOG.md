@@ -17,6 +17,7 @@ These changes correct default rendering. Compare screens that use segmented tabs
 - `Stepper` adds `indicator="solid"` for filled markers, `connector="dotted"` for the line towards steps not yet completed, and `badgeTone` on a step.
 - `ContentComparison` in the viewer shows two versions of a document as one: words and blocks that came are `<ins>`, those that went are `<del>`, and rich text keeps its formatting. `compareBlocks` and `compareHtml` in the content package give the same result as data. `ins` joins the tags of `RICH_HTML_POLICY`; a host sanitizer used with the viewer's `/core` entry must allow it for comparisons.
 - `SaveStatus` in the UI package shows where an automatic save stands (`saving`, `saved`, `error`) in a polite status region, with an optional retry button after a failure.
+- The viewer stylesheet styles its table block as `table.elea-table`. Loaded beside the UI package, it no longer changes the cell padding and borders of `Table`.
 - `Alert` reads `--elea-alert-<tone>-surface`, `--elea-alert-<tone>-border` and `--elea-alert-<tone>-text` for each tone.
 
 ## 0.1.3 - 2026-11-26

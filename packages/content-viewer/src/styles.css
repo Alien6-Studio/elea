@@ -254,18 +254,18 @@
   font: inherit;
 }
 .elea-table-wrapper { overflow-x: auto; }
-.elea-table {
+table.elea-table {
   font-family: var(--elea-font-family-sans);
   border-collapse: collapse;
   min-width: 100%;
   font-size: var(--elea-font-size-base);
 }
-.elea-table th, .elea-table td {
+table.elea-table th, table.elea-table td {
   border: 1px solid var(--elea-color-border-strong);
   padding: var(--elea-space-2) var(--elea-space-4);
   text-align: left;
 }
-.elea-table th { background: var(--elea-color-surface-subtle); font-weight: var(--elea-font-weight-semibold); }
+table.elea-table th { background: var(--elea-color-surface-subtle); font-weight: var(--elea-font-weight-semibold); }
 .elea-unknown { color: var(--elea-color-text-subtle); font-size: var(--elea-font-size-sm); }
 .elea-unknown p { margin: 0; }
 
