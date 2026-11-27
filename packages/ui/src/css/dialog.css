@@ -15,6 +15,11 @@
 .elea-dialog--sm { max-width: 24rem; }
 .elea-dialog--md { max-width: 32rem; }
 .elea-dialog--lg { max-width: 48rem; }
+.elea-dialog--xl { max-width: 72rem; }
+.elea-dialog--full { height: calc(100vh - 2 * var(--elea-space-4)); }
+/* The body takes the room left and scrolls, so the header and the actions stay in place. */
+.elea-dialog--scroll-body { display: flex; flex-direction: column; overflow: hidden; }
+.elea-dialog--scroll-body > .elea-dialog__body { flex: 1; min-height: 0; overflow: auto; }
 .elea-dialog__header { display: flex; align-items: flex-start; gap: var(--elea-space-4); }
 .elea-dialog__title { flex: 1; margin: 0; font-size: var(--elea-font-size-xl); font-weight: var(--elea-font-weight-semibold); }
 .elea-dialog__icon { display: inline-flex; margin-inline-end: var(--elea-space-2); vertical-align: -0.15em; color: var(--elea-color-text-link); }

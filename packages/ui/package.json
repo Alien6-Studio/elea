@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-ui",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Elea UI primitives for React: buttons, fields, cards, tables, alerts, toasts, dialogs, sheets, popovers, menus, tabs and more, styled with Elea tokens only",
   "type": "module",
   "sideEffects": [
@@ -66,6 +66,7 @@
     "./css/popover.css": "./dist/css/popover.css",
     "./css/progress.css": "./dist/css/progress.css",
     "./css/radio-group.css": "./dist/css/radio-group.css",
+    "./css/save-status.css": "./dist/css/save-status.css",
     "./css/responsive-image.css": "./dist/css/responsive-image.css",
     "./css/search-autocomplete.css": "./dist/css/search-autocomplete.css",
     "./css/search-field.css": "./dist/css/search-field.css",
@@ -89,7 +90,7 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-tokens": "^0.1.3"
+    "@alien6-studio/elea-tokens": "^0.1.4"
   },
   "peerDependencies": {
     "libphonenumber-js": "^1.13.17",

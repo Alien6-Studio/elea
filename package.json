@@ -1,6 +1,6 @@
 {
   "name": "elea",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "Elea design system by Alien6 Studio: design tokens, headless core, block content viewer and editor for React",
   "type": "module",

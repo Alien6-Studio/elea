@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-content",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Elea headless core: block document model, schema, block registry, sanitization and text extraction",
   "type": "module",
   "sideEffects": false,

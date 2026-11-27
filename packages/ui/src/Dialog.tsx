@@ -167,15 +167,18 @@ export function ModalSurface({ open, onClose, prefix, backdropClassName, classNa
 }
 
 export interface DialogRootProps extends ModalRootProps {
-  size?: "sm" | "md" | "lg" | undefined;
+  /** `full` takes the viewport, less its margin. */
+  size?: "sm" | "md" | "lg" | "xl" | "full" | undefined;
+  /** What scrolls when the content outgrows the surface. With `body`, the header and the actions stay in place. */
+  scroll?: "surface" | "body" | undefined;
 }
 
 /**
  * The modal surface alone: focus moves inside, Tab cycles within, Escape and the backdrop close it,
  * focus returns to the opener. Give it a `DialogTitle`, which names it.
  */
-export function DialogRoot({ size = "md", className, ...surface }: Readonly<DialogRootProps>) {
-  return <ModalSurface {...surface} prefix="elea-dialog" className={cx(`elea-dialog--${size}`, className)} />;
+export function DialogRoot({ size = "md", scroll = "surface", className, ...surface }: Readonly<DialogRootProps>) {
+  return <ModalSurface {...surface} prefix="elea-dialog" className={cx(`elea-dialog--${size}`, scroll === "body" && "elea-dialog--scroll-body", className)} />;
 }
 
 export interface DialogPartProps {

@@ -1,6 +1,6 @@
 "use client";
 
-import { applyLinkTarget, documentToHtml, resolveLinkUrl, type HtmlSanitizer, type BlockLike } from "@alien6-studio/elea-content";
+import { applyLinkTarget, documentToHtml, en, resolveLinkUrl, type HtmlSanitizer, type BlockLike } from "@alien6-studio/elea-content";
 import { parseClipboard, type PastedContent } from "./paste.js";
 import { copyBlock } from "./selection.js";
 import { TextLimitContext, clipMarkup, fitPastedBlocks, inputText } from "./editorTextLimit.js";
@@ -8,8 +8,9 @@ import { editableHtml, selectionOffsets, textPoint } from "./caret.js";
 import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef, useState, type ClipboardEvent, type CompositionEvent, type CSSProperties, type FocusEvent, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import { useSurfaceScope } from "@alien6-studio/elea-ui";
-import { CheckIcon, CloseIcon } from "./icons.js";
+import { CheckIcon, CloseIcon, ExternalLinkIcon, TrashIcon } from "./icons.js";
 import { useContentServices } from "./provider.js";
+import { useRestrictions, type EditorMark } from "./restrictions.js";
 
 export interface ActiveFormats {
   bold: boolean;
@@ -24,6 +25,8 @@ export interface ActiveFormats {
   blockquote: boolean;
   ul: boolean;
   ol: boolean;
+  /** The caret sits in a link: the link control edits it. */
+  link?: boolean | undefined;
 }
 
 export const EMPTY_FORMATS: ActiveFormats = {
@@ -308,6 +311,9 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
   ref,
 ) {
   const { sanitizer, messages, siteHostnames } = useContentServices();
+  const restrictions = useRestrictions();
+  const allowsMark = (mark: EditorMark) => restrictions?.allowsMark(mark) ?? true;
+  const restrictHtml = (html: string) => restrictions?.restrictHtml(html) ?? html;
   const linkOptions = siteHostnames ? { siteHostnames } : {};
   const effectivePlaceholder = placeholder ?? messages.editor.startWriting;
   const editorRef = useRef<HTMLDivElement>(null);
@@ -335,6 +341,8 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
   const [linkUrlError, setLinkUrlError] = useState(false);
   const [linkPopoverPosition, setLinkPopoverPosition] = useState<{ top: number; left: number } | null>(null);
   const savedSelectionForLinkRef = useRef<Range | null>(null);
+  /** The link under the caret when the popover opened: it is edited, not nested. */
+  const [editedLink, setEditedLink] = useState<HTMLAnchorElement | null>(null);
   const linkInputRef = useRef<HTMLInputElement>(null);
 
   const writeContent = (editor: HTMLElement, next: string) => {
@@ -399,6 +407,7 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
       blockquote: !!element.closest("blockquote"),
       ul: !!element.closest("ul"),
       ol: !!element.closest("ol"),
+      link: !!element.closest("a"),
     };
   };
 
@@ -433,6 +442,7 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
       const match = rule.pattern.exec(text.replaceAll("\u00a0", " "));
       if (match) {
         const target = rule.convert(match);
+        if (restrictions && !restrictions.allowsBlock(target.type)) return false;
         editor.innerHTML = "";
         convert(target.type, target.data);
         return true;
@@ -521,6 +531,7 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
     const firstText = paragraphText(first);
     let inline = inlinePaste(pasted, !!insertBlocks, currentSanitizer);
     if (inline !== null) {
+      inline = restrictHtml(inline);
       if (limit && inputText(inline).length > capacity) inline = clipMarkup(inline, capacity);
       if (!inline) return;
       insertInlineHtml(currentSanitizer.sanitize(pastedLine(inline, latest.current.singleLine)), range, selection);
@@ -529,7 +540,7 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
     }
     if (!first || !insertBlocks) return;
     const after = extractContentAfterCaret(range, editor);
-    if (typeof firstText === "string") insertInlineHtml(currentSanitizer.sanitize(firstText), range, selection);
+    if (typeof firstText === "string") insertInlineHtml(currentSanitizer.sanitize(restrictHtml(firstText)), range, selection);
     else range.deleteContents();
     handleInput();
     insertBlocks(typeof firstText === "string" ? rest : pasted.blocks, after);
@@ -720,18 +731,15 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
   };
 
   const openLinkInput = () => {
+    if (!allowsMark("link")) return;
     const selection = globalThis.getSelection();
     const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : lastSelectionRef.current;
-    // Inside an existing link: remove it instead of nesting one
-    const existingLink = elementOf(range?.startContainer)?.closest("a");
-    if (existingLink) {
-      unwrap(existingLink);
-      handleInput();
-      return;
-    }
+    // Inside an existing link: the same popover edits it instead of nesting one
+    const existingLink = elementOf(range?.startContainer)?.closest("a") ?? null;
+    setEditedLink(existingLink);
     savedSelectionForLinkRef.current = range ? range.cloneRange() : null;
-    const selected = range ? range.toString().trim() : "";
-    const rangeRect = range?.getBoundingClientRect();
+    const selected = existingLink?.getAttribute("href") ?? (range ? range.toString().trim() : "");
+    const rangeRect = (existingLink ?? range)?.getBoundingClientRect();
     const editorRect = editorRef.current?.getBoundingClientRect();
     const anchorRect = rangeRect && rangeRect.height > 0 ? rangeRect : editorRect;
     if (anchorRect) setLinkPopoverPosition({ top: anchorRect.bottom + 6, left: anchorRect.left });
@@ -746,7 +754,16 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
     setLinkInputValue("");
     setLinkUrlError(false);
     setLinkPopoverPosition(null);
+    setEditedLink(null);
     editorRef.current?.focus();
+  };
+
+  const removeLink = () => {
+    if (editedLink?.isConnected) {
+      unwrap(editedLink);
+      handleInput();
+    }
+    closeLinkInput();
   };
 
   const submitLink = () => {
@@ -761,7 +778,12 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
       return;
     }
     const range = savedSelectionForLinkRef.current;
-    if (range) createLinkAtRange(url, range);
+    if (editedLink?.isConnected) {
+      editedLink.href = url.replaceAll(/[<>"]/g, encodeURIComponent);
+      applyLinkTarget(editedLink, latest.current.linkOptions);
+      handleInput();
+    } else if (range) createLinkAtRange(url, range);
+    setEditedLink(null);
     editorRef.current?.focus();
     setShowLinkInput(false);
     setLinkInputValue("");
@@ -794,9 +816,10 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
   const handleFormattingShortcut = (event: KeyboardEvent): boolean => {
     if (!event.ctrlKey && !event.metaKey) return false;
     switch (event.key) {
-      case "b": event.preventDefault(); toggleInlineFormat("strong"); return true;
-      case "i": event.preventDefault(); toggleInlineFormat("em"); return true;
-      case "u": event.preventDefault(); toggleInlineFormat("u"); return true;
+      // A mark the host leaves out still swallows its shortcut, or the browser would apply it
+      case "b": event.preventDefault(); if (allowsMark("bold")) toggleInlineFormat("strong"); return true;
+      case "i": event.preventDefault(); if (allowsMark("italic")) toggleInlineFormat("em"); return true;
+      case "u": event.preventDefault(); if (allowsMark("underline")) toggleInlineFormat("u"); return true;
       case "k": event.preventDefault(); openLinkInput(); return true;
       default: return false;
     }
@@ -1035,6 +1058,8 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
   const popoverTop = linkPopoverPosition?.top ?? (editorRect?.bottom ?? 100) + 6;
   const popoverLeft = linkPopoverPosition?.left ?? editorRect?.left ?? 20;
 
+  const linkOpenLabel = messages.editor.linkOpen ?? en.editor.linkOpen;
+  const linkRemoveLabel = messages.editor.linkRemove ?? en.editor.linkRemove;
   const linkPopover = showLinkInput && typeof document !== "undefined"
     ? createPortal(
         <div role="dialog" aria-label={messages.editor.linkUrlPrompt} className="elea-link-popover" {...linkScope} style={{ position: "fixed", top: popoverTop, left: popoverLeft }}>
@@ -1056,6 +1081,14 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
           <button type="button" className="elea-link-popover__button elea-link-popover__button--confirm" onMouseDown={(event) => { event.preventDefault(); submitLink(); }} aria-label={messages.editor.linkConfirm}>
             <CheckIcon />
           </button>
+          {editedLink && <>
+            <a className="elea-link-popover__button" href={resolveLinkUrl(linkInputValue.trim()) ?? undefined} target="_blank" rel="noopener noreferrer" aria-label={linkOpenLabel} title={linkOpenLabel}>
+              <ExternalLinkIcon />
+            </a>
+            <button type="button" className="elea-link-popover__button" onMouseDown={(event) => { event.preventDefault(); removeLink(); }} aria-label={linkRemoveLabel} title={linkRemoveLabel}>
+              <TrashIcon />
+            </button>
+          </>}
           <button type="button" className="elea-link-popover__button" onMouseDown={(event) => { event.preventDefault(); closeLinkInput(); }} aria-label={messages.editor.linkCancel}>
             <CloseIcon />
           </button>

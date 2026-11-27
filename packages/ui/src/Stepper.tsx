@@ -7,6 +7,8 @@ import { Skeleton } from "./Skeleton.js";
 
 export type StepperOrientation = "horizontal" | "vertical";
 
+export type StepperBadgeTone = "neutral" | "primary" | "success" | "info" | "warning" | "danger";
+
 export interface StepperStep {
   /** Stable identifier within this sequence. */
   id: string;
@@ -15,6 +17,8 @@ export interface StepperStep {
   badge?: ReactNode;
   /** Localized equivalent of a visual badge, such as "3 errors". */
   badgeLabel?: string | undefined;
+  /** Colour of a text badge, such as `danger` for points to fix. */
+  badgeTone?: StepperBadgeTone | undefined;
   disabled?: boolean | undefined;
 }
 
@@ -33,6 +37,10 @@ export interface StepperProps extends StepperNavigationProps, Omit<StepperRootAt
   orientation?: StepperOrientation | undefined;
   /** Only the current and preceding steps can be selected directly. */
   linear?: boolean | undefined;
+  /** `solid` fills the marker of every step, where `outline` fills the current one only. */
+  indicator?: "outline" | "solid" | undefined;
+  /** `dotted` draws the segments that lead to upcoming steps as dots. */
+  connector?: "solid" | "dotted" | undefined;
 }
 
 function currentIndex(steps: readonly StepperStep[], current: string | number) {
@@ -61,12 +69,12 @@ function moveFocus(event: KeyboardEvent<HTMLButtonElement>, orientation: Stepper
 }
 
 /** Controlled progress navigation. Arrow keys explore the sequence; activating a button requests a step. */
-export const Stepper = forwardRef<HTMLElement, StepperProps>(function Stepper({ label, steps, current, onSelect, orientation = "horizontal", linear = false, className, ...rest }, ref) {
+export const Stepper = forwardRef<HTMLElement, StepperProps>(function Stepper({ label, steps, current, onSelect, orientation = "horizontal", linear = false, indicator, connector, className, ...rest }, ref) {
   const id = useId();
   const active = currentIndex(steps, current);
   if (steps.length === 0) return null;
   return (
-    <nav {...rest} ref={ref} className={cx("elea-stepper", className)} data-orientation={orientation} aria-label={label}>
+    <nav {...rest} ref={ref} className={cx("elea-stepper", className)} data-orientation={orientation} data-indicator={indicator} data-connector={connector} aria-label={label}>
       <ol className="elea-stepper__list">
         {steps.map((step, index) => {
           const selected = index === active;
@@ -92,7 +100,7 @@ export const Stepper = forwardRef<HTMLElement, StepperProps>(function Stepper({ 
                     onClick={() => onSelect(step)} onKeyDown={event => moveFocus(event, orientation)}>{step.label}</button>
                   {descriptionId && <span className="elea-stepper__description" id={descriptionId}>{step.description}</span>}
                   {badgeId && <>
-                    <span className="elea-stepper__badge" id={step.badgeLabel ? undefined : badgeId} aria-hidden={step.badgeLabel ? true : undefined}>{step.badge}</span>
+                    <span className="elea-stepper__badge" data-tone={step.badgeTone} id={step.badgeLabel ? undefined : badgeId} aria-hidden={step.badgeLabel ? true : undefined}>{step.badge}</span>
                     {step.badgeLabel && <span id={badgeId} hidden>{step.badgeLabel}</span>}
                   </>}
                 </div>
@@ -115,8 +123,8 @@ export interface StepperPanelProps extends StepperNavigationProps, StepperRootAt
 /** Optional footer. Previous and Next move one available step, including in a linear flow. */
 export const StepperPanel = forwardRef<HTMLDivElement, StepperPanelProps>(function StepperPanel(
   // Hosts may share props with Stepper. Only the navigation uses these three settings.
-  { steps, current, onSelect, previousLabel, nextLabel, finish, className, linear: _linear, label: _label, orientation: _orientation, ...rest }:
-    StepperPanelProps & Partial<Pick<StepperProps, "linear" | "label" | "orientation">>,
+  { steps, current, onSelect, previousLabel, nextLabel, finish, className, linear: _linear, label: _label, orientation: _orientation, indicator: _indicator, connector: _connector, ...rest }:
+    StepperPanelProps & Partial<Pick<StepperProps, "linear" | "label" | "orientation" | "indicator" | "connector">>,
   ref,
 ) {
   const active = currentIndex(steps, current);

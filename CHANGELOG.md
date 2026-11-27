@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.4 - Unreleased
+## 0.1.4 - 2026-11-27
 
 These changes correct default rendering. Compare screens that use segmented tabs, cards, the classic editor or `buttonRadiusScale: "profile"` before upgrading.
 
@@ -9,6 +9,15 @@ These changes correct default rendering. Compare screens that use segmented tabs
 - The document toolbar and the classic editor frame limit their corners to the toolbar padding, 0.5rem, in themes with longer corners. A host `--elea-control-radius` still applies to the classic editor.
 - With `buttonRadiusScale: "profile"`, a silhouette below 0.25rem, such as Hors champ, keeps the uniform `sm`, `md` and `lg` radii: its profile steps were less than a pixel apart.
 - `brandTokens` emits two derived shape tokens for the stylesheets, `--elea-_shape-control-nested` and `--elea-_shape-surface-clearance`. They are private and may change.
+- `ContentEditor` `blockTypes` now governs the toolbar, the block-type switcher, the slash menu, typing shortcuts and pasting as well as the add menus, and the new `marks` prop does the same for bold, italic, underline and links. A host that already passes `blockTypes` should check stored documents: a disallowed block that carries text is shown as paragraphs, one without text is left out and passed to `onBlocksLeftOut`, and `onBlocksChange` receives the accepted form with the first edit.
+- With the caret in a link, the link control opens the link field with its address, to change it, remove the link or open it. It used to remove the link.
+- The fixed toolbar stays usable while no field has focus: a format returns to the last edited field, or to the end of the document, and then applies. Disabled undo and redo say why in their tooltip.
+- A `Menu` item with `href` is a link, rendered by the host router through `render` as with `Button`. `header` on `Menu` and `MenuContent` shows content above the items and describes the menu. `MenuItemProps` and `MenuItemData` become unions of an action and a link.
+- `Dialog` adds the `xl` and `full` sizes, and `scroll="body"` keeps the header and the actions in place while the body scrolls.
+- `Stepper` adds `indicator="solid"` for filled markers, `connector="dotted"` for the line towards steps not yet completed, and `badgeTone` on a step.
+- `ContentComparison` in the viewer shows two versions of a document as one: words and blocks that came are `<ins>`, those that went are `<del>`, and rich text keeps its formatting. `compareBlocks` and `compareHtml` in the content package give the same result as data. `ins` joins the tags of `RICH_HTML_POLICY`; a host sanitizer used with the viewer's `/core` entry must allow it for comparisons.
+- `SaveStatus` in the UI package shows where an automatic save stands (`saving`, `saved`, `error`) in a polite status region, with an optional retry button after a failure.
+- `Alert` reads `--elea-alert-<tone>-surface`, `--elea-alert-<tone>-border` and `--elea-alert-<tone>-text` for each tone.
 
 ## 0.1.3 - 2026-11-26
 

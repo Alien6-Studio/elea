@@ -82,6 +82,19 @@
 }
 .elea-stepper__step[data-state="done"] .elea-stepper__indicator { color: var(--_elea-step-done); }
 .elea-stepper__step[data-state="upcoming"][data-disabled] .elea-stepper__indicator { border-style: dashed; }
+.elea-stepper[data-indicator="solid"] .elea-stepper__step[data-state="done"] .elea-stepper__indicator {
+  border-color: var(--_elea-step-active);
+  background: var(--_elea-step-active);
+  color: var(--elea-stepper-on-active, var(--elea-color-action-primary-text));
+}
+.elea-stepper[data-indicator="solid"] .elea-stepper__step[data-state="upcoming"] .elea-stepper__indicator {
+  border-color: transparent;
+  background: var(--elea-stepper-upcoming-surface, var(--elea-color-surface-muted));
+}
+.elea-stepper[data-indicator="solid"] .elea-stepper__step[data-state="upcoming"][data-disabled] .elea-stepper__indicator { border-color: currentColor; }
+.elea-stepper[data-connector="dotted"] .elea-stepper__step:not([data-state="done"])::after {
+  background: radial-gradient(circle closest-side, var(--elea-stepper-track, var(--elea-color-border-strong)) 96%, transparent) 0 0 / calc(3 * var(--_elea-step-stroke)) var(--_elea-step-stroke) repeat-x;
+}
 .elea-stepper__item:has(.elea-stepper__button:focus-visible) .elea-stepper__indicator::after {
   content: "";
   position: absolute;
@@ -116,6 +129,11 @@
   font-size: var(--elea-font-size-xs);
   font-weight: var(--elea-font-weight-medium);
 }
+.elea-stepper__badge[data-tone="primary"] { background: var(--elea-color-action-primary-container); color: var(--elea-color-action-primary-on-container); }
+.elea-stepper__badge[data-tone="success"] { background: var(--elea-color-action-success-container, color-mix(in srgb, var(--elea-color-success) 10%, var(--elea-color-surface-default))); color: var(--elea-color-action-success-on-container, var(--elea-color-success)); }
+.elea-stepper__badge[data-tone="info"] { background: var(--elea-color-action-info-container, color-mix(in srgb, var(--elea-color-info) 10%, var(--elea-color-surface-default))); color: var(--elea-color-action-info-on-container, var(--elea-color-info)); }
+.elea-stepper__badge[data-tone="warning"] { background: var(--elea-color-action-warning-container, color-mix(in srgb, var(--elea-color-warning) 10%, var(--elea-color-surface-default))); color: var(--elea-color-action-warning-on-container, var(--elea-color-warning)); }
+.elea-stepper__badge[data-tone="danger"] { background: var(--elea-color-action-danger-container, color-mix(in srgb, var(--elea-color-danger) 10%, var(--elea-color-surface-default))); color: var(--elea-color-action-danger-on-container, var(--elea-color-danger)); }
 .elea-stepper__body > .elea-skeleton { max-inline-size: 100%; }
 
 .elea-stepper[data-orientation="vertical"] .elea-stepper__list { flex-direction: column; overflow: visible; }
@@ -127,13 +145,19 @@
   inline-size: var(--_elea-step-stroke);
   block-size: auto;
 }
+.elea-stepper[data-orientation="vertical"][data-connector="dotted"] .elea-stepper__step:not([data-state="done"])::after {
+  background-size: var(--_elea-step-stroke) calc(3 * var(--_elea-step-stroke));
+  background-repeat: repeat-y;
+}
 .elea-stepper[data-orientation="vertical"] .elea-stepper__item { flex-direction: row; gap: var(--elea-space-3); }
 .elea-stepper[data-orientation="vertical"] .elea-stepper__body { align-content: center; min-block-size: var(--_elea-step-size); }
 .elea-stepper__panel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--elea-density-action-gap, var(--elea-space-3)); }
 
 @media (forced-colors: active) {
   .elea-stepper__item:has(.elea-stepper__button:focus-visible) .elea-stepper__indicator::after { outline-color: Highlight; forced-color-adjust: none; }
-  .elea-stepper__step:not(:last-child)::after { background: GrayText; forced-color-adjust: none; }
-  .elea-stepper__step[data-state="done"]::after { background: Highlight; }
+  .elea-stepper__step:not(:last-child)::after { background-color: GrayText; forced-color-adjust: none; }
+  .elea-stepper[data-connector="dotted"] .elea-stepper__step:not([data-state="done"])::after { background-color: transparent; }
+  .elea-stepper[data-indicator="solid"] .elea-stepper__step[data-state="done"] .elea-stepper__indicator { background: Highlight; border-color: Highlight; color: HighlightText; forced-color-adjust: none; }
+  .elea-stepper__step[data-state="done"]::after { background-color: Highlight; }
   .elea-stepper__step[data-state="current"] .elea-stepper__indicator { background: Highlight; border-color: Highlight; outline-color: Highlight; color: HighlightText; forced-color-adjust: none; }
 }

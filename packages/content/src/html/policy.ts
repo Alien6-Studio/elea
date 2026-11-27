@@ -11,7 +11,7 @@ export interface RichHtmlPolicy {
 export const RICH_HTML_POLICY: RichHtmlPolicy = {
   allowedTags: [
     "p", "span", "div", "br",
-    "strong", "b", "em", "i", "u", "s", "strike", "del",
+    "strong", "b", "em", "i", "u", "s", "strike", "del", "ins",
     "a",
     "ul", "ol", "li",
     "h1", "h2", "h3", "h4", "h5", "h6",

@@ -2,13 +2,15 @@
 .elea-alert {
   font-family: var(--elea-font-family-sans);
   --elea-alert-color: var(--elea-color-text-muted);
-  --_elea-alert-surface: initial;
-  --_elea-alert-on-surface: initial;
+  /* Each tone reads three host variables: --elea-alert-<tone>-surface, -border and -text. Without one, `initial` leaves the fallback of each reader in charge. */
+  --_elea-alert-surface: var(--elea-alert-neutral-surface, initial);
+  --_elea-alert-on-surface: var(--elea-alert-neutral-text, initial);
+  --_elea-alert-border: var(--elea-alert-neutral-border, initial);
   display: flex;
   align-items: flex-start;
   gap: var(--elea-space-3);
   padding: var(--elea-space-3) var(--elea-space-4);
-  border: 1px solid color-mix(in srgb, var(--elea-alert-color) 35%, var(--elea-color-surface-default));
+  border: 1px solid var(--_elea-alert-border, color-mix(in srgb, var(--elea-alert-color) 35%, var(--elea-color-surface-default)));
   border-radius: var(--elea-shape-surface, var(--elea-radius-lg));
   background: var(--_elea-alert-surface, color-mix(in srgb, var(--elea-alert-color) 10%, var(--elea-color-surface-default)));
   color: var(--_elea-alert-on-surface, var(--elea-color-text-default));
@@ -18,28 +20,33 @@
 }
 .elea-alert--primary {
   --elea-alert-color: var(--elea-color-action-primary-ink);
-  --_elea-alert-surface: var(--elea-color-action-primary-container);
-  --_elea-alert-on-surface: var(--elea-color-action-primary-on-container);
+  --_elea-alert-surface: var(--elea-alert-primary-surface, var(--elea-color-action-primary-container));
+  --_elea-alert-on-surface: var(--elea-alert-primary-text, var(--elea-color-action-primary-on-container));
+  --_elea-alert-border: var(--elea-alert-primary-border, initial);
 }
 .elea-alert--success {
   --elea-alert-color: var(--elea-color-action-success-ink, var(--elea-color-success));
-  --_elea-alert-surface: var(--elea-color-action-success-container, color-mix(in srgb, var(--elea-color-success) 10%, var(--elea-color-surface-default)));
-  --_elea-alert-on-surface: var(--elea-color-action-success-on-container, var(--elea-color-success));
+  --_elea-alert-surface: var(--elea-alert-success-surface, var(--elea-color-action-success-container, color-mix(in srgb, var(--elea-color-success) 10%, var(--elea-color-surface-default))));
+  --_elea-alert-on-surface: var(--elea-alert-success-text, var(--elea-color-action-success-on-container, var(--elea-color-success)));
+  --_elea-alert-border: var(--elea-alert-success-border, initial);
 }
 .elea-alert--info {
   --elea-alert-color: var(--elea-color-action-info-ink, var(--elea-color-info));
-  --_elea-alert-surface: var(--elea-color-action-info-container, color-mix(in srgb, var(--elea-color-info) 10%, var(--elea-color-surface-default)));
-  --_elea-alert-on-surface: var(--elea-color-action-info-on-container, var(--elea-color-info));
+  --_elea-alert-surface: var(--elea-alert-info-surface, var(--elea-color-action-info-container, color-mix(in srgb, var(--elea-color-info) 10%, var(--elea-color-surface-default))));
+  --_elea-alert-on-surface: var(--elea-alert-info-text, var(--elea-color-action-info-on-container, var(--elea-color-info)));
+  --_elea-alert-border: var(--elea-alert-info-border, initial);
 }
 .elea-alert--warning {
   --elea-alert-color: var(--elea-color-action-warning-ink, var(--elea-color-warning));
-  --_elea-alert-surface: var(--elea-color-action-warning-container, color-mix(in srgb, var(--elea-color-warning) 10%, var(--elea-color-surface-default)));
-  --_elea-alert-on-surface: var(--elea-color-action-warning-on-container, var(--elea-color-warning));
+  --_elea-alert-surface: var(--elea-alert-warning-surface, var(--elea-color-action-warning-container, color-mix(in srgb, var(--elea-color-warning) 10%, var(--elea-color-surface-default))));
+  --_elea-alert-on-surface: var(--elea-alert-warning-text, var(--elea-color-action-warning-on-container, var(--elea-color-warning)));
+  --_elea-alert-border: var(--elea-alert-warning-border, initial);
 }
 .elea-alert--danger {
   --elea-alert-color: var(--elea-color-action-danger-ink, var(--elea-color-danger));
-  --_elea-alert-surface: var(--elea-color-action-danger-container, color-mix(in srgb, var(--elea-color-danger) 10%, var(--elea-color-surface-default)));
-  --_elea-alert-on-surface: var(--elea-color-action-danger-on-container, var(--elea-color-danger));
+  --_elea-alert-surface: var(--elea-alert-danger-surface, var(--elea-color-action-danger-container, color-mix(in srgb, var(--elea-color-danger) 10%, var(--elea-color-surface-default))));
+  --_elea-alert-on-surface: var(--elea-alert-danger-text, var(--elea-color-action-danger-on-container, var(--elea-color-danger)));
+  --_elea-alert-border: var(--elea-alert-danger-border, initial);
 }
 .elea-alert--outline { --_elea-alert-on-surface: var(--elea-alert-color); background: var(--elea-color-surface-default); }
 .elea-alert__icon { display: inline-flex; flex: none; font-size: 1.25em; line-height: 1; padding-block-start: 0.1em; color: var(--_elea-alert-on-surface, var(--elea-alert-color)); animation: elea-pop var(--elea-motion-duration-slow) var(--elea-motion-bounce, var(--elea-motion-easing-standard)); }

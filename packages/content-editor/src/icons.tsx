@@ -16,6 +16,7 @@ export const TrashIcon = (props: IconProps) => <Icon {...props}><path d="M3 6h18
 export const BoldIcon = (props: IconProps) => <Icon {...props}><path d="M7 4h7a4 4 0 0 1 0 8H7zM7 12h8a4 4 0 0 1 0 8H7z" /></Icon>;
 export const ItalicIcon = (props: IconProps) => <Icon {...props}><path d="M19 4h-9M14 20H5M15 4 9 20" /></Icon>;
 export const UnderlineIcon = (props: IconProps) => <Icon {...props}><path d="M6 4v6a6 6 0 0 0 12 0V4M4 20h16" /></Icon>;
+export const ExternalLinkIcon = (props: IconProps) => <Icon {...props}><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></Icon>;
 export const LinkIcon = (props: IconProps) => <Icon {...props}><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></Icon>;
 export const EraserIcon = (props: IconProps) => <Icon {...props}><path d="m7 21-4-4a2 2 0 0 1 0-3L14 3a2 2 0 0 1 3 0l4 4a2 2 0 0 1 0 3l-9 9M22 21H7M5 12l7 7" /></Icon>;
 export const QuoteIcon = (props: IconProps) => <Icon {...props}><path d="M4 16h5V9H5a4 4 0 0 1 4-4M13 16h5V9h-4a4 4 0 0 1 4-4" /></Icon>;

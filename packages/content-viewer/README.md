@@ -64,6 +64,31 @@ module.exports = nextJest({ dir: "./" })({
 - `typography="inherit"`: the content takes the font family, size, line height and colour of
   the page around it, and headings are sized in proportion to that text.
 
+## Comparing two versions
+
+`ContentComparison` renders two versions of a document as one, for a draft against what is
+published:
+
+```tsx
+import { ContentComparison } from "@alien6-studio/elea-content-viewer";
+
+<ContentComparison before={published} after={draft} />
+```
+
+It takes the options of `ContentView`. Blocks are matched by content, not by id. A paragraph,
+heading, quote or list that kept at least half of its words is shown once, with the words that
+went in `<del class="elea-change">` and those that came in `<ins class="elea-change">`, each
+inside the formatting it had. Any other block that differs is shown whole, the earlier version in
+a `<del>` and the later one in an `<ins>`. Each block carries `data-elea-change`: `same`,
+`changed`, `added` or `removed`. Quote captions and heading levels are not compared word by word.
+
+The stylesheet underlines insertions and strikes deletions through, so the difference does not
+rest on colour. Set `--elea-comparison-added` and `--elea-comparison-removed` on `.elea-comparison`
+to change the two colours. With the `/core` entry, the host sanitizer must allow `ins` and `del`.
+
+For the comparison as data, `compareBlocks(before, after)` and `compareHtml(before, after)` are
+exported by `@alien6-studio/elea-content`.
+
 ## Server rendering without a DOM
 
 The default entry sanitizes with DOMPurify, which on a server needs jsdom: a heavy module to

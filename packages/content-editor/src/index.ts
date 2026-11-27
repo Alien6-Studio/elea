@@ -5,6 +5,7 @@ export { RichTextField, EMPTY_FORMATS, type ActiveFormats, type BlockTag, type I
 export { SlashMenu, slashMenuItems, type SlashMenuHandle, type SlashMenuProps } from "./SlashMenu.js";
 export { RichTextInput, type RichTextInputProps } from "./RichTextInput.js";
 export { Toolbar, type ToolbarProps } from "./Toolbar.js";
+export { EDITOR_MARKS, type EditorMark } from "./restrictions.js";
 export { AddBlockButton, type AddBlockButtonProps } from "./AddBlockButton.js";
 export { QuickAddButtons, type QuickAddButtonsProps } from "./QuickAddButtons.js";
 export { VirtualizedBlockList, type VirtualizedBlockListProps } from "./VirtualizedBlockList.js";

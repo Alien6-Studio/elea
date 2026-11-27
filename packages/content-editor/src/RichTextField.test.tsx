@@ -247,8 +247,23 @@ test("link popover: open, cancel, create external and internal links, refuse uns
   assert.match(last() ?? "", /href="https:\/\/example.org"/);
   assert.equal(screen.queryByRole("dialog"), null);
 
+  // With the caret in a link the same popover edits it: its address is shown and can be removed
+  const unlink = (anchor: HTMLAnchorElement) => {
+    placeCaret(anchor.firstChild as Node, 1);
+    act(() => ref.current?.openLinkInput());
+    fireEvent.mouseDown(screen.getByRole("button", { name: en.editor.linkRemove }));
+  };
   placeCaret(link.firstChild as Node, 1);
   act(() => ref.current?.openLinkInput());
+  assert.equal((screen.getByRole("textbox", { name: en.editor.linkUrlPrompt }) as HTMLInputElement).value, "https://example.org");
+  assert.equal(screen.getByRole("link", { name: en.editor.linkOpen }).getAttribute("href"), "https://example.org");
+  submitLink("example.com/changed");
+  assert.equal(editor.querySelectorAll("a").length, 1);
+  assert.equal(link.getAttribute("href"), "https://example.com/changed");
+  assert.equal(link.textContent, "world");
+  assert.match(last() ?? "", /href="https:\/\/example.com\/changed"/);
+  unlink(link);
+  assert.equal(screen.queryByRole("dialog"), null);
   assert.equal(editor.querySelector("a"), null);
   assert.equal(editor.textContent, "Hello world");
 
@@ -258,15 +273,13 @@ test("link popover: open, cancel, create external and internal links, refuse uns
   link = editor.querySelector("a") as HTMLAnchorElement;
   assert.equal(link.getAttribute("href"), "/member/%C3%A9t%C3%A9/%22archive%22?page=1&view=print");
   assert.equal(link.hasAttribute("target"), false);
-  placeCaret(link.firstChild as Node, 1);
-  act(() => ref.current?.openLinkInput());
+  unlink(link);
 
   selectText(editor, 0, 5);
   act(() => ref.current?.openLinkInput());
   submitLink("https://members.example.org/resources");
   assert.equal(editor.querySelector("a")?.hasAttribute("target"), false);
-  placeCaret(editor.querySelector("a")?.firstChild as Node, 1);
-  act(() => ref.current?.openLinkInput());
+  unlink(editor.querySelector("a") as HTMLAnchorElement);
 
   selectText(editor, 0, 5);
   act(() => ref.current?.openLinkInput());
@@ -283,8 +296,10 @@ test("link popover: open, cancel, create external and internal links, refuse uns
   fireEvent.mouseDown(screen.getByRole("button", { name: en.editor.linkConfirm }));
   assert.equal(editor.querySelector("a")?.textContent, "https://example.org/page");
 
-  // The caret sits inside the new link: opening again removes it instead of nesting one
+  // The caret sits inside the new link: opening again edits it instead of nesting one
   act(() => ref.current?.openLinkInput());
+  assert.equal((screen.getByRole("textbox", { name: en.editor.linkUrlPrompt }) as HTMLInputElement).value, "https://example.org/page");
+  fireEvent.mouseDown(screen.getByRole("button", { name: en.editor.linkRemove }));
   assert.equal(editor.querySelector("a"), null);
   assert.equal(screen.queryByRole("dialog"), null);
 
@@ -300,7 +315,7 @@ test("the value prop replaces the content when the editor is not focused, and se
   const { editor } = renderEditor("<strong>a</strong>", { onSelectionChange: (next) => formats.push(next) });
   selectText(editor.querySelector("strong") as HTMLElement, 0, 1);
   document.dispatchEvent(new window.Event("selectionchange"));
-  assert.deepEqual(formats.at(-1), { bold: true, italic: false, underline: false, h1: false, h2: false, h3: false, h4: false, h5: false, h6: false, blockquote: false, ul: false, ol: false });
+  assert.deepEqual(formats.at(-1), { bold: true, italic: false, underline: false, h1: false, h2: false, h3: false, h4: false, h5: false, h6: false, blockquote: false, ul: false, ol: false, link: false });
   fireEvent.compositionStart(editor);
   fireEvent.compositionEnd(editor, { data: "é" });
   fireEvent.compositionEnd(editor, { data: "" });

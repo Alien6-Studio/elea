@@ -51,6 +51,7 @@ export {
   type VideoData,
 } from "./blocks/builtin.js";
 export { annotateHierarchy, type AnnotatedBlock, type HierarchyMeta } from "./hierarchy.js";
+export { compareBlocks, compareHtml, type BlockChange, type BlockChangeKind, type CompareBlocksOptions } from "./compare.js";
 export { documentExcerpt, documentToText, type DocumentTextOptions } from "./text.js";
 export { decodeHtmlEntities, excerpt, htmlToText, stripHtmlTags, type HtmlToTextOptions } from "./html/text.js";
 export {

@@ -207,6 +207,40 @@ Set these CSS custom properties on the editor’s container to match the surroun
 }
 ```
 
+### Restricting what a field accepts
+
+`blockTypes` lists the blocks a field accepts and `marks` the inline formats, among `bold`,
+`italic`, `underline` and `link`. Both default to everything; a paragraph is always accepted.
+
+```tsx
+<ContentEditor
+  mode="classic"
+  blockTypes={["paragraph", "list"]}
+  marks={["bold", "italic", "underline", "link"]}
+  blocks={blocks}
+  onBlocksChange={setBlocks}
+  onBlocksLeftOut={(left) => notify(`${left.length} block(s) cannot be stored in this field`)}
+/>
+```
+
+The lists govern every way content can appear: the add and slash menus, the toolbar and the
+floating bar, the block-type switcher, typing shortcuts, keyboard shortcuts and pasting, including
+blocks copied from another Elea editor. A control for something the field does not accept is not
+rendered. A control that is accepted but unavailable, such as redo with nothing to redo, is
+disabled and says why in its tooltip. No option disables one control; show a read-only field
+with the content viewer.
+
+Content the field does not accept falls back the same way on load and on paste. A block that
+carries text (heading, quote, code, list) becomes paragraphs with that text, and a disallowed
+mark is removed around its text. A block without text (attachment, media, embed, delimiter) is
+left out and passed to `onBlocksLeftOut`, once. A loaded document is shown in its accepted form;
+`onBlocksChange` receives that form with the first edit, not on load.
+
+With the caret in a link, the link control and Ctrl+K (Command+K on Mac) open the link field
+with its address, to change it, remove the link or open it. In the fixed toolbar, a format chosen
+while no field has focus returns to the last edited field, or to the end of the document, and
+then applies.
+
 ## What loads when
 
 Three parts of the editor stay out of its first load and come the first time they are asked
@@ -241,8 +275,8 @@ const ContentEditor = lazy(() => import("@alien6-studio/elea-content-editor").th
 
 ## Pieces
 
-- `ContentEditor`: title and summary fields, the block list, the add menu; `editors` and `blockTypes`
-  extend it with custom blocks.
+- `ContentEditor`: title and summary fields, the block list, the add menu; `editors` adds custom
+  blocks, `blockTypes` and `marks` set what the field accepts.
 - `RichTextField`: the contentEditable engine with its imperative handle (inline, list and block
   formats, link prompt, clear), keyboard shortcuts, Enter and Backspace rules.
 - `RichTextInput`: one field with bold, italic, underline and lists, with an optional length limit.

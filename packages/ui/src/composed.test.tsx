@@ -220,3 +220,59 @@ test("a composed sheet takes the dialog parts under its own classes", () => {
   fireEvent.keyDown(document, { key: "Escape" });
   assert.equal(closed, 1);
 });
+
+test("menu items with an address are links, rendered by the host router when asked, under a described header", async () => {
+  const chosen: string[] = [];
+  const { container } = render(
+    <MenuRoot>
+      <MenuTrigger>{(props) => <button type="button" {...props}>Account</button>}</MenuTrigger>
+      <MenuContent label="Account" header={<><strong>Ada Lovelace</strong> Analytical Engines</>}>
+        <MenuItem href="/profile" onSelect={() => chosen.push("profile")}>Profile</MenuItem>
+        <MenuItem href="/billing" render={({ children, ...props }) => <a {...props} data-router="">{children}</a>}>Billing</MenuItem>
+        <MenuItem href="/admin" disabled>Administration</MenuItem>
+        <MenuItem onSelect={() => chosen.push("out")}>Sign out</MenuItem>
+      </MenuContent>
+    </MenuRoot>,
+  );
+  const trigger = screen.getByRole("button", { name: "Account" });
+  fireEvent.click(trigger);
+  const menu = screen.getByRole("menu", { name: "Account", description: "Ada Lovelace Analytical Engines" });
+  assert.equal(menu.firstElementChild?.className, "elea-menu__header");
+  const [profile, billing, admin, out] = within(menu).getAllByRole("menuitem") as HTMLElement[];
+  assert.deepEqual([profile!.tagName, profile!.getAttribute("href"), profile!.className], ["A", "/profile", "elea-menu__item"]);
+  assert.deepEqual([billing!.getAttribute("href"), billing!.dataset.router], ["/billing", ""]);
+  assert.deepEqual([admin!.hasAttribute("href"), admin!.getAttribute("aria-disabled")], [false, "true"]);
+  assert.equal(document.activeElement, profile);
+  assert.deepEqual(await violations(container), []);
+  fireEvent.keyDown(profile!, { key: "ArrowDown" });
+  fireEvent.keyDown(billing!, { key: "ArrowDown" });
+  assert.equal(document.activeElement, out, "the link without a destination is skipped");
+  fireEvent.mouseEnter(billing!);
+  assert.equal(document.activeElement, billing);
+  profile!.addEventListener("click", (event) => event.preventDefault());
+  assert.equal(fireEvent.keyDown(profile!, { key: "Enter" }), true, "Enter is left to the link");
+  assert.equal(fireEvent.keyDown(profile!, { key: " " }), false);
+  assert.deepEqual(chosen, ["profile"]);
+  assert.equal(screen.queryByRole("menu"), null);
+  assert.equal(document.activeElement, trigger);
+  fireEvent.click(trigger);
+  fireEvent.click(within(screen.getByRole("menu")).getByRole("menuitem", { name: "Administration" }));
+  assert.ok(screen.getByRole("menu"), "a disabled link leaves the menu open");
+});
+
+test("a dialog takes the wider sizes and can keep its header and actions while the body scrolls", () => {
+  const { rerender } = render(
+    <DialogRoot open onClose={() => {}} size="xl" scroll="body">
+      <DialogHeader><DialogTitle>Preview</DialogTitle></DialogHeader>
+      <DialogBody>Document</DialogBody>
+    </DialogRoot>,
+  );
+  const dialog = () => screen.getByRole("dialog", { name: "Preview" });
+  assert.equal(dialog().className, "elea-dialog elea-dialog--xl elea-dialog--scroll-body");
+  rerender(
+    <DialogRoot open onClose={() => {}} size="full">
+      <DialogHeader><DialogTitle>Preview</DialogTitle></DialogHeader>
+    </DialogRoot>,
+  );
+  assert.equal(dialog().className, "elea-dialog elea-dialog--full");
+});

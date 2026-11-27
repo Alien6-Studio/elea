@@ -16,6 +16,7 @@ import { useDocumentHistory, type DocumentHistory } from "./hooks/useDocumentHis
 import { useBlockDrag, type DropTarget } from "./hooks/useBlockDrag.js";
 import { ClassicShell, DocumentToolbar, HistoryButtons, SelectionBar, TitleFields } from "./editorChrome.js";
 import { previewPart, sourcePart, usePart } from "./parts.js";
+import { RestrictionsContext, createRestrictions, type EditorMark } from "./restrictions.js";
 import { clipboardItem, copyBlock, writeBlocksToClipboard } from "./selection.js";
 import { cleanBlocks } from "./paste.js";
 import { insertPasted, pastePayload, pasteSite } from "./blockPaste.js";
@@ -61,8 +62,17 @@ export interface ContentEditorProps {
   context?: EditorContextInfo | undefined;
   /** Editing components for custom block types. */
   editors?: BlockEditorMap | undefined;
-  /** Block types offered by the add menus; defaults to the seven built-in blocks. */
+  /**
+   * The block types this editor accepts; every type when absent, and the add menus then offer the
+   * seven built-in blocks. It governs every way a block appears: menus, toolbar, typing shortcuts,
+   * pasting and the document handed in. A paragraph is always accepted: a disallowed block carrying
+   * text falls back to it, one without text is left out and reported through `onBlocksLeftOut`.
+   */
   blockTypes?: readonly string[] | undefined;
+  /** The inline marks this editor accepts; all of them when absent. A disallowed mark keeps its text. */
+  marks?: readonly EditorMark[] | undefined;
+  /** Called with the blocks without text that `blockTypes` left out, on load and on paste. */
+  onBlocksLeftOut?: ((blocks: BlockLike[]) => void) | undefined;
   enableVirtualization?: boolean | undefined;
   virtualizationThreshold?: number | undefined;
   /** Keep the reading measure (default), or fill the host's available width. */
@@ -99,8 +109,8 @@ export type ContentEditorHandle = DocumentHistory;
  * Content is controlled: every change goes through `onBlocksChange`.
  */
 export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>(function ContentEditor({
-  blocks,
-  onBlocksChange,
+  blocks: hostBlocks,
+  onBlocksChange: hostBlocksChange,
   title = "",
   onTitleChange,
   summary = "",
@@ -111,6 +121,8 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   context = NO_CONTEXT,
   editors,
   blockTypes,
+  marks,
+  onBlocksLeftOut,
   enableVirtualization = true,
   virtualizationThreshold = 50,
   width,
@@ -124,6 +136,26 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   onModeChange,
 }, ref) {
   const { registry, sanitizer, resolveAssetUrl, messages } = useContentServices();
+  const leftOutRef = useRef(onBlocksLeftOut);
+  leftOutRef.current = onBlocksLeftOut;
+  const blockTypesKey = blockTypes?.join("\n");
+  const marksKey = marks?.join("\n");
+  // The allow-list follows what the host lists, not the identity of the arrays it passes
+  const restrictions = useMemo(
+    () => (blockTypes || marks ? createRestrictions({ blockTypes, marks, onLeftOut: left => leftOutRef.current?.(left) }) : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [blockTypesKey, marksKey],
+  );
+  // The document is edited in its accepted form; the host receives it with the first change
+  const restricted = useMemo(() => restrictions?.restrict(hostBlocks), [restrictions, hostBlocks]);
+  const blocks = restricted?.blocks ?? hostBlocks;
+  const onBlocksChange = useCallback((next: EleaBlock[]) => hostBlocksChange(restrictions ? restrictions.admit(next) : next), [restrictions, hostBlocksChange]);
+  const reportedLeftOut = useRef(new Set<string>());
+  useEffect(() => {
+    const fresh = restricted?.leftOut.filter(block => !reportedLeftOut.current.has(block.id)) ?? [];
+    for (const block of fresh) reportedLeftOut.current.add(block.id);
+    if (fresh.length) leftOutRef.current?.(fresh);
+  }, [restricted]);
   const textLimit = useEditorTextLimit(blocks, maxLength, registry);
   // The source view and the preview load when first asked for; the blocks stay until they are there
   const [source, sourceWaiting] = usePart(sourcePart, mode === "markdown");
@@ -242,6 +274,8 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     const raw = payload.copied && JSON.stringify(payload.copied);
     // The clipboard format of blocks can be forged by any page: clean them once compared with the last copy
     if (payload.copied) cleanBlocks(created, sanitizer);
+    if (restrictions) created = restrictions.admit(created);
+    if (!created.length) return;
     const duplicate = lastCopy?.ids === selection.ids && raw === lastCopy.raw && sameBlocks(lastCopy.document, blocks);
     const after = duplicate ? blocks.indexOf(selectedBlocks.at(-1)!) + 1 : undefined;
     const paste = (incoming: EleaBlock[]) => selectedBlocks.length > 0 && !duplicate
@@ -337,11 +371,12 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   /** A typing shortcut or the slash menu changes the block's type; the caret follows into the new field. */
   const handleConvert = useCallback(
     (id: string, type: string, data?: Record<string, unknown>) => {
+      if (restrictions && !restrictions.allowsBlock(type)) return;
       convertBlock(id, type, data);
       setFocusedBlock(id);
       scheduleBlockFocus(id, "end");
     },
-    [convertBlock, setFocusedBlock, scheduleBlockFocus],
+    [convertBlock, setFocusedBlock, scheduleBlockFocus, restrictions],
   );
 
   const handleMove = useCallback((ids: readonly string[], target: DropTarget) => moveBlocks(ids, target.id, target.position), [moveBlocks]);
@@ -482,11 +517,12 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
 
   const handleAddBlock = useCallback(
     (type: string, afterId?: string, initialText?: string) => {
+      if (restrictions && !restrictions.allowsBlock(type)) return;
       const id = addBlock(type, afterId, initialText);
       setFocusedBlock(id);
       scheduleBlockFocus(id);
     },
-    [addBlock, setFocusedBlock, scheduleBlockFocus],
+    [addBlock, setFocusedBlock, scheduleBlockFocus, restrictions],
   );
   function focusDocumentEnd() {
     const last = blocks.at(-1);
@@ -496,6 +532,14 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     } else {
       handleAddBlock("paragraph");
     }
+  }
+  const lastFieldBlock = useRef<string | null>(null);
+  if (hasActiveField && focusedBlock) lastFieldBlock.current = focusedBlock;
+  /** A format control used while no field has focus: the field it left takes the command with its last selection, else the end of the document. */
+  function activateField() {
+    const id = lastFieldBlock.current;
+    if (id && blocks.some(block => block.id === id)) setFocusedBlock(id);
+    else focusDocumentEnd();
   }
 
   const handleBlockBlur = useCallback(
@@ -512,14 +556,14 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   const handleInsertBlocksAfter = useCallback(
     (id: string, pasted: BlockLike[], after: string) => {
       const trailing = after.trim() ? [{ type: "paragraph", data: { text: after } }] : [];
-      const ids = insertBlocks([...pasted, ...trailing], id);
+      const ids = insertBlocks([...(restrictions?.admit(pasted) ?? pasted), ...trailing], id);
       const last = ids.at(-1);
       if (last) {
         setFocusedBlock(last);
         scheduleBlockFocus(last);
       }
     },
-    [insertBlocks, setFocusedBlock, scheduleBlockFocus],
+    [insertBlocks, setFocusedBlock, scheduleBlockFocus, restrictions],
   );
   const handleSourceImage = useCallback((data: BlockData) => {
     insertBlocks([{ type: "image", data }]);
@@ -532,7 +576,7 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     handleAddBlock(type, mode === "markdown" ? undefined : focusedBlock ?? undefined);
   };
   const documentToolbar = blockMode !== "default" && (
-    <DocumentToolbar mode={mode} onAdd={insertBlock} types={blockTypes} hasActiveField={hasActiveField} editorRef={activeFieldRef} activeFormats={activeFormats} listCommand={listCommand} history={historyButtons} modePicker={!!onModeChange} />
+    <DocumentToolbar mode={mode} onAdd={insertBlock} types={blockTypes} hasActiveField={hasActiveField} onActivate={activateField} editorRef={activeFieldRef} activeFormats={activeFormats} listCommand={listCommand} history={historyButtons} modePicker={!!onModeChange} />
   );
   const selectionBar = !isMarkdown && selection.ids.length > 0 && selectionAnchor && (
     <SelectionBar
@@ -624,7 +668,8 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     </div>
   );
 
-  if (!onModeChange) return editor;
+  const restrictedEditor = <RestrictionsContext.Provider value={restrictions}>{editor}</RestrictionsContext.Provider>;
+  if (!onModeChange) return restrictedEditor;
   return (
     <div className="elea-editor-workspace">
       <div className="elea-content-editor__mode">
@@ -634,7 +679,7 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
         />
         {historyButtons}
       </div>
-      {editor}
+      {restrictedEditor}
     </div>
   );
 });

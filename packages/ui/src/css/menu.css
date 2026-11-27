@@ -29,13 +29,22 @@
   font: inherit;
   font-size: var(--elea-font-size-sm);
   text-align: left;
+  text-decoration: none;
+  box-sizing: border-box;
   cursor: pointer;
 }
-.elea-menu__item:focus, .elea-menu__item:hover:not(:disabled) { background: var(--elea-color-surface-muted); }
-.elea-menu__item:disabled { opacity: 0.5; cursor: not-allowed; }
+.elea-menu__item:focus, .elea-menu__item:hover:not(:disabled, [aria-disabled]) { background: var(--elea-color-surface-muted); }
+.elea-menu__item:is(:disabled, [aria-disabled]) { opacity: 0.5; cursor: not-allowed; }
 .elea-menu__item--danger { color: var(--elea-color-action-danger-ink, var(--elea-color-danger)); }
 .elea-menu__item:focus-visible { outline: var(--elea-control-focus-outline, 2px solid var(--elea-color-focus)); outline-offset: -2px; }
 .elea-menu__icon { display: inline-flex; }
+.elea-menu__header {
+  margin-block-end: var(--elea-space-1);
+  padding: var(--elea-space-2) var(--elea-space-3);
+  border-block-end: 1px solid var(--elea-color-border-default);
+  color: var(--elea-color-text-default);
+  font-size: var(--elea-font-size-sm);
+}
 .elea-menu__separator { margin: var(--elea-space-1) 0; border: 0; border-top: 1px solid var(--elea-color-border-default); }
 .elea-menu__group { min-width: 0; margin: 0; padding: 0; border: 0; }
 .elea-menu__group-label {

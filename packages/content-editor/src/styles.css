@@ -619,8 +619,6 @@
   .elea-content-editor--toolbar > .elea-doc-toolbar { margin-inline-start: calc(-1 * var(--elea-editor-gutter)); padding-inline: var(--elea-space-2); }
   .elea-doc-toolbar .elea-quick-add__item { padding-inline: var(--elea-space-1); }
 }
-.elea-doc-toolbar fieldset { margin: 0; padding: 0; border: 0; }
-.elea-doc-toolbar__group--idle { opacity: 0.4; pointer-events: none; }
 .elea-classic-editor > .elea-doc-toolbar {
   position: relative;
   gap: var(--elea-space-1) var(--elea-space-2);

@@ -131,3 +131,18 @@ test("stepper refs, styles, DOM events and attributes reach each documented root
   assert.equal(panel.current, null);
   assert.equal(skeleton.current, null);
 });
+
+test("drawing options mark the navigation and a badge takes a tone without changing what is announced", () => {
+  const toned: readonly StepperStep[] = [{ id: "a", label: "Details", badge: 3, badgeLabel: "3 points to fix", badgeTone: "danger" }, { id: "b", label: "Review", badge: 1 }];
+  const { rerender } = render(<Stepper label="Form" steps={toned} current="a" onSelect={() => {}} indicator="solid" connector="dotted" />);
+  const nav = screen.getByRole("navigation", { name: "Form" });
+  assert.deepEqual([nav.dataset.indicator, nav.dataset.connector], ["solid", "dotted"]);
+  assert.deepEqual(Array.from(nav.querySelectorAll<HTMLElement>(".elea-stepper__badge"), badge => badge.dataset.tone), ["danger", undefined]);
+  assert.ok(within(nav).getByRole("button", { name: "Details", description: "3 points to fix" }));
+  rerender(<Stepper label="Form" steps={toned} current="a" onSelect={() => {}} />);
+  assert.deepEqual([nav.dataset.indicator, nav.dataset.connector], [undefined, undefined]);
+  const shared = { label: "Form", steps: toned, current: "a", onSelect: () => {}, indicator: "solid", connector: "dotted" } as const;
+  render(<StepperPanel {...shared} previousLabel="Previous" nextLabel="Next" data-testid="panel" />);
+  const panel = screen.getByTestId("panel");
+  assert.deepEqual([panel.hasAttribute("indicator"), panel.hasAttribute("connector")], [false, false]);
+});

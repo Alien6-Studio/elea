@@ -143,7 +143,8 @@ export function parsePastedText(text: string, sanitizer?: HtmlSanitizer): Pasted
 
 /** Reads the clipboard of a paste event: rich HTML when there is some, plain text otherwise. */
 export function parseClipboard(clipboard: Pick<DataTransfer, "getData">, sanitizer: HtmlSanitizer): PastedContent {
-  // Blocks copied from an Elea editor travel whole, attachments and media included.
+  // Blocks copied from an Elea editor travel whole, attachments and media included; the editor
+  // receiving them applies its own allow-list.
   // Any page can forge that clipboard format, so their rich text is cleaned like any paste.
   const blocks = readBlocksFromClipboard(clipboard);
   if (blocks) {

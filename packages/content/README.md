@@ -25,6 +25,10 @@ This package ships ES modules only. For Jest with `next/jest`, add `@alien6-stud
   for export and for pasted text; `documentToHtml`: static HTML with the viewer's classes, for
   e-mails, feeds and search indexes, every URL checked. To preserve inline formatting, pass
   `{ sanitize: html => sanitizer.sanitize(html) }` to `documentToHtml`. The default serializes rich text as plain text.
+- `compareBlocks(before, after)`: two versions of a document as a list of blocks marked `same`,
+  `changed`, `added` or `removed`, matched by content. `compareHtml(before, after)`: rich text
+  holding both versions, with `<ins class="elea-change">` and `<del class="elea-change">` inside
+  the formatting of each word. Neither needs a DOM; sanitize the result as any stored HTML.
 
 Normalization retains the first occurrence of each non-empty stored block id.
 If an id is missing or repeated, a generated id is assigned without reusing

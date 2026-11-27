@@ -15,6 +15,7 @@ import { VideoBlock } from "./blocks/VideoBlock.js";
 import { AddBlockButton } from "./AddBlockButton.js";
 import { blockTypeIcons, GripIcon, HeadingIcon, ListIcon, PilcrowIcon, QuoteIcon, TrashIcon } from "./icons.js";
 import { useContentServices, type EditorContextInfo } from "./provider.js";
+import { useRestrictions } from "./restrictions.js";
 import { EMPTY_FORMATS, RichTextField, type ActiveFormats, type RichTextFieldHandle, type SelectionInfo } from "./RichTextField.js";
 import { createPortal } from "react-dom";
 import { SLASH_MENU_KEYS, SlashMenu, type SlashMenuHandle } from "./SlashMenu.js";
@@ -409,7 +410,8 @@ function BlockMenu({ block, onUpdate, onConvert, onRemove }: Readonly<Pick<Block
     return () => document.removeEventListener("mousedown", close);
   }, [open]);
 
-  const shapes: BlockShape[] = open && onConvert && ["paragraph", "header", "list", "quote"].includes(block.type)
+  const restrictions = useRestrictions();
+  const allShapes: BlockShape[] = open && onConvert && ["paragraph", "header", "list", "quote"].includes(block.type)
     ? [
         { id: "paragraph", type: "paragraph", label: messages.blockTypes.paragraph, icon: <PilcrowIcon />, data: {}, current: block.type === "paragraph" },
         ...([1, 2, 3, 4] as const).map(level => ({ id: `h${level}`, type: "header", label: messages.toolbar[`h${level}`], icon: <HeadingIcon />, data: { level }, current: block.type === "header" && (block.data.level ?? 2) === level })),
@@ -418,6 +420,7 @@ function BlockMenu({ block, onUpdate, onConvert, onRemove }: Readonly<Pick<Block
         { id: "quote", type: "quote", label: messages.blockTypes.quote, icon: <QuoteIcon />, data: {}, current: block.type === "quote" },
       ]
     : [];
+  const shapes = restrictions ? allShapes.filter(shape => restrictions.allowsBlock(shape.type)) : allShapes;
   const pick = (shape: BlockShape) => {
     setOpen(false);
     if (shape.current) return;

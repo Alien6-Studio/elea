@@ -132,8 +132,9 @@ function checkTailwindHost(consumer) {
 }
 
 const VITE = "8.3.8";
-// Includes the clipboard HTML parser and document length checks. Preview, Markdown and crop controls load on demand.
-const EDITOR_FIRST_LOAD = 62_000;
+// Includes the clipboard HTML parser, document length checks, the block and mark allow-lists and link editing.
+// Preview, Markdown and crop controls load on demand.
+const EDITOR_FIRST_LOAD = 63_600;
 
 /**
  * Vite must emit the UI stylesheet and its fonts at the host's base URL. The editor's first load is

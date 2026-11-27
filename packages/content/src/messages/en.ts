@@ -17,6 +17,10 @@ export const en = {
     linkCancel: "Cancel",
     codePlaceholder: "Code...",
     keptBlock: "This block keeps its content as it is; it cannot be edited here.",
+    linkRemove: "Remove link",
+    linkOpen: "Open link",
+    undoUnavailable: "Nothing to undo",
+    redoUnavailable: "Nothing to redo",
   },
   source: {
     mode: "Editor mode",

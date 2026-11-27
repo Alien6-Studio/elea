@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-content-viewer",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Elea viewer: React rendering of block documents, usable in server components",
   "type": "module",
   "sideEffects": [
@@ -41,8 +41,8 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-content": "^0.1.3",
-    "@alien6-studio/elea-tokens": "^0.1.3",
+    "@alien6-studio/elea-content": "^0.1.4",
+    "@alien6-studio/elea-tokens": "^0.1.4",
     "isomorphic-dompurify": "^4.8.0"
   },
   "peerDependencies": {

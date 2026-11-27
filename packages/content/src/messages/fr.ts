@@ -18,6 +18,10 @@ export const fr: EleaMessages = {
     linkCancel: "Annuler",
     codePlaceholder: "Code...",
     keptBlock: "Ce bloc garde son contenu tel quel ; il ne se modifie pas ici.",
+    linkRemove: "Retirer le lien",
+    linkOpen: "Ouvrir le lien",
+    undoUnavailable: "Rien à annuler",
+    redoUnavailable: "Rien à rétablir",
   },
   source: {
     mode: "Mode d’édition",

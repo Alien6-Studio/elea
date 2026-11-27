@@ -1,0 +1,45 @@
+/* SaveStatus */
+.elea-save-status {
+  font-family: var(--elea-font-family-sans);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--elea-space-2);
+  min-width: 0;
+  color: var(--elea-color-text-muted);
+  font-size: var(--elea-font-size-sm);
+  line-height: var(--elea-font-leading-normal);
+}
+.elea-save-status--error { color: var(--elea-color-action-danger-ink, var(--elea-color-danger)); }
+.elea-save-status__message { display: inline-flex; align-items: center; gap: var(--elea-space-1); min-width: 0; }
+/* Times keep their width from one save to the next. */
+.elea-save-status__text { font-variant-numeric: tabular-nums; }
+.elea-save-status__icon { display: inline-flex; flex: none; font-size: 1.15em; }
+.elea-save-status--saved .elea-save-status__icon { color: var(--elea-color-action-success-ink, var(--elea-color-success)); animation: elea-save-status-settle var(--elea-motion-duration-slow, 0.3s) var(--elea-motion-easing-standard, ease); }
+.elea-save-status__spinner {
+  inline-size: 0.85em;
+  block-size: 0.85em;
+  border: 0.125em solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: var(--elea-radius-full);
+  animation: elea-save-status-turn 0.8s linear infinite;
+}
+.elea-save-status__retry {
+  padding: 0;
+  border: 0;
+  border-radius: var(--elea-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--elea-font-weight-medium);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+.elea-save-status__retry:hover { color: var(--elea-color-text-default); }
+.elea-save-status__retry:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+@keyframes elea-save-status-turn { to { rotate: 360deg; } }
+@keyframes elea-save-status-settle { from { scale: 0.6; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .elea-save-status__spinner { animation-duration: 2s; }
+  .elea-save-status--saved .elea-save-status__icon { animation: none; }
+}

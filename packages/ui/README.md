@@ -414,6 +414,12 @@ in the layout direction. Home and End reach the first and last available steps.
 Enter or Space selects the focused step. The filled marker follows the current step,
 and the underlined label follows keyboard focus.
 
+Two props change the drawing and nothing else. `indicator="solid"` fills every marker:
+completed and current steps in the active colour, upcoming steps in
+`--elea-stepper-upcoming-surface`. `connector="dotted"` dots the line that leads to steps
+not yet completed. A step's `badgeTone` (`primary`, `success`, `info`, `warning`, `danger`)
+colours its badge; keep the meaning in `badgeLabel`, since the colour is not announced.
+
 Render `<StepperSkeleton steps={3} orientation="vertical" />` while the steps load.
 
 A ref on `Stepper` points to its `<nav>`. Refs on `StepperPanel` and
@@ -473,7 +479,9 @@ for text on the active fill and `--elea-stepper-track` for the upcoming line.
 - `Dialog` (focus trap, Escape, backdrop, focus return) and `ConfirmDialog`, which takes a `tone`
   (`danger`, `primary`, `success`, `info`) and an optional `icon`. For another header, body
   or footer, compose `DialogRoot` with `DialogHeader`, `DialogTitle`, `DialogClose`,
-  `DialogDescription`, `DialogBody` and `DialogFooter`.
+  `DialogDescription`, `DialogBody` and `DialogFooter`. `size` goes from `sm` to `xl` (72rem), and
+  `full` takes the viewport less its margin. With `scroll="body"`, the header and the actions stay
+  in place and only the body scrolls.
 - `Sheet`, a dialog docked to an edge of the viewport (`side`, `size`) whose body scrolls between its
   header and its actions. `SheetRoot` takes the same parts as `DialogRoot`.
 - `Popover`, a panel anchored to its trigger for a short form or details: not modal, closed by
@@ -500,7 +508,9 @@ for text on the active fill and `--elea-stepper-track` for the upcoming line.
   field uses the styles of `Field`: with per-component sheets, load `css/field.css` too.
 - `Menu` dropdown with keyboard navigation and outside-click dismissal, from a list of items. For
   separators and groups, compose `MenuRoot`, `MenuTrigger`, `MenuContent`, `MenuItem`,
-  `MenuSeparator` and `MenuGroup`.
+  `MenuSeparator` and `MenuGroup`. An item with `href` is a link; pass `render` to hand it to the
+  host router, as with `Button`. `header` shows content above the items, such as a name and a
+  company, and describes the menu.
 - `Tooltip` on hover and focus around any children, text included. The pointer can move onto the hint and Escape
   dismisses it. The hint exists only while shown, above clipping
   containers and inside the viewport, and its wrapper generates no box, so a truncated trigger stays truncated.
@@ -540,8 +550,11 @@ for text on the active fill and `--elea-stepper-track` for the upcoming line.
 - `Avatar` showing a picture, or the initials of `name` when it is missing or fails to load, and
   `AvatarGroup` stacking them with a `+n` count past `max`.
 - `Alert` in six tones, announced as an alert for `danger` and `warning` and as a status otherwise,
-  with a title, an icon, actions and an optional dismiss button labelled by `dismissLabel`.
+  with a title, an icon, actions and an optional dismiss button labelled by `dismissLabel`. Each
+  tone reads `--elea-alert-<tone>-surface`, `--elea-alert-<tone>-border` and
+  `--elea-alert-<tone>-text`; the host keeps the contrast between surface and text.
 - `Progress` for a measured value or, without `value`, an indeterminate wait, with a visible label
+- `SaveStatus` for where an automatic save stands: `state` is `idle`, `saving`, `saved` or `error`, the text is yours (`Saved at 12:12`), and `onRetry` with `retryLabel` adds a retry button after a failure. The text sits in a polite status region that stays mounted
   and value.
 - `Table` composed from `TableHead`, `TableBody`, `TableRow`, `TableHeaderCell` and `TableCell`, which
   scrolls sideways inside its own region instead of widening the page: densities, striped and

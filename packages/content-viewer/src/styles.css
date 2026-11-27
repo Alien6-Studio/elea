@@ -288,3 +288,32 @@
 @media (prefers-reduced-motion: reduce) {
   .elea-content-skeleton__line { animation: none; }
 }
+
+/* Comparison: what came is underlined on a tint, what went is struck through; neither relies on colour alone. */
+.elea-comparison {
+  --elea-comparison-added: var(--elea-color-action-success-ink, var(--elea-color-success));
+  --elea-comparison-removed: var(--elea-color-action-danger-ink, var(--elea-color-danger));
+}
+.elea-comparison :is(ins, del):is(.elea-change, .elea-block) { border-radius: var(--elea-radius-sm); }
+.elea-comparison ins:is(.elea-change, .elea-block) {
+  background: color-mix(in srgb, var(--elea-comparison-added) 14%, transparent);
+  text-decoration: underline;
+  text-decoration-color: var(--elea-comparison-added);
+  text-decoration-thickness: 0.0625em;
+  text-underline-offset: 0.2em;
+}
+.elea-comparison del:is(.elea-change, .elea-block) {
+  background: color-mix(in srgb, var(--elea-comparison-removed) 12%, transparent);
+  color: var(--elea-color-text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--elea-comparison-removed);
+}
+/* A whole block: the tint runs the width of the column and a rule in the margin names the change. */
+.elea-comparison :is(ins, del).elea-block {
+  display: block;
+  padding: var(--elea-space-2) var(--elea-space-3);
+  border-inline-start: 0.1875rem solid var(--elea-comparison-added);
+}
+.elea-comparison del.elea-block { border-inline-start-style: dashed; border-inline-start-color: var(--elea-comparison-removed); }
+.elea-comparison del.elea-block :is(img, video, iframe) { opacity: 0.55; }
+.elea-comparison .elea-block[data-elea-change="changed"] { padding-inline-start: var(--elea-space-3); border-inline-start: 0.1875rem solid var(--elea-color-border-default); }

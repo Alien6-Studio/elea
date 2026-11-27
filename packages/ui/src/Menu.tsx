@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode } from "react";
+import type { ButtonLinkRenderProps } from "./Button.js";
 import { cx } from "./cx.js";
 
 /** Where focus lands when the menu opens. */
@@ -93,15 +94,17 @@ export interface MenuContentProps {
   /** Accessible name of the menu list. */
   label: string;
   align?: "start" | "end" | undefined;
+  /** Shown above the items and read as the description of the menu, such as a name and a company. */
+  header?: ReactNode;
   className?: string | undefined;
   children?: ReactNode;
 }
 
 /** The list, present while open: arrows, Home and End move, Escape and Tab close. */
-export function MenuContent({ label, align = "start", className, children }: Readonly<MenuContentProps>) {
+export function MenuContent({ label, align = "start", header, className, children }: Readonly<MenuContentProps>) {
   const { id, open, edge, close } = useMenu();
   const listRef = useRef<HTMLDivElement>(null);
-  const items = () => Array.from(listRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]:enabled') ?? []);
+  const items = () => Array.from(listRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]:not(:disabled, [aria-disabled])') ?? []);
 
   useEffect(() => {
     if (open) items().at(edge === "first" ? 0 : -1)?.focus();
@@ -123,11 +126,16 @@ export function MenuContent({ label, align = "start", className, children }: Rea
   };
 
   if (!open) return null;
-  return <div ref={listRef} id={id} role="menu" aria-label={label} className={cx("elea-menu__list", `elea-menu__list--${align}`, className)} onKeyDown={onKeyDown}>{children}</div>;
+  const headerId = header == null ? undefined : `${id}-header`;
+  return (
+    <div ref={listRef} id={id} role="menu" aria-label={label} aria-describedby={headerId} className={cx("elea-menu__list", `elea-menu__list--${align}`, className)} onKeyDown={onKeyDown}>
+      {headerId && <div id={headerId} className="elea-menu__header">{header}</div>}
+      {children}
+    </div>
+  );
 }
 
-export interface MenuItemProps {
-  onSelect: () => void;
+interface MenuItemBaseProps {
   icon?: ReactNode;
   disabled?: boolean | undefined;
   /** Destructive tone. */
@@ -136,26 +144,56 @@ export interface MenuItemProps {
   children?: ReactNode;
 }
 
-/** One action; choosing it closes the menu and returns focus to the trigger. */
-export function MenuItem({ onSelect, icon, disabled, danger, className, children }: Readonly<MenuItemProps>) {
+export interface MenuActionItemProps extends MenuItemBaseProps {
+  onSelect: () => void;
+  href?: undefined;
+}
+
+export interface MenuLinkItemProps extends MenuItemBaseProps {
+  /** The address the item leads to. */
+  href: string;
+  /** Renders an enabled router link, as `Button` does. A disabled item uses a native anchor without a destination. */
+  render?: ((props: ButtonLinkRenderProps) => ReactElement) | undefined;
+  onSelect?: (() => void) | undefined;
+}
+
+export type MenuItemProps = MenuActionItemProps | MenuLinkItemProps;
+
+/** One action, or a link when `href` is given; choosing it closes the menu and returns focus to the trigger. */
+export function MenuItem({ onSelect, icon, disabled, danger, className, children, ...rest }: Readonly<MenuItemProps>) {
   const { close } = useMenu();
-  return (
-    <button
-      type="button"
-      role="menuitem"
-      className={cx("elea-menu__item", danger && "elea-menu__item--danger", className)}
-      disabled={disabled}
-      tabIndex={-1}
-      onMouseEnter={(event) => event.currentTarget.focus()}
-      onClick={() => {
-        close(true);
-        onSelect();
-      }}
-    >
+  const content = (
+    <>
       {icon && <span className="elea-menu__icon" aria-hidden="true">{icon}</span>}
       <span>{children}</span>
-    </button>
+    </>
   );
+  const shared = {
+    role: "menuitem",
+    className: cx("elea-menu__item", danger && "elea-menu__item--danger", className),
+    tabIndex: -1,
+    onClick: () => {
+      close(true);
+      onSelect?.();
+    },
+  };
+  if (rest.href !== undefined) {
+    // An anchor without an address is no link: a disabled one is a plain item
+    if (disabled) return <span role="menuitem" className={shared.className} aria-disabled="true">{content}</span>;
+    const link = {
+      ...shared,
+      href: rest.href,
+      onMouseEnter: (event: ReactMouseEvent<HTMLAnchorElement>) => event.currentTarget.focus(),
+      // A link answers Enter; a menu item answers Space as well
+      onKeyDown: (event: KeyboardEvent<HTMLAnchorElement>) => {
+        if (event.key !== " ") return;
+        event.preventDefault();
+        event.currentTarget.click();
+      },
+    };
+    return rest.render ? rest.render({ ...link, children: content }) : <a {...link}>{content}</a>;
+  }
+  return <button {...shared} type="button" disabled={disabled} onMouseEnter={(event) => event.currentTarget.focus()}>{content}</button>;
 }
 
 /** A line between two sets of items. */
@@ -173,10 +211,10 @@ export function MenuGroup({ label, children }: Readonly<{ label: ReactNode; chil
   );
 }
 
-export interface MenuItemData extends Omit<MenuItemProps, "className" | "children"> {
-  id: string;
-  label: ReactNode;
-}
+type MenuItemDataOf<Props> = Props extends unknown ? Omit<Props, "className" | "children"> & { id: string; label: ReactNode } : never;
+
+/** An item of `Menu`: an action with `onSelect`, or a link with `href`. */
+export type MenuItemData = MenuItemDataOf<MenuItemProps>;
 
 export interface MenuProps {
   /** The trigger, given the props that open the menu and name it. */
@@ -185,6 +223,8 @@ export interface MenuProps {
   /** Accessible name of the menu list. */
   label: string;
   align?: "start" | "end" | undefined;
+  /** Shown above the items and read as the description of the menu. */
+  header?: ReactNode;
   className?: string | undefined;
 }
 
@@ -193,11 +233,11 @@ export interface MenuProps {
  * Escape and an outside click close it. Compose `MenuRoot`, `MenuTrigger`, `MenuContent` and
  * `MenuItem` to add separators and groups.
  */
-export function Menu({ trigger, items, label, align, className }: Readonly<MenuProps>) {
+export function Menu({ trigger, items, label, align, header, className }: Readonly<MenuProps>) {
   return (
     <MenuRoot className={className}>
       <MenuTrigger>{trigger}</MenuTrigger>
-      <MenuContent label={label} align={align}>
+      <MenuContent label={label} align={align} header={header}>
         {items.map(({ id, label: text, ...item }) => <MenuItem key={id} {...item}>{text}</MenuItem>)}
       </MenuContent>
     </MenuRoot>

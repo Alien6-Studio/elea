@@ -1,8 +1,8 @@
 "use client";
 
-import { formatMessage } from "@alien6-studio/elea-content";
+import { en, formatMessage } from "@alien6-studio/elea-content";
 import { IconButton } from "@alien6-studio/elea-ui";
-import type { ReactNode, RefObject } from "react";
+import { useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { AddBlockButton } from "./AddBlockButton.js";
 import type { EditorMode } from "./ContentEditor.js";
@@ -27,8 +27,8 @@ export function HistoryButtons({ documentHistory, history, controls }: Readonly<
   return (
     <div className="elea-doc-toolbar__group elea-doc-toolbar__group--history">
       {controls ?? <>
-        <IconButton variant="disc" label={messages.actions.undo} onClick={documentHistory.undo} disabled={!documentHistory.canUndo}><UndoIcon /></IconButton>
-        <IconButton variant="disc" label={messages.actions.redo} onClick={documentHistory.redo} disabled={!documentHistory.canRedo}><RedoIcon /></IconButton>
+        <IconButton variant="disc" label={messages.actions.undo} title={documentHistory.canUndo ? undefined : messages.editor.undoUnavailable ?? en.editor.undoUnavailable} onClick={documentHistory.undo} disabled={!documentHistory.canUndo}><UndoIcon /></IconButton>
+        <IconButton variant="disc" label={messages.actions.redo} title={documentHistory.canRedo ? undefined : messages.editor.redoUnavailable ?? en.editor.redoUnavailable} onClick={documentHistory.redo} disabled={!documentHistory.canRedo}><RedoIcon /></IconButton>
       </>}
     </div>
   );
@@ -39,6 +39,8 @@ interface DocumentToolbarProps {
   onAdd: (type: string) => void;
   types: readonly string[] | undefined;
   hasActiveField: boolean;
+  /** Gives the document focus when a format control is used while no field has it. */
+  onActivate: () => void;
   editorRef: RefObject<RichTextFieldHandle | null>;
   activeFormats: ActiveFormats;
   listCommand: ((command: ListCommand) => void) | undefined;
@@ -47,8 +49,35 @@ interface DocumentToolbarProps {
   modePicker: boolean;
 }
 
-export function DocumentToolbar({ mode, onAdd, types, hasActiveField, editorRef, activeFormats, listCommand, history, modePicker }: Readonly<DocumentToolbarProps>) {
+/** How long a command waits for the field it gave focus to; past it, a later focus must not trigger it. */
+const PENDING_COMMAND_MS = 1000;
+
+export function DocumentToolbar({ mode, onAdd, types, hasActiveField, onActivate, editorRef, activeFormats, listCommand, history, modePicker }: Readonly<DocumentToolbarProps>) {
   const { messages } = useContentServices();
+  const pending = useRef<{ run: (field: RichTextFieldHandle) => void; at: number } | null>(null);
+  const activate = useRef(onActivate);
+  activate.current = onActivate;
+  // The bar never goes inert: without a focused field, a control gives the document focus, then applies
+  const fieldRef = useMemo<RefObject<RichTextFieldHandle>>(() => {
+    const send = (run: (field: RichTextFieldHandle) => void) => {
+      if (editorRef.current) return run(editorRef.current);
+      pending.current = { run, at: Date.now() };
+      activate.current();
+    };
+    return { current: {
+      applyInlineFormat: tag => send(field => field.applyInlineFormat(tag)),
+      applyListFormat: tag => send(field => field.applyListFormat(tag)),
+      applyBlockFormat: (tag, wholeParagraph) => send(field => field.applyBlockFormat(tag, wholeParagraph)),
+      openLinkInput: () => send(field => field.openLinkInput()),
+      clearFormat: () => send(field => field.clearFormat()),
+    } };
+  }, [editorRef]);
+  useEffect(() => {
+    const waiting = pending.current;
+    if (!hasActiveField || !waiting) return;
+    pending.current = null;
+    if (Date.now() - waiting.at < PENDING_COMMAND_MS && editorRef.current) waiting.run(editorRef.current);
+  }, [hasActiveField, editorRef]);
   return (
     <div className="elea-doc-toolbar">
       <div className="elea-doc-toolbar__group" role="group" aria-label={messages.actions.insert}>
@@ -57,9 +86,9 @@ export function DocumentToolbar({ mode, onAdd, types, hasActiveField, editorRef,
           <QuickAddButtons row onAdd={onAdd} types={types} />
         </> : <AddBlockButton onAdd={onAdd} types={types} />}
       </div>
-      <fieldset className={`elea-doc-toolbar__group${hasActiveField ? "" : " elea-doc-toolbar__group--idle"}`} disabled={!hasActiveField}>
-        <Toolbar editorRef={editorRef} activeFormats={activeFormats} compactHeadings={mode === "classic"} inline={!!listCommand} onListCommand={listCommand} />
-      </fieldset>
+      <div className="elea-doc-toolbar__group">
+        <Toolbar editorRef={fieldRef} activeFormats={activeFormats} compactHeadings={mode === "classic"} inline={!!listCommand} onListCommand={listCommand} />
+      </div>
       {!modePicker && history}
     </div>
   );

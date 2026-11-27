@@ -3,10 +3,13 @@ import type { en } from "./en.js";
 /** Recursively widens literal strings so that translations can carry any text. */
 type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
 
+/** Editor labels added after the first release: a host's own messages may leave them out. */
+type OptionalEditorMessage = "characterCount" | "linkRemove" | "linkOpen" | "undoUnavailable" | "redoUnavailable";
+
 /** Every label of the viewer and editor. Consumers pass a full object or merge over `en`. */
 type DefaultMessages = Widen<typeof en>;
 export type EleaMessages = Omit<DefaultMessages, "source" | "list" | "cropFormats" | "cropCorners" | "editor" | "image" | "video" | "attachment"> & Partial<Pick<DefaultMessages, "list" | "cropFormats" | "cropCorners">> & {
-  editor: Omit<DefaultMessages["editor"], "characterCount"> & { characterCount?: string };
+  editor: Omit<DefaultMessages["editor"], OptionalEditorMessage> & Partial<Pick<DefaultMessages["editor"], OptionalEditorMessage>>;
   image: Omit<DefaultMessages["image"], "errorSvg" | "adjustCrop"> & { errorSvg?: string; adjustCrop?: string };
   source?: DefaultMessages["source"] & { /** @deprecated */ blockComments?: string };
   video: Omit<DefaultMessages["video"], "remove"> & { remove?: string };

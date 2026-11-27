@@ -12,3 +12,10 @@ node_modules/
 /.trunk/
 /artifacts/
 .attest/keys/
+
+# Site sources and build output of the gh-pages branch, left behind when switching branches
+/.build/
+/docs/assets/
+/overrides/
+/playground/
+__pycache__/

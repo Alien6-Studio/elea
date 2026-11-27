@@ -71,17 +71,16 @@ test("the classic mode shows a fixed bar over a continuous document and nothing 
   assert.ok(root.className.includes("elea-content-editor--classic"));
   assert.equal(document.querySelectorAll(".elea-block-editor__gutter").length, 0);
   assert.equal(document.querySelectorAll(".elea-block-editor__head").length, 0);
-  // The document bar: formatting idle until a paragraph has the focus, insertion, history
+  // The document bar: formatting, insertion, history; its controls stay usable without a focused field
   const bar = document.querySelector(".elea-doc-toolbar") as HTMLElement;
   assert.equal(bar.parentElement?.className, "elea-classic-editor");
   assert.equal(bar.nextElementSibling?.className, "elea-classic-editor__canvas");
-  assert.ok(bar.querySelector(".elea-doc-toolbar__group--idle"));
+  assert.equal(bar.querySelector("fieldset, :disabled:not([aria-label^='Undo']):not([aria-label^='Redo'])"), null);
   const undo = within(bar).getByRole("button", { name: en.actions.undo }) as HTMLButtonElement;
   assert.equal(undo.disabled, true);
   const alpha = screen.getAllByRole("textbox", { name: en.editor.startWriting })[0] as HTMLElement;
   alpha.focus = () => {};
   fireEvent.focus(alpha);
-  assert.equal(bar.querySelector(".elea-doc-toolbar__group--idle"), null);
   // No bubble: the fixed bar formats the focused paragraph
   selectText(alpha, 0, 5);
   act(() => { document.dispatchEvent(new window.Event("selectionchange")); });
@@ -101,7 +100,6 @@ test("the classic mode shows a fixed bar over a continuous document and nothing 
   fireEvent.keyDown(alpha, { key: "ArrowDown", ctrlKey: true, shiftKey: true });
   assert.deepEqual(state().map(([id]) => id).slice(0, 2).includes("a"), true);
   fireEvent.blur(alpha, { relatedTarget: document.body });
-  assert.ok(bar.querySelector(".elea-doc-toolbar__group--idle"));
 });
 
 test("writing at the end of the classic canvas keeps the last media and reuses the final paragraph", async () => {
@@ -143,7 +141,6 @@ test("the classic toolbar follows focus backwards through paragraphs and a list"
   assert.equal(listField.querySelector("li strong")?.textContent, "One");
   const alpha = blockRoot("p").querySelector<HTMLElement>("[contenteditable]")!;
   act(() => alpha.focus());
-  assert.equal(bar.querySelector("fieldset:disabled"), null);
   selectText(alpha, 0, 5);
   fireEvent.mouseDown(within(bar).getByRole("button", { name: en.toolbar.italic }));
   assert.equal(alpha.querySelector("em")?.textContent, "Alpha");
@@ -207,7 +204,6 @@ test("inserting from the toolbar respects each classic editor's own caret", () =
   assert.deepEqual(changes.at(-1)?.map(block => block.type), ["paragraph", "image", "paragraph"]);
   act(() => body.focus());
   open(second!);
-  assert.ok(first!.querySelector("fieldset:disabled"));
   fireEvent.click(within(second!).getByRole("menuitem", { name: en.blockTypes.image }));
   assert.deepEqual(changes.at(-1)?.map(block => block.type), ["paragraph", "paragraph", "image"]);
 });
@@ -236,11 +232,9 @@ test("the toolbar mode keeps the writing surface, fixes a bar above the document
   assert.equal(document.querySelectorAll(".elea-block-editor__head").length, 0);
   assert.equal(document.querySelectorAll(".elea-block-editor__gutter").length, 3);
   const bar = document.querySelector(".elea-doc-toolbar") as HTMLElement;
-  assert.ok(bar.querySelector(".elea-doc-toolbar__group--idle"));
   const alpha = screen.getAllByRole("textbox", { name: en.editor.startWriting })[0] as HTMLElement;
   alpha.focus = () => {};
   fireEvent.focus(alpha);
-  assert.equal(bar.querySelector(".elea-doc-toolbar__group--idle"), null);
   selectText(alpha, 0, 5);
   act(() => { document.dispatchEvent(new window.Event("selectionchange")); });
   assert.equal(document.querySelector("[data-elea-bubble]"), null);
