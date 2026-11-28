@@ -55,6 +55,7 @@
     "./css/field.css": "./dist/css/field.css",
     "./css/identifier-input.css": "./dist/css/identifier-input.css",
     "./css/layout.css": "./dist/css/layout.css",
+    "./css/layout-bare.css": "./dist/css/layout-bare.css",
     "./css/footer.css": "./dist/css/footer.css",
     "./css/hero.css": "./dist/css/hero.css",
     "./css/menu.css": "./dist/css/menu.css",

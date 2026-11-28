@@ -600,40 +600,56 @@ its `open` prop to play the exit.
 ## Page layout
 
 The optional `css/layout.css` sheet composes pages with classes, in HTML or JSX. `elea-frame` sets
-the outer edges that every view shares and `elea-grid` rules it into equal columns: two, four from
-48rem of viewport and six from 72rem. A block takes the whole line until it states a span. A grid
-placed directly in a grid inherits the lines it spans, so blocks at any depth start and end on
-the same edges.
+the outer edges that every view shares and `elea-grid` rules it into equal columns: four, eight
+from 48rem of viewport (`md`) and twelve from 72rem (`lg`). A block takes the whole line until it
+states the columns it spans. A grid placed directly in a grid inherits the lines it spans, so
+blocks at any depth start and end on the same edges.
 
 ```html
 <main class="elea-frame elea-grid">
-  <nav class="elea-grid__rail" aria-label="Guides">…</nav>
-  <article class="elea-grid__prose">
+  <nav class="elea-grid__rail elea-col-md-2 elea-col-lg-3" aria-label="Guides">…</nav>
+  <article class="elea-grid__prose elea-start-md-3 elea-start-lg-4">
     <h1>Button</h1>
-    <p>Text keeps four columns.</p>
-    <figure class="elea-grid__plate">A plate takes the fifth as well.</figure>
+    <p>Text keeps eight columns.</p>
+    <figure class="elea-grid__plate">A plate takes the ninth as well.</figure>
   </article>
   <section class="elea-grid">
-    <article class="elea-grid__third">…</article>
-    <article class="elea-grid__third">…</article>
-    <article class="elea-grid__third">…</article>
+    <article class="elea-col-md-4">…</article>
+    <article class="elea-col-md-4">…</article>
+    <article class="elea-col-md-4">…</article>
   </section>
 </main>
 ```
 
-| Span | Two columns | Four columns | Six columns |
-| --- | --- | --- | --- |
-| `elea-grid__rail` | Whole line | First column | First column |
-| `elea-grid__body` | Whole line | Columns 2 to 4 | Columns 2 to 6 |
-| `elea-grid__prose` | Whole line | Columns 2 to 4 | Columns 2 to 6, text in 2 to 5 |
-| `elea-grid__half` | Whole line | 2 | 3 |
-| `elea-grid__third` | Whole line | 2 | 2 |
-| `elea-grid__panel` | Whole line | Whole line | 2 |
-| `elea-grid__stage` | Whole line | Whole line | 4 |
+| Class | Applies | Effect |
+| --- | --- | --- |
+| `elea-col-1` to `elea-col-4` | At every width | Spans that many columns |
+| `elea-col-md-1` to `elea-col-md-8` | From 48rem | Spans that many columns |
+| `elea-col-lg-1` to `elea-col-lg-12` | From 72rem | Spans that many columns |
+| `elea-start-1` to `elea-start-4` | At every width | Starts on that column line |
+| `elea-start-md-1` to `elea-start-md-8` | From 48rem | Starts on that column line |
+| `elea-start-lg-1` to `elea-start-lg-12` | From 72rem | Starts on that column line |
 
-Two pages that put their text in `elea-grid__body` or `elea-grid__prose` start their titles on
-the same edge, with or without a rail. The thresholds are in `rem` and follow the reader's text
-size. A grid nested through an element that is not itself a grid rules its own width.
+A class holds at every wider ruling until another replaces it: `elea-col-md-4` is half of eight
+columns and a third of twelve. A start without a span runs to the last line, so two pages that
+start their text with `elea-start-md-3 elea-start-lg-4` put their titles on the same edge, with or
+without a rail. A span stated for a wider ruling resets a start stated for a narrower one.
+
+`css/layout-bare.css` is the same sheet with class names that drop the prefix: `frame`, `grid`,
+`col-md-4`, `start-lg-4`, `grid__rail`. Load one of the two. The bare names suit a page that owns
+its class names; beside Bootstrap, Tailwind or another sheet that defines `grid` or `col-*`, keep
+the prefixed sheet. The names resemble Bootstrap's and the ruling differs: `md` has eight columns,
+so `col-md-4` is a half there, where Bootstrap's `col-md-6` is.
+
+Two roles add what a number cannot say. `elea-grid__rail` states the measure a line of navigation
+needs in `--elea-layout-measure`, nine to fourteen rem with the viewport, so a page can be checked
+against it: a rail narrower than its measure is an error. `elea-grid__prose` keeps its text on
+eight of nine columns from 72rem and lets an `elea-grid__plate` take the ninth. The thresholds are
+in `rem` and follow the reader's text size. A grid nested through an element that is not itself a
+grid rules its own width.
+
+The configuration is declared on `:root`. Set a property there to change it and read it with
+`var()` where a rule has to follow the ruling, such as a separator in the middle of a gutter.
 
 | Property | Default | Role |
 | --- | --- | --- |

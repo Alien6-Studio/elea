@@ -38,6 +38,9 @@ const parts = ordered.map((name) => {
   writeFileSync(`dist/css/${name}`, `${LAYERS}\n${keyframes.length > 0 ? layered("base", keyframes.join("\n")) : ""}${layered("components", standalone)}`);
   return css;
 });
+// The layout classes also ship without their prefix, for a page that owns its class names. Only on request:
+// frame, grid, col-4 and start-2 are names another sheet of the host may already use.
+writeFileSync("dist/css/layout-bare.css", `${LAYERS}\n${layered("components", read("layout.css").replaceAll(/(?<!-)elea-(?=frame|grid|col-|start-)/g, ""))}`);
 writeFileSync("dist/styles.css", [
   "/* Elea UI primitives: every value comes from the tokens of @alien6-studio/elea-tokens (elea.css). */",
   LAYERS,

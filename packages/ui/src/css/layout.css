@@ -1,42 +1,50 @@
 /* Layout: a frame and the columns every view of a site shares. A block states the columns it
    takes and a grid placed in a grid inherits its lines, so blocks at any depth start and end on
-   the same edges. The ruling has two columns, four from 48rem and six from 72rem. */
-:where(.elea-frame, .elea-grid) {
-  --elea-_layout-margin: var(--elea-layout-margin, clamp(var(--elea-space-5), 4.4vi, var(--elea-space-12)));
-  --elea-_layout-gutter: var(--elea-layout-gutter, clamp(var(--elea-space-4), 2.4vi, var(--elea-space-8)));
-  box-sizing: border-box;
-  min-inline-size: 0;
+   the same edges. The ruling has four columns, eight from 48rem (md) and twelve from 72rem (lg).
+   elea-col-N spans N columns and elea-start-N starts on line N; with md or lg before the number
+   they apply from that width and hold above it. A span resets the start stated at a narrower width. */
+@property --elea-layout-measure { syntax: "<length>"; inherits: false; initial-value: 0px; }
+
+/* The configuration is stated once, so a sheet that composes with the ruling reads it */
+:root {
+  --elea-layout-width: 74rem;
+  --elea-layout-margin: clamp(var(--elea-space-5), 4.4vi, var(--elea-space-12));
+  --elea-layout-gutter: clamp(var(--elea-space-4), 2.4vi, var(--elea-space-8));
 }
+
+:where(.elea-frame, .elea-grid) { box-sizing: border-box; min-inline-size: 0; }
 
 /* Frame: the outer edges every view shares */
 .elea-frame {
-  inline-size: min(var(--elea-layout-width, 74rem), 100% - 2 * var(--elea-_layout-margin));
+  inline-size: min(var(--elea-layout-width), 100% - 2 * var(--elea-layout-margin));
   margin-inline: auto;
 }
 
 .elea-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--elea-_layout-gutter);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--elea-layout-gutter);
   align-items: start;
 }
 .elea-grid > .elea-grid { grid-template-columns: subgrid; }
 
-/* A block takes the whole line until the ruling has the columns of its span */
+/* A block takes the whole line until it states a span; a start alone runs to the last line */
 :where(.elea-grid > *) { grid-column: 1 / -1; min-inline-size: 0; }
+.elea-col-1 { grid-column: auto / span 1; } .elea-col-2 { grid-column: auto / span 2; } .elea-col-3 { grid-column: auto / span 3; } .elea-col-4 { grid-column: auto / span 4; }
+.elea-start-1 { grid-column-start: 1; } .elea-start-2 { grid-column-start: 2; } .elea-start-3 { grid-column-start: 3; } .elea-start-4 { grid-column-start: 4; }
+/* A rail holds a line of navigation: nine to fourteen rem, growing with the viewport */
+.elea-grid__rail { --elea-layout-measure: clamp(9rem, 17vi, 14rem); }
 
 @media (min-width: 48rem) {
-  .elea-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .elea-grid__rail { grid-column: 1; }
-  .elea-grid__body, .elea-grid__prose { grid-column: 2 / -1; }
-  .elea-grid__half, .elea-grid__third { grid-column: span 2; }
+  .elea-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  .elea-col-md-1 { grid-column: auto / span 1; } .elea-col-md-2 { grid-column: auto / span 2; } .elea-col-md-3 { grid-column: auto / span 3; } .elea-col-md-4 { grid-column: auto / span 4; } .elea-col-md-5 { grid-column: auto / span 5; } .elea-col-md-6 { grid-column: auto / span 6; } .elea-col-md-7 { grid-column: auto / span 7; } .elea-col-md-8 { grid-column: auto / span 8; }
+  .elea-start-md-1 { grid-column-start: 1; } .elea-start-md-2 { grid-column-start: 2; } .elea-start-md-3 { grid-column-start: 3; } .elea-start-md-4 { grid-column-start: 4; } .elea-start-md-5 { grid-column-start: 5; } .elea-start-md-6 { grid-column-start: 6; } .elea-start-md-7 { grid-column-start: 7; } .elea-start-md-8 { grid-column-start: 8; }
 }
 
 @media (min-width: 72rem) {
-  .elea-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .elea-grid__half { grid-column: span 3; }
-  .elea-grid__panel { grid-column: span 2; }
-  .elea-grid__stage { grid-column: span 4; }
-  /* Prose spans five columns: its text keeps four, a plate takes the fifth */
-  .elea-grid__prose > :where(:not(.elea-grid__plate)) { max-inline-size: calc(80% - .2 * var(--elea-_layout-gutter)); }
+  .elea-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .elea-col-lg-1 { grid-column: auto / span 1; } .elea-col-lg-2 { grid-column: auto / span 2; } .elea-col-lg-3 { grid-column: auto / span 3; } .elea-col-lg-4 { grid-column: auto / span 4; } .elea-col-lg-5 { grid-column: auto / span 5; } .elea-col-lg-6 { grid-column: auto / span 6; } .elea-col-lg-7 { grid-column: auto / span 7; } .elea-col-lg-8 { grid-column: auto / span 8; } .elea-col-lg-9 { grid-column: auto / span 9; } .elea-col-lg-10 { grid-column: auto / span 10; } .elea-col-lg-11 { grid-column: auto / span 11; } .elea-col-lg-12 { grid-column: auto / span 12; }
+  .elea-start-lg-1 { grid-column-start: 1; } .elea-start-lg-2 { grid-column-start: 2; } .elea-start-lg-3 { grid-column-start: 3; } .elea-start-lg-4 { grid-column-start: 4; } .elea-start-lg-5 { grid-column-start: 5; } .elea-start-lg-6 { grid-column-start: 6; } .elea-start-lg-7 { grid-column-start: 7; } .elea-start-lg-8 { grid-column-start: 8; } .elea-start-lg-9 { grid-column-start: 9; } .elea-start-lg-10 { grid-column-start: 10; } .elea-start-lg-11 { grid-column-start: 11; } .elea-start-lg-12 { grid-column-start: 12; }
+  /* Prose on nine columns: its text keeps eight, a plate takes the ninth */
+  .elea-grid__prose > :where(:not(.elea-grid__plate)) { max-inline-size: calc((100% + var(--elea-layout-gutter)) * 8 / 9 - var(--elea-layout-gutter)); }
 }

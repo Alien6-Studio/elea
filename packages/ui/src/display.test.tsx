@@ -189,7 +189,9 @@ test("every component sheet is published on its own and declared in the package 
   const sheets = readdirSync(new URL("./css", import.meta.url)).filter((name) => name.endsWith(".css")).sort();
   const manifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { exports: Record<string, unknown> };
   const declared = Object.keys(manifest.exports).filter((key) => key.startsWith("./css/")).map((key) => key.slice(6)).sort();
-  assert.deepEqual(declared, sheets);
-  for (const name of sheets) assert.equal(manifest.exports[`./css/${name}`], `./dist/css/${name}`);
+  // The build derives layout-bare.css from layout.css
+  const published = [...sheets, "layout-bare.css"].sort();
+  assert.deepEqual(declared, published);
+  for (const name of published) assert.equal(manifest.exports[`./css/${name}`], `./dist/css/${name}`);
   assert.ok(sheets.includes("motion.css") && sheets.includes("button-effects.css"));
 });
