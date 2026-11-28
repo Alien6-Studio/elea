@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { RICH_HTML_POLICY, type HtmlSanitizer } from "@alien6-studio/elea-content";
+import { RICH_HTML_POLICY } from "@alien6-studio/elea-content";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ContentComparison } from "./ContentComparison.js";
 import { ContentComparison as CoreContentComparison } from "./core.js";
+import { createDefaultSanitizer } from "./sanitizer.js";
 
 const before = { blocks: [
   { type: "header", data: { text: "Colophon", level: 2 } },
@@ -34,8 +35,12 @@ test("ContentComparison takes host renderers and falls back when both versions a
 });
 
 test("the core entry compares through the sanitizer of the host", () => {
-  const sanitizer: HtmlSanitizer = { policy: RICH_HTML_POLICY, sanitize: (html) => html.replaceAll(/<\/?script>/g, "") };
+  const sanitizer = createDefaultSanitizer({ policy: {
+    ...RICH_HTML_POLICY,
+    allowedTags: RICH_HTML_POLICY.allowedTags.filter(tag => tag !== "strong"),
+  } });
   const html = renderToStaticMarkup(<CoreContentComparison before={before} after={after} sanitizer={sanitizer} />);
+  assert.doesNotMatch(html, /<strong\b/i);
   assert.match(html, /<ins class="elea-change elea-change--added">Tuesday<\/ins>/);
   assert.doesNotMatch(html, /<script/);
 });

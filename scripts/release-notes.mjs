@@ -17,8 +17,10 @@ if (releases.length !== 1) throw new Error(`Expected exactly one CHANGELOG.md se
 const [heading] = releases;
 const next = headings[headings.indexOf(heading) + 1];
 const changes = changelog.slice(heading.index + heading[0].length, next?.index).trim();
-const prose = changes.replaceAll(/<!--[\s\S]*?-->/g, "").replaceAll(/^#{1,6} .*$/gm, "").trim();
-if (!prose) throw new Error(`Add integrator-facing release notes under CHANGELOG.md section ${version}`);
+const hasProse = changes.split(/<!--[\s\S]*?(?:-->|$)/u).some(part =>
+  part.split("\n").some(line => line.trim() && !/^#{1,6} /.test(line)),
+);
+if (!hasProse) throw new Error(`Add integrator-facing release notes under CHANGELOG.md section ${version}`);
 
 const repo = process.env.GITHUB_REPOSITORY ?? "Alien6-Studio/elea";
 const source = `https://github.com/${repo}/blob/${tag}`;

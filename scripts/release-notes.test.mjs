@@ -45,7 +45,7 @@ test("publication requires one exact nonempty version section and the example on
   for (const changelog of ["## Unreleased\nA different version", "## 1.2.30\nLater release",
     "## 1.2.3-2026-01-01\nMissing separators", "## 1.2.3 - 2026-1-01\nIncomplete date",
     "## 1.2.3 - 2026-01-01 draft\nTrailing text",
-    "## 1.2.3\n### Changes\n<!-- to be filled -->", "## 1.2.3\nFirst\n## 1.2.3\nSecond"]) {
+    "## 1.2.3\n### Changes\n<!-- to be filled -->", "## 1.2.3\n<!-- open comment\nUnfinished text", "## 1.2.3\nFirst\n## 1.2.3\nSecond"]) {
     assert.notEqual(notes(checkout(t, changelog)).status, 0, changelog);
   }
   const cwd = checkout(t, "## 1.2.3\nNew version notes.");
