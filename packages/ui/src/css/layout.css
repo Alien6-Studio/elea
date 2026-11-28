@@ -32,8 +32,8 @@
 :where(.elea-grid > *) { grid-column: 1 / -1; min-inline-size: 0; }
 .elea-col-1 { grid-column: auto / span 1; } .elea-col-2 { grid-column: auto / span 2; } .elea-col-3 { grid-column: auto / span 3; } .elea-col-4 { grid-column: auto / span 4; }
 .elea-start-1 { grid-column-start: 1; } .elea-start-2 { grid-column-start: 2; } .elea-start-3 { grid-column-start: 3; } .elea-start-4 { grid-column-start: 4; }
-/* A rail holds a line of navigation: nine to fourteen rem, growing with the viewport */
-.elea-grid__rail { --elea-layout-measure: clamp(9rem, 17vi, 14rem); }
+/* A rail holds a line of navigation: nine rem, which two columns give from 48rem */
+.elea-grid__rail { --elea-layout-measure: 9rem; }
 
 @media (min-width: 48rem) {
   .elea-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
@@ -45,6 +45,6 @@
   .elea-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
   .elea-col-lg-1 { grid-column: auto / span 1; } .elea-col-lg-2 { grid-column: auto / span 2; } .elea-col-lg-3 { grid-column: auto / span 3; } .elea-col-lg-4 { grid-column: auto / span 4; } .elea-col-lg-5 { grid-column: auto / span 5; } .elea-col-lg-6 { grid-column: auto / span 6; } .elea-col-lg-7 { grid-column: auto / span 7; } .elea-col-lg-8 { grid-column: auto / span 8; } .elea-col-lg-9 { grid-column: auto / span 9; } .elea-col-lg-10 { grid-column: auto / span 10; } .elea-col-lg-11 { grid-column: auto / span 11; } .elea-col-lg-12 { grid-column: auto / span 12; }
   .elea-start-lg-1 { grid-column-start: 1; } .elea-start-lg-2 { grid-column-start: 2; } .elea-start-lg-3 { grid-column-start: 3; } .elea-start-lg-4 { grid-column-start: 4; } .elea-start-lg-5 { grid-column-start: 5; } .elea-start-lg-6 { grid-column-start: 6; } .elea-start-lg-7 { grid-column-start: 7; } .elea-start-lg-8 { grid-column-start: 8; } .elea-start-lg-9 { grid-column-start: 9; } .elea-start-lg-10 { grid-column-start: 10; } .elea-start-lg-11 { grid-column-start: 11; } .elea-start-lg-12 { grid-column-start: 12; }
-  /* Prose on nine columns: its text keeps eight, a plate takes the ninth */
-  .elea-grid__prose > :where(:not(.elea-grid__plate)) { max-inline-size: calc((100% + var(--elea-layout-gutter)) * 8 / 9 - var(--elea-layout-gutter)); }
+  /* Prose on ten columns: its text keeps eight, a plate takes all ten */
+  .elea-grid__prose > :where(:not(.elea-grid__plate)) { max-inline-size: calc((100% + var(--elea-layout-gutter)) * 8 / 10 - var(--elea-layout-gutter)); }
 }

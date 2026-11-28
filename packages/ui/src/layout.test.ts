@@ -36,12 +36,14 @@ test("the frame and the gutter are stated once, where a host or another sheet re
   }
 });
 
-test("a rail states the measure it needs, and three of twelve columns hold it in the default frame", () => {
+test("a rail states the measure it needs, and two columns hold it in the default frame", () => {
   assert.match(css, /@property --elea-layout-measure \{ syntax: "<length>"; inherits: false; initial-value: 0px; \}/);
-  assert.match(css, /\.elea-grid__rail \{ --elea-layout-measure: clamp\(9rem, 17vi, 14rem\); \}/);
-  // At 72rem of viewport: margins of 4.4vi, gutters of 2.4vi capped at 2rem
-  const [frame, gutter] = [72 - 2 * 0.044 * 72, Math.min(0.024 * 72, 2)];
-  const rail = (span: number, count: number) => (span * (frame - (count - 1) * gutter)) / count + (span - 1) * gutter;
-  assert.ok(rail(3, 12) >= 0.17 * 72);
-  assert.ok(rail(2, 12) < 0.17 * 72);
+  assert.match(css, /\.elea-grid__rail \{ --elea-layout-measure: 9rem; \}/);
+  // Where each ruling begins its columns are narrowest: margins of 4.4vi and gutters of 2.4vi
+  const rail = (viewport: number, count: number) => {
+    const [frame, gutter] = [viewport - 2 * 0.044 * viewport, 0.024 * viewport];
+    return (2 * (frame - (count - 1) * gutter)) / count + gutter;
+  };
+  assert.ok(rail(48, 8) >= 9);
+  assert.ok(rail(72, 12) >= 9);
 });

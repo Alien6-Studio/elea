@@ -607,11 +607,11 @@ blocks at any depth start and end on the same edges.
 
 ```html
 <main class="elea-frame elea-grid">
-  <nav class="elea-grid__rail elea-col-md-2 elea-col-lg-3" aria-label="Guides">…</nav>
-  <article class="elea-grid__prose elea-start-md-3 elea-start-lg-4">
+  <nav class="elea-grid__rail elea-col-md-2" aria-label="Guides">…</nav>
+  <article class="elea-grid__prose elea-start-md-3">
     <h1>Button</h1>
     <p>Text keeps eight columns.</p>
-    <figure class="elea-grid__plate">A plate takes the ninth as well.</figure>
+    <figure class="elea-grid__plate">A plate takes all ten.</figure>
   </article>
   <section class="elea-grid">
     <article class="elea-col-md-4">…</article>
@@ -632,7 +632,7 @@ blocks at any depth start and end on the same edges.
 
 A class holds at every wider ruling until another replaces it: `elea-col-md-4` is half of eight
 columns and a third of twelve. A start without a span runs to the last line, so two pages that
-start their text with `elea-start-md-3 elea-start-lg-4` put their titles on the same edge, with or
+start their text with `elea-start-md-3` put their titles on the same edge, with or
 without a rail. A span stated for a wider ruling resets a start stated for a narrower one.
 
 `css/layout-bare.css` is the same sheet with class names that drop the prefix: `frame`, `grid`,
@@ -642,9 +642,9 @@ the prefixed sheet. The names resemble Bootstrap's and the ruling differs: `md` 
 so `col-md-4` is a half there, where Bootstrap's `col-md-6` is.
 
 Two roles add what a number cannot say. `elea-grid__rail` states the measure a line of navigation
-needs in `--elea-layout-measure`, nine to fourteen rem with the viewport, so a page can be checked
-against it: a rail narrower than its measure is an error. `elea-grid__prose` keeps its text on
-eight of nine columns from 72rem and lets an `elea-grid__plate` take the ninth. The thresholds are
+needs in `--elea-layout-measure`, nine rem, which two columns give from 48rem, so a page can be
+checked against it: a rail narrower than its measure is an error. `elea-grid__prose` spans ten
+columns from 72rem, keeps its text on eight and lets an `elea-grid__plate` take all ten. The thresholds are
 in `rem` and follow the reader's text size. A grid nested through an element that is not itself a
 grid rules its own width.
 
