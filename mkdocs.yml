@@ -18,6 +18,11 @@ extra:
       parts:
         - { title: Atlas, slug: atlas }
         - { title: Laboratory, slug: laboratory }
+    - title: Interaction Observatory
+      slug: interaction-observatory
+      parts:
+        - { title: Atlas, slug: atlas }
+        - { title: Laboratory, slug: laboratory }
 theme:
   name: null
   custom_dir: overrides
@@ -28,6 +33,7 @@ plugins:
 hooks:
   - scripts/package_typeface.py
   - scripts/research_redirects.py
+  - scripts/observatory_figures.py
 nav:
   - Overview: index.md
   - Getting started: getting-started.md

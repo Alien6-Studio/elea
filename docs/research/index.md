@@ -5,9 +5,9 @@ description: Studies on the construction of interfaces, with their sources, thei
 
 # Research
 
-Studies of form and composition for designers. Each brings measured drawings
-together with published research and identifies the decisions that remain
-in the designer’s hands.
+Studies of form, composition and interaction. Each connects a worked
+construction to published evidence and identifies the decisions that
+remain in the designer’s hands.
 
 ## Geometry of interfaces
 
@@ -29,3 +29,13 @@ board show how type, shared edges and empty columns shape a layout.
 - [Read the composition study](composition-of-interfaces.md) for the constructions, evidence and limits.
 - [Compare three working grids](composition-of-interfaces/atlas.md) using one exhibition programme.
 - [Construct a grid and try the three archive views](composition-of-interfaces/laboratory.md) at different widths.
+
+## Interaction Observatory
+
+A control can be activated twice while the application saves a document
+once. Follow the separate signals for activation, focus, exposure and
+task outcome, and see what changes when some outcomes are missing.
+
+- [Read the interaction study](interaction-observatory.md) for the measurement rules and worked figures.
+- [Open the interaction atlas](interaction-observatory/atlas.md) for four constructed comparisons.
+- [Open the interaction laboratory](interaction-observatory/laboratory.md) to observe a local session.

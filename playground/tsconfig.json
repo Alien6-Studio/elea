@@ -21,6 +21,7 @@
     "src",
     "tests",
     "scripts",
+    "interaction-lab.tsx",
     "vite.config.ts",
     "playwright.config.ts"
   ],

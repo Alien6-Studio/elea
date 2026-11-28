@@ -16,7 +16,8 @@ python -m http.server 4174 --bind 127.0.0.1 --directory .build/elea
 
 Open port 4174. The build installs local archives made from the
 specified checkout and compiles the private Next.js fixture in
-`playground/tests/fixtures/next` against those archives.
+`playground/tests/fixtures/next` against those archives. The Interaction Observatory uses the independent
+Observe archive, so the paired source checkout must include `packages/observe`.
 
 ## Browser checks
 

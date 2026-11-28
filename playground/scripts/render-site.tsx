@@ -8,6 +8,7 @@ import { SiteHeader } from "../src/components/SiteHeader.js";
 import { SiteFooter } from "../src/components/SiteFooter.js";
 import { featuredColourThemes, makeBrandTheme, studioTheme } from "../src/pages/brandTheme.js";
 import { SiteHome } from "./site-home.js";
+import { ContrastFigure, DwellFigure, ExposureFigure, OutcomeFigure, SlotFigure, TimestampFigure } from "./observatory-figures.js";
 
 const assets = new URL("../../docs/assets/", import.meta.url);
 const templates = new URL("../../overrides/", import.meta.url);
@@ -75,3 +76,12 @@ writeFileSync(new URL("typography-cover.html", templates), renderToString(
 ));
 writeFileSync(new URL("site-home.html", templates), renderToStaticMarkup(<SiteHome />));
 writeFileSync(new URL("site-footer.html", templates), renderToStaticMarkup(<SiteFooter />));
+
+const figures = new URL("../../.build/observatory-figures/", import.meta.url);
+mkdirSync(figures, { recursive: true });
+for (const [name, Figure] of Object.entries({
+  exposure: ExposureFigure, outcomes: OutcomeFigure, slot: SlotFigure,
+  timestamp: TimestampFigure, dwell: DwellFigure, contrast: ContrastFigure,
+})) {
+  writeFileSync(new URL(`${name}.html`, figures), renderToStaticMarkup(<Figure />));
+}

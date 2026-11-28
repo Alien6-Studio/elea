@@ -34,6 +34,7 @@ export default defineConfig({
         "glyph-carousel": "glyph-carousel.js",
         "geometry-lab": "geometry-lab.js",
         "composition-lab": "composition-lab.js",
+        "interaction-lab": "interaction-lab.tsx",
         "site-profile": "site-profile.js",
       },
       output: { entryFileNames: entry => entry.name === "index" ? "assets/[name]-[hash].js" : "[name].js" },

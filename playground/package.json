@@ -9,11 +9,12 @@
     "audit:geometry": "tsx scripts/audit-geometry.ts",
     "audit:layout": "tsx scripts/audit-layout.ts",
     "build": "vite build",
-    "lint": "tsc -p tsconfig.json --noEmit && tsx scripts/check-examples.ts && npm run test:geometry && npm run test:layout && npm run test:grids",
+    "lint": "tsc -p tsconfig.json --noEmit && tsx scripts/check-examples.ts && npm run test:geometry && npm run test:layout && npm run test:grids && npm run test:observation",
     "test": "playwright test --project=chromium --project=firefox --project=webkit",
     "test:geometry": "node --import tsx --test src/geometry/geometry.test.ts",
     "test:layout": "node --import tsx --test src/composition/audit.test.ts",
     "test:grids": "node --test src/composition/grid.test.mjs && node ../scripts/research/layout-grids.mjs --check",
+    "test:observation": "node --import tsx --test src/observe/study.test.ts",
     "test:next": "next build tests/fixtures/next"
   },
   "dependencies": {

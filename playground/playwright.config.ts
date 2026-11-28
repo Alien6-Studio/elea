@@ -5,7 +5,7 @@ const visualTests = "**/visual.spec.ts";
 const criticalFlows = [
   "**/stepper.spec.ts", "**/date-field.spec.ts", "**/multi-select.spec.ts",
   "**/dialog-motion.spec.ts", "**/theme-proof.spec.ts", "**/layout-guides.spec.ts", "**/site-search.spec.ts",
-  "**/composition.spec.ts", "**/composition-atlas.spec.ts",
+  "**/composition.spec.ts", "**/composition-atlas.spec.ts", "**/observatory.spec.ts",
 ];
 const desktop = { width: 1400, height: 1300 };
 
