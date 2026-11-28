@@ -18,7 +18,7 @@
   {% for path in config.extra_css %}
     <link rel="stylesheet" href="{{ path | url }}">
   {% endfor %}
-  {% set page_styles = page.meta.stylesheet or page.meta.lab %}
+  {% set page_styles = page.meta.stylesheet | default(page.meta.lab) %}
   {% if page_styles %}<link rel="stylesheet" href="{{ ('assets/' ~ page_styles ~ '.css') | url }}">{% endif %}
 </head>
 {% set typography_page = page.file.src_uri == 'typography.md' %}

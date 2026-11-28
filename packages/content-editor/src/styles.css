@@ -446,7 +446,7 @@
 .elea-add-block__menu .elea-quick-add__item svg { flex: none; width: 1rem; height: 1rem; color: inherit; }
 .elea-add-block__menu [aria-checked="true"] { color: var(--elea-color-neutral-950); font-weight: var(--elea-font-weight-semibold); }
 @container (max-width: 24rem) {
-  .elea-add-block__menu > button { padding: 0 2px; min-width: var(--elea-add-size); font-size: var(--elea-font-size-xs); }
+  .elea-add-block__menu > button { padding: 0 1px; font-size: var(--elea-font-size-xs); }
   .elea-add-block__menu [aria-checked="true"] { background: var(--elea-color-neutral-200); }
   .elea-add-block__menu > button svg { display: none; }
 }

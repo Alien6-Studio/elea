@@ -2,6 +2,7 @@
 title: Interaction Observatory laboratory
 description: Inspect semantic interaction events from an opt-in local demonstration.
 lab: interaction-lab
+stylesheet: false
 view: laboratory
 ---
 

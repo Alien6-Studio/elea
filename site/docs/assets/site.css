@@ -330,7 +330,7 @@ a { text-underline-offset: 0.18em; }
   color: var(--elea-color-text-default); font-size: .85rem; font-weight: 560; text-decoration: none;
 }
 .home-specimen__demo {
-  height: 4.1rem; border-radius: var(--elea-shape-surface, var(--elea-radius-md));
+  height: 4.1rem; border-radius: var(--elea-radius-lg);
   display: grid; place-items: center; background: var(--elea-color-surface-subtle); border: 1px solid var(--elea-color-border-default);
 }
 .home-specimen__demo .elea-tabs__panel { padding: 0; }

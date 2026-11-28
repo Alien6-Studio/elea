@@ -182,8 +182,11 @@ test("synthetic data stays separate and the mobile workbench has no horizontal o
   await workbench.getByRole("button", { name: "Start local session" }).press("Enter");
   await workbench.getByRole("button", { name: "Preview", exact: true }).press("Enter");
   await expect(page.getByRole("region", { name: "Document preview" })).toBeVisible();
-  expect(await workbench.locator('[id^="observe-action-"]').evaluateAll(
-    elements => elements.every(element => element.scrollWidth - element.clientWidth <= 1),
-  )).toBe(true);
+  const overflowingControls = await page.evaluate(() =>
+    [...document.querySelectorAll('[id^="observe-action-"]')]
+      .filter(element => element.scrollWidth - element.clientWidth > 1)
+      .map(element => element.id),
+  );
+  expect(overflowingControls).toEqual([]);
   expect(await width()).toBeLessThanOrEqual(320);
 });
