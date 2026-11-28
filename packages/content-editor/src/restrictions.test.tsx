@@ -51,6 +51,8 @@ test("the allow-list turns disallowed text into paragraphs, leaves out blocks wi
   assert.deepEqual(plain.restrict([{ id: "l", type: "list", data: { items: ["One", { content: "Two", items: ["Three"] }] } }]).blocks.map(block => block.data),
     [{ text: "One" }, { text: "Two" }, { text: "Three" }]);
   assert.equal(plain.restrictHtml("<ul><li>One</li><li>Two</li></ul>"), "One<br>Two");
+  assert.equal(restrictions.restrictHtml('<em>One &amp; two</em><strong style="color: blue">Three</strong>'),
+    "One &amp; two<strong>Three</strong>");
 });
 
 interface FieldProps {
@@ -179,7 +181,7 @@ test("the link shortcut in a link shows its address, which can be changed and sa
   fireEvent.keyDown(field, { key: "k", ctrlKey: true });
   const input = screen.getByRole("textbox", { name: en.editor.linkUrlPrompt }) as HTMLInputElement;
   assert.equal(input.value, "https://example.org");
-  assert.equal(screen.getByRole("link", { name: en.editor.linkOpen }).getAttribute("href"), "https://example.org");
+  assert.equal(screen.getByRole("link", { name: en.editor.linkOpen }).getAttribute("href"), "https://example.org/");
   assert.ok(screen.getByRole("button", { name: en.editor.linkRemove }));
   fireEvent.change(input, { target: { value: "https://example.com/next" } });
   fireEvent.keyDown(input, { key: "Enter" });

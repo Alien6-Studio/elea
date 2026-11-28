@@ -9,7 +9,10 @@ updates:
         patterns:
           - "*"
   - package-ecosystem: npm
-    directory: /
+    directories:
+      - /
+      - /docs/examples/dtcg
+      - /site/playground
     schedule:
       interval: weekly
     groups:

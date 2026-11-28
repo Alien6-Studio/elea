@@ -3,9 +3,10 @@ import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { useState } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { defaultRegistry, en, fr, type EleaBlock } from "@alien6-studio/elea-content";
+import { defaultRegistry, en, fr, RICH_HTML_POLICY, type EleaBlock } from "@alien6-studio/elea-content";
 import type { MediaBlockProps } from "./blocks/ImageBlock.js";
 import { ContentEditor } from "./ContentEditor.js";
+import { clipMarkup } from "./editorTextLimit.js";
 import { ContentProvider } from "./provider.js";
 import { placeCaret, resetSelection, selectText } from "./test/dom.js";
 import { loadEditorParts } from "./parts.js";
@@ -68,6 +69,11 @@ test("oversized structured paste keeps whole blocks, escapes the clipped last ru
   assert.equal(blocks[0]!.data.text, "ab");
   assert.equal(blocks[1]!.data.text, "&lt;b&gt;");
   assert.equal(count(), "5 / 5 caractères");
+});
+
+test("clipping a rich fragment keeps host-approved marks and drops unapproved attributes", () => {
+  const policy = { ...RICH_HTML_POLICY, allowedTags: [...RICH_HTML_POLICY.allowedTags, "mark"] };
+  assert.equal(clipMarkup('<mark style="color: blue">A &amp; BC</mark>', 5, policy), "<mark>A &amp; B</mark>");
 });
 
 test("an external over-limit value stays editable and IME only commits a fitting composition", () => {

@@ -87,8 +87,18 @@ export interface RichTextFieldProps {
   style?: CSSProperties | undefined;
 }
 
+function linkPreviewAddress(input: string, base: string): string | undefined {
+  const candidate = resolveLinkUrl(input);
+  if (!candidate) return undefined;
+  try {
+    const { href } = new URL(candidate, base);
+    return href.startsWith("https://") || href.startsWith("http://") ? href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const BLOCK_TAGS = new Set(["P", "DIV", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE", "LI"]);
-const OUTER_BLOCK_TAGS = new Set(["h1", "h2", "h3", "h4", "h5", "h6", "blockquote"]);
 const UNWRAP_TAGS = new Set(["STRONG", "EM", "U", "A", "MARK", "SPAN", "H1", "H2", "H3", "H4", "H5", "H6", "BLOCKQUOTE"]);
 
 function elementOf(node: Node | null | undefined): HTMLElement | null {
@@ -526,13 +536,13 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
     const pasted = parseClipboard(event.clipboardData, currentSanitizer);
     const limit = limitRef.current;
     const capacity = (limit?.remaining ?? Infinity) + range.toString().length;
-    if (limit) pasted.blocks = fitPastedBlocks(pasted.blocks, capacity, limit.text);
+    if (limit) pasted.blocks = fitPastedBlocks(pasted.blocks, capacity, limit.text, currentSanitizer.policy);
     const [first, ...rest] = pasted.blocks;
     const firstText = paragraphText(first);
     let inline = inlinePaste(pasted, !!insertBlocks, currentSanitizer);
     if (inline !== null) {
       inline = restrictHtml(inline);
-      if (limit && inputText(inline).length > capacity) inline = clipMarkup(inline, capacity);
+      if (limit && inputText(inline).length > capacity) inline = clipMarkup(inline, capacity, currentSanitizer.policy);
       if (!inline) return;
       insertInlineHtml(currentSanitizer.sanitize(pastedLine(inline, latest.current.singleLine)), range, selection);
       handleInput();
@@ -560,7 +570,7 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
     const holder = document.createElement("div");
     holder.innerHTML = html;
     const only = holder.childNodes.length === 1 ? holder.firstElementChild : null;
-    return only && OUTER_BLOCK_TAGS.has(only.tagName.toLowerCase()) ? only.innerHTML : html;
+    return only?.matches("h1,h2,h3,h4,h5,h6,blockquote") ? only.innerHTML : html;
   };
 
   /** The current range when it sits inside this editor; a stale selection elsewhere is ignored. */
@@ -1058,6 +1068,7 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
   const popoverTop = linkPopoverPosition?.top ?? (editorRect?.bottom ?? 100) + 6;
   const popoverLeft = linkPopoverPosition?.left ?? editorRect?.left ?? 20;
 
+  const openAddress = editedLink ? linkPreviewAddress(linkInputValue, editedLink.ownerDocument.baseURI) : undefined;
   const linkOpenLabel = messages.editor.linkOpen ?? en.editor.linkOpen;
   const linkRemoveLabel = messages.editor.linkRemove ?? en.editor.linkRemove;
   const linkPopover = showLinkInput && typeof document !== "undefined"
@@ -1082,7 +1093,7 @@ export const RichTextField = forwardRef<RichTextFieldHandle, RichTextFieldProps>
             <CheckIcon />
           </button>
           {editedLink && <>
-            <a className="elea-link-popover__button" href={resolveLinkUrl(linkInputValue.trim()) ?? undefined} target="_blank" rel="noopener noreferrer" aria-label={linkOpenLabel} title={linkOpenLabel}>
+            <a className="elea-link-popover__button" href={openAddress} target="_blank" rel="noopener noreferrer" aria-label={linkOpenLabel} title={linkOpenLabel}>
               <ExternalLinkIcon />
             </a>
             <button type="button" className="elea-link-popover__button" onMouseDown={(event) => { event.preventDefault(); removeLink(); }} aria-label={linkRemoveLabel} title={linkRemoveLabel}>

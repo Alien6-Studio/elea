@@ -1,7 +1,8 @@
 "use client";
 
-import type { BlockLike } from "@alien6-studio/elea-content";
+import type { BlockLike, RichHtmlPolicy } from "@alien6-studio/elea-content";
 import { createContext, useContext } from "react";
+import { richHtmlTemplate } from "./clipboardHtml.js";
 
 export const EDITOR_MARKS = ["bold", "italic", "underline", "link"] as const;
 /** An inline format a host can allow or leave out. */
@@ -19,6 +20,7 @@ export interface RestrictionOptions {
   marks?: readonly EditorMark[] | undefined;
   /** Told about the blocks `admit` leaves out. */
   onLeftOut?: ((blocks: BlockLike[]) => void) | undefined;
+  policy?: RichHtmlPolicy;
 }
 
 export interface RestrictedBlocks<T> {
@@ -71,7 +73,7 @@ function unwrapLine(element: Element): void {
   element.replaceWith(...Array.from(element.childNodes));
 }
 
-export function createRestrictions({ blockTypes, marks, onLeftOut }: RestrictionOptions): EditorRestrictions {
+export function createRestrictions({ blockTypes, marks, onLeftOut, policy }: RestrictionOptions): EditorRestrictions {
   const types = blockTypes ? new Set(["paragraph", ...blockTypes]) : null;
   const allowsBlock = (type: string) => !types || types.has(type);
   const allowsMark = (mark: EditorMark) => !marks || marks.includes(mark);
@@ -83,8 +85,7 @@ export function createRestrictions({ blockTypes, marks, onLeftOut }: Restriction
 
   const restrictHtml = (html: string): string => {
     if (!pattern?.test(html)) return html;
-    const holder = document.createElement("template");
-    holder.innerHTML = html;
+    const holder = richHtmlTemplate(html, policy);
     for (const element of Array.from(holder.content.querySelectorAll(tags.join(",")))) unwrapLine(element);
     return holder.innerHTML;
   };

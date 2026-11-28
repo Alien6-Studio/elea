@@ -1,7 +1,8 @@
 "use client";
 
-import { asRecord, asString, htmlToText, type BlockLike, type BlockRegistry, type EleaBlock, type ListItem } from "@alien6-studio/elea-content";
+import { asRecord, asString, htmlToText, type BlockLike, type BlockRegistry, type EleaBlock, type ListItem, type RichHtmlPolicy } from "@alien6-studio/elea-content";
 import { textPoint } from "./caret.js";
+import { richHtmlTemplate } from "./clipboardHtml.js";
 import { createContext, useContext, useId, useMemo } from "react";
 
 /** Count the same UTF-16 units as a text control, excluding the editor's markup. */
@@ -73,10 +74,9 @@ export function useEditorTextLimit(blocks: EleaBlock[], maxLength: number | unde
 }
 
 /** Keep the prefix of a sanitized rich run, including marks and links across the cut. */
-export function clipMarkup(html: string, capacity: number): string {
+export function clipMarkup(html: string, capacity: number, policy: RichHtmlPolicy): string {
   if (capacity <= 0) return "";
-  const template = document.createElement("template");
-  template.innerHTML = html;
+  const template = richHtmlTemplate(html, policy);
   const root = template.content;
   const prefix = textPrefix(root.textContent, capacity);
   if (!prefix) return "";
@@ -84,20 +84,20 @@ export function clipMarkup(html: string, capacity: number): string {
   tail.selectNodeContents(root);
   tail.setStart(...textPoint(root, prefix.length));
   tail.deleteContents();
-  return root.textContent ? template.innerHTML : "";
+  return template.innerHTML;
 }
 
-function clipItems(items: ListItem[], capacity: number): ListItem[] {
+function clipItems(items: ListItem[], capacity: number, policy: RichHtmlPolicy): ListItem[] {
   const fitted: ListItem[] = [];
   for (const item of items) {
     if (capacity <= 0) break;
     const content = typeof item === "string" ? item : item.content;
     const length = inputText(content).length;
-    const clipped = length > capacity ? clipMarkup(content, capacity) : content;
+    const clipped = length > capacity ? clipMarkup(content, capacity, policy) : content;
     capacity -= length;
     if (typeof item === "string") fitted.push(clipped);
     else {
-      const children = clipItems(item.items ?? [], capacity);
+      const children = clipItems(item.items ?? [], capacity, policy);
       fitted.push({ ...item, content: clipped, ...(item.items && { items: children }) });
       capacity -= children.reduce((sum, child) => sum + itemText(child).length, 0);
     }
@@ -105,19 +105,19 @@ function clipItems(items: ListItem[], capacity: number): ListItem[] {
   return fitted;
 }
 
-function clipBlock<T extends BlockLike>(block: T, capacity: number): T | undefined {
+function clipBlock<T extends BlockLike>(block: T, capacity: number, policy: RichHtmlPolicy): T | undefined {
   if (capacity <= 0) return undefined;
   const data = asRecord(block.data);
   switch (block.type) {
     case "paragraph":
     case "header":
     case "quote": {
-      const clipped = clipMarkup(asString(data.text), capacity);
+      const clipped = clipMarkup(asString(data.text), capacity, policy);
       const caption = block.type === "quote" ? { caption: textPrefix(asString(data.caption), capacity - inputText(clipped).length) } : {};
       return clipped || caption.caption ? { ...block, data: { ...data, text: clipped, ...caption } } : undefined;
     }
     case "list":
-    case "nestedlist": return { ...block, data: { ...data, items: clipItems(data.items as ListItem[], capacity) } };
+    case "nestedlist": return { ...block, data: { ...data, items: clipItems(data.items as ListItem[], capacity, policy) } };
     case "code": return { ...block, data: { ...data, code: textPrefix(asString(data.code), capacity) } };
     case "image":
     case "video": return { ...block, data: { ...data, caption: textPrefix(asString(data.caption), capacity) } };
@@ -126,12 +126,12 @@ function clipBlock<T extends BlockLike>(block: T, capacity: number): T | undefin
 }
 
 /** Opaque extension blocks are copied atomically; editable text keeps its formatting. */
-export function fitPastedBlocks<T extends BlockLike>(incoming: T[], capacity: number, text: EditorTextLimit["text"]): T[] {
+export function fitPastedBlocks<T extends BlockLike>(incoming: T[], capacity: number, text: EditorTextLimit["text"], policy: RichHtmlPolicy): T[] {
   const accepted: T[] = [];
   for (const block of incoming) {
     const length = text(block).length;
     if (length > capacity) {
-      const clipped = clipBlock(block, capacity);
+      const clipped = clipBlock(block, capacity, policy);
       if (clipped) accepted.push(clipped);
       break;
     }

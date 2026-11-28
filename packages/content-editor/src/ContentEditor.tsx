@@ -142,9 +142,9 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
   const marksKey = marks?.join("\n");
   // The allow-list follows what the host lists, not the identity of the arrays it passes
   const restrictions = useMemo(
-    () => (blockTypes || marks ? createRestrictions({ blockTypes, marks, onLeftOut: left => leftOutRef.current?.(left) }) : undefined),
+    () => (blockTypes || marks ? createRestrictions({ blockTypes, marks, policy: sanitizer.policy, onLeftOut: left => leftOutRef.current?.(left) }) : undefined),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [blockTypesKey, marksKey],
+    [blockTypesKey, marksKey, sanitizer.policy],
   );
   // The document is edited in its accepted form; the host receives it with the first change
   const restricted = useMemo(() => restrictions?.restrict(hostBlocks), [restrictions, hostBlocks]);
@@ -283,7 +283,7 @@ export const ContentEditor = forwardRef<ContentEditorHandle, ContentEditorProps>
     let next = paste(created);
     if (textLimit && !textLimit.accepts(next)) {
       const usedWithoutPaste = paste([]).reduce((sum, block) => sum + textLimit.text(block).length, 0);
-      created = fitPastedBlocks(created, Math.max(textLimit.max, textLimit.count) - usedWithoutPaste, textLimit.text);
+      created = fitPastedBlocks(created, Math.max(textLimit.max, textLimit.count) - usedWithoutPaste, textLimit.text, sanitizer.policy);
       if (!created.length) return;
       next = paste(created);
     }

@@ -256,7 +256,15 @@ test("link popover: open, cancel, create external and internal links, refuse uns
   placeCaret(link.firstChild as Node, 1);
   act(() => ref.current?.openLinkInput());
   assert.equal((screen.getByRole("textbox", { name: en.editor.linkUrlPrompt }) as HTMLInputElement).value, "https://example.org");
-  assert.equal(screen.getByRole("link", { name: en.editor.linkOpen }).getAttribute("href"), "https://example.org");
+  const linkInput = screen.getByRole("textbox", { name: en.editor.linkUrlPrompt });
+  const previewLink = () => screen.getByRole("link", { name: en.editor.linkOpen });
+  assert.equal(previewLink().getAttribute("href"), "https://example.org/");
+  fireEvent.change(linkInput, { target: { value: "/article#notes" } });
+  assert.equal(previewLink().getAttribute("href"), new URL("/article#notes", document.baseURI).href);
+  for (const value of ["mailto:editor@example.org", "https://"]) {
+    fireEvent.change(linkInput, { target: { value } });
+    assert.equal(screen.queryByRole("link", { name: en.editor.linkOpen }), null);
+  }
   submitLink("example.com/changed");
   assert.equal(editor.querySelectorAll("a").length, 1);
   assert.equal(link.getAttribute("href"), "https://example.com/changed");

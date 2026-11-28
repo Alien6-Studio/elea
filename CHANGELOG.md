@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The editor sanitizes rich text before removing restricted marks or clipping a paste to the character limit. The link preview opens a browser-validated HTTP or HTTPS address.
+
 ## 0.1.5 - 2026-11-28
 
 The additions are opt-in and existing screens need no change. Upgrade the packages your application uses together.
