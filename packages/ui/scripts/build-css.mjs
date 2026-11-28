@@ -17,6 +17,7 @@ const dependencies = {
   "identifier-input.css": ["field.css"],
   "phone-input.css": ["field.css", "select.css", "combobox.css"],
   "multi-select.css": ["badge.css", "select.css"],
+  "measurement.css": ["button.css"],
   "navbar.css": ["navigation-list.css"],
   "hero.css": ["responsive-image.css"],
   "search-autocomplete.css": ["field.css", "search-field.css"],

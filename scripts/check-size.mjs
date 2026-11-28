@@ -46,7 +46,7 @@ const UI_BUDGETS = {
   "card-network": 325, "identifier-input": 5_000, layout: 1_275, "layout-bare": 1_275, phone: 175, "phone-input": 3_200,
   calendar: 3_600, carousel: 5_575, "color-picker": 2_400, combobox: 4_200,
   accordion: 2_500, alert: 1_900, avatar: 1_500, badge: 1_125, button: 3_950, "button-effects": 1_500, card: 1_700, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
-  dialog: 4_250, field: 2_025, footer: 1_250, hero: 1_900, index: 750, menu: 3_075, motion: 1_350, navbar: 3_750, "navigation-list": 1_950,
+  dialog: 4_250, field: 2_025, footer: 1_250, hero: 1_900, index: 750, measurement: 5_200, menu: 3_075, motion: 1_350, navbar: 3_750, "navigation-list": 1_950,
   "panel-position": 1_025, "responsive-image": 800, "search-autocomplete": 3_925,
   pagination: 2_050, popover: 4_300, progress: 1_500, "save-status": 1_550, "search-field": 2_750, sidebar: 1_975,
   "radio-group": 1_750, select: 5_025, separator: 750, sheet: 1_775, skeleton: 2_100, scope: 900, "skeleton-region": 750, slider: 2_000, stepper: 6_625, table: 2_275, tabs: 3_200, toast: 3_425, tooltip: 2_300,

@@ -738,3 +738,18 @@ The built-in editions retain each component’s size scale. The medium disc has 
 For portal controls, declare those variables on the theme attribute that
 the portal copies. A class or inline variable on a source ancestor only
 affects that DOM subtree.
+
+## Measurement displays
+
+Import `MeasurementPlot`, `MeasurementMap`, `MeasurementLog` and
+`MeasurementRecord` from `@alien6-studio/elea-ui/measurement`. The normal
+UI stylesheet includes their styles. A partial CSS integration can import
+`@alien6-studio/elea-ui/css/measurement.css`.
+
+The plot draws intervals and points on a shared horizontal scale. Supply
+the unit formatter and an accessible label, and provide exact values in a
+caption or a companion table. The map prints values in a two-column grid
+and normalises shading against the supplied or displayed maximum. The log
+renders host-selected records, and the record surface wraps preformatted
+text. Each forwards its ref and native attributes to its figure, list or
+preformatted element. Applications own the dataset, selection and consent.

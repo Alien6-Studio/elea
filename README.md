@@ -25,6 +25,10 @@ The packages share one version and one `vX.Y.Z` release tag. Install the package
 you use at the same version. See the [release instructions](docs/release.md)
 to build and qualify archives from a checkout.
 
+[Alien6 Observe](packages/observe) is a separate SDK workspace for optional
+local interaction instrumentation. Its development archive is available through
+the Observe workspace and follows an independent version.
+
 ELEA packages ship as ES modules only. When running Jest through `next/jest`, list every ELEA package your tests import, including transitive dependencies, in your Next.js [`transpilePackages` configuration](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages).
 
 With Tailwind v4, one line is required before every import, or Preflight resets the components:

@@ -1,0 +1,19 @@
+{
+  "name": "@alien6-studio/observe",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Semantic interaction events with an opt-in local collector",
+  "type": "module",
+  "sideEffects": false,
+  "engines": { "node": ">=22" },
+  "license": "Apache-2.0",
+  "files": ["dist", "README.md"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./browser": { "types": "./dist/browser.d.ts", "default": "./dist/browser.js" }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  }
+}

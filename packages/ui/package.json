@@ -35,6 +35,7 @@
       "import": "./dist/phone.js",
       "default": "./dist/phone.js"
     },
+    "./measurement": { "types": "./dist/Measurement.d.ts", "import": "./dist/Measurement.js", "default": "./dist/Measurement.js" },
     "./styles.css": "./dist/styles.css",
     "./bundle.css": "./dist/bundle.css",
     "./css/accordion.css": "./dist/css/accordion.css",
@@ -58,6 +59,7 @@
     "./css/layout-bare.css": "./dist/css/layout-bare.css",
     "./css/footer.css": "./dist/css/footer.css",
     "./css/hero.css": "./dist/css/hero.css",
+    "./css/measurement.css": "./dist/css/measurement.css",
     "./css/menu.css": "./dist/css/menu.css",
     "./css/motion.css": "./dist/css/motion.css",
     "./css/multi-select.css": "./dist/css/multi-select.css",
