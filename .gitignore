@@ -16,3 +16,6 @@ __pycache__/
 /.attest/
 /.trunk/
 /artifacts/
+
+# Continuum Attest init looks for this literal entry.
+.attest/keys/
