@@ -227,6 +227,8 @@ import { colorFamilies } from "@alien6-studio/elea-tokens/palette";
 import { editions, makeBrandTheme } from "@alien6-studio/elea-tokens/brand";
 import { ContentView, ContentExcerpt, createDefaultSanitizer } from "@alien6-studio/elea-content-viewer";
 import { DropZone, cropRect } from "@alien6-studio/elea-media";
+import { createLocalObserve } from "@alien6-studio/observe";
+import { createBrowserCollector } from "@alien6-studio/observe/browser";
 import { ibanFormat, paymentCardFormat, sirenFormat, siretFormat } from "@alien6-studio/elea-ui/formats";
 import { Breadcrumb, Button, Calendar, CardNumberInput, Carousel, ColorPicker, Combobox, DateField, Dialog, Footer, Hero, IbanInput, Input, MultiSelect, Navbar, ResponsiveImage, SearchAutocomplete, SearchField, Sidebar, SirenInput, SiretInput, Stepper, Textarea, StepperPanel, StepperSkeleton } from "@alien6-studio/elea-ui";
 import { JSDOM } from "jsdom";
@@ -281,6 +283,16 @@ assert.ok(renderToString(React.createElement(ContentExcerpt, { data: doc })).inc
 // Media on the server: the drop zone renders its input and label, the geometry needs no DOM
 assert.ok(renderToString(React.createElement(DropZone, { label: "Add", onFiles: () => {} })).includes('type="file"'));
 assert.equal(cropRect({ width: 200, height: 100 }, { width: 100, height: 100 }, { zoom: 1, rotation: 0, offset: { x: 0, y: 0 } }).width, 100);
+const observed = { surface: "editor", component: "button", slot: "document.save", role: "button", state: "ready", variant: null };
+const observedContext = { theme: null, appearance: null, density: null, experiment: null };
+const observe = createLocalObserve({ purpose: "local-demo", catalog: { revision: "check-1", entries: [{ target: observed, context: observedContext, kinds: ["interaction.activated"] }] }, collectors: [] });
+const activation = { schemaVersion: 1, kind: "interaction.activated", target: observed, context: observedContext, detail: { source: "application-command", modality: "keyboard" } };
+assert.equal(observe.record(activation), false, "nothing is recorded before a grant");
+observe.setGrant({ purpose: "local-demo", destination: "memory", kinds: ["interaction.activated"] });
+assert.equal(observe.record(activation), true);
+assert.equal(observe.snapshot().length, 1);
+observe.dispose();
+assert.equal(typeof createBrowserCollector, "function");
 
 // UI primitives render on the server from the published entry point
 const button = renderToString(React.createElement(Button, null, "Save"));

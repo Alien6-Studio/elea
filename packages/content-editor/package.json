@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-content-editor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Elea editor: React block editor with rich text, toolbar and injectable services",
   "type": "module",
   "sideEffects": [
@@ -36,11 +36,11 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@alien6-studio/elea-content": "^0.1.4",
-    "@alien6-studio/elea-content-viewer": "^0.1.4",
-    "@alien6-studio/elea-media": "^0.1.4",
-    "@alien6-studio/elea-tokens": "^0.1.4",
-    "@alien6-studio/elea-ui": "^0.1.4",
+    "@alien6-studio/elea-content": "^0.1.5",
+    "@alien6-studio/elea-content-viewer": "^0.1.5",
+    "@alien6-studio/elea-media": "^0.1.5",
+    "@alien6-studio/elea-tokens": "^0.1.5",
+    "@alien6-studio/elea-ui": "^0.1.5",
     "isomorphic-dompurify": "^4.8.0"
   },
   "peerDependencies": {

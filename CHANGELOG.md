@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.5 - 2026-11-28
 
+The additions are opt-in and existing screens need no change. Upgrade the packages your application uses together.
+
+- `@alien6-studio/observe` is a new package for registered, semantic interface events: activation, focus, exposure, state transition and task outcome. It has no dependency, does not require ELEA and works with native HTML. The host declares a catalog and grants collection; records stay in a bounded memory buffer and nothing is sent. It shares the version of the ELEA packages. See [Alien6 Observe](packages/observe).
 - The UI package adds the optional `css/layout.css` sheet: `elea-frame` for the outer edges of a page and `elea-grid` for its columns, four that become eight from 48rem (`md`) and twelve from 72rem (`lg`). `elea-col-N`, `elea-col-md-N` and `elea-col-lg-N` state the columns a block spans, `elea-start-N` and its `md` and `lg` forms the line it starts on, and `--elea-layout-*` properties on `:root` hold the width, margin and gutter. `css/layout-bare.css` is the same sheet with class names that drop the prefix, such as `grid` and `col-md-4`. See [Page layout](packages/ui#page-layout).
+- The UI package adds the `/measurement` entry with `MeasurementPlot`, `MeasurementMap`, `MeasurementLog` and `MeasurementRecord`, which draw intervals, values and records the host supplies. See [Measurement displays](packages/ui#measurement-displays).
 
 ## 0.1.4 - 2026-11-27
 

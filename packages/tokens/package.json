@@ -1,6 +1,6 @@
 {
   "name": "@alien6-studio/elea-tokens",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Elea design tokens: DTCG 2025.10 exports, CSS custom properties, Tailwind v3 preset and v4 theme, shadcn/ui aliases and TypeScript constants",
   "type": "module",
   "sideEffects": [

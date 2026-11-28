@@ -4,7 +4,6 @@ site_url: https://elea.alien6.com/
 repo_name: Alien6-Studio/elea
 repo_url: https://github.com/Alien6-Studio/elea
 extra:
-  source_revision: !ENV ELEA_SOURCE_REVISION
   # Each study is research/<slug>.md; its parts are research/<slug>/<part>.md.
   research:
     - title: Geometry of interfaces
@@ -32,12 +31,14 @@ plugins:
 hooks:
   - scripts/package_typeface.py
   - scripts/research_redirects.py
+  - scripts/document_tables.py
   - scripts/observatory_figures.py
 nav:
   - Overview: index.md
   - Getting started: getting-started.md
   - Content: content.md
   - UI integration: components.md
+  - Observe: observe.md
   - Versions: versions.md
 exclude_docs: |
   node_modules/

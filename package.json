@@ -1,6 +1,6 @@
 {
   "name": "elea",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "Elea design system by Alien6 Studio: design tokens, headless core, block content viewer and editor for React",
   "type": "module",
@@ -22,7 +22,7 @@
     "test:coverage": "c8 --check-coverage --lines 85 --statements 85 --functions 95 --branches 70 --exclude '**/dist/**' --exclude '**/*.test.*' --exclude '**/scripts/**' --exclude '**/src/test/**' --reporter=lcov --reporter=text npm test",
     "test:package": "node scripts/check-package.mjs",
     "test:dtcg": "npm ci --prefix docs/examples/dtcg --ignore-scripts && npm test --prefix docs/examples/dtcg",
-    "pack": "npm pack -w packages/tokens -w packages/content -w packages/content-viewer -w packages/media -w packages/content-editor -w packages/ui --pack-destination artifacts",
+    "pack": "npm pack -w packages/tokens -w packages/content -w packages/content-viewer -w packages/media -w packages/content-editor -w packages/ui -w packages/observe --pack-destination artifacts",
     "check": "npm run build && node docs/examples/theme-shapes.mjs && npm run test:dtcg && npm run check:size && npm run lint && npm run test:coverage && npm run test:package --",
     "check:size": "node scripts/check-size.mjs"
   },

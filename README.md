@@ -1,6 +1,6 @@
 # Elea
 
-Documentation and live playground: https://alien6-studio.github.io/elea/
+Documentation and live playground: https://elea.alien6.com/
 
 Elea is Alien6 Studio's open-source design system for content-rich applications.
 It combines design tokens and React components with an EditorJS-compatible
@@ -19,15 +19,11 @@ supplies its own storage, media services, translations and theme.
 | [`@alien6-studio/elea-content-viewer`](packages/content-viewer) | React rendering of block documents without hooks, usable in server components, with its stylesheet | [![npm version of elea-content-viewer](https://img.shields.io/npm/v/@alien6-studio/elea-content-viewer)](https://www.npmjs.com/package/@alien6-studio/elea-content-viewer) |
 | [`@alien6-studio/elea-content-editor`](packages/content-editor) | React block editor: rich text engine, blocks, toolbar, virtualization, with upload and attachment picking injected by the host | [![npm version of elea-content-editor](https://img.shields.io/npm/v/@alien6-studio/elea-content-editor)](https://www.npmjs.com/package/@alien6-studio/elea-content-editor) |
 | [`@alien6-studio/elea-media`](packages/media) | Media components on Elea tokens: file drop zone, image cropper with zoom and rotation, crop geometry | [![npm version of elea-media](https://img.shields.io/npm/v/@alien6-studio/elea-media)](https://www.npmjs.com/package/@alien6-studio/elea-media) |
+| [`@alien6-studio/observe`](packages/observe) | Registered, semantic interaction events kept in memory under a host grant. No dependency, no ELEA or React required | [![npm version of observe](https://img.shields.io/npm/v/@alien6-studio/observe)](https://www.npmjs.com/package/@alien6-studio/observe) |
 | [`@alien6-studio/elea-ui`](packages/ui) | React primitives and layouts on Elea tokens, including forms, overlays, pagination and a footer | [![npm version of elea-ui](https://img.shields.io/npm/v/@alien6-studio/elea-ui)](https://www.npmjs.com/package/@alien6-studio/elea-ui) |
 
 The packages share one version and one `vX.Y.Z` release tag. Install the packages
-you use at the same version. See the [release instructions](docs/release.md)
-to build and qualify archives from a checkout.
-
-[Alien6 Observe](packages/observe) is a separate SDK workspace for optional
-local interaction instrumentation. Its development archive is available through
-the Observe workspace and follows an independent version.
+you use at the same version.
 
 ELEA packages ship as ES modules only. When running Jest through `next/jest`, list every ELEA package your tests import, including transitive dependencies, in your Next.js [`transpilePackages` configuration](https://nextjs.org/docs/app/api-reference/config/next-config-js/transpilePackages).
 
@@ -57,20 +53,16 @@ npm ci
 npm run check
 ```
 
-`check` guards the repository against real hosts and mailboxes, builds every package and the
-playground, enforces the gzip size budget of each package, type-checks, runs the tests with
-coverage thresholds, then installs the six packed archives in clean projects outside the repository.
-It checks the shipped exports, TypeScript declarations, server rendering and the editor
-in a DOM with React 18 and React 19. CI also tests the playground in Chromium against
-the packages built from the commit under review.
+`check` builds every package, enforces each gzip size budget, type-checks and runs the
+tests with coverage thresholds. It then installs the packed archives in clean projects
+outside the repository and exercises them with React 18 and React 19. CI also tests the
+site in a browser against the packages built from the commit under review.
 
-## Release and verification
+## Releases
 
-Each [package release](https://github.com/Alien6-Studio/elea/releases) links
-to the package guides and runnable examples at its signed tag. Read the
-[changelog](CHANGELOG.md) for upgrade instructions and the
-[release guide](docs/release.md) to reproduce the [theme shapes example](docs/examples/theme-shapes.mjs)
-and verify the published archives.
+Read the [changelog](CHANGELOG.md) for what each version changes and what an
+upgrade requires. The [release guide](docs/release.md) covers reproducing a
+version, preparing a release and verifying the published archives.
 
 ## Contributing and security
 

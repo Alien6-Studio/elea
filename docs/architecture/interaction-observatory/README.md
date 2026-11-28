@@ -1,6 +1,6 @@
 # R02 · Interaction Observatory
 
-**Status** · Local SDK prototype for ELEA 0.1.5
+**Status** · Released with ELEA 0.1.5
 
 The host application owns collection policy. Alien6 Observe defines a portable
 event model and an optional pipeline. ELEA components continue to expose their
@@ -12,7 +12,7 @@ existing refs, events and controlled state.
 
 | Decision | Consequence |
 | --- | --- |
-| Keep the core independent of ELEA, React and the DOM. | A native HTML application can use the same contract. Qualify one native HTML integration and one ELEA integration before publishing Alien6 Observe. |
+| Keep the core independent of ELEA, React and the DOM. | A native HTML application can use the same contract. The [browser tests](../../../packages/observe/src/browser.test.ts) qualify a native HTML integration and the [laboratory tests](../../../site/playground/tests/observatory.spec.ts) an ELEA integration. |
 | Register semantics explicitly. | A deployment catalog allowlists the surface, component, slot, role, state and variant tuples. A slot identifies a product function such as `document.save`. Presentation and experiment codes are also registered. |
 | Validate a closed wire format. | Validate exact keys and catalog combinations before queueing and at ingress. Bound payload size and code cardinality. Use `null` for unknown or inapplicable context. |
 | Version the payload and catalog independently. | Increment the wire schema for shape or meaning changes. Revise the catalog when registered codes or collection rules change. |

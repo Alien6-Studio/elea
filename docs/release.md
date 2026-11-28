@@ -1,10 +1,13 @@
 # Releases
 
-ELEA publishes its six npm packages under one version. Each GitHub release links to the package guides, example source and changelog at its signed tag. For upgrade instructions, open the release matching the version in your lockfile. The public playground follows ongoing development.
+The seven npm packages share one version and one signed `vX.Y.Z` tag. Each
+[GitHub release](https://github.com/Alien6-Studio/elea/releases) links the
+package guides, the examples and the [changelog](../CHANGELOG.md) at its tag.
 
 ## Reproduce a version
 
-Clone the signed tag named in the release and use Node.js 22 or later. From the repository root run the example against that checkout’s packages.
+Check out the tag with Node.js 22 or later, then build the packages and run
+the [theme shapes example](examples/theme-shapes.mjs).
 
 ```sh
 npm ci
@@ -12,18 +15,38 @@ npm run build:packages
 node docs/examples/theme-shapes.mjs
 ```
 
-Open `artifacts/examples/theme-shapes/index.html` in a browser. The [theme shapes example](examples/theme-shapes.mjs) uses the public token and component APIs. The [changelog](../CHANGELOG.md) records visible changes, compatibility details and upgrade actions by version.
+Open `artifacts/examples/theme-shapes/index.html` in a browser.
 
 ## Prepare a release
 
-1. Set the root and all public workspace package versions to the same semantic version. Update the lockfile. Move the release’s changes from `## Unreleased` in the changelog to a heading such as `## 1.2.3`. Describe what changes for integrators and any action an upgrade requires.
-2. Run `npm ci` and `npm run check`. Preview the release body with `node scripts/release-notes.mjs v1.2.3`, substituting the intended tag. The check resolves every package guide and the example against the checkout.
-3. Create an annotated SSH-signed `vX.Y.Z` tag on the reviewed commit on `main`. Verify it with `scripts/verify-tag.sh vX.Y.Z` and push the tag to start the release workflow. The signing key must be listed in [the release signers](../.github/release/allowed_signers).
+1. Set the same version on the root and on every public package, and update
+   the lockfile.
+2. In the changelog, move the entries under `## Unreleased` to a heading such
+   as `## 1.2.3`. Say what changes for integrators and what an upgrade requires.
+3. Run `npm ci` and `npm run check`, then preview the release body with
+   `node scripts/release-notes.mjs v1.2.3`.
+4. On the reviewed commit of `main`, create an annotated, SSH-signed tag with
+   a key listed in [the release signers](../.github/release/allowed_signers).
+   Verify it with `scripts/verify-tag.sh v1.2.3` and push it. The tag starts
+   the release workflow.
 
-## Verify the published packages
+A failed release is retried with the same tag. The workflow compares what is
+already published by integrity and keeps existing release notes and assets.
 
-CI tests the source and packed consumers. Continuum Attest qualifies the archives, and a protected environment signs the receipt. The publish job verifies the signed tag, source revision and qualified file checksums. It checks the version notes before publishing new releases via npm trusted publishing and verifies each archive’s SHA-512 integrity against the public registry.
+## Verify a published release
 
-The GitHub release includes package archives and a qualification bundle. Extract `qualification-evidence.tar.gz` and run `sha256sum --check proof/SHA256SUMS` from its extracted root. Compare `artifacts/source-revision.txt` with `git rev-parse HEAD` in the tagged checkout.
+The workflow tests the source and the packed archives, qualifies the archives
+with Continuum Attest and signs the receipt in a protected environment. It
+publishes through npm trusted publishing after verifying the tag, the source
+revision and the checksums, then checks each archive’s SHA-512 integrity
+against the registry.
 
-Retry a failed release with the same signed tag. The workflow compares existing npm archives by integrity. If a public GitHub release exists, it also checks its archived package bytes and preserves its release notes and assets.
+To check a release yourself, download `qualification-evidence.tar.gz` from
+it and extract it.
+
+```sh
+sha256sum --check proof/SHA256SUMS
+```
+
+`artifacts/source-revision.txt` must equal `git rev-parse HEAD` in the tagged
+checkout.

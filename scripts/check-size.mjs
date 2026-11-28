@@ -21,7 +21,8 @@ import { gzipSync } from "node:zlib";
 // the package can grow by components without any of them growing unnoticed. This includes scoped
 // control tokens, independent feedback fills and foregrounds with local host fallbacks,
 // the font on standalone controls and surfaces, and the optional Tabs presentations.
-const BUDGETS = { tokens: 25_000, content: 37_000, "content-viewer": 14_400, media: 8_200, "content-editor": 83_200 };
+// observe holds the event contract, its validator, the local buffer and the browser collector, without a dependency.
+const BUDGETS = { tokens: 25_000, content: 37_000, "content-viewer": 14_400, media: 8_200, "content-editor": 83_200, observe: 5_200 };
 const referencePaletteFiles = new Set(["palette.js", "palette.css", "color-themes.js"]);
 // The optional atlas includes nine sets of component shapes, thirteen colour schemes and five surface scales.
 const referencePaletteBudget = 6_225;
