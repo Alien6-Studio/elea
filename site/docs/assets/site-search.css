@@ -1,0 +1,15 @@
+.site-search { position: relative; inline-size: 100%; }
+.site-search__shortcut {
+  pointer-events: none;
+  position: absolute;
+  inset-inline-end: var(--elea-space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: .1rem .3rem;
+  border: 1px solid var(--elea-color-border-default);
+  border-radius: var(--elea-radius-sm);
+  background: var(--elea-color-surface-default);
+  color: var(--elea-color-text-muted);
+  font: var(--elea-font-weight-medium) var(--elea-font-size-xs)/var(--elea-font-leading-normal) var(--elea-font-family-sans);
+}
+@media (pointer: coarse), (max-width: 30rem) { .site-search__shortcut { display: none; } }

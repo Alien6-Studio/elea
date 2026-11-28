@@ -1,0 +1,228 @@
+@import "./repository-link.css";
+
+:root {
+  --elea-font-family-serif: "Iowan Old Style", Georgia, serif;
+  --site-page-title: clamp(2.75rem, 6vw, 4.75rem);
+  --site-page-inset: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+:root[data-site-font="instrument"] {
+  --elea-font-family-sans: "Instrument Sans Variable", system-ui, sans-serif;
+}
+
+:root[data-switching-profile],
+:root[data-switching-profile] *,
+:root[data-switching-profile] *::before,
+:root[data-switching-profile] *::after {
+  transition: none !important;
+}
+
+:root[data-site-font="roboto"] {
+  --elea-font-family-sans: "Roboto Variable", Roboto, system-ui, sans-serif;
+}
+
+.site-page-title {
+  margin: 0;
+  font: 620 var(--site-page-title) / 1.03 var(--elea-font-family-sans);
+  letter-spacing: -.052em;
+}
+
+
+.site-missing { max-width: 40rem; padding-block: clamp(4rem, 12vw, 9rem); }
+.site-missing__code {
+  margin: 0 0 .75rem;
+  color: var(--elea-color-text-muted);
+  font: var(--elea-font-size-sm) var(--elea-font-family-mono);
+  letter-spacing: .06em;
+}
+.site-missing__lead { margin: 1.25rem 0 0; color: var(--elea-color-text-muted); font-size: var(--elea-font-size-lg); line-height: 1.55; }
+.site-missing__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.75rem; }
+
+.site__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.site__skip {
+  position: fixed;
+  z-index: 2;
+  inset: var(--elea-space-3) auto auto var(--elea-space-3);
+  padding: var(--elea-space-2) var(--elea-space-4);
+  border-radius: var(--elea-radius-md);
+  background: var(--elea-color-surface-default);
+  transform: translateY(-200%);
+}
+.site__skip:focus { transform: none; }
+@layer elea.base {
+  .site__masthead :focus-visible, .site__skip:focus-visible { outline: 2px solid var(--elea-color-focus); outline-offset: 2px; }
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+.site__masthead {
+  border-block-end: 1px solid var(--elea-color-border-default);
+  background: var(--elea-color-surface-default);
+}
+.site__masthead-inner {
+  --site-tool-gap: clamp(.625rem, 1.25vw, 1.125rem);
+  align-items: center;
+  row-gap: var(--elea-space-2);
+  padding-block-start: var(--elea-space-3);
+}
+.site__wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: .1875em;
+  min-height: 2.75rem;
+  color: var(--elea-color-text-default);
+  font: 400 clamp(2.5rem, 5vw, 3rem)/.9 "ELEA Sans", sans-serif;
+  font-synthesis: none;
+  letter-spacing: normal;
+  text-decoration: none;
+}
+.site__wordmark::before {
+  content: "";
+  flex: none;
+  width: .89em;
+  height: .89em;
+  transform: translateY(.08em);
+  background-color: currentColor;
+  mask: url("./elea-mark.svg") center / contain no-repeat;
+  forced-color-adjust: none;
+}
+/* The wordmark takes the rail; search, repository and tools share the body as one bar */
+.site__bar, .site__tools { display: flex; align-items: center; gap: var(--elea-space-2) var(--site-tool-gap); }
+.site__bar { flex-wrap: wrap; }
+#site-search { flex: 1 1 6rem; min-inline-size: 0; }
+.site__tools { flex: none; margin-inline-start: auto; }
+.site__masthead .site__theme-toggle { flex: none; width: 2.5rem; height: 2.5rem; padding: 0; }
+.site__masthead-links { border: 0; }
+.site__masthead-links .elea-navbar__bar { padding: 0; }
+.site__masthead-links .elea-navigation-list { column-gap: clamp(1rem, 2vw, 2rem); row-gap: 0; }
+.site-profile-select { inline-size: 10.25rem; }
+.site-profile-select .elea-ui-select__list { inset-inline: auto 0; min-inline-size: max(100%, 11rem); }
+.site-profile-option, .site-profile-option__swatches { display: inline-flex; align-items: center; vertical-align: middle; }
+.site-profile-option { gap: .5rem; max-inline-size: 100%; }
+.site-profile-option__swatches { flex: none; overflow: hidden; border-radius: var(--elea-radius-sm); }
+.site-profile-option__swatches > span { width: .55rem; height: .85rem; }
+.site__masthead-links .elea-navigation-list__link {
+  padding-inline: 0;
+  border-radius: 0;
+  border-block-end: 2px solid transparent;
+}
+.site__masthead-links a[aria-current] {
+  color: var(--elea-color-text-default);
+  border-color: var(--elea-color-text-link);
+}
+.site__theme-toggle .elea-button__label, .site__theme-when-light, .site__theme-when-dark { display: flex; }
+:root:not([data-theme]) .site__theme-toggle,
+:root[data-theme="dark"] .site__theme-when-light,
+:root[data-theme="light"] .site__theme-when-dark { display: none; }
+
+.site-footer {
+  --elea-color-surface-subtle: var(--elea-color-neutral-950);
+  --elea-color-border-default: var(--elea-color-neutral-800);
+  --elea-color-text-default: var(--elea-color-neutral-50);
+  --elea-color-text-muted: var(--elea-color-neutral-300);
+  --elea-color-text-link: var(--elea-color-primary-200);
+  --elea-color-focus: var(--elea-color-primary-400);
+  --elea-footer-max-width: calc(var(--elea-layout-width) + 2 * var(--elea-layout-margin));
+  --elea-footer-padding: var(--elea-layout-margin);
+}
+.site-footer .elea-footer__brand p { margin: var(--elea-space-3) 0 0; }
+.site-footer .elea-footer__main {
+  padding-block: clamp(var(--elea-space-8), 5vw, var(--elea-space-12));
+}
+.site-footer__signature {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--elea-space-3);
+  min-height: 2.75rem;
+  margin-inline-start: auto;
+}
+.site-footer__signature img {
+  display: block;
+  width: 4.5rem;
+  height: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.52;
+}
+.site-footer__signature:is(:hover, :focus-visible) img { opacity: 0.8; }
+
+.docs-guidebar {
+  border-block-end: 1px solid var(--elea-color-border-default);
+  background: color-mix(in srgb, var(--elea-color-surface-subtle) 42%, var(--elea-color-surface-default));
+}
+.docs-guidebar__inner { align-items: center; row-gap: 0; }
+.docs-guidebar__label {
+  color: var(--elea-color-text-muted);
+  font-size: .75rem;
+  font-weight: var(--elea-font-weight-semibold);
+}
+.docs-guidebar__links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 1.25rem; }
+.docs-guidebar__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  color: var(--elea-color-text-muted);
+  font-size: .8125rem;
+  text-decoration: none;
+}
+.docs-guidebar__links a[aria-current] {
+  color: var(--elea-color-text-default);
+  font-weight: var(--elea-font-weight-semibold);
+}
+.docs-guidebar__links a:hover { color: var(--elea-color-text-link); text-decoration: underline; }
+@media (max-width: 60rem) {
+  .site__masthead-links .elea-navigation-list { column-gap: 1.25rem; }
+  .site__masthead-links a:focus-visible { outline-offset: -2px; }
+}
+/* Below eight columns the masthead keeps a compact arrangement of its own */
+@media not all and (min-width: 48rem) {
+  .site__masthead-inner {
+    grid-template-areas: "logo search search search" "repo repo profile mode" "links links links links";
+    grid-template-columns: max-content minmax(0, 1fr) 10.25rem 2.5rem;
+    gap: var(--elea-space-2) var(--elea-space-3);
+  }
+  .site__bar, .site__tools { display: contents; }
+  #site-search { grid-area: search; }
+  .site__brand { grid-area: logo; }
+  .site__masthead .site-repo { grid-area: repo; }
+  #site-profile-picker { grid-area: profile; }
+  .site__masthead .site__theme-toggle { grid-area: mode; }
+  .site__masthead-links { grid-area: links; }
+  .site-profile-select { inline-size: 100%; }
+}
+@media (max-width: 25rem) {
+  .site__masthead-inner { grid-template-columns: max-content minmax(0, 1fr) 7.875rem 2.5rem; column-gap: var(--elea-space-2); }
+  .site__wordmark { font-size: 2rem; }
+  .site-profile-select { min-width: 0; }
+  .site-profile-select .site-profile-option { gap: .3rem; }
+  .site-profile-select .site-profile-option__swatches > span { width: .33rem; }
+  .site__masthead-links a { font-size: .8125rem; }
+}
+@media (max-width: 22rem) {
+  .site__masthead-links a { font-size: .75rem; letter-spacing: -.01em; }
+}
+@media (max-width: 30rem) {
+  .site__masthead-links .elea-navigation-list {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    justify-items: start;
+    gap: 0 .9rem;
+  }
+}
+@media not all and (min-width: 48rem) {
+  .docs-guidebar__label { display: none; }
+  .docs-guidebar__links { column-gap: 1rem; }
+}
+@media (max-width: 25rem) {
+  .docs-guidebar__links { column-gap: .8rem; }
+}

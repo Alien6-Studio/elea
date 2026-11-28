@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" data-elea-theme="site">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="{{ 'assets/elea-mark.svg' | url }}">
+  <title>Page not found · {{ config.site_name }}</title>
+  <script src="{{ 'assets/site-theme.js' | url }}"></script>
+  {% for path in config.extra_css %}
+    <link rel="stylesheet" href="{{ path | url }}">
+  {% endfor %}
+</head>
+<body>
+  {% include "header-home.html" %}
+  <main id="main" class="frame" tabindex="-1">
+    {% include "not-found.html" %}
+  </main>
+  {% include "site-footer.html" %}
+  <script type="module" src="{{ 'playground/site-profile.js' | url }}"></script>
+</body>
+</html>

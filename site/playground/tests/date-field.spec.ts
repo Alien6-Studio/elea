@@ -1,0 +1,47 @@
+import { expect, test } from "@playwright/test";
+
+test("typed and calendar dates share bounds and the calendar restores focus", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/playground/#/ui/date-field");
+  const day = page.getByRole("textbox", { name: "Day", exact: true });
+  const month = page.getByRole("textbox", { name: "Month", exact: true });
+  const iso = page.getByRole("status", { name: "ISO date" });
+  const year = page.getByRole("textbox", { name: "Year", exact: true });
+  await year.click();
+  await year.pressSequentially("2027");
+  await expect(iso).toHaveText("No date selected");
+  await year.click();
+  await year.pressSequentially("2028");
+  await expect(iso).toHaveText("2028-02-28");
+  await page.getByText("Publication date", { exact: true }).click();
+  await expect(day).toBeFocused();
+  await day.pressSequentially("29");
+  await expect(month).toBeFocused();
+  await expect(iso).toHaveText("2028-02-29");
+  await day.fill("31");
+  await expect(day).toHaveAttribute("aria-invalid", "true");
+  await expect(iso).toHaveText("No date selected");
+  const trigger = page.getByRole("button", { name: "Open calendar" });
+  await trigger.click();
+  const grid = page.getByRole("grid", { name: "Publication date" });
+  // With no selected date, the calendar opens on today clamped to the publication window.
+  const previous = page.getByRole("button", { name: "Previous month" });
+  if (await previous.isEnabled()) await previous.click();
+  await expect(grid.getByRole("button", { name: /19 February 2028/ })).toBeDisabled();
+  const leapDay = grid.getByRole("button", { name: /29 February 2028/ });
+  await expect(leapDay).toBeEnabled();
+  await expect(leapDay).toBeInViewport({ ratio: 1 });
+  await testInfo.attach("date-field-calendar", { body: await page.screenshot(), contentType: "image/png" });
+  await leapDay.click();
+  await expect(trigger).toBeFocused();
+  await expect(iso).toHaveText("2028-02-29");
+  await trigger.press("Enter");
+  await expect(page.getByRole("button", { name: /29 February 2028/ })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await trigger.press("Enter");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

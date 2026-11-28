@@ -1,0 +1,39 @@
+{
+  "name": "elea-playground",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "scripts": {
+    "audit:geometry": "tsx scripts/audit-geometry.ts",
+    "audit:layout": "tsx scripts/audit-layout.ts",
+    "build": "vite build",
+    "lint": "tsc -p tsconfig.json --noEmit && tsx scripts/check-examples.ts && npm run test:geometry && npm run test:layout && npm run test:grids && npm run test:observation",
+    "test": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:geometry": "node --import tsx --test src/geometry/geometry.test.ts",
+    "test:layout": "node --import tsx --test src/composition/audit.test.ts",
+    "test:grids": "node --test src/composition/grid.test.mjs && node ../scripts/research/layout-grids.mjs --check",
+    "test:observation": "node --import tsx --test src/observe/study.test.ts",
+    "test:next": "next build tests/fixtures/next"
+  },
+  "dependencies": {
+    "@fontsource-variable/instrument-sans": "5.3.0",
+    "@fontsource-variable/roboto": "5.3.0",
+    "libphonenumber-js": "1.13.17",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "next": "16.4.6",
+    "tsx": "4.23.12",
+    "typescript": "7.0.2",
+    "vite": "8.3.8"
+  },
+  "license": "Apache-2.0"
+}
