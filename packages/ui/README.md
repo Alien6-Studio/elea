@@ -597,6 +597,50 @@ the last modal releases the scroll lock. Motion disabled or a reduced-motion
 preference makes closing immediate. Keep the controlled root mounted and change
 its `open` prop to play the exit.
 
+## Page layout
+
+The optional `css/layout.css` sheet composes pages with classes, in HTML or JSX. `elea-frame` sets
+the outer edges that every view shares and `elea-grid` rules it into equal columns: two, four from
+48rem of viewport and six from 72rem. A block takes the whole line until it states a span. A grid
+placed directly in a grid inherits the lines it spans, so blocks at any depth start and end on
+the same edges.
+
+```html
+<main class="elea-frame elea-grid">
+  <nav class="elea-grid__rail" aria-label="Guides">…</nav>
+  <article class="elea-grid__prose">
+    <h1>Button</h1>
+    <p>Text keeps four columns.</p>
+    <figure class="elea-grid__plate">A plate takes the fifth as well.</figure>
+  </article>
+  <section class="elea-grid">
+    <article class="elea-grid__third">…</article>
+    <article class="elea-grid__third">…</article>
+    <article class="elea-grid__third">…</article>
+  </section>
+</main>
+```
+
+| Span | Two columns | Four columns | Six columns |
+| --- | --- | --- | --- |
+| `elea-grid__rail` | Whole line | First column | First column |
+| `elea-grid__body` | Whole line | Columns 2 to 4 | Columns 2 to 6 |
+| `elea-grid__prose` | Whole line | Columns 2 to 4 | Columns 2 to 6, text in 2 to 5 |
+| `elea-grid__half` | Whole line | 2 | 3 |
+| `elea-grid__third` | Whole line | 2 | 2 |
+| `elea-grid__panel` | Whole line | Whole line | 2 |
+| `elea-grid__stage` | Whole line | Whole line | 4 |
+
+Two pages that put their text in `elea-grid__body` or `elea-grid__prose` start their titles on
+the same edge, with or without a rail. The thresholds are in `rem` and follow the reader's text
+size. A grid nested through an element that is not itself a grid rules its own width.
+
+| Property | Default | Role |
+| --- | --- | --- |
+| `--elea-layout-width` | `74rem` | Widest frame |
+| `--elea-layout-margin` | `1.25rem` to `3rem` | Space outside the frame |
+| `--elea-layout-gutter` | `1rem` to `2rem` | Space between columns and between rows |
+
 ## Portals and local appearance
 
 Apply `data-elea-appearance` on a DOM or JSX container. Dialog, Sheet and

@@ -38,10 +38,11 @@ const cropAdjustmentFiles = new Set(["AdjustableCrop.js", "CropFormatControls.js
 // Navbar positions its vertical lists at the logical start of each group. The standalone
 // Navbar and Sidebar sheets include their shared link and disclosure-only group styles.
 // DateField bundles the standalone calendar, field and popover styles. Field counters and digit masks are optional.
+// Layout is a sheet without a script: a frame and a column ruling.
 // Alert reads host colours per tone, Dialog adds two sizes and a scrolling body, Menu adds link items and a header, Stepper adds drawing options and badge tones.
 const UI_BUDGETS = {
   breadcrumb: 1_375, "date-field": 7_025, "multi-select": 5_475, "input-formats": 1_600, "input-mask": 1_500, "phone-format": 525, "text-controls": 1_700,
-  "card-network": 325, "identifier-input": 5_000, phone: 175, "phone-input": 3_200,
+  "card-network": 325, "identifier-input": 5_000, layout: 775, phone: 175, "phone-input": 3_200,
   calendar: 3_600, carousel: 5_575, "color-picker": 2_400, combobox: 4_200,
   accordion: 2_500, alert: 1_900, avatar: 1_500, badge: 1_125, button: 3_950, "button-effects": 1_500, card: 1_700, checkbox: 1_775, "confirm-field": 1_000, cx: 250,
   dialog: 4_250, field: 2_025, footer: 1_250, hero: 1_900, index: 750, menu: 3_075, motion: 1_350, navbar: 3_750, "navigation-list": 1_950,

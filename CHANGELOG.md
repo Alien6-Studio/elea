@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The UI package adds the optional `css/layout.css` sheet: `elea-frame` for the outer edges of a page and `elea-grid` for its columns, two that become four from 48rem and six from 72rem. Named spans such as `elea-grid__rail`, `elea-grid__body` and `elea-grid__half` place content on the column lines, and `--elea-layout-*` properties set the width, margin and gutter. See [Page layout](packages/ui#page-layout).
+
 ## 0.1.4 - 2026-11-27
 
 These changes correct default rendering. Compare screens that use segmented tabs, cards, the classic editor or `buttonRadiusScale: "profile"` before upgrading.

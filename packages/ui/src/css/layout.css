@@ -1,0 +1,42 @@
+/* Layout: a frame and the columns every view of a site shares. A block states the columns it
+   takes and a grid placed in a grid inherits its lines, so blocks at any depth start and end on
+   the same edges. The ruling has two columns, four from 48rem and six from 72rem. */
+:where(.elea-frame, .elea-grid) {
+  --elea-_layout-margin: var(--elea-layout-margin, clamp(var(--elea-space-5), 4.4vi, var(--elea-space-12)));
+  --elea-_layout-gutter: var(--elea-layout-gutter, clamp(var(--elea-space-4), 2.4vi, var(--elea-space-8)));
+  box-sizing: border-box;
+  min-inline-size: 0;
+}
+
+/* Frame: the outer edges every view shares */
+.elea-frame {
+  inline-size: min(var(--elea-layout-width, 74rem), 100% - 2 * var(--elea-_layout-margin));
+  margin-inline: auto;
+}
+
+.elea-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--elea-_layout-gutter);
+  align-items: start;
+}
+.elea-grid > .elea-grid { grid-template-columns: subgrid; }
+
+/* A block takes the whole line until the ruling has the columns of its span */
+:where(.elea-grid > *) { grid-column: 1 / -1; min-inline-size: 0; }
+
+@media (min-width: 48rem) {
+  .elea-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .elea-grid__rail { grid-column: 1; }
+  .elea-grid__body, .elea-grid__prose { grid-column: 2 / -1; }
+  .elea-grid__half, .elea-grid__third { grid-column: span 2; }
+}
+
+@media (min-width: 72rem) {
+  .elea-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .elea-grid__half { grid-column: span 3; }
+  .elea-grid__panel { grid-column: span 2; }
+  .elea-grid__stage { grid-column: span 4; }
+  /* Prose spans five columns: its text keeps four, a plate takes the fifth */
+  .elea-grid__prose > :where(:not(.elea-grid__plate)) { max-inline-size: calc(80% - .2 * var(--elea-_layout-gutter)); }
+}

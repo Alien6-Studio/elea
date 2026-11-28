@@ -15,9 +15,9 @@
   align-items: start;
   gap: var(--elea-space-6);
   box-sizing: border-box;
-  max-inline-size: var(--elea-footer-max-width, 74rem);
+  /* The rows end where their content does, so the rule between them stays inside the margins */
+  inline-size: calc(min(var(--elea-footer-max-width, 74rem), 100%) - 2 * var(--elea-footer-padding, var(--elea-space-6)));
   margin-inline: auto;
-  padding-inline: var(--elea-footer-padding, var(--elea-space-6));
 }
 .elea-footer__main { padding-block: var(--elea-space-8); }
 .elea-footer__end { align-items: center; padding-block: var(--elea-space-4); }
