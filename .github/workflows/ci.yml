@@ -43,9 +43,10 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
   e2e:
     name: Playground end to end
-    uses: Alien6-Studio/elea/.github/workflows/check-pages.yml@gh-pages
+    uses: ./.github/workflows/check-pages.yml
     with:
-      source-ref: ${{ inputs.ref || github.sha }}
+      ref: ${{ inputs.ref || github.sha }}
+      upload-site: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && inputs.ref == '' }}
   checks:
     name: Elea checks
     if: always()

@@ -5,7 +5,6 @@ repo_name: Alien6-Studio/elea
 repo_url: https://github.com/Alien6-Studio/elea
 extra:
   source_revision: !ENV ELEA_SOURCE_REVISION
-  docs_revision: !ENV ELEA_DOCS_REVISION
   # Each study is research/<slug>.md; its parts are research/<slug>/<part>.md.
   research:
     - title: Geometry of interfaces

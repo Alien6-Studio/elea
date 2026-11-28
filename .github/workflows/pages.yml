@@ -1,0 +1,49 @@
+name: GitHub Pages
+
+# Publishes the site CI built and tested for a push to main. The gh-pages branch holds
+# nothing but that generated site.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: elea-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: gh-pages
+          path: pages
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: site
+          path: site
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+      - name: Replace the branch content with the tested site
+        env:
+          REVISION: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          git -C pages rm -r --quiet --ignore-unmatch .
+          cp -R site/. pages/
+          touch pages/.nojekyll
+          git -C pages add --all
+          if git -C pages diff --cached --quiet; then exit 0; fi
+          git -C pages -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit --quiet --message "Publish the site built from $REVISION"
+          git -C pages push origin HEAD:gh-pages

@@ -98,15 +98,14 @@
       </div>
       <article class="elea-grid__prose start-md-3 docs-article">
         {{ page.content }}
-        {% if page.file.src_uri == 'versions.md' and config.extra.source_revision and config.extra.docs_revision %}
+        {% if page.file.src_uri == 'versions.md' and config.extra.source_revision %}
           <h2>Current site build</h2>
           <p>
-            Library <a href="{{ config.repo_url }}/tree/{{ config.extra.source_revision }}"><code>{{ config.extra.source_revision[:10] }}</code></a> ·
-            Documentation and playground <a href="{{ config.repo_url }}/tree/{{ config.extra.docs_revision }}"><code>{{ config.extra.docs_revision[:10] }}</code></a>
+            Library, documentation and playground <a href="{{ config.repo_url }}/tree/{{ config.extra.source_revision }}"><code>{{ config.extra.source_revision[:10] }}</code></a>
           </p>
           <p><a href="{{ 'examples/theme-shapes/' | url }}">Compare the nine theme shapes</a> or
             <a href="{{ config.repo_url }}/blob/{{ config.extra.source_revision }}/docs/examples/theme-shapes.mjs">run the theme shapes example</a> from the library checkout.</p>
-          <p><a href="{{ config.repo_url }}/blob/{{ config.extra.docs_revision }}/README.md">Build the guided examples</a> using the two revisions above.</p>
+          <p><a href="{{ config.repo_url }}/blob/{{ config.extra.source_revision }}/site/README.md">Build the guided examples</a> at the revision above.</p>
           <p><a href="{{ config.repo_url }}/blob/{{ config.extra.source_revision }}/CHANGELOG.md">Read the changelog for this build</a>.</p>
         {% endif %}
       </article>

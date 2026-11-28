@@ -1,23 +1,22 @@
 # Elea documentation
 
-This branch contains the MkDocs site with its Elea theme and the interactive
-playground deployed to GitHub Pages. The design system and its release scripts
-live on `main`.
+This folder contains the MkDocs site with its Elea theme and the interactive
+playground deployed to GitHub Pages. The paths below are relative to it.
 
-With Node 24 and Python 3.12, install the dependencies in an Elea source
-checkout, then build the site from this branch.
+With Node 24 and Python 3.12, install the dependencies of the repository,
+then build the site.
 
 ```sh
-npm --prefix /path/to/elea ci
+npm --prefix .. ci
 python -m pip install -r requirements.txt
-scripts/build.sh /path/to/elea
+scripts/build.sh
 python -m http.server 4174 --bind 127.0.0.1 --directory .build/elea
 ```
 
-Open port 4174. The build installs local archives made from the
-specified checkout and compiles the private Next.js fixture in
-`playground/tests/fixtures/next` against those archives. The Interaction Observatory uses the independent
-Observe archive, so the paired source checkout must include `packages/observe`.
+Open port 4174. The build installs local archives made from the packages of
+the checkout and compiles the private Next.js fixture in
+`playground/tests/fixtures/next` against those archives. The Interaction
+Observatory uses the independent Observe archive from `packages/observe`.
 
 ## Browser checks
 
@@ -42,5 +41,6 @@ For native browser interactions, install the three Playwright browsers in
 `playground` and run `npm --prefix playground test`. To test an already served
 build, set `ELEA_TEST_URL` to its origin, for example `http://127.0.0.1:4310`.
 
-Pull requests targeting `gh-pages` run these checks against the proposed site.
-A push to `gh-pages` deploys the checked static files through GitHub Actions.
+Pull requests run these checks against the proposed site. A push to `main`
+publishes the checked static files to the `gh-pages` branch, which holds
+nothing else and is never edited by hand.

@@ -4,7 +4,7 @@ import { Lab } from "./Lab.js";
 import { CornerPlate, CurvaturePlate, FamilyPlate, NestingPlate, OpticalPlate, SpecimenPlate, statuses } from "./plates.js";
 
 const study = `${sitePath}research/geometry-of-interfaces/`;
-const source = `${repositoryUrl}/tree/gh-pages/playground/src/geometry`;
+const source = `${repositoryUrl}/tree/main/site/playground/src/geometry`;
 
 export type GeometryView = "atlas" | "laboratory";
 

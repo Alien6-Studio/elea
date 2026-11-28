@@ -39,7 +39,7 @@ With Tailwind v4, one line is required before every import, or Preflight resets 
 
 See [Overriding and Tailwind](packages/ui#overriding).
 
-The documentation and live playground are built from the [`gh-pages` branch](https://github.com/Alien6-Studio/elea/tree/gh-pages).
+The documentation and live playground are built from the [`site` folder](site). The `gh-pages` branch holds the generated site only.
 
 ## Layers
 

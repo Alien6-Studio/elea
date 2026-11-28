@@ -365,11 +365,9 @@ test("the site build identifies the library and playground behind the examples",
   expect(libraryExample).toMatch(/\/blob\/[0-9a-f]{40}\/docs\/examples\/theme-shapes\.mjs$/);
   await expect(guide.getByRole("link", { name: "Read the changelog for this build" }))
     .toHaveAttribute("href", libraryExample!.replace("docs/examples/theme-shapes.mjs", "CHANGELOG.md"));
-  expect(playgroundGuide).toMatch(/\/blob\/[0-9a-f]{40}\/README\.md$/);
-  for (const link of [libraryExample!, playgroundGuide!]) {
-    const revision = link.split("/blob/")[1]!.split("/")[0]!;
-    await expect(guide.getByRole("link", { name: revision.slice(0, 10), exact: true })).toHaveAttribute("href", new RegExp("/tree/" + revision + "$"));
-  }
+  const revision = libraryExample!.split("/blob/")[1]!.split("/")[0]!;
+  expect(playgroundGuide).toMatch(new RegExp("/blob/" + revision + "/site/README\\.md$"));
+  await expect(guide.getByRole("link", { name: revision.slice(0, 10), exact: true })).toHaveAttribute("href", new RegExp("/tree/" + revision + "$"));
   await guide.getByRole("link", { name: "Compare the nine theme shapes" }).click();
   await expect(page.getByRole("heading", { level: 2 })).toHaveCount(9);
   const reserve = page.locator('[data-elea-theme="reserve"]');

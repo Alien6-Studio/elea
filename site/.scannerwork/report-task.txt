@@ -1,0 +1,6 @@
+projectKey=opensource_elea_site
+serverUrl=https://sonarqube.alien6.local
+serverVersion=26.2.0.119303
+dashboardUrl=https://sonarqube.alien6.local/dashboard?id=opensource_elea_site
+ceTaskId=15bd403c-c943-4adc-9959-bc1179543028
+ceTaskUrl=https://sonarqube.alien6.local/api/ce/task?id=15bd403c-c943-4adc-9959-bc1179543028

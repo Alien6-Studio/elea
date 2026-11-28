@@ -11,7 +11,7 @@ def on_post_build(*, config):
         assets / "fonts/ELEASans-Variable.woff2",
         assets / "fonts/ELEASans-Italic-Variable.woff2",
         assets / "fonts/elea-sans.css",
-        Path(config.config_file_path).parent / "LICENSE",
+        Path(config.config_file_path).parent.parent / "LICENSE",
     )
     with ZipFile(assets / "ELEA-Sans.zip", "w") as archive:
         for file in files:

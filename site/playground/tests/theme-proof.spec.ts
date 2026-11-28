@@ -72,7 +72,6 @@ for (const [theme, label] of [["reserve", "Réserve"], ["rasance", "Rasance"]] a
         provenance: {
           origin: process.env.GITHUB_ACTIONS === "true" ? "github-actions" : "local",
           sourceRevision: process.env.ELEA_SOURCE_REVISION || null,
-          siteRevision: process.env.ELEA_PAGES_REVISION || process.env.GITHUB_SHA || null,
         },
         browser: { engine: browser.browserType().name(), version: browser.version(), project: testInfo.project.name },
         viewport: page.viewportSize(), reducedMotion: "reduce",

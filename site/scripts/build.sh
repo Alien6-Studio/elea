@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# != 1 ]]; then
-  printf 'Usage: %s <Elea source checkout>\n' "$0" >&2
+if [[ $# != 0 ]]; then
+  printf 'Usage: %s\n' "$0" >&2
   exit 2
 fi
 
 site_root=$(cd "$(dirname "$0")/.." && pwd)
-source_root=$(cd "$1" && pwd)
+source_root=$(cd "$site_root/.." && pwd)
 playground="$site_root/playground"
 archive_dir=$(mktemp -d)
 trap 'rm -rf -- "$archive_dir"' EXIT
@@ -30,9 +30,8 @@ cp "$site_root/docs/assets/elea-mark.svg" "$playground/public/favicon.svg"
 )
 
 site_dir="$site_root/.build/elea"
-export ELEA_SOURCE_REVISION ELEA_DOCS_REVISION
+export ELEA_SOURCE_REVISION
 ELEA_SOURCE_REVISION=$(git -C "$source_root" rev-parse --verify HEAD 2>/dev/null || true)
-ELEA_DOCS_REVISION=$(git -C "$site_root" rev-parse --verify HEAD 2>/dev/null || true)
 "${MKDOCS:-mkdocs}" build --strict --config-file "$site_root/mkdocs.yml" --site-dir "$site_dir"
 mkdir -p "$site_dir/playground"
 cp -R "$playground/dist/." "$site_dir/playground/"
