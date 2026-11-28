@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en" data-elea-theme="site">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How the roles of the material determine a grid, and how a record, a comparison and a collection can share it across different widths.">
+  <link rel="canonical" href="https://elea.alien6.com/research/composition-of-interfaces/">
+  <link rel="icon" type="image/svg+xml" href="../../assets/elea-mark.svg">
+  <title>Composition of interfaces · Elea</title>
+  
+  <script src="../../assets/site-theme.js"></script>
+  
+    <link rel="stylesheet" href="../../assets/elea.css">
+  
+    <link rel="stylesheet" href="../../assets/type-roles.css">
+  
+    <link rel="stylesheet" href="../../assets/editions.css">
+  
+    <link rel="stylesheet" href="../../assets/site-profile.css">
+  
+    <link rel="stylesheet" href="../../assets/elea-viewer.css">
+  
+    <link rel="stylesheet" href="../../assets/elea-ui.css">
+  
+    <link rel="stylesheet" href="../../assets/elea-layout.css">
+  
+    <link rel="stylesheet" href="../../assets/brand.css">
+  
+    <link rel="stylesheet" href="../../assets/site-search.css">
+  
+    <link rel="stylesheet" href="../../assets/site.css">
+  
+    <link rel="stylesheet" href="../../assets/research.css">
+  
+  
+  <link rel="stylesheet" href="../../assets/composition-study.css">
+</head>
+
+
+<body>
+  
+    <a class="site__skip" href="#main">Skip to content</a><header class="site__masthead"><div class="frame grid site__masthead-inner"><div class="site__brand col-md-2"><a class="site__wordmark" href="/" aria-label="Elea">elea</a></div><div class="start-md-3 site__bar"><div id="site-search"><div role="search" aria-label="Site" class="site-search"><div class="elea-search-autocomplete"><div class="elea-search-field elea-search-field--clearable"><svg class="elea-search-field__icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg><input aria-keyshortcuts="Control+k Meta+k" id="elea-site-query" role="combobox" aria-autocomplete="list" autoComplete="off" aria-expanded="false" type="search" aria-label="Search the site" placeholder="Search" class="elea-ui-input elea-ui-input--md" value=""/></div></div><kbd aria-hidden="true" class="site-search__shortcut">Ctrl K</kbd></div></div><a class="site-repo" href="https://github.com/Alien6-Studio/elea" aria-label="Alien6-Studio/elea on GitHub, Latest release v0.1.4, 1 star, 0 forks"><svg class="site-repo__glyph" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7m12 5v-3.4c0-1 .1-1.5-.5-2.1 3.1-.4 6.4-1.6 6.4-7a5.4 5.4 0 0 0-1.5-3.8 5 5 0 0 0-.1-3.8s-1.2-.4-3.9 1.5a13.2 13.2 0 0 0-7 0C5.7.8 4.5 1.2 4.5 1.2a5 5 0 0 0-.1 3.8 5.4 5.4 0 0 0-1.5 3.8c0 5.4 3.3 6.6 6.4 7-.5.5-.7 1.1-.7 2.1v3.4"></path></svg><span class="site-repo__copy" aria-hidden="true"><span class="site-repo__name">Alien6-Studio/<wbr/>elea</span><span class="site-repo__facts"><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><path d="M8.5 2H14v5.5l-6.3 6.3a1 1 0 0 1-1.4 0L2.2 9.7a1 1 0 0 1 0-1.4Z"></path><circle cx="11.5" cy="4.5" r=".65" fill="currentColor" stroke="none"></circle></svg>v0.1.4</span><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><path d="m8 1.8 1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.5l-3.8 2.1.7-4.3-3.1-3 4.3-.6Z"></path></svg>1</span><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><circle cx="4" cy="3" r="1.6"></circle><circle cx="12" cy="3" r="1.6"></circle><circle cx="8" cy="13" r="1.6"></circle><path d="M4 4.6v1.5c0 2 4 1.5 4 4v1.3m4-6.8v1.5c0 2-4 1.5-4 4"></path></svg>0</span></span></span></a><div class="site__tools"><div id="site-profile-picker" hidden=""><div class="elea-ui-select elea-ui-select--sm site-profile-select"><button type="button" id="site-profile" class="elea-ui-select__trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="site-profile-listbox" aria-label="Site theme"><span class="elea-ui-select__value"><span class="site-profile-option"><span class="site-profile-option__swatches" aria-hidden="true"><span style="background-color:#edbb28"></span><span style="background-color:#232321"></span><span style="background-color:#739397"></span></span><span>Ponctuation</span></span></span><span class="elea-ui-select__chevron"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></button></div></div><button data-site-theme-toggle="" data-testid="theme-toggle" class="elea-button elea-button--ghost elea-button--sm site__theme-toggle" type="button"><span class="elea-button__label"><span class="site__theme-when-light"><span class="site__visually-hidden">Switch to the dark theme</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg></span><span class="site__theme-when-dark"><span class="site__visually-hidden">Switch to the light theme</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"></path></svg></span></span></button></div></div><nav aria-label="Main" class="elea-navbar start-md-3 site__masthead-links" data-collapse="never" data-submenu-layout="list"><div class="elea-navbar__bar"><button type="button" class="elea-navbar__toggle" hidden="" aria-controls="_R_e_" aria-expanded="false"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>Site menu</button><div id="_R_e_" class="elea-navbar__panel"><ul class="elea-navigation-list"><li><a href="/getting-started/" class="elea-navigation-list__link"><span>Docs</span></a></li><li><a href="/playground/#/ui" class="elea-navigation-list__link"><span>Components</span></a></li><li><a href="/typography/" class="elea-navigation-list__link"><span>Typography</span></a></li><li><a href="/playground/#/colours" class="elea-navigation-list__link"><span>Colours</span></a></li><li><a href="/playground/#/theme" class="elea-navigation-list__link"><span>Theme studio</span></a></li><li><a href="/playground/#/playground" class="elea-navigation-list__link"><span>Editorial workspace</span></a></li><li><a href="/research/" class="elea-navigation-list__link" aria-current="true"><span>Research</span></a></li></ul></div></div></nav></div></header>
+    <div class="docs-guidebar">
+      <div class="frame grid docs-guidebar__inner">
+        <span class="elea-grid__rail col-md-2 docs-guidebar__label">Research</span>
+        <nav class="start-md-3 docs-guidebar__links" aria-label="Research">
+          <a href="../">All studies</a>
+          
+            
+            <a href="../geometry-of-interfaces/">Geometry of interfaces</a>
+          
+            
+            <a href="./" aria-current="page">Composition of interfaces</a>
+          
+            
+            <a href="../interaction-observatory/">Interaction Observatory</a>
+          
+        </nav>
+      </div>
+    </div>
+    
+      
+      
+    
+      
+      
+        <div class="docs-guidebar docs-guidebar--study">
+          <div class="frame grid docs-guidebar__inner">
+            <span class="elea-grid__rail col-md-2 docs-guidebar__label">Composition of interfaces</span>
+            <nav class="start-md-3 docs-guidebar__links" aria-label="Composition of interfaces">
+              <a href="./" aria-current="page">Study</a>
+              
+                <a href="atlas/">Atlas</a>
+              
+                <a href="laboratory/">Laboratory</a>
+              
+            </nav>
+          </div>
+        </div>
+      
+    
+      
+      
+    
+  
+  
+    <main id="main" class="frame grid docs-layout" tabindex="-1">
+      <div class="elea-grid__rail col-md-2 docs-rail">
+        
+          <nav class="docs-toc" aria-label="On this page">
+            <p>On this page</p>
+            
+              <a href="#establish-the-field">Establish the field</a>
+            
+              <a href="#construct-the-columns">Construct the columns</a>
+            
+              <a href="#give-the-spans-a-purpose">Give the spans a purpose</a>
+            
+              <a href="#set-modules-and-baselines">Set modules and baselines</a>
+            
+              <a href="#find-where-the-grid-stops-fitting">Find where the grid stops fitting</a>
+            
+              <a href="#one-ruling-for-a-family-of-views">One ruling for a family of views</a>
+            
+              <a href="#what-measurements-can-establish">What measurements can establish</a>
+            
+              <a href="#what-a-layout-system-can-carry-from-one-view-to-the-next">What a layout system can carry from one view to the next</a>
+            
+              <a href="#how-far-from-a-passage-should-its-note-sit">How far from a passage should its note sit?</a>
+            
+          </nav>
+        
+      </div>
+      <article class="elea-grid__prose start-md-3 docs-article">
+        <h1 id="composition-of-interfaces">Composition of interfaces</h1>
+<p>Open a record, compare two recordings, then return to the collection. At
+the same window width, the comparison can have room for two passages while
+the record still needs its note below the text. What can hold these views
+together when they rearrange at different moments?</p>
+<!-- series-plate -->
+<figure class="grid-plot">
+<div class="grid-plot__pair">
+<div><svg viewBox="0 0 240 160" role="img" aria-label="Archive at 40 rem"><title>Archive at 40 rem</title><desc>The note sits below the passage. The comparison is paired and the index fits 2 entries in its first row.</desc>
+<rect x="0" y="0" width="240" height="160" class="grid-plot__field"/>
+<rect x="6" y="5" width="184" height="144" class="grid-plot__paper"/>
+<rect x="15.2" y="9" width="23.766666666666666" height="136" class="grid-plot__track"/>
+<rect x="43.56666666666667" y="9" width="23.766666666666666" height="136" class="grid-plot__track"/>
+<rect x="71.93333333333334" y="9" width="23.766666666666666" height="136" class="grid-plot__track"/>
+<rect x="100.3" y="9" width="23.766666666666666" height="136" class="grid-plot__track"/>
+<rect x="128.66666666666666" y="9" width="23.766666666666666" height="136" class="grid-plot__track"/>
+<rect x="157.03333333333333" y="9" width="23.766666666666666" height="136" class="grid-plot__track"/>
+<rect x="15.2" y="14" width="151.79999999999998" height="20" class="grid-plot__span"/>
+<line x1="18.2" y1="18" x2="124.49599999999998" y2="18" class="grid-plot__type"/>
+<rect x="15.2" y="37" width="165.6" height="11" class="grid-plot__note"/>
+<line x1="18.2" y1="41" x2="134.432" y2="41" class="grid-plot__type"/>
+<rect x="15.2" y="64" width="80.5" height="18" class="grid-plot__span"/>
+<line x1="18.2" y1="68" x2="73.16" y2="68" class="grid-plot__type"/>
+<rect x="100.3" y="64" width="80.5" height="18" class="grid-plot__span"/>
+<line x1="103.3" y1="68" x2="158.26" y2="68" class="grid-plot__type"/>
+<rect x="15.2" y="99" width="80.5" height="16" class="grid-plot__span"/>
+<line x1="18.2" y1="103" x2="73.16" y2="103" class="grid-plot__type"/>
+<rect x="100.3" y="99" width="80.5" height="16" class="grid-plot__span"/>
+<line x1="103.3" y1="103" x2="158.26" y2="103" class="grid-plot__type"/>
+<rect x="15.2" y="120" width="80.5" height="16" class="grid-plot__span"/>
+<line x1="18.2" y1="124" x2="73.16" y2="124" class="grid-plot__type"/>
+</svg><span class="grid-plot__label">A 40-rem frame</span></div>
+<div><svg viewBox="0 0 240 160" role="img" aria-label="Archive at 46 rem"><title>Archive at 46 rem</title><desc>The note sits beside the passage. The comparison is paired and the index fits 3 entries in its first row.</desc>
+<rect x="0" y="0" width="240" height="160" class="grid-plot__field"/>
+<rect x="6" y="5" width="211.6" height="144" class="grid-plot__paper"/>
+<rect x="15.2" y="9" width="28.366666666666667" height="136" class="grid-plot__track"/>
+<rect x="48.16666666666667" y="9" width="28.366666666666667" height="136" class="grid-plot__track"/>
+<rect x="81.13333333333334" y="9" width="28.366666666666667" height="136" class="grid-plot__track"/>
+<rect x="114.1" y="9" width="28.366666666666667" height="136" class="grid-plot__track"/>
+<rect x="147.06666666666666" y="9" width="28.366666666666667" height="136" class="grid-plot__track"/>
+<rect x="180.03333333333333" y="9" width="28.366666666666667" height="136" class="grid-plot__track"/>
+<rect x="15.2" y="14" width="127.26666666666667" height="25" class="grid-plot__span"/>
+<line x1="18.2" y1="18" x2="106.832" y2="18" class="grid-plot__type"/>
+<rect x="147.06666666666666" y="14" width="61.33333333333333" height="15" class="grid-plot__note"/>
+<line x1="150.06666666666666" y1="18" x2="191.22666666666666" y2="18" class="grid-plot__type"/>
+<rect x="15.2" y="64" width="94.3" height="18" class="grid-plot__span"/>
+<line x1="18.2" y1="68" x2="83.096" y2="68" class="grid-plot__type"/>
+<rect x="114.1" y="64" width="94.3" height="18" class="grid-plot__span"/>
+<line x1="117.1" y1="68" x2="181.99599999999998" y2="68" class="grid-plot__type"/>
+<rect x="15.2" y="99" width="61.33333333333333" height="16" class="grid-plot__span"/>
+<line x1="18.2" y1="103" x2="59.36" y2="103" class="grid-plot__type"/>
+<rect x="81.13333333333334" y="99" width="61.33333333333333" height="16" class="grid-plot__span"/>
+<line x1="84.13333333333334" y1="103" x2="125.29333333333334" y2="103" class="grid-plot__type"/>
+<rect x="147.06666666666666" y="99" width="61.33333333333333" height="16" class="grid-plot__span"/>
+<line x1="150.06666666666666" y1="103" x2="191.22666666666666" y2="103" class="grid-plot__type"/>
+</svg><span class="grid-plot__label">A 46-rem frame</span></div>
+</div>
+<figcaption>The upper band shows the record and its outlined note, the middle band a comparison, and the lower band an index of three recordings. The frames use the same horizontal scale.</figcaption>
+</figure>
+<!-- /series-plate -->
+
+<p>The three views above share six columns and the same margins. The useful
+difference lies in what each piece of content needs from those columns.
+A passage needs a sustained line of type. A note needs an edge near the
+passage it describes. The collection needs room for a succession of names.
+The <a href="#one-ruling-for-a-family-of-views">worked series</a> derives the different
+widths at which each arrangement becomes possible.</p>
+<p>A grid supplies positions to return to across a composition. Its geometry
+can be specified exactly. Whether it helps a reader compare two entries
+requires observation. Which entry gets the larger field, and where the
+designer leaves space around it, are artistic decisions.</p>
+<h2 id="establish-the-field">Establish the field</h2>
+<p>Draw the final frame, then mark the space the composition can occupy. On a
+bound spread the inner margins meet at the binding. On a folded sheet a
+crease may pass through otherwise available space. On screen the frame may be
+one panel within a larger page. Measure that panel. A marginal note outside
+the text block still needs to fit inside the frame.</p>
+<p>If the frame width is <code>W</code> and its two side margins are <code>L</code> and <code>R</code>, the
+available width is <code>A = W − L − R</code>. Moving four units from the left margin
+to the right preserves the measure of every column but moves every leading
+edge four units to the left. This is one way to change a page's relationship
+to a facing page without resetting its text.</p>
+<p>A single text block inside these margins already makes a <strong>manuscript grid</strong>.
+Set the body first and read several complete lines. Try a long word, a short
+final line and a second paragraph. The same physical measure gives different
+line breaks when typeface, size, language or word spacing changes. For a book,
+place two facing pages together before fixing the inner and outer margins.</p>
+<h3 id="a-proportional-grid-for-facing-pages">A proportional grid for facing pages</h3>
+<p>Take a page of width <code>W</code> and height <code>H</code>. Reserve <code>W/9</code> beside the binding
+and <code>2W/9</code> at the outer edge. Leave <code>H/9</code> above the text and <code>2H/9</code> below.
+The text rectangle measures <code>2W/3 × 2H/3</code>, so it keeps the page's aspect
+ratio and occupies four ninths of its area. Mirror the horizontal margins on
+the facing page. Across an open, flat spread the two inner margins add up to
+one outer margin. The deeper margin sits below the text on both pages.</p>
+<!-- spread-plate -->
+<figure class="grid-plot grid-plot--spread">
+<svg viewBox="0 0 240 180" role="img" aria-label="Facing pages divided into ninths"><title>Facing pages divided into ninths</title><desc>The composition is mirrored at the fold. The outside margin of each page is twice its inside margin. The lower margin is twice the upper margin.</desc>
+<rect x="0" y="0" width="120" height="180" class="grid-plot__field"/>
+<line x1="13.333333333333334" y1="0" x2="13.333333333333334" y2="180" class="grid-plot__guide"/>
+<line x1="26.666666666666668" y1="0" x2="26.666666666666668" y2="180" class="grid-plot__guide"/>
+<line x1="40" y1="0" x2="40" y2="180" class="grid-plot__guide"/>
+<line x1="53.333333333333336" y1="0" x2="53.333333333333336" y2="180" class="grid-plot__guide"/>
+<line x1="66.66666666666667" y1="0" x2="66.66666666666667" y2="180" class="grid-plot__guide"/>
+<line x1="80" y1="0" x2="80" y2="180" class="grid-plot__guide"/>
+<line x1="93.33333333333333" y1="0" x2="93.33333333333333" y2="180" class="grid-plot__guide"/>
+<line x1="106.66666666666667" y1="0" x2="106.66666666666667" y2="180" class="grid-plot__guide"/>
+<line x1="0" y1="20" x2="120" y2="20" class="grid-plot__guide"/>
+<line x1="0" y1="40" x2="120" y2="40" class="grid-plot__guide"/>
+<line x1="0" y1="60" x2="120" y2="60" class="grid-plot__guide"/>
+<line x1="0" y1="80" x2="120" y2="80" class="grid-plot__guide"/>
+<line x1="0" y1="100" x2="120" y2="100" class="grid-plot__guide"/>
+<line x1="0" y1="120" x2="120" y2="120" class="grid-plot__guide"/>
+<line x1="0" y1="140" x2="120" y2="140" class="grid-plot__guide"/>
+<line x1="0" y1="160" x2="120" y2="160" class="grid-plot__guide"/>
+<rect x="26.666666666666668" y="20" width="80" height="120" class="grid-plot__span"/>
+<line x1="31.666666666666668" y1="30" x2="101.06666666666668" y2="30" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="36" x2="101.06666666666668" y2="36" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="42" x2="101.06666666666668" y2="42" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="48" x2="101.06666666666668" y2="48" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="54" x2="101.06666666666668" y2="54" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="60" x2="101.06666666666668" y2="60" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="66" x2="101.06666666666668" y2="66" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="72" x2="101.06666666666668" y2="72" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="78" x2="101.06666666666668" y2="78" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="84" x2="101.06666666666668" y2="84" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="90" x2="79.46666666666667" y2="90" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="96" x2="101.06666666666668" y2="96" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="102" x2="101.06666666666668" y2="102" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="108" x2="101.06666666666668" y2="108" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="114" x2="101.06666666666668" y2="114" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="120" x2="101.06666666666668" y2="120" class="grid-plot__type"/>
+<line x1="31.666666666666668" y1="126" x2="79.46666666666667" y2="126" class="grid-plot__type"/>
+<rect x="120" y="0" width="120" height="180" class="grid-plot__field"/>
+<line x1="133.33333333333334" y1="0" x2="133.33333333333334" y2="180" class="grid-plot__guide"/>
+<line x1="146.66666666666666" y1="0" x2="146.66666666666666" y2="180" class="grid-plot__guide"/>
+<line x1="160" y1="0" x2="160" y2="180" class="grid-plot__guide"/>
+<line x1="173.33333333333334" y1="0" x2="173.33333333333334" y2="180" class="grid-plot__guide"/>
+<line x1="186.66666666666669" y1="0" x2="186.66666666666669" y2="180" class="grid-plot__guide"/>
+<line x1="200" y1="0" x2="200" y2="180" class="grid-plot__guide"/>
+<line x1="213.33333333333331" y1="0" x2="213.33333333333331" y2="180" class="grid-plot__guide"/>
+<line x1="226.66666666666669" y1="0" x2="226.66666666666669" y2="180" class="grid-plot__guide"/>
+<line x1="120" y1="20" x2="240" y2="20" class="grid-plot__guide"/>
+<line x1="120" y1="40" x2="240" y2="40" class="grid-plot__guide"/>
+<line x1="120" y1="60" x2="240" y2="60" class="grid-plot__guide"/>
+<line x1="120" y1="80" x2="240" y2="80" class="grid-plot__guide"/>
+<line x1="120" y1="100" x2="240" y2="100" class="grid-plot__guide"/>
+<line x1="120" y1="120" x2="240" y2="120" class="grid-plot__guide"/>
+<line x1="120" y1="140" x2="240" y2="140" class="grid-plot__guide"/>
+<line x1="120" y1="160" x2="240" y2="160" class="grid-plot__guide"/>
+<rect x="133.33333333333334" y="20" width="80" height="120" class="grid-plot__span"/>
+<line x1="138.33333333333334" y1="30" x2="207.73333333333335" y2="30" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="36" x2="207.73333333333335" y2="36" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="42" x2="207.73333333333335" y2="42" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="48" x2="207.73333333333335" y2="48" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="54" x2="207.73333333333335" y2="54" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="60" x2="207.73333333333335" y2="60" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="66" x2="207.73333333333335" y2="66" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="72" x2="207.73333333333335" y2="72" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="78" x2="207.73333333333335" y2="78" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="84" x2="207.73333333333335" y2="84" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="90" x2="186.13333333333335" y2="90" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="96" x2="207.73333333333335" y2="96" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="102" x2="207.73333333333335" y2="102" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="108" x2="207.73333333333335" y2="108" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="114" x2="207.73333333333335" y2="114" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="120" x2="207.73333333333335" y2="120" class="grid-plot__type"/>
+<line x1="138.33333333333334" y1="126" x2="186.13333333333335" y2="126" class="grid-plot__type"/>
+<line x1="120" y1="0" x2="120" y2="180" class="grid-plot__fold"/>
+</svg>
+<figcaption>A facing-page construction in ninths. Each text field keeps its page’s proportions. At the fold, the two inner margins together equal one outer margin.</figcaption>
+</figure>
+<!-- /spread-plate -->
+
+<p>On a 180 × 270 mm page the text block is 120 × 180 mm. Increase the page
+width to 210 mm and this construction gives the text 140 mm. If the type and
+line breaks of the original edition are worth keeping, retain the 120 mm
+measure and distribute the extra 30 mm in the margins. These are distinct
+briefs. One preserves proportions, the other preserves the setting of the text.</p>
+<h2 id="construct-the-columns">Construct the columns</h2>
+<p>For <code>N</code> equal columns and a uniform gutter <code>G</code>, there are <code>N − 1</code> gutters.
+Subtract their total width before dividing the available field. With one
+column the entire available width belongs to it.</p>
+<ul>
+<li>Each column has width <code>C = (A − (N − 1)G) / N</code>.</li>
+<li>A block spanning <code>k</code> consecutive columns has width <code>S(k) = kC + (k − 1)G</code>.</li>
+<li>Numbering from one, column <code>j</code> starts at <code>x(j) = L + (j − 1)(C + G)</code>
+  in a left-to-right field.</li>
+</ul>
+<p>The construction needs positive column width, an integer <code>N ≥ 1</code> and a span
+from one through <code>N</code>. A block spanning two columns takes the gutter inside
+its footprint. A separate neighbouring block leaves the gutter between them
+open. The last column must end at <code>W − R</code>.</p>
+<!-- column-plate -->
+<figure class="grid-plot">
+<div class="grid-plot__pair">
+<div><svg viewBox="0 0 240 160" role="img" aria-label="3 plus 3 columns"><title>3 plus 3 columns</title><desc>Six tracks of 29 units, with two occupied spans of 99 and 99 separated by one six-unit gutter.</desc>
+<rect x="0" y="0" width="240" height="160" class="grid-plot__field"/>
+<rect x="18" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="53" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="88" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="123" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="158" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="193" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="18" y="45" width="99" height="78" class="grid-plot__span"/>
+<rect x="123" y="45" width="99" height="78" class="grid-plot__span"/>
+<text x="67.5" y="88" text-anchor="middle" class="grid-plot__value">99</text>
+<text x="172.5" y="88" text-anchor="middle" class="grid-plot__value">99</text>
+<line x1="18" y1="8" x2="18" y2="152" class="grid-plot__edge"/>
+<line x1="47" y1="8" x2="47" y2="152" class="grid-plot__edge"/>
+<line x1="53" y1="8" x2="53" y2="152" class="grid-plot__edge"/>
+<line x1="82" y1="8" x2="82" y2="152" class="grid-plot__edge"/>
+<line x1="88" y1="8" x2="88" y2="152" class="grid-plot__edge"/>
+<line x1="117" y1="8" x2="117" y2="152" class="grid-plot__edge"/>
+<line x1="123" y1="8" x2="123" y2="152" class="grid-plot__edge"/>
+<line x1="152" y1="8" x2="152" y2="152" class="grid-plot__edge"/>
+<line x1="158" y1="8" x2="158" y2="152" class="grid-plot__edge"/>
+<line x1="187" y1="8" x2="187" y2="152" class="grid-plot__edge"/>
+<line x1="193" y1="8" x2="193" y2="152" class="grid-plot__edge"/>
+<line x1="222" y1="8" x2="222" y2="152" class="grid-plot__edge"/>
+</svg><span class="grid-plot__label">Three + three</span></div>
+<div><svg viewBox="0 0 240 160" role="img" aria-label="2 plus 4 columns"><title>2 plus 4 columns</title><desc>Six tracks of 29 units, with two occupied spans of 64 and 134 separated by one six-unit gutter.</desc>
+<rect x="0" y="0" width="240" height="160" class="grid-plot__field"/>
+<rect x="18" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="53" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="88" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="123" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="158" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="193" y="8" width="29" height="144" class="grid-plot__track"/>
+<rect x="18" y="45" width="64" height="78" class="grid-plot__span"/>
+<rect x="88" y="45" width="134" height="78" class="grid-plot__span"/>
+<text x="50" y="88" text-anchor="middle" class="grid-plot__value">64</text>
+<text x="155" y="88" text-anchor="middle" class="grid-plot__value">134</text>
+<line x1="18" y1="8" x2="18" y2="152" class="grid-plot__edge"/>
+<line x1="47" y1="8" x2="47" y2="152" class="grid-plot__edge"/>
+<line x1="53" y1="8" x2="53" y2="152" class="grid-plot__edge"/>
+<line x1="82" y1="8" x2="82" y2="152" class="grid-plot__edge"/>
+<line x1="88" y1="8" x2="88" y2="152" class="grid-plot__edge"/>
+<line x1="117" y1="8" x2="117" y2="152" class="grid-plot__edge"/>
+<line x1="123" y1="8" x2="123" y2="152" class="grid-plot__edge"/>
+<line x1="152" y1="8" x2="152" y2="152" class="grid-plot__edge"/>
+<line x1="158" y1="8" x2="158" y2="152" class="grid-plot__edge"/>
+<line x1="187" y1="8" x2="187" y2="152" class="grid-plot__edge"/>
+<line x1="193" y1="8" x2="193" y2="152" class="grid-plot__edge"/>
+<line x1="222" y1="8" x2="222" y2="152" class="grid-plot__edge"/>
+</svg><span class="grid-plot__label">Two + four</span></div>
+</div>
+<figcaption>Both frames measure 240 × 160 units. Six 29-unit columns occupy the same positions in each. Changing the span assignment moves the division while preserving the margins and the separating gutter.</figcaption>
+</figure>
+<!-- /column-plate -->
+
+<p>Take a 240-unit frame with 18 units on either side. The live field is 204
+units wide. Six columns with five 6-unit gutters leave 174 units for type
+and artwork, or 29 per column. Two blocks spanning three columns each are
+99 units wide. Giving one block two columns and the other four yields widths
+of 64 and 134, with the same 6-unit gutter. A 2:4 division in <strong>column count</strong>
+therefore produces a slightly wider than 2:1 ratio between the actual blocks.</p>
+<p>The gutter has a cost. Double it from 6 to 12 while keeping the frame,
+margins and six columns. Each column shrinks from 29 to 24. The note spanning
+two columns loses four units of measure (64 to 60), while the passage spanning
+four loses only two (134 to 132). Set a full line on each side of the gap and
+check whether the two passages remain distinct and both still read well.</p>
+<p>A six-column grid can carry halves, thirds and sixths without moving its
+guides. A four-column grid can carry quarters and halves. Choose between
+them by listing the arrangements a series actually needs. An essay and an
+occasional pair of examples may need only two columns. Adding guides that no
+element uses introduces choices without adding a usable alignment.</p>
+<h2 id="give-the-spans-a-purpose">Give the spans a purpose</h2>
+<p><strong>For sustained reading</strong>, give the text a continuous measure. A heading may
+use the same leading edge and span a greater width. Keep its line endings
+independent of the body so that a long title can wrap without widening every
+paragraph.</p>
+<p><strong>For explanation beside a reference</strong>, let the narrower region contain the
+shorter material, such as dates, notes or an index. Give their common edge a
+specific job. Follow a note across that edge to its corresponding passage.
+If the relationship repeatedly crosses a page turn, the rail needs a local
+reference or a different position. An asymmetric grid can be made with
+unequal spans on equal columns, as the column plate shows.</p>
+<p><strong>For a collection</strong>, repeat a set of fields for items of equal rank.
+An exceptional item can span two fields, but decide what warrants that
+emphasis and where the next ordinary item resumes. Empty modules can also
+carry meaning. Leaving a column open beside a title gives it room. Leaving
+the same column empty between a label and its value separates the two.</p>
+<p>Massimo Vignelli gives a precise example in <em>The Vignelli Canon</em>. A
+three-column letterhead reserves the first column for an identifying mark or
+open space. The letter occupies the other two. A fold supplies another
+alignment in the vertical direction. In a second design he uses five columns
+for a centred heading and a three-column text block. The count follows the
+placement the designer wants to repeat. <a href="https://www.rit.edu/vignellicenter/sites/rit.edu.vignellicenter/files/documents/The%20Vignelli%20Canon.pdf">The Vignelli Canon, “Grids, Margins, Columns and Modules” and “A Company Letterhead”</a>.</p>
+<h3 id="what-does-an-empty-column-bring-together">What does an empty column bring together?</h3>
+<p>A departure board has three things to say about each service. Its time
+occupies one column, its destination two, and its platform two. On our
+six-column ruling that leaves one column empty. Both settings below give
+each field the same width. They make different pairs out of the same words.</p>
+<!-- departure-plate -->
+<figure class="grid-plot">
+<div class="grid-plot__pair">
+<div><svg viewBox="0 0 240 160" role="img" aria-label="Departures with space before the platform"><title>Departures with space before the platform</title><desc>The three services have the same times, destinations and platforms. One column is empty before the platform.</desc>
+<rect x="0" y="0" width="240" height="160" class="grid-plot__field"/>
+<text x="18" y="32" class="grid-plot__heading">Departures</text>
+<line x1="18" y1="43" x2="222" y2="43" class="grid-plot__fold"/>
+<line x1="18" y1="49" x2="18" y2="139" class="grid-plot__guide"/>
+<line x1="53" y1="49" x2="53" y2="139" class="grid-plot__guide"/>
+<line x1="88" y1="49" x2="88" y2="139" class="grid-plot__guide"/>
+<line x1="123" y1="49" x2="123" y2="139" class="grid-plot__guide"/>
+<line x1="158" y1="49" x2="158" y2="139" class="grid-plot__guide"/>
+<line x1="193" y1="49" x2="193" y2="139" class="grid-plot__guide"/>
+<text x="18" y="66" class="grid-plot__entry">08:10</text>
+<text x="53" y="66" class="grid-plot__entry">North Pier</text>
+<text x="158" y="66" class="grid-plot__entry">Platform 2</text>
+<line x1="18" y1="76" x2="222" y2="76" class="grid-plot__row-rule"/>
+<text x="18" y="97" class="grid-plot__entry">08:40</text>
+<text x="53" y="97" class="grid-plot__entry">Dry Dock</text>
+<text x="158" y="97" class="grid-plot__entry">Platform 1</text>
+<line x1="18" y1="107" x2="222" y2="107" class="grid-plot__row-rule"/>
+<text x="18" y="128" class="grid-plot__entry">09:20</text>
+<text x="53" y="128" class="grid-plot__entry">Tide Mill</text>
+<text x="158" y="128" class="grid-plot__entry">Platform 3</text>
+<line x1="18" y1="138" x2="222" y2="138" class="grid-plot__row-rule"/>
+</svg><span class="grid-plot__label">Time beside destination</span></div>
+<div><svg viewBox="0 0 240 160" role="img" aria-label="Departures with space after the time"><title>Departures with space after the time</title><desc>The three services have the same times, destinations and platforms. One column is empty after the time.</desc>
+<rect x="0" y="0" width="240" height="160" class="grid-plot__field"/>
+<text x="18" y="32" class="grid-plot__heading">Departures</text>
+<line x1="18" y1="43" x2="222" y2="43" class="grid-plot__fold"/>
+<line x1="18" y1="49" x2="18" y2="139" class="grid-plot__guide"/>
+<line x1="53" y1="49" x2="53" y2="139" class="grid-plot__guide"/>
+<line x1="88" y1="49" x2="88" y2="139" class="grid-plot__guide"/>
+<line x1="123" y1="49" x2="123" y2="139" class="grid-plot__guide"/>
+<line x1="158" y1="49" x2="158" y2="139" class="grid-plot__guide"/>
+<line x1="193" y1="49" x2="193" y2="139" class="grid-plot__guide"/>
+<text x="18" y="66" class="grid-plot__entry">08:10</text>
+<text x="88" y="66" class="grid-plot__entry">North Pier</text>
+<text x="158" y="66" class="grid-plot__entry">Platform 2</text>
+<line x1="18" y1="76" x2="222" y2="76" class="grid-plot__row-rule"/>
+<text x="18" y="97" class="grid-plot__entry">08:40</text>
+<text x="88" y="97" class="grid-plot__entry">Dry Dock</text>
+<text x="158" y="97" class="grid-plot__entry">Platform 1</text>
+<line x1="18" y1="107" x2="222" y2="107" class="grid-plot__row-rule"/>
+<text x="18" y="128" class="grid-plot__entry">09:20</text>
+<text x="88" y="128" class="grid-plot__entry">Tide Mill</text>
+<text x="158" y="128" class="grid-plot__entry">Platform 3</text>
+<line x1="18" y1="138" x2="222" y2="138" class="grid-plot__row-rule"/>
+</svg><span class="grid-plot__label">Destination beside platform</span></div>
+</div>
+<figcaption>Read across the 08:40 service. Dry Dock moves by one column. The times and platforms stay in place, and all three fields retain their width.</figcaption>
+</figure>
+<!-- /departure-plate -->
+
+<p>In the first setting, time and destination share a 6-unit gutter. Before
+the platform come a gutter, an empty 29-unit column and another gutter,
+41 units in all. Move the empty column to the other side of the destination
+and the gaps exchange places. The outside edges, occupied area and number
+of alignments cannot tell the two settings apart. Which space to leave
+open depends on which two pieces someone needs to read together. These gaps
+are measured between fields. A short name such as <em>Dry Dock</em> leaves more
+space between its last letter and the next field.</p>
+<p>Leyssen and colleagues asked people to compose or choose pictures of
+familiar objects. Participants preferred related objects closer together
+than unrelated ones. A preference for centring emerged most clearly when
+the distance within the pair was fixed. Their subject was pictorial
+preference. For the board this suggests a testable question. Would someone
+starting from a departure time find its destination faster in the first
+setting? Would someone starting from a destination find its platform faster
+in the second? Each question has a different starting point and a measurable
+answer. <a href="https://palmerlab.berkeley.edu/Leyssen.i-perception.2012.pdf">Leyssen et al., <em>Aesthetic Preference for Spatial Composition in Multi-Object Pictures</em> (2012)</a>.</p>
+<h2 id="set-modules-and-baselines">Set modules and baselines</h2>
+<p>Columns describe horizontal positions. Add rows when material needs a shared
+top, bottom or recurring entry point across columns. A <strong>module</strong> is the field
+at the intersection of a column and a row. A <strong>baseline grid</strong> supplies the
+lines on which type can sit. Its step can be much finer than a module.</p>
+<!-- rhythm-plate -->
+<figure class="grid-plot">
+<div class="grid-plot__pair">
+<div><svg viewBox="0 0 240 160" role="img" aria-label="Four module rows"><title>Four module rows</title><desc>Four 24-unit rows are separated by 8 units. Each row spans three steps of the horizontal ruling.</desc>
+<rect x="0" y="0" width="240" height="160" class="grid-plot__field"/>
+<rect x="18" y="16" width="29" height="24" class="grid-plot__module"/>
+<rect x="53" y="16" width="29" height="24" class="grid-plot__module"/>
+<rect x="88" y="16" width="29" height="24" class="grid-plot__module"/>
+<rect x="123" y="16" width="29" height="24" class="grid-plot__module"/>
+<rect x="158" y="16" width="29" height="24" class="grid-plot__module"/>
+<rect x="193" y="16" width="29" height="24" class="grid-plot__module"/>
+<rect x="18" y="48" width="29" height="24" class="grid-plot__module"/>
+<rect x="53" y="48" width="29" height="24" class="grid-plot__module"/>
+<rect x="88" y="48" width="29" height="24" class="grid-plot__module"/>
+<rect x="123" y="48" width="29" height="24" class="grid-plot__module"/>
+<rect x="158" y="48" width="29" height="24" class="grid-plot__module"/>
+<rect x="193" y="48" width="29" height="24" class="grid-plot__module"/>
+<rect x="18" y="80" width="29" height="24" class="grid-plot__module"/>
+<rect x="53" y="80" width="29" height="24" class="grid-plot__module"/>
+<rect x="88" y="80" width="29" height="24" class="grid-plot__module"/>
+<rect x="123" y="80" width="29" height="24" class="grid-plot__module"/>
+<rect x="158" y="80" width="29" height="24" class="grid-plot__module"/>
+<rect x="193" y="80" width="29" height="24" class="grid-plot__module"/>
+<rect x="18" y="112" width="29" height="24" class="grid-plot__module"/>
+<rect x="53" y="112" width="29" height="24" class="grid-plot__module"/>
+<rect x="88" y="112" width="29" height="24" class="grid-plot__module"/>
+<rect x="123" y="112" width="29" height="24" class="grid-plot__module"/>
+<rect x="158" y="112" width="29" height="24" class="grid-plot__module"/>
+<rect x="193" y="112" width="29" height="24" class="grid-plot__module"/>
+<line x1="18" y1="16" x2="222" y2="16" class="grid-plot__guide"/>
+<line x1="18" y1="24" x2="222" y2="24" class="grid-plot__guide"/>
+<line x1="18" y1="32" x2="222" y2="32" class="grid-plot__guide"/>
+<line x1="18" y1="40" x2="222" y2="40" class="grid-plot__guide"/>
+<line x1="18" y1="48" x2="222" y2="48" class="grid-plot__guide"/>
+<line x1="18" y1="56" x2="222" y2="56" class="grid-plot__guide"/>
+<line x1="18" y1="64" x2="222" y2="64" class="grid-plot__guide"/>
+<line x1="18" y1="72" x2="222" y2="72" class="grid-plot__guide"/>
+<line x1="18" y1="80" x2="222" y2="80" class="grid-plot__guide"/>
+<line x1="18" y1="88" x2="222" y2="88" class="grid-plot__guide"/>
+<line x1="18" y1="96" x2="222" y2="96" class="grid-plot__guide"/>
+<line x1="18" y1="104" x2="222" y2="104" class="grid-plot__guide"/>
+<line x1="18" y1="112" x2="222" y2="112" class="grid-plot__guide"/>
+<line x1="18" y1="120" x2="222" y2="120" class="grid-plot__guide"/>
+<line x1="18" y1="128" x2="222" y2="128" class="grid-plot__guide"/>
+<line x1="18" y1="136" x2="222" y2="136" class="grid-plot__guide"/>
+</svg><span class="grid-plot__label">Module rows</span></div>
+<div><svg viewBox="0 0 240 160" role="img" aria-label="Two baseline sequences"><title>Two baseline sequences</title><desc>Starting on the same ruling, lines set 16 units apart and 24 units apart meet again after 48 and 96 units.</desc>
+<rect x="0" y="0" width="240" height="160" class="grid-plot__field"/>
+<line x1="18" y1="16" x2="222" y2="16" class="grid-plot__guide"/>
+<line x1="18" y1="24" x2="222" y2="24" class="grid-plot__guide"/>
+<line x1="18" y1="32" x2="222" y2="32" class="grid-plot__guide"/>
+<line x1="18" y1="40" x2="222" y2="40" class="grid-plot__guide"/>
+<line x1="18" y1="48" x2="222" y2="48" class="grid-plot__guide"/>
+<line x1="18" y1="56" x2="222" y2="56" class="grid-plot__guide"/>
+<line x1="18" y1="64" x2="222" y2="64" class="grid-plot__guide"/>
+<line x1="18" y1="72" x2="222" y2="72" class="grid-plot__guide"/>
+<line x1="18" y1="80" x2="222" y2="80" class="grid-plot__guide"/>
+<line x1="18" y1="88" x2="222" y2="88" class="grid-plot__guide"/>
+<line x1="18" y1="96" x2="222" y2="96" class="grid-plot__guide"/>
+<line x1="18" y1="104" x2="222" y2="104" class="grid-plot__guide"/>
+<line x1="18" y1="112" x2="222" y2="112" class="grid-plot__guide"/>
+<line x1="18" y1="120" x2="222" y2="120" class="grid-plot__guide"/>
+<line x1="18" y1="128" x2="222" y2="128" class="grid-plot__guide"/>
+<line x1="18" y1="136" x2="222" y2="136" class="grid-plot__guide"/>
+<line x1="18" y1="16" x2="117" y2="16" class="grid-plot__ink"/>
+<line x1="18" y1="32" x2="117" y2="32" class="grid-plot__ink"/>
+<line x1="18" y1="48" x2="117" y2="48" class="grid-plot__ink"/>
+<line x1="18" y1="64" x2="117" y2="64" class="grid-plot__ink"/>
+<line x1="18" y1="80" x2="117" y2="80" class="grid-plot__ink"/>
+<line x1="18" y1="96" x2="117" y2="96" class="grid-plot__ink"/>
+<line x1="18" y1="112" x2="117" y2="112" class="grid-plot__ink"/>
+<line x1="18" y1="128" x2="117" y2="128" class="grid-plot__ink"/>
+<line x1="123" y1="16" x2="222" y2="16" class="grid-plot__accent"/>
+<line x1="123" y1="40" x2="222" y2="40" class="grid-plot__accent"/>
+<line x1="123" y1="64" x2="222" y2="64" class="grid-plot__accent"/>
+<line x1="123" y1="88" x2="222" y2="88" class="grid-plot__accent"/>
+<line x1="123" y1="112" x2="222" y2="112" class="grid-plot__accent"/>
+<line x1="123" y1="136" x2="222" y2="136" class="grid-plot__accent"/>
+</svg><span class="grid-plot__label">16- and 24-unit leading</span></div>
+</div>
+<figcaption>The first ruling lies 16 units below the top of the frame. An 8-unit step locates both the modules and the ideal text baselines. The two sequences on the right coincide every 48 units.</figcaption>
+</figure>
+<!-- /rhythm-plate -->
+
+<p>In the module plate the first horizontal guide sits at 16 and successive
+guides are 8 units apart. A module three steps deep is 24 units high. Leave
+one step between modules and the row starts are 16, 48, 80 and 112. An item
+spanning two rows occupies <code>24 + 8 + 24 = 56</code> units. The final row ends at
+136 in the 160-unit frame, leaving 24 units below. The lower margin is a
+choice visible in the construction.</p>
+<p>To align type across columns, set the <strong>first actual baseline</strong> and the
+advance to the next one. In the plate both columns start at 16. With
+advances of 16 on the left and 24 on the right, the two sequences meet
+again at 64 and 112. The repeat interval is 48, the least common multiple
+of the two advances. Giving two text boxes the same top edge and line
+height alone cannot guarantee the same first baseline for different fonts.
+Check where the letters sit inside the rendered line boxes.</p>
+<p>A printed catalogue can allocate a second row to a long entry or continue
+it on the next page. On screen a description may grow after the reader
+opens it or enlarges the type. Let the row grow and resume the rhythm below
+it. A fixed module that clips a description preserves the arithmetic at the
+cost of the content. An alternative construction derives the vertical unit
+from the chosen leading and divides the field afterwards.
+<a href="https://www.ibm.com/design/language/2x-grid/#baseline-unit">IBM Design Language, baseline unit</a>.</p>
+<h2 id="find-where-the-grid-stops-fitting">Find where the grid stops fitting</h2>
+<p>Record a minimum usable width for each role after setting representative
+material. Suppose a note requires 60 units and the main passage 100.
+These are design constraints for this example. In the six-column construction
+the proposed note spans two columns, so its width is <code>2C + 6</code>. The note fits
+when <code>C ≥ 27</code>. The passage spans four columns and needs <code>4C + 18 ≥ 100</code>,
+which gives <code>C ≥ 20.5</code>. The note therefore sets the limit.</p>
+<p>With the original margins and gutters, the smallest frame for <strong>this
+allocation</strong> is <code>18 + 6 × 27 + 5 × 6 + 18 = 228</code> units. There the two
+blocks measure 60 and 126. At 222 units they measure 58 and 122. The main
+passage still fits and the note has already failed. A narrower setting can
+bring the note into the text flow and give both elements a single column.
+A different gutter or span would give a different threshold.</p>
+<p>Choose the narrow reading order before moving the regions. Keep a note with
+the passage it explains, a heading with the section it introduces, and a
+label with its value. For interactive work, follow the focus sequence as well
+as reading the words. For ordinary vertically scrolling text, also check
+reflow at 320 CSS pixels. <a href="https://www.w3.org/TR/WCAG22/#meaningful-sequence">WCAG 2.2, Meaningful Sequence</a> · <a href="https://www.w3.org/TR/WCAG22/#focus-order">Focus Order</a> · <a href="https://www.w3.org/TR/WCAG22/#reflow">Reflow</a>.</p>
+<h2 id="one-ruling-for-a-family-of-views">One ruling for a family of views</h2>
+<p>Consider a small sound archive. Its record view sets a passage beside a
+field note. Its comparison gives two recordings equal space. Its index
+repeats an entry three times across the field. Begin with the divisions
+these tasks require. Halves and thirds can both end on the lines of six
+equal columns. Six is the smallest count divisible by both two and three.
+If quarters must also align across views, the smallest count becomes twelve.
+A quarter used only inside a single entry can be a local division.</p>
+<p>The margins and gutters matter as much as the count. In the 240-unit
+construction above, a four-column field is 134 units wide. Divide it in
+two with the original 6-unit gutter and each half is 64 units. The halves
+recover the edges of the underlying two-column spans. With a local gutter
+of 2 units, the halves become 66 units. The centre of the gutter stays at
+67, but each of its edges moves by 2. For a caption that must line up with
+the next row, the distinction is visible at the first letter.</p>
+<p>Two working systems show different reasons to keep an edge across a series.
+In the US National Park Service's Unigrid, the folds define 4 × 8¼ inch
+panels. A brochure can be one or two panels wide and up to six panels long.
+The folded format and the size of a press sheet constrain the family while
+each park can give its map a different extent. <a href="https://www.nps.gov/subjects/hfc/a-brief-history-of-the-unigrid.htm">National Park Service, A Brief History of the Unigrid</a>.</p>
+<p>In the GOV.UK Design System, the main text can keep its two-thirds measure
+both on pages with secondary material and on pages where the last third is
+empty. Here the repeated decision concerns the reading column. The space
+at its side is available to the composition without obliging an editor to
+fill it. <a href="https://design-system.service.gov.uk/styles/layout/">GOV.UK Design System, Layout</a>.</p>
+<h3 id="different-views-change-at-different-widths">Different views change at different widths</h3>
+<p>For the archive, take a margin of 2 rem on each side and a gutter of 1 rem.
+One rem is the size of the root type on screen. Let the passage occupy four
+columns and the field note two. The editor gives the passage a measure
+between 23 and 33 rem and reserves at least 12 rem for the note. These are
+settings for this specimen. A different face, language or task may call for
+other measures.</p>
+<p>At frame width <code>W</code>, the width of a span is
+<code>S(k) = (k/N)(W − L − R + G) − G</code>. Running the equation in reverse gives
+the frame at which a span first reaches a chosen measure <code>m</code>. The result is
+<code>W = L + R − G + (N/k)(m + G)</code>. Each occupied region sets its own limit.
+The widest of the required lower bounds tells us when the whole row fits.
+A maximum reading measure can also set an upper bound.</p>
+<div class="ledger-scroll" role="region" aria-label="Measures and transitions in the archive" tabindex="0">
+<table class="type-ledger">
+<caption>Three views on the same six columns</caption>
+<thead><tr><th scope="col">View</th><th scope="col">Measure chosen for this setting</th><th scope="col">Where the arrangement fits</th></tr></thead>
+<tbody>
+<tr><th scope="row">Record and field note</th><td>Passage 23–33 rem, note at least 12 rem</td><td>Four plus two columns from 42 to 54 rem</td></tr>
+<tr><th scope="row">Comparison</th><td>Each recording at least 16 rem</td><td>Two equal fields from 37 rem</td></tr>
+<tr><th scope="row">Index</th><td>Each entry at least 13 rem</td><td>Two across from 31 rem, three from 45 rem</td></tr>
+</tbody></table>
+</div>
+
+<p>At <strong>40 rem</strong>, half the field is 17.5 rem once the intervening gutter is
+allowed for. Two recordings fit side by side. A two-column note gets only
+11⅓ rem. It belongs below the passage at this width. The index fits two
+entries on its first row and carries the third to the next. A single switch
+for all three views would give up a viable comparison or squeeze the note.
+The interface can keep the same outer edges through all three changes.</p>
+<p>An interface often changes width without the window moving at all. Take a
+56-rem workspace. Opening a 14-rem navigation rail with a 1-rem gap leaves
+41 rem for the working view. The comparison still fits. The note moves
+below the record and the third index entry starts a new row. Closing the
+rail restores all three arrangements. The width that matters here can be
+measured between the sides of the working pane.</p>
+<p>For this edition, the whole frame stops growing at <strong>54 rem</strong>. At that
+width the four-column passage reaches its chosen maximum of 33 rem. Extra
+space falls equally outside the edition and the three views keep their
+common edges. Another edition could let the collection grow wider and cap
+only the text inside the reading view. Its index would gain space at the
+cost of that edge matching across views.</p>
+<h3 id="when-a-proportion-has-no-solution">When a proportion has no solution</h3>
+<p>Suppose the note must now accommodate an 18-rem transcription. On the
+four-plus-two division the note reaches that measure at <strong>60 rem</strong>, while
+the passage reaches its ceiling at <strong>54 rem</strong>. No frame width meets both
+conditions. Doubling the ruling to twelve and assigning eight columns to
+the passage and four to the note leaves their widths exactly as before.</p>
+<p>Changing the allocation does help. On two equal fields, a frame of <strong>51 rem</strong>
+gives each side 23 rem. Both pieces fit, the first line of the passage
+starts on its usual edge, and the note moves inward by one column. Below
+51 rem the note can follow its passage in reading order. <a href="laboratory/#one-ruling-three-views">Try the three views
+at the same width</a>.</p>
+<h3 id="the-width-of-an-actual-label">The width of an actual label</h3>
+<p>What does the proposed measure buy in type? Take the short label <em>East
+landing microphone</em>. A two-column slot in the 40-rem frame is 11⅓ rem
+wide, or about 181.3 pixels with the root type set to 16 pixels. The two
+settings below use that exact measure, a 1-rem type size, medium weight
+and zero added letterspacing. Only the typeface changes.</p>
+<figure class="composed-labels">
+  <div><span class="composed-labels__name">Instrument Sans</span><span class="composed-labels__line composed-labels__line--instrument">East landing microphone</span></div>
+  <div><span class="composed-labels__name">Roboto</span><span class="composed-labels__line composed-labels__line--roboto">East landing microphone</span></div>
+  <figcaption>The outlines mark the slot the note would receive if the 40-rem record kept its two regions side by side. Instrument Sans wraps after “landing”. Roboto fits on one line.</figcaption>
+</figure>
+
+<p>At that size the unbroken label measured <strong>185.1 pixels in Instrument Sans</strong>
+and <strong>177.2 in Roboto</strong> in our Chromium setting. The wider label <em>East
+landing and harbour wall microphones</em> measured 318.9 and 308.4 pixels.
+Neither fits on one line in the proposed 18 rem (288 pixels). If a line
+break is acceptable, the note can keep that measure. Keeping the label
+on one line changes the brief. Within a two-column span on this ruling,
+each extra unit of required label width costs three units of frame width.
+A different string or a different font file needs its own measurement.
+Reading speed would require a reader study.</p>
+<h2 id="what-measurements-can-establish">What measurements can establish</h2>
+<p><strong>Construction.</strong> Track widths, alignment coordinates, spans and the positions
+of horizontal guides can all be calculated. The plates use abstract units
+and ideal edges. A physical fold has thickness, and a rasterised line may
+occupy fractional pixels. Verify the final edge on the intended medium.
+Changing a display width while holding text size constant is a new layout
+condition. Uniformly scaling down a drawing preserves only its geometry.</p>
+<p><strong>Reading.</strong> Dyson and Kipping compared line lengths in screen reading. Their
+100-character lines were read faster than 25-character lines, with no observed
+difference in comprehension. Readers nevertheless rated the 55-character
+lines easiest. A fastest line, a preferred line and a line that improves
+comprehension can be three different claims. The results apply to the
+texts, type and screen conditions studied. <a href="https://journals.uc.edu/index.php/vl/article/view/5671">The Effects of Line Length and Method of Movement on Patterns of Reading from Screen (1998)</a>.</p>
+<p><strong>Grouping.</strong> Brumby and Zhuang asked 36 people to find named words in
+menus. When the words were randomly arranged, adding boxes around groups
+increased mean correct search time from 3.95 to 4.51 seconds. Their items
+stayed in place. Widening a gutter moves items as well as separating them.
+The result gives a reason to check the <em>meaning</em> of a group before drawing
+its boundaries and leaves the effective gutter for any new layout open.
+<a href="https://discovery.ucl.ac.uk/id/eprint/1499240/1/DuncanBrumby_Visual%20Grouping_paper359final.pdf">Visual Grouping in Menu Interfaces (2015)</a>.</p>
+<p><strong>Art direction.</strong> The 3+3 and 2+4 arrangements both close exactly at the
+outer margins. Use equal spans when the items deserve equivalent treatment,
+or deliberately give one more space when it introduces the other. Arithmetic
+can reveal an unintended offset. It cannot tell an editor which passage
+deserves the emphasis.</p>
+<h2 id="what-a-layout-system-can-carry-from-one-view-to-the-next">What a layout system can carry from one view to the next</h2>
+<p><strong>Give a recurring edge a name in the composition.</strong> In the archive, the
+record title, the first listening position and the first collection entry
+start on the same line. The far edge of the passage is free to change.
+A designer can now draw a fourth view and say exactly which edge it
+inherits. A locally divided field can meet the parent lines again when
+it inherits their gutter as well as their extent.</p>
+<p><strong>Specify the relationship each arrangement serves.</strong> Two equal spans give
+the recordings equivalent treatment. The unequal record gives the passage
+more room and keeps its note nearby. On the board, the open column separates
+one pair of fields so that the other pair sits together. Translating the
+words or reversing the reading direction can preserve those relationships
+even as the physical positions change.</p>
+<p><strong>Write a condition for leaving the arrangement.</strong> Set representative words
+in the intended face, work back from each required measure, and keep the
+intersection of the resulting ranges. If the intersection is empty, choose
+a different division or put the items in reading order on separate rows.
+This is where a family can share a drawing rule and still have different
+transitions. Six columns, 2-rem margins and a 54-rem ceiling describe one
+edition of the archive. The reasoning also works for another edition with
+different type and different dimensions.</p>
+<h2 id="how-far-from-a-passage-should-its-note-sit">How far from a passage should its note sit?</h2>
+<p>In the six-column example, arithmetic tells us the smallest width at which
+the note fits. It leaves another question open. A narrow gutter can make the
+note look like a continuation of the passage. A wide one can draw it towards
+the next passage. Which separation helps the reader match the note to the
+right text?</p>
+<p>One comparison would keep the page size, type and line lengths fixed.
+The extra width for the gutter would come equally from the two outer margins.
+Readers would match notes to passages, encountering each passage only once.
+Reversing the order of the layouts and exchanging the passages between them
+would help distinguish the effect of the layout from the difficulty of a
+particular text.</p>
+<p>Correct matches would tell us about reading. A separate preference judgement
+would tell us which page readers liked. Readers might prefer the more open
+page and make the same number of correct matches in both. The question
+remains open for these layouts.</p>
+<p>The atlas follows one programme through three compositions. In the laboratory,
+open the collection navigation while keeping the window still, then compare
+which parts of the archive change. <a href="atlas/">Atlas</a> ·
+<a href="laboratory/#one-ruling-three-views">Laboratory</a>.</p>
+      </article>
+    </main>
+  
+  <footer role="contentinfo" class="elea-footer site-footer"><div class="elea-footer__main"><div class="elea-footer__brand"><a class="site__wordmark" href="/" aria-label="Elea">elea</a><p>Open-source React components for products built around rich content.</p></div><div class="elea-footer__groups"><nav aria-label="Explore Elea"><p class="elea-footer__label">Explore Elea</p><ul><li><a href="/getting-started/">Docs</a></li><li><a href="/playground/#/ui">Components</a></li><li><a href="/typography/">Typography</a></li><li><a href="/playground/#/colours">Colours</a></li><li><a href="/playground/#/theme">Theme studio</a></li><li><a href="/playground/#/playground">Editorial workspace</a></li><li><a href="/research/">Research</a></li></ul></nav><nav aria-label="Project"><p class="elea-footer__label">Project</p><ul><li><a href="/versions/">Versions and changes</a></li><li><a href="https://github.com/Alien6-Studio/elea">Source on GitHub</a></li><li><a href="https://github.com/Alien6-Studio/elea/blob/main/LICENSE">Apache 2.0 license</a></li></ul></nav></div></div><div class="elea-footer__end"><a class="site-footer__signature" href="https://alien6.com"><span>Built by</span><img src="/assets/alien6.png" width="92" height="41" alt="Alien6" loading="lazy"/></a></div></footer>
+  <script type="module" src="../../playground/site-profile.js"></script>
+</body>
+</html>

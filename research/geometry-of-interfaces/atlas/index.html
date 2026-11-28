@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" data-elea-theme="site">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Six computed plates on corners, curvature, nested contours and optical corrections, with the numbers behind each drawing.">
+  <link rel="canonical" href="https://elea.alien6.com/research/geometry-of-interfaces/atlas/">
+  <link rel="icon" type="image/svg+xml" href="../../../assets/elea-mark.svg">
+  <title>Geometry of interfaces, atlas · Elea</title>
+  
+  <script src="../../../assets/site-theme.js"></script>
+  
+    <link rel="stylesheet" href="../../../assets/elea.css">
+  
+    <link rel="stylesheet" href="../../../assets/type-roles.css">
+  
+    <link rel="stylesheet" href="../../../assets/editions.css">
+  
+    <link rel="stylesheet" href="../../../assets/site-profile.css">
+  
+    <link rel="stylesheet" href="../../../assets/elea-viewer.css">
+  
+    <link rel="stylesheet" href="../../../assets/elea-ui.css">
+  
+    <link rel="stylesheet" href="../../../assets/elea-layout.css">
+  
+    <link rel="stylesheet" href="../../../assets/brand.css">
+  
+    <link rel="stylesheet" href="../../../assets/site-search.css">
+  
+    <link rel="stylesheet" href="../../../assets/site.css">
+  
+    <link rel="stylesheet" href="../../../assets/research.css">
+  
+  
+  <link rel="stylesheet" href="../../../assets/geometry-lab.css">
+</head>
+
+
+<body>
+  
+    <a class="site__skip" href="#main">Skip to content</a><header class="site__masthead"><div class="frame grid site__masthead-inner"><div class="site__brand col-md-2"><a class="site__wordmark" href="/" aria-label="Elea">elea</a></div><div class="start-md-3 site__bar"><div id="site-search"><div role="search" aria-label="Site" class="site-search"><div class="elea-search-autocomplete"><div class="elea-search-field elea-search-field--clearable"><svg class="elea-search-field__icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg><input aria-keyshortcuts="Control+k Meta+k" id="elea-site-query" role="combobox" aria-autocomplete="list" autoComplete="off" aria-expanded="false" type="search" aria-label="Search the site" placeholder="Search" class="elea-ui-input elea-ui-input--md" value=""/></div></div><kbd aria-hidden="true" class="site-search__shortcut">Ctrl K</kbd></div></div><a class="site-repo" href="https://github.com/Alien6-Studio/elea" aria-label="Alien6-Studio/elea on GitHub, Latest release v0.1.4, 1 star, 0 forks"><svg class="site-repo__glyph" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7m12 5v-3.4c0-1 .1-1.5-.5-2.1 3.1-.4 6.4-1.6 6.4-7a5.4 5.4 0 0 0-1.5-3.8 5 5 0 0 0-.1-3.8s-1.2-.4-3.9 1.5a13.2 13.2 0 0 0-7 0C5.7.8 4.5 1.2 4.5 1.2a5 5 0 0 0-.1 3.8 5.4 5.4 0 0 0-1.5 3.8c0 5.4 3.3 6.6 6.4 7-.5.5-.7 1.1-.7 2.1v3.4"></path></svg><span class="site-repo__copy" aria-hidden="true"><span class="site-repo__name">Alien6-Studio/<wbr/>elea</span><span class="site-repo__facts"><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><path d="M8.5 2H14v5.5l-6.3 6.3a1 1 0 0 1-1.4 0L2.2 9.7a1 1 0 0 1 0-1.4Z"></path><circle cx="11.5" cy="4.5" r=".65" fill="currentColor" stroke="none"></circle></svg>v0.1.4</span><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><path d="m8 1.8 1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.5l-3.8 2.1.7-4.3-3.1-3 4.3-.6Z"></path></svg>1</span><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><circle cx="4" cy="3" r="1.6"></circle><circle cx="12" cy="3" r="1.6"></circle><circle cx="8" cy="13" r="1.6"></circle><path d="M4 4.6v1.5c0 2 4 1.5 4 4v1.3m4-6.8v1.5c0 2-4 1.5-4 4"></path></svg>0</span></span></span></a><div class="site__tools"><div id="site-profile-picker" hidden=""><div class="elea-ui-select elea-ui-select--sm site-profile-select"><button type="button" id="site-profile" class="elea-ui-select__trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="site-profile-listbox" aria-label="Site theme"><span class="elea-ui-select__value"><span class="site-profile-option"><span class="site-profile-option__swatches" aria-hidden="true"><span style="background-color:#edbb28"></span><span style="background-color:#232321"></span><span style="background-color:#739397"></span></span><span>Ponctuation</span></span></span><span class="elea-ui-select__chevron"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></button></div></div><button data-site-theme-toggle="" data-testid="theme-toggle" class="elea-button elea-button--ghost elea-button--sm site__theme-toggle" type="button"><span class="elea-button__label"><span class="site__theme-when-light"><span class="site__visually-hidden">Switch to the dark theme</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg></span><span class="site__theme-when-dark"><span class="site__visually-hidden">Switch to the light theme</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"></path></svg></span></span></button></div></div><nav aria-label="Main" class="elea-navbar start-md-3 site__masthead-links" data-collapse="never" data-submenu-layout="list"><div class="elea-navbar__bar"><button type="button" class="elea-navbar__toggle" hidden="" aria-controls="_R_e_" aria-expanded="false"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>Site menu</button><div id="_R_e_" class="elea-navbar__panel"><ul class="elea-navigation-list"><li><a href="/getting-started/" class="elea-navigation-list__link"><span>Docs</span></a></li><li><a href="/playground/#/ui" class="elea-navigation-list__link"><span>Components</span></a></li><li><a href="/typography/" class="elea-navigation-list__link"><span>Typography</span></a></li><li><a href="/playground/#/colours" class="elea-navigation-list__link"><span>Colours</span></a></li><li><a href="/playground/#/theme" class="elea-navigation-list__link"><span>Theme studio</span></a></li><li><a href="/playground/#/playground" class="elea-navigation-list__link"><span>Editorial workspace</span></a></li><li><a href="/research/" class="elea-navigation-list__link" aria-current="true"><span>Research</span></a></li></ul></div></div></nav></div></header>
+    <div class="docs-guidebar">
+      <div class="frame grid docs-guidebar__inner">
+        <span class="elea-grid__rail col-md-2 docs-guidebar__label">Research</span>
+        <nav class="start-md-3 docs-guidebar__links" aria-label="Research">
+          <a href="../../">All studies</a>
+          
+            
+            <a href="../" aria-current="true">Geometry of interfaces</a>
+          
+            
+            <a href="../../composition-of-interfaces/">Composition of interfaces</a>
+          
+            
+            <a href="../../interaction-observatory/">Interaction Observatory</a>
+          
+        </nav>
+      </div>
+    </div>
+    
+      
+      
+        <div class="docs-guidebar docs-guidebar--study">
+          <div class="frame grid docs-guidebar__inner">
+            <span class="elea-grid__rail col-md-2 docs-guidebar__label">Geometry of interfaces</span>
+            <nav class="start-md-3 docs-guidebar__links" aria-label="Geometry of interfaces">
+              <a href="../">Study</a>
+              
+                <a href="./" aria-current="page">Atlas</a>
+              
+                <a href="../laboratory/">Laboratory</a>
+              
+            </nav>
+          </div>
+        </div>
+      
+    
+      
+      
+    
+      
+      
+    
+  
+  
+    <main id="main" class="frame research-lab" tabindex="-1">
+      <div id="research-lab" data-view="atlas"><h1 id="geometry-of-interfaces-atlas">Geometry of interfaces: atlas</h1>
+<p>The plates are drawn in the browser and need JavaScript.
+The <a href="../">written study</a> carries the same
+constructions as static figures.</p></div>
+    </main>
+    <script type="module" src="../../../playground/geometry-lab.js"></script>
+  
+  <footer role="contentinfo" class="elea-footer site-footer"><div class="elea-footer__main"><div class="elea-footer__brand"><a class="site__wordmark" href="/" aria-label="Elea">elea</a><p>Open-source React components for products built around rich content.</p></div><div class="elea-footer__groups"><nav aria-label="Explore Elea"><p class="elea-footer__label">Explore Elea</p><ul><li><a href="/getting-started/">Docs</a></li><li><a href="/playground/#/ui">Components</a></li><li><a href="/typography/">Typography</a></li><li><a href="/playground/#/colours">Colours</a></li><li><a href="/playground/#/theme">Theme studio</a></li><li><a href="/playground/#/playground">Editorial workspace</a></li><li><a href="/research/">Research</a></li></ul></nav><nav aria-label="Project"><p class="elea-footer__label">Project</p><ul><li><a href="/versions/">Versions and changes</a></li><li><a href="https://github.com/Alien6-Studio/elea">Source on GitHub</a></li><li><a href="https://github.com/Alien6-Studio/elea/blob/main/LICENSE">Apache 2.0 license</a></li></ul></nav></div></div><div class="elea-footer__end"><a class="site-footer__signature" href="https://alien6.com"><span>Built by</span><img src="/assets/alien6.png" width="92" height="41" alt="Alien6" loading="lazy"/></a></div></footer>
+  <script type="module" src="../../../playground/site-profile.js"></script>
+</body>
+</html>

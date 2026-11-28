@@ -1,25 +1,2 @@
-import "@vitejs/plugin-react/preamble";
-import { createElement, useEffect, useSyncExternalStore } from "react";
-import { createRoot, hydrateRoot } from "react-dom/client";
-import { SiteSearch } from "./src/components/SiteSearch.tsx";
-import { SiteProfileSelect } from "./src/components/SiteProfileSelect.tsx";
-import { siteProfile } from "./src/siteProfile.ts";
-
-const picker = document.getElementById("site-profile-picker");
-
-function StoredProfileSelect() {
-  const profile = useSyncExternalStore(siteProfile.subscribe, siteProfile.get, () => "reserve");
-  useEffect(() => { picker.hidden = false; }, []);
-  return createElement(SiteProfileSelect, { profile, onProfileChange: siteProfile.set });
-}
-
-hydrateRoot(picker, createElement(StoredProfileSelect));
-
-const search = document.getElementById("site-search");
-if (search) hydrateRoot(search, createElement(SiteSearch));
-
-const comparison = document.getElementById("theme-comparison");
-if (comparison) {
-  const { ThemeComparison } = await import("./src/components/ThemeComparison.tsx");
-  createRoot(comparison).render(createElement(ThemeComparison));
-}
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/ThemeComparison-CdjIvYF4.js","assets/Button-CDE3YPd-.js","assets/jsx-runtime-Am8b9ysO.js","assets/cx-hZG6twJP.js","assets/Skeleton-uHGQUyB9.js","assets/Select-BTFb_aA1.js","assets/palette-BTYVItIu.js","assets/brandTheme-D2Qgr46P.js","assets/siteProfile-6k8F1OXG.js","assets/SiteProfileSelect-BAjpuBKo.js"])))=>i.map(i=>d[i]);
+import{n as e}from"./assets/jsx-runtime-Am8b9ysO.js";import{t}from"./assets/client-Bm5Fnv5S.js";import{t as n}from"./assets/SiteSearch-D5PhV9nK.js";import{t as r}from"./assets/SiteProfileSelect-BAjpuBKo.js";import{n as i}from"./assets/brandTheme-D2Qgr46P.js";import{n as a}from"./assets/siteProfile-6k8F1OXG.js";import{t as o}from"./assets/preload-helper-CTk6w4mk.js";var s=e(),c=t(),l=document.getElementById(`site-profile-picker`);function u(){let e=(0,s.useSyncExternalStore)(a.subscribe,a.get,()=>i);return(0,s.useEffect)(()=>{l.hidden=!1},[]),(0,s.createElement)(r,{profile:e,onProfileChange:a.set})}(0,c.hydrateRoot)(l,(0,s.createElement)(u));var d=document.getElementById(`site-search`);d&&(0,c.hydrateRoot)(d,(0,s.createElement)(n));var f=document.getElementById(`theme-comparison`);if(f){let{ThemeComparison:e}=await o(async()=>{let{ThemeComparison:e}=await import(`./assets/ThemeComparison-CdjIvYF4.js`);return{ThemeComparison:e}},__vite__mapDeps([0,1,2,3,4,5,6,7,8,9]));(0,c.createRoot)(f).render((0,s.createElement)(e))}

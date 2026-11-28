@@ -1,0 +1,53 @@
+@layer elea.tokens, elea.base, elea.components;
+@layer elea.components {
+/* Layout: a frame and the columns every view of a site shares. A block states the columns it
+   takes and a grid placed in a grid inherits its lines, so blocks at any depth start and end on
+   the same edges. The ruling has four columns, eight from 48rem (md) and twelve from 72rem (lg).
+   col-N spans N columns and start-N starts on line N; with md or lg before the number
+   they apply from that width and hold above it. A span resets the start stated at a narrower width. */
+@property --elea-layout-measure { syntax: "<length>"; inherits: false; initial-value: 0px; }
+
+/* The configuration is stated once, so a sheet that composes with the ruling reads it */
+:root {
+  --elea-layout-width: 74rem;
+  --elea-layout-margin: clamp(var(--elea-space-5), 4.4vi, var(--elea-space-12));
+  --elea-layout-gutter: clamp(var(--elea-space-4), 2.4vi, var(--elea-space-8));
+}
+
+:where(.frame, .grid) { box-sizing: border-box; min-inline-size: 0; }
+
+/* Frame: the outer edges every view shares */
+.frame {
+  inline-size: min(var(--elea-layout-width), 100% - 2 * var(--elea-layout-margin));
+  margin-inline: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--elea-layout-gutter);
+  align-items: start;
+}
+.grid > .grid { grid-template-columns: subgrid; }
+
+/* A block takes the whole line until it states a span; a start alone runs to the last line */
+:where(.grid > *) { grid-column: 1 / -1; min-inline-size: 0; }
+.col-1 { grid-column: auto / span 1; } .col-2 { grid-column: auto / span 2; } .col-3 { grid-column: auto / span 3; } .col-4 { grid-column: auto / span 4; }
+.start-1 { grid-column-start: 1; } .start-2 { grid-column-start: 2; } .start-3 { grid-column-start: 3; } .start-4 { grid-column-start: 4; }
+/* A rail holds a line of navigation: nine rem, which two columns give from 48rem */
+.grid__rail { --elea-layout-measure: 9rem; }
+
+@media (min-width: 48rem) {
+  .grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  .col-md-1 { grid-column: auto / span 1; } .col-md-2 { grid-column: auto / span 2; } .col-md-3 { grid-column: auto / span 3; } .col-md-4 { grid-column: auto / span 4; } .col-md-5 { grid-column: auto / span 5; } .col-md-6 { grid-column: auto / span 6; } .col-md-7 { grid-column: auto / span 7; } .col-md-8 { grid-column: auto / span 8; }
+  .start-md-1 { grid-column-start: 1; } .start-md-2 { grid-column-start: 2; } .start-md-3 { grid-column-start: 3; } .start-md-4 { grid-column-start: 4; } .start-md-5 { grid-column-start: 5; } .start-md-6 { grid-column-start: 6; } .start-md-7 { grid-column-start: 7; } .start-md-8 { grid-column-start: 8; }
+}
+
+@media (min-width: 72rem) {
+  .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .col-lg-1 { grid-column: auto / span 1; } .col-lg-2 { grid-column: auto / span 2; } .col-lg-3 { grid-column: auto / span 3; } .col-lg-4 { grid-column: auto / span 4; } .col-lg-5 { grid-column: auto / span 5; } .col-lg-6 { grid-column: auto / span 6; } .col-lg-7 { grid-column: auto / span 7; } .col-lg-8 { grid-column: auto / span 8; } .col-lg-9 { grid-column: auto / span 9; } .col-lg-10 { grid-column: auto / span 10; } .col-lg-11 { grid-column: auto / span 11; } .col-lg-12 { grid-column: auto / span 12; }
+  .start-lg-1 { grid-column-start: 1; } .start-lg-2 { grid-column-start: 2; } .start-lg-3 { grid-column-start: 3; } .start-lg-4 { grid-column-start: 4; } .start-lg-5 { grid-column-start: 5; } .start-lg-6 { grid-column-start: 6; } .start-lg-7 { grid-column-start: 7; } .start-lg-8 { grid-column-start: 8; } .start-lg-9 { grid-column-start: 9; } .start-lg-10 { grid-column-start: 10; } .start-lg-11 { grid-column-start: 11; } .start-lg-12 { grid-column-start: 12; }
+  /* Prose on ten columns: its text keeps eight, a plate takes all ten */
+  .grid__prose > :where(:not(.grid__plate)) { max-inline-size: calc((100% + var(--elea-layout-gutter)) * 8 / 10 - var(--elea-layout-gutter)); }
+}
+}

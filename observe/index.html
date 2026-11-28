@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en" data-elea-theme="site">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Elea is an open-source React design system for rendering, editing and styling rich content.">
+  <link rel="canonical" href="https://elea.alien6.com/observe/">
+  <link rel="icon" type="image/svg+xml" href="../assets/elea-mark.svg">
+  <title>Observe · Elea</title>
+  
+  <script src="../assets/site-theme.js"></script>
+  
+    <link rel="stylesheet" href="../assets/elea.css">
+  
+    <link rel="stylesheet" href="../assets/type-roles.css">
+  
+    <link rel="stylesheet" href="../assets/editions.css">
+  
+    <link rel="stylesheet" href="../assets/site-profile.css">
+  
+    <link rel="stylesheet" href="../assets/elea-viewer.css">
+  
+    <link rel="stylesheet" href="../assets/elea-ui.css">
+  
+    <link rel="stylesheet" href="../assets/elea-layout.css">
+  
+    <link rel="stylesheet" href="../assets/brand.css">
+  
+    <link rel="stylesheet" href="../assets/site-search.css">
+  
+    <link rel="stylesheet" href="../assets/site.css">
+  
+    <link rel="stylesheet" href="../assets/research.css">
+  
+  
+  
+</head>
+
+
+<body>
+  
+    <a class="site__skip" href="#main">Skip to content</a><header class="site__masthead"><div class="frame grid site__masthead-inner"><div class="site__brand col-md-2"><a class="site__wordmark" href="/" aria-label="Elea">elea</a></div><div class="start-md-3 site__bar"><div id="site-search"><div role="search" aria-label="Site" class="site-search"><div class="elea-search-autocomplete"><div class="elea-search-field elea-search-field--clearable"><svg class="elea-search-field__icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg><input aria-keyshortcuts="Control+k Meta+k" id="elea-site-query" role="combobox" aria-autocomplete="list" autoComplete="off" aria-expanded="false" type="search" aria-label="Search the site" placeholder="Search" class="elea-ui-input elea-ui-input--md" value=""/></div></div><kbd aria-hidden="true" class="site-search__shortcut">Ctrl K</kbd></div></div><a class="site-repo" href="https://github.com/Alien6-Studio/elea" aria-label="Alien6-Studio/elea on GitHub, Latest release v0.1.4, 1 star, 0 forks"><svg class="site-repo__glyph" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7m12 5v-3.4c0-1 .1-1.5-.5-2.1 3.1-.4 6.4-1.6 6.4-7a5.4 5.4 0 0 0-1.5-3.8 5 5 0 0 0-.1-3.8s-1.2-.4-3.9 1.5a13.2 13.2 0 0 0-7 0C5.7.8 4.5 1.2 4.5 1.2a5 5 0 0 0-.1 3.8 5.4 5.4 0 0 0-1.5 3.8c0 5.4 3.3 6.6 6.4 7-.5.5-.7 1.1-.7 2.1v3.4"></path></svg><span class="site-repo__copy" aria-hidden="true"><span class="site-repo__name">Alien6-Studio/<wbr/>elea</span><span class="site-repo__facts"><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><path d="M8.5 2H14v5.5l-6.3 6.3a1 1 0 0 1-1.4 0L2.2 9.7a1 1 0 0 1 0-1.4Z"></path><circle cx="11.5" cy="4.5" r=".65" fill="currentColor" stroke="none"></circle></svg>v0.1.4</span><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><path d="m8 1.8 1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.5l-3.8 2.1.7-4.3-3.1-3 4.3-.6Z"></path></svg>1</span><span class="site-repo__fact"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"><circle cx="4" cy="3" r="1.6"></circle><circle cx="12" cy="3" r="1.6"></circle><circle cx="8" cy="13" r="1.6"></circle><path d="M4 4.6v1.5c0 2 4 1.5 4 4v1.3m4-6.8v1.5c0 2-4 1.5-4 4"></path></svg>0</span></span></span></a><div class="site__tools"><div id="site-profile-picker" hidden=""><div class="elea-ui-select elea-ui-select--sm site-profile-select"><button type="button" id="site-profile" class="elea-ui-select__trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="site-profile-listbox" aria-label="Site theme"><span class="elea-ui-select__value"><span class="site-profile-option"><span class="site-profile-option__swatches" aria-hidden="true"><span style="background-color:#edbb28"></span><span style="background-color:#232321"></span><span style="background-color:#739397"></span></span><span>Ponctuation</span></span></span><span class="elea-ui-select__chevron"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></button></div></div><button data-site-theme-toggle="" data-testid="theme-toggle" class="elea-button elea-button--ghost elea-button--sm site__theme-toggle" type="button"><span class="elea-button__label"><span class="site__theme-when-light"><span class="site__visually-hidden">Switch to the dark theme</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg></span><span class="site__theme-when-dark"><span class="site__visually-hidden">Switch to the light theme</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"></path></svg></span></span></button></div></div><nav aria-label="Main" class="elea-navbar start-md-3 site__masthead-links" data-collapse="never" data-submenu-layout="list"><div class="elea-navbar__bar"><button type="button" class="elea-navbar__toggle" hidden="" aria-controls="_R_e_" aria-expanded="false"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>Site menu</button><div id="_R_e_" class="elea-navbar__panel"><ul class="elea-navigation-list"><li><a href="/getting-started/" class="elea-navigation-list__link" aria-current="true"><span>Docs</span></a></li><li><a href="/playground/#/ui" class="elea-navigation-list__link"><span>Components</span></a></li><li><a href="/typography/" class="elea-navigation-list__link"><span>Typography</span></a></li><li><a href="/playground/#/colours" class="elea-navigation-list__link"><span>Colours</span></a></li><li><a href="/playground/#/theme" class="elea-navigation-list__link"><span>Theme studio</span></a></li><li><a href="/playground/#/playground" class="elea-navigation-list__link"><span>Editorial workspace</span></a></li><li><a href="/research/" class="elea-navigation-list__link"><span>Research</span></a></li></ul></div></div></nav></div></header>
+    <div class="docs-guidebar">
+      <div class="frame grid docs-guidebar__inner">
+        <span class="elea-grid__rail col-md-2 docs-guidebar__label">Guides</span>
+        <nav class="start-md-3 docs-guidebar__links" aria-label="Documentation">
+          
+            <a href="../getting-started/">Getting started</a>
+          
+            <a href="../content/">Content</a>
+          
+            <a href="../components/">UI integration</a>
+          
+            <a href="./" aria-current="page">Observe</a>
+          
+            <a href="../versions/">Versions</a>
+          
+        </nav>
+      </div>
+    </div>
+  
+  
+    <main id="main" class="frame grid docs-layout" tabindex="-1">
+      <div class="elea-grid__rail col-md-2 docs-rail">
+        
+          <nav class="docs-toc" aria-label="On this page">
+            <p>On this page</p>
+            
+              <a href="#three-things-to-declare">Three things to declare</a>
+            
+              <a href="#record-a-save">Record a save</a>
+            
+              <a href="#the-five-events">The five events</a>
+            
+              <a href="#what-it-leaves-to-you">What it leaves to you</a>
+            
+          </nav>
+        
+      </div>
+      <article class="elea-grid__prose start-md-3 docs-article">
+        <h1 id="observe">Observe</h1>
+<p>Alien6 Observe is a TypeScript SDK that records what happens to the controls
+you register: an activation, a focus change, an exposure, a state transition
+or the outcome of a task. It has no dependency and does not require ELEA. It
+keeps the records in memory and sends nothing.</p>
+<pre><code class="language-sh">npm install @alien6-studio/observe
+</code></pre>
+<p>The <a href="https://github.com/Alien6-Studio/elea/tree/main/packages/observe">package</a>
+is released with the ELEA packages, under the same version, from 0.1.5.</p>
+<h2 id="three-things-to-declare">Three things to declare</h2>
+<div class="elea-table" role="region" aria-label="You declare, What it does" tabindex="0"><table>
+<thead>
+<tr>
+<th>You declare</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A <strong>catalog</strong></td>
+<td>Lists every target you allow, with its context and its event kinds. An event that matches no entry is rejected.</td>
+</tr>
+<tr>
+<td>A <strong>grant</strong></td>
+<td>Starts collection for one purpose and a set of event kinds. Until the host gives one, nothing is recorded.</td>
+</tr>
+<tr>
+<td><strong>Bindings</strong></td>
+<td>Attach a registered target to a DOM element, for the events a browser can establish.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A target names a control by its function, not by its label or position:
+a <code>surface</code>, a <code>component</code>, a <code>slot</code> such as <code>document.save</code>, a <code>role</code>, and
+the current <code>state</code> and <code>variant</code> or <code>null</code>. The context carries the theme,
+appearance, density and experiment arm, each <code>null</code> when unknown. Every code
+is 1 to 64 characters among lowercase letters, digits, <code>.</code>, <code>_</code> and <code>-</code>.</p>
+<h2 id="record-a-save">Record a save</h2>
+<p>This example counts the clicks on a save button and records whether the
+save succeeded. The browser establishes the click. The application reports
+the outcome, because only it knows the document was stored.</p>
+<pre><code class="language-ts">import {
+  createLocalObserve, type ObserveCatalogV1, type ObserveContextV1, type ObserveTargetV1,
+} from &quot;@alien6-studio/observe&quot;;
+import { createBrowserCollector } from &quot;@alien6-studio/observe/browser&quot;;
+
+const save = {
+  surface: &quot;editor&quot;, component: &quot;button&quot;, slot: &quot;document.save&quot;,
+  role: &quot;button&quot;, state: &quot;ready&quot;, variant: null,
+} satisfies ObserveTargetV1;
+const context = { theme: null, appearance: null, density: null, experiment: null } satisfies ObserveContextV1;
+
+const catalog = {
+  revision: &quot;editor-1&quot;,
+  entries: [{
+    target: save, context,
+    kinds: [&quot;interaction.activated&quot;, &quot;task.outcome&quot;],
+    tasks: [&quot;document.save&quot;],
+  }],
+} satisfies ObserveCatalogV1;
+
+const observe = createLocalObserve({
+  purpose: &quot;local-demo&quot;,
+  catalog,
+  collectors: [
+    createBrowserCollector([{ element: button, target: () =&gt; save, activation: true }], () =&gt; context),
+  ],
+});
+
+// Nothing is recorded before the grant.
+observe.setGrant({
+  purpose: &quot;local-demo&quot;, destination: &quot;memory&quot;,
+  kinds: [&quot;interaction.activated&quot;, &quot;task.outcome&quot;],
+});
+
+// Once the document is stored:
+observe.record({
+  schemaVersion: 1, kind: &quot;task.outcome&quot;, target: save, context,
+  detail: { source: &quot;application-task&quot;, task: &quot;document.save&quot;, outcome: &quot;succeeded&quot;, duration: &quot;under-1s&quot; },
+});
+
+observe.snapshot();     // the records, oldest first
+observe.setGrant(null); // stops collection and clears the records
+</code></pre>
+<p><code>record</code> returns <code>false</code> when it refuses an event. <code>snapshot</code> returns frozen
+records, each with an <code>index</code>, an <code>elapsedMs</code> rounded to 10 ms and the
+<code>event</code>. The buffer holds 128 records by default, 1,024 at most, and drops
+the oldest first. <code>subscribe</code> calls a listener after each change, to refresh
+a display. <code>dispose</code> ends the instance.</p>
+<h2 id="the-five-events">The five events</h2>
+<div class="elea-table" role="region" aria-label="Event, Reported by, It establishes" tabindex="0"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Reported by</th>
+<th>It establishes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>interaction.activated</code></td>
+<td>A binding with <code>activation</code>, or <code>record</code> for an application command</td>
+<td>The target was activated. The modality stays <code>unknown</code> unless the source proves it.</td>
+</tr>
+<tr>
+<td><code>focus.changed</code></td>
+<td>A binding with <code>focus</code></td>
+<td>DOM focus entered or left the element.</td>
+</tr>
+<tr>
+<td><code>exposure.qualified</code></td>
+<td>A binding with <code>exposure</code> and a catalog rule</td>
+<td>The element kept a minimum share of its area in the viewport of a visible document for a minimum time. It does not establish that anyone looked at it.</td>
+</tr>
+<tr>
+<td><code>state.transitioned</code></td>
+<td><code>record</code></td>
+<td>The target moved from a state listed in <code>fromStates</code> to its current <code>state</code>.</td>
+</tr>
+<tr>
+<td><code>task.outcome</code></td>
+<td><code>record</code></td>
+<td>A task listed in <code>tasks</code> succeeded, failed or was cancelled, with a duration band or <code>null</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A binding only reports trusted browser events on a connected element, and
+ignores a control that is disabled or inert. Use one activation source per
+action: the click binding or the application command, not both.</p>
+<h2 id="what-it-leaves-to-you">What it leaves to you</h2>
+<ul>
+<li><strong>Consent and purpose.</strong> The host decides when to grant and when to revoke.
+  Replacing or revoking a grant detaches the listeners and discards the records.</li>
+<li><strong>Delivery.</strong> The SDK stores, transfers and exports nothing, and refuses a
+  grant whose destination is <code>export</code>.</li>
+<li><strong>Content.</strong> The event has no field for a label, a form value, a URL, a
+  coordinate or an identifier of a person, a device or a session. Keep them
+  out of the codes you register.</li>
+<li><strong>Untrusted input.</strong> <code>createEventValidator(catalog)</code> checks a value against
+  the catalog and returns a frozen event or <code>null</code>.</li>
+</ul>
+<p>The <a href="../research/interaction-observatory/">Interaction Observatory</a> explains
+what each event can support as a claim, and its
+<a href="../research/interaction-observatory/laboratory/">laboratory</a> runs this SDK on
+a save. To display records, the UI package provides
+<a href="https://github.com/Alien6-Studio/elea/tree/main/packages/ui#measurement-displays">measurement displays</a>.</p>
+      </article>
+    </main>
+  
+  <footer role="contentinfo" class="elea-footer site-footer"><div class="elea-footer__main"><div class="elea-footer__brand"><a class="site__wordmark" href="/" aria-label="Elea">elea</a><p>Open-source React components for products built around rich content.</p></div><div class="elea-footer__groups"><nav aria-label="Explore Elea"><p class="elea-footer__label">Explore Elea</p><ul><li><a href="/getting-started/">Docs</a></li><li><a href="/playground/#/ui">Components</a></li><li><a href="/typography/">Typography</a></li><li><a href="/playground/#/colours">Colours</a></li><li><a href="/playground/#/theme">Theme studio</a></li><li><a href="/playground/#/playground">Editorial workspace</a></li><li><a href="/research/">Research</a></li></ul></nav><nav aria-label="Project"><p class="elea-footer__label">Project</p><ul><li><a href="/versions/">Versions and changes</a></li><li><a href="https://github.com/Alien6-Studio/elea">Source on GitHub</a></li><li><a href="https://github.com/Alien6-Studio/elea/blob/main/LICENSE">Apache 2.0 license</a></li></ul></nav></div></div><div class="elea-footer__end"><a class="site-footer__signature" href="https://alien6.com"><span>Built by</span><img src="/assets/alien6.png" width="92" height="41" alt="Alien6" loading="lazy"/></a></div></footer>
+  <script type="module" src="../playground/site-profile.js"></script>
+</body>
+</html>
