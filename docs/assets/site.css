@@ -200,7 +200,7 @@ a { text-underline-offset: 0.18em; }
   .typography-page { display: block; background: white; color: black; }
   .type-book { width: 100%; max-width: none; padding: 0; }
   .type-cover { grid-template-columns: 1fr 1fr; }
-  :is(.type-cover, .type-spread) > .elea-grid__half { grid-column: auto; }
+  :is(.type-cover, .type-spread) > :is([class^="col-"], [class*=" col-"]) { grid-column: auto; }
   .type-cover__title { font-size: 56pt; }
   .type-cover__title em { display: block; }
   .type-plate { margin: 0; break-inside: avoid; }
@@ -326,7 +326,7 @@ a { text-underline-offset: 0.18em; }
 .home-tool > p, .home-services p { max-width: 49ch; color: var(--elea-color-text-muted); margin: .7rem 0 1.3rem; }
 .home-specimens { row-gap: 1rem; }
 .home-specimen {
-  position: relative; grid-column: auto; display: flex; flex-direction: column; gap: .5rem;
+  position: relative; display: flex; flex-direction: column; gap: .5rem;
   color: var(--elea-color-text-default); font-size: .85rem; font-weight: 560; text-decoration: none;
 }
 .home-specimen__demo {
@@ -349,7 +349,6 @@ a { text-underline-offset: 0.18em; }
 }
 
 @media (max-width: 57rem) {
-  .home-spread > * { grid-column: 1 / -1; }
   .home-copy h1 { font-size: clamp(2.42rem, 8.5vw, 4.6rem); }
   .home-lead { max-width: 45ch; }
   .notebook__document .elea-content { min-height: clamp(16rem, 39vw, 22rem); }

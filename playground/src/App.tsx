@@ -44,8 +44,8 @@ function destinationOf(view: View, path: string) {
 }
 
 function layoutOf(view: View) {
-  if (view === "archive" || view === "workspace") return "full";
-  return view;
+  if (view === "archive" || view === "workspace") return "";
+  return `frame site__content--${view}`;
 }
 
 function navigationFor(brand: BrandTheme | undefined) {
@@ -72,7 +72,7 @@ function Page({ view, archive, path, brand, preferred, session, onChange }: Read
   onChange: (next: BrandTheme) => void;
 }>) {
   switch (view) {
-    case "archive": return <p className="elea-frame"><a href={archive}>View the archived Workspace capture on GitHub</a>.</p>;
+    case "archive": return <p className="frame"><a href={archive}>View the archived Workspace capture on GitHub</a>.</p>;
     case "missing": return <NotFound />;
     case "catalog": return <CatalogPage route={path} brand={brand} />;
     case "colours": return <ColoursPage key={session} brand={brand ?? preferred} onChange={onChange} />;
@@ -119,8 +119,8 @@ export function App() {
   return (
     <div className="site">
       <SiteHeader navigation={navigation} section={section} profile={profile} onProfileChange={selectProfile} />
-      <main id="main" tabIndex={-1} className={`site__content site__content--${layoutOf(view)}`}>
-        <Suspense fallback={<p className="elea-frame" role="status">Loading…</p>}>
+      <main id="main" tabIndex={-1} className={`site__content ${layoutOf(view)}`.trimEnd()}>
+        <Suspense fallback={<p className={layoutOf(view) ? undefined : "frame"} role="status">Loading…</p>}>
           <Page view={view} archive={archive} path={path} brand={brand} preferred={preferred} session={editorSession} onChange={editBrand} />
         </Suspense>
       </main>

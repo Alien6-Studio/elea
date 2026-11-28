@@ -18,6 +18,7 @@ const styles = [
   ["@alien6-studio/elea-tokens/typography.css", "type-roles.css"],
   ["@alien6-studio/elea-tokens/editions.css", "editions.css"],
   ["@alien6-studio/elea-ui/styles.css", "elea-ui.css"],
+  ["@alien6-studio/elea-ui/css/layout-bare.css", "elea-layout.css"],
   ["@alien6-studio/elea-content-viewer/styles.css", "elea-viewer.css"],
 ] as const;
 for (const [specifier, target] of styles) {
@@ -57,8 +58,8 @@ writeFileSync(new URL("header-research.html", templates), renderToStaticMarkup(<
 writeFileSync(new URL("not-found.html", templates), renderToStaticMarkup(<NotFound />));
 writeFileSync(new URL("header-typography.html", templates), renderToStaticMarkup(<SiteHeader section="typography" />));
 writeFileSync(new URL("typography-cover.html", templates), renderToString(
-  <header className="elea-grid type-cover">
-    <div className="elea-grid__half type-cover__lead">
+  <header className="grid type-cover">
+    <div className="col-md-4 col-lg-6 type-cover__lead">
       <h1>Typography</h1>
       <div className="type-cover__family">
         <p className="type-cover__title">ELEA <em>Sans</em></p>
@@ -68,7 +69,7 @@ writeFileSync(new URL("typography-cover.html", templates), renderToString(
         </div>
       </div>
     </div>
-    <div id="glyph-carousel" className="elea-grid__half"><GlyphCarousel /></div>
+    <div id="glyph-carousel" className="col-md-4 col-lg-6"><GlyphCarousel /></div>
     <p className="type-cover__details">Variable typeface <span>Roman &amp; italic <span aria-hidden="true">·</span> 100–900</span></p>
   </header>
 ));

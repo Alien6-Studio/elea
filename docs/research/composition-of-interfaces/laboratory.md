@@ -10,8 +10,8 @@ view: laboratory
     <h1 class="site-page-title">Composition laboratory</h1>
     <p>Build a page from its outside edges in. Set the frame and margins, divide the available measure into columns, then give the title a span. The programme below shows what fits and where space is left open.</p>
   </header>
-  <div class="elea-grid grid-lab__bench">
-    <form class="elea-grid__panel grid-lab__controls" hidden>
+  <div class="grid grid-lab__bench">
+    <form class="col-lg-4 grid-lab__controls" hidden>
       <fieldset>
         <legend>Construct the grid</legend>
         <div><label for="grid-width">Frame width</label><span data-value="width">720 px</span><input id="grid-width" type="range" min="240" max="960" step="8" value="720"></div>
@@ -22,7 +22,7 @@ view: laboratory
         <div><label for="grid-span">Title span</label><span data-value="span">4 columns</span><input id="grid-span" type="range" min="1" max="6" step="1" value="4"></div>
       </fieldset>
     </form>
-    <section class="elea-grid__stage grid-lab__work" aria-labelledby="grid-sheet-heading">
+    <section class="col-lg-8 grid-lab__work" aria-labelledby="grid-sheet-heading">
       <div class="grid-lab__head">
         <h2 id="grid-sheet-heading">Programme sheet</h2>
         <label><input id="grid-guides" type="checkbox" checked> Show construction lines</label>
@@ -39,12 +39,12 @@ view: laboratory
       <noscript><p>The static grid has six columns, 24 px outer margins and 12 px gutters. The title spans four columns. Enable JavaScript to change the construction and inspect the current dimensions.</p></noscript>
     </section>
   </div>
-  <dl class="elea-grid grid-lab__readings" aria-label="Grid measurements" hidden>
-    <div><dt>Effective frame</dt><dd data-readout="frame"></dd></div>
-    <div><dt>Column width</dt><dd data-readout="track"></dd></div>
-    <div><dt>Title width</dt><dd data-readout="span"></dd></div>
-    <div><dt>Space after title</dt><dd data-readout="reserve"></dd></div>
-    <div><dt>Module depth</dt><dd data-readout="module"></dd></div>
+  <dl class="grid grid-lab__readings" aria-label="Grid measurements" hidden>
+    <div class="col-2"><dt>Effective frame</dt><dd data-readout="frame"></dd></div>
+    <div class="col-2"><dt>Column width</dt><dd data-readout="track"></dd></div>
+    <div class="col-2"><dt>Title width</dt><dd data-readout="span"></dd></div>
+    <div class="col-2"><dt>Space after title</dt><dd data-readout="reserve"></dd></div>
+    <div class="col-2"><dt>Module depth</dt><dd data-readout="module"></dd></div>
   </dl>
   <details class="grid-lab__method">
     <summary>How to read the construction</summary>

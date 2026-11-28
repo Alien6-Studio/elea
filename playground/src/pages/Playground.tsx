@@ -169,7 +169,7 @@ export function PlaygroundPage({ brand }: Readonly<{ brand?: BrandTheme }>) {
   return (
     <ContentProvider messages={messages} imageCrop={demoCrop} siteHostnames={siteHostnames} uploadImage={uploadImage} renderAttachmentPicker={({ onSelect }) => <Picker onSelect={onSelect} />}>
       {css && <style>{css}</style>}
-      <div className="workspace elea-frame">
+      <div className="workspace frame">
         <header className="workspace-intro">
           <div>
             <h1 className="site-page-title">Editorial workspace</h1>

@@ -18,7 +18,7 @@ const notebook = {
 
 function NotebookPreview() {
   return (
-    <fieldset className="elea-grid__half notebook">
+    <fieldset className="col-md-4 col-lg-6 notebook">
       <legend className="site__visually-hidden">Document view</legend>
       <input className="site__visually-hidden" type="radio" name="document-view" id="show-document" defaultChecked />
       <input className="site__visually-hidden" type="radio" name="document-view" id="show-blocks" />
@@ -58,8 +58,8 @@ export function SiteHome() {
   return (
     <>
       <section className="home-intro" aria-labelledby="home-title">
-        <div className="elea-frame elea-grid home-spread">
-          <div className="elea-grid__half home-copy">
+        <div className="frame grid home-spread">
+          <div className="col-md-4 col-lg-6 home-copy">
             <p className="home-eyebrow">Open-source React library</p>
             <h1 id="home-title">A design system<br />for <span>rich content.</span></h1>
             <p className="home-lead">Build a member portal or a publishing tool with React components, a block editor and a theme that fits your brand.</p>
@@ -72,7 +72,7 @@ export function SiteHome() {
           <NotebookPreview />
         </div>
       </section>
-      <section className="elea-frame home-editions" aria-labelledby="home-theme">
+      <section className="frame home-editions" aria-labelledby="home-theme">
         <div className="home-editions__heading">
           <div>
             <h2 id="home-theme">Publication themes</h2>
@@ -82,20 +82,20 @@ export function SiteHome() {
         </div>
         <div id="theme-comparison"><ThemeComparison interactive={false} /></div>
       </section>
-      <div className="elea-frame elea-grid home-tools">
-        <section className="elea-grid elea-grid__stage home-tool" aria-labelledby="home-components">
+      <div className="frame grid home-tools">
+        <section className="grid col-lg-8 home-tool" aria-labelledby="home-components">
           <h2 id="home-components"><a href={`${interactive}ui`}>Component library <span aria-hidden="true">↗</span></a></h2>
           <p>Open a component to try its states, test the keyboard behaviour and copy the React example.</p>
-          <div className="elea-grid home-specimens">
+          <div className="grid home-specimens">
             {componentSamples.map(({ slug, label, preview }) => (
-              <div className="home-specimen" key={slug}>
+              <div className="col-2 home-specimen" key={slug}>
                 <div className="home-specimen__demo" inert aria-hidden="true">{preview}</div>
                 <a href={`${interactive}ui/${slug}`}>{label}</a>
               </div>
             ))}
           </div>
         </section>
-        <section className="elea-grid__panel home-tool home-services" aria-labelledby="services-title">
+        <section className="col-lg-4 home-tool home-services" aria-labelledby="services-title">
           <h2 id="services-title">Integrate Elea with Alien6</h2>
           <p>Get help migrating an existing editor, building custom blocks or adapting the system to your brand.</p>
           <Button href={alien6ContactUrl} variant="outline" trailingIcon="↗">Contact Alien6</Button>

@@ -46,6 +46,7 @@ extra_css:
   - assets/site-profile.css
   - assets/elea-viewer.css
   - assets/elea-ui.css
+  - assets/elea-layout.css
   - assets/brand.css
   - assets/site-search.css
   - assets/site.css

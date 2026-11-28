@@ -1,7 +1,4 @@
-.site__content--studio, .site__content--colours {
-  width: min(var(--site-width), calc(100% - var(--site-gutter) * 2));
-  padding: var(--site-page-inset) 0 clamp(3rem, 7vw, 6rem);
-}
+.site__content--studio, .site__content--colours { padding-block: var(--site-page-inset) clamp(3rem, 7vw, 6rem); }
 .studio-intro {
   display: flex;
   align-items: end;

@@ -3,8 +3,8 @@ title: Typography
 description: A type specimen of ELEA Sans, with its roman and italic cuts, small capitals and nine weights.
 ---
 
-<div class="elea-grid type-spread">
-  <section class="elea-grid__half type-glyphs" aria-labelledby="letterforms">
+<div class="grid type-spread">
+  <section class="col-md-4 col-lg-6 type-glyphs" aria-labelledby="letterforms">
     <h2 id="letterforms">Letterforms</h2>
     <p class="type-alphabet">ABCDEFGHIJKLM<wbr>NOPQRSTUVWXYZ</p>
     <p class="type-alphabet">abcdefghijklm<wbr>nopqrstuvwxyz</p>
@@ -23,7 +23,7 @@ description: A type specimen of ELEA Sans, with its roman and italic cuts, small
     </figure>
   </section>
 
-  <section class="elea-grid__half type-text" aria-labelledby="text-sizes">
+  <section class="col-md-4 col-lg-6 type-text" aria-labelledby="text-sizes">
     <h2 id="text-sizes">Text sizes</h2>
     <figure>
       <figcaption>24 pt · Italic</figcaption>

@@ -13,8 +13,9 @@ export function SiteHeader({ section, navigation = siteNavigation, profile, onPr
         document.getElementById("main")?.focus();
       }}>Skip to content</a>
       <header className="site__masthead">
-        <div className="elea-frame elea-grid site__masthead-inner">
-          <Logo />
+        <div className="frame grid site__masthead-inner">
+          <div className="site__brand col-md-2"><Logo /></div>
+          <div className="start-md-3 site__bar">
           <div id="site-search"><SiteSearch /></div>
           <RepositoryLink />
           <div className="site__tools">
@@ -34,7 +35,8 @@ export function SiteHeader({ section, navigation = siteNavigation, profile, onPr
             </span>
           </Button>
           </div>
-          <Navbar className="site__masthead-links" label="Main" menuLabel="Site menu" collapse="never"
+          </div>
+          <Navbar className="start-md-3 site__masthead-links" label="Main" menuLabel="Site menu" collapse="never"
             items={navigation} current={section}
             render={props => <a {...props} aria-current={props["aria-current"] ? "true" : undefined} />} />
         </div>

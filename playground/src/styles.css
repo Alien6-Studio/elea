@@ -5,6 +5,7 @@
 @import "@fontsource-variable/roboto";
 @import "@fontsource-variable/roboto/wght-italic.css";
 @import "@alien6-studio/elea-ui/bundle.css";
+@import "@alien6-studio/elea-ui/css/layout-bare.css";
 @import "@alien6-studio/elea-tokens/editions.css";
 @import "../../docs/assets/site-profile.css";
 @import "../../docs/assets/brand.css";
@@ -33,14 +34,7 @@ pre code { background: transparent; padding: 0; font-size: inherit; color: inher
 }
 /* Site frame */
 .site { display: flex; flex-direction: column; min-height: 100vh; }
-.site__content {
-  flex: 1;
-  width: min(100%, 62rem);
-  margin-inline: auto;
-  padding: var(--elea-space-8) var(--site-gutter);
-}
-.site__content--full { width: 100%; padding: 0; }
-.site__content--missing { width: min(var(--site-width), calc(100% - var(--site-gutter) * 2)); padding: 0; }
+.site__content { flex: 1; }
 .site__content > h1 { font-size: clamp(2.25rem, 5vw, 3.75rem); font-weight: 650; line-height: 1.06; letter-spacing: -0.042em; margin: var(--elea-space-4) 0 var(--elea-space-3); }
 .site__content > h2 { font-size: var(--elea-font-size-2xl); margin: var(--elea-space-10) 0 var(--elea-space-3); }
 .lead { font-size: var(--elea-font-size-lg); color: var(--elea-color-text-muted); margin: 0 0 var(--elea-space-6); }

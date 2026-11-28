@@ -2,7 +2,8 @@ import { pathToFileURL } from "node:url";
 import { chromium, type Page } from "@playwright/test";
 import { componentGuides } from "../src/data/componentGuides.js";
 import { siteNavigation } from "../src/links.js";
-import { auditLayout, collectLayout, type LayoutRuleResult } from "../src/composition/audit.js";
+import { auditLayout, type LayoutRuleResult } from "../src/composition/audit.js";
+import { collectLayout } from "../src/composition/collect.js";
 
 /**
  * Audits the whole site against the columns of its layout: every page and

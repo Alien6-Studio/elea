@@ -151,11 +151,8 @@
   color: var(--elea-color-text-muted);
 }
 .grid-lab__caption { margin: var(--elea-space-3) 0 0; font-size: var(--elea-font-size-sm); }
-/* One reading to a column of the page */
 .grid-lab__readings { row-gap: var(--elea-space-4); margin: 0; }
 .grid-lab__readings[hidden] { display: none; }
-/* Below the specificity of the full line a block takes by default */
-.grid-lab__readings > div { grid-column: auto; }
 .grid-lab__readings div { border-block-start: var(--grid-rule); padding-block-start: var(--elea-space-2); }
 .grid-lab__readings dt { color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
 .grid-lab__readings dd { margin: var(--elea-space-1) 0 0; font-size: var(--elea-font-size-xl); font-variant-numeric: tabular-nums; }

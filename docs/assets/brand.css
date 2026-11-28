@@ -2,13 +2,8 @@
 
 :root {
   --elea-font-family-serif: "Iowan Old Style", Georgia, serif;
-  --site-width: 74rem;
   --site-page-title: clamp(2.75rem, 6vw, 4.75rem);
   --site-page-inset: clamp(2.5rem, 5vw, 4.5rem);
-  --site-gutter: clamp(1.25rem, 4.4vw, 3.25rem);
-  --elea-layout-width: var(--site-width);
-  --elea-layout-margin: var(--site-gutter);
-  --elea-layout-gutter: clamp(1rem, 2.4vw, 2.25rem);
 }
 
 :root[data-site-font="instrument"] {
@@ -84,7 +79,6 @@
   display: inline-flex;
   align-items: center;
   gap: .1875em;
-  justify-self: start;
   min-height: 2.75rem;
   color: var(--elea-color-text-default);
   font: 400 clamp(2.5rem, 5vw, 3rem)/.9 "ELEA Sans", sans-serif;
@@ -102,18 +96,16 @@
   mask: url("./elea-mark.svg") center / contain no-repeat;
   forced-color-adjust: none;
 }
-/* Logo, search, repository and tools take a column each; the search takes three once there are six */
-.site__masthead-inner > * { grid-column: auto; }
-.site__tools { display: flex; align-items: center; justify-content: end; gap: var(--site-tool-gap); }
-#site-profile-picker { flex: 1; min-inline-size: 0; }
+/* The wordmark takes the rail; search, repository and tools share the body as one bar */
+.site__bar, .site__tools { display: flex; align-items: center; gap: var(--elea-space-2) var(--site-tool-gap); }
+.site__bar { flex-wrap: wrap; }
+#site-search { flex: 1 1 6rem; min-inline-size: 0; }
+.site__tools { flex: none; margin-inline-start: auto; }
 .site__masthead .site__theme-toggle { flex: none; width: 2.5rem; height: 2.5rem; padding: 0; }
-.site__masthead-links { grid-column: 2 / -1; border: 0; }
-@media (min-width: 72rem) {
-  #site-search { grid-column: span 3; }
-}
+.site__masthead-links { border: 0; }
 .site__masthead-links .elea-navbar__bar { padding: 0; }
 .site__masthead-links .elea-navigation-list { column-gap: clamp(1rem, 2vw, 2rem); row-gap: 0; }
-.site-profile-select { inline-size: 100%; }
+.site-profile-select { inline-size: 10.25rem; }
 .site-profile-select .elea-ui-select__list { inset-inline: auto 0; min-inline-size: max(100%, 11rem); }
 .site-profile-option, .site-profile-option__swatches { display: inline-flex; align-items: center; vertical-align: middle; }
 .site-profile-option { gap: .5rem; max-inline-size: 100%; }
@@ -140,8 +132,8 @@
   --elea-color-text-muted: var(--elea-color-neutral-300);
   --elea-color-text-link: var(--elea-color-primary-200);
   --elea-color-focus: var(--elea-color-primary-400);
-  --elea-footer-max-width: calc(var(--site-width) + var(--site-gutter) * 2);
-  --elea-footer-padding: var(--site-gutter);
+  --elea-footer-max-width: calc(var(--elea-layout-width) + 2 * var(--elea-layout-margin));
+  --elea-footer-padding: var(--elea-layout-margin);
 }
 .site-footer .elea-footer__brand p { margin: var(--elea-space-3) 0 0; }
 .site-footer .elea-footer__main {
@@ -191,20 +183,21 @@
   .site__masthead-links .elea-navigation-list { column-gap: 1.25rem; }
   .site__masthead-links a:focus-visible { outline-offset: -2px; }
 }
-/* Below four columns the masthead keeps a compact arrangement of its own */
+/* Below eight columns the masthead keeps a compact arrangement of its own */
 @media not all and (min-width: 48rem) {
   .site__masthead-inner {
     grid-template-areas: "logo search search search" "repo repo profile mode" "links links links links";
     grid-template-columns: max-content minmax(0, 1fr) 10.25rem 2.5rem;
     gap: var(--elea-space-2) var(--elea-space-3);
   }
-  .site__tools { display: contents; }
-  #site-search { grid-area: search; min-inline-size: 0; }
-  .site__masthead .site__wordmark { grid-area: logo; }
+  .site__bar, .site__tools { display: contents; }
+  #site-search { grid-area: search; }
+  .site__brand { grid-area: logo; }
   .site__masthead .site-repo { grid-area: repo; }
   #site-profile-picker { grid-area: profile; }
   .site__masthead .site__theme-toggle { grid-area: mode; }
   .site__masthead-links { grid-area: links; }
+  .site-profile-select { inline-size: 100%; }
 }
 @media (max-width: 25rem) {
   .site__masthead-inner { grid-template-columns: max-content minmax(0, 1fr) 7.875rem 2.5rem; column-gap: var(--elea-space-2); }
@@ -231,6 +224,5 @@
   .docs-guidebar__links { column-gap: 1rem; }
 }
 @media (max-width: 25rem) {
-  .docs-guidebar { --site-gutter: .5rem; }
   .docs-guidebar__links { column-gap: .8rem; }
 }

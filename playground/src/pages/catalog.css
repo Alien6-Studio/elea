@@ -1,7 +1,4 @@
-.site__content--catalog {
-  width: min(var(--site-width), calc(100% - var(--site-gutter) * 2));
-  padding: var(--site-page-inset) 0 clamp(3rem, 7vw, 6rem);
-}
+.site__content--catalog { padding-block: var(--site-page-inset) clamp(3rem, 7vw, 6rem); }
 .catalog { color: var(--elea-color-text-default); }
 :is(.catalog-examples a, .catalog-index a, .catalog-guide__actions a, .catalog-guide__example, .catalog-filters button):focus-visible {
   outline: 2px solid var(--elea-color-focus);
@@ -109,18 +106,8 @@
 .catalog-plate-carousel { inline-size: min(100%, 30rem); }
 .catalog-plate-carousel img { display: block; width: 100%; height: auto; }
 .gallery__preview .catalog-plate-carousel { max-inline-size: 8.5rem; }
-/* Five equal tracks with the page gutter fall on the five columns of the guide */
-.carousel-gallery {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--elea-space-6) var(--elea-layout-gutter);
-  align-items: start;
-}
-.carousel-gallery > .demo { grid-column: 1 / -1; min-inline-size: 0; }
-@media (min-width: 72rem) {
-  .carousel-gallery > .demo:first-child { grid-column: span 3; }
-  .carousel-gallery > .demo:nth-child(2) { grid-column: span 2; }
-}
+.carousel-gallery { display: grid; gap: var(--elea-space-6); }
+.carousel-gallery > .demo { min-inline-size: 0; }
 .carousel-gallery .demo__title { margin: 0 0 var(--elea-space-2); }
 .carousel-gallery .demo__stage { padding: 0; border: 0; background: transparent; }
 .carousel-gallery .catalog-plate-carousel { inline-size: 100%; }
@@ -213,7 +200,8 @@
 .catalog-button-effects { inline-size: min(100%, 34rem); grid-template-columns: repeat(auto-fill, minmax(min(100%, 7.5rem), 1fr)); }
 .catalog-button-radii {
   inline-size: 100%;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.25rem), 1fr));
+  /* Tracks of one fixed width: a radius stated in percent is then the same on every step */
+  grid-template-columns: repeat(auto-fill, min(100%, 7.5rem));
   row-gap: var(--elea-space-4);
 }
 .catalog-button-radii figure { display: grid; gap: var(--elea-space-2); margin: 0; text-align: center; }
