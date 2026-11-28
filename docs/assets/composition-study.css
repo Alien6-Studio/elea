@@ -1,0 +1,73 @@
+.grid-plot { margin: var(--elea-space-6) 0; }
+.grid-plot__pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--elea-space-3);
+}
+.grid-plot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--elea-color-border-default);
+}
+.grid-plot__field { fill: var(--elea-color-surface-default); }
+.grid-plot__paper { fill: var(--elea-color-surface-default); stroke: var(--elea-color-border-default); }
+.grid-plot__note { fill: var(--elea-color-surface-default); stroke: var(--elea-color-text-link); stroke-width: .8; }
+.grid-plot__track { fill: var(--elea-color-text-muted); fill-opacity: .12; }
+.grid-plot__span,
+.grid-plot__module { fill: var(--elea-color-action-primary); fill-opacity: .23; }
+.grid-plot__edge,
+.grid-plot__guide {
+  stroke: var(--elea-color-text-muted);
+  stroke-width: .5;
+  stroke-dasharray: 2 2;
+  opacity: .65;
+}
+.grid-plot__ink,
+.grid-plot__accent { stroke: currentColor; stroke-width: 2; }
+.grid-plot__accent { stroke: var(--elea-color-action-primary); }
+.grid-plot__type { stroke: currentColor; stroke-width: .7; }
+.grid-plot__fold { stroke: currentColor; stroke-width: .65; }
+.grid-plot--spread svg { max-height: 19rem; background: var(--elea-color-surface-subtle); }
+.grid-plot__value { fill: currentColor; font: 13px var(--elea-font-family-mono); }
+.grid-plot__heading { fill: currentColor; font: 500 21px var(--elea-font-family-serif); }
+.grid-plot__entry { fill: currentColor; font: 500 9.5px "Instrument Sans Variable", sans-serif; font-variant-numeric: tabular-nums; }
+.grid-plot__row-rule { stroke: var(--elea-color-text-muted); stroke-width: .45; opacity: .65; }
+.grid-plot__label {
+  display: block;
+  margin-block-start: var(--elea-space-2);
+  font-size: var(--elea-font-size-sm);
+  font-weight: var(--elea-font-weight-semibold);
+}
+.grid-plot figcaption {
+  margin-block-start: var(--elea-space-2);
+  color: var(--elea-color-text-muted);
+  font-size: var(--elea-font-size-sm);
+}
+@media (max-width: 27rem) {
+  .grid-plot__pair { grid-template-columns: minmax(0, 1fr); }
+}
+
+.composed-labels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--elea-space-3);
+  margin: var(--elea-space-6) 0;
+}
+.composed-labels__name { display: block; margin-block-end: .5rem; font-size: var(--elea-font-size-sm); }
+.composed-labels__line {
+  display: block;
+  inline-size: min(100%, calc(34rem / 3));
+  min-block-size: 2.8rem;
+  padding-block: .35rem;
+  outline: 1px solid var(--elea-color-text-muted);
+  background: var(--elea-color-surface-subtle);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+  font-synthesis: none;
+}
+.composed-labels__line--instrument { font-family: "Instrument Sans Variable", sans-serif; }
+.composed-labels__line--roboto { font-family: "Roboto Variable", sans-serif; }
+.composed-labels figcaption { grid-column: 1 / -1; font-size: var(--elea-font-size-sm); color: var(--elea-color-text-muted); }

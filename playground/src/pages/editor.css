@@ -134,7 +134,6 @@
   .workspace-settings-menu .elea-ui-select { width: 100%; }
 }
 @media (max-width: 32rem) {
-  .workspace-desk { margin-inline: calc(-.55 * var(--site-gutter)); }
   .workspace-paper { --elea-editor-gutter: var(--elea-space-12); padding-inline: .25rem .9rem; }
   .workspace-intro { padding-block: 1.65rem 1.35rem; gap: .45rem; }
   .workspace-document > span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }

@@ -255,7 +255,7 @@ function storedMotion() {
 
 function ExampleLinks({ brand }: Readonly<{ brand?: BrandTheme }>) {
   return (
-    <nav aria-label="Composed examples" className="catalog-examples">
+    <nav aria-label="Composed examples" className="elea-grid__panel catalog-examples">
       <a href={brandRoute("theme", brand)}>
         <span>Edit theme in Theme Studio <span aria-hidden="true">→</span></span>
         <small>Colour, typography and density</small>
@@ -287,9 +287,11 @@ function Overview({ brand, motionSwitch }: Readonly<{ brand?: BrandTheme; motion
 
   return (
     <>
-      <Hero className="catalog-hero" layout="split" heading="Components"
-        description="Explore the building blocks behind Elea’s publication forms and editorial tools. Each guide includes a live example and its React code."
-        media={<ExampleLinks brand={brand} />} />
+      <div className="elea-grid catalog-head">
+        <Hero className="elea-grid__stage catalog-hero" heading="Components"
+          description="Explore the building blocks behind Elea’s publication forms and editorial tools. Each guide includes a live example and its React code." />
+        <ExampleLinks brand={brand} />
+      </div>
       <div className="catalog-tools">
         <SearchField className="catalog-search" ref={searchRef} label="Search components" clearLabel="Clear component search" value={query} onValueChange={setQuery} />
         <div className="catalog-filters" role="group" aria-label="Filter by category">
@@ -299,9 +301,9 @@ function Overview({ brand, motionSwitch }: Readonly<{ brand?: BrandTheme; motion
         {motionSwitch}
       </div>
       <p className="catalog-results" role="status">{filtered.length} component {filtered.length === 1 ? "guide" : "guides"}</p>
-      {filtered.length > 0 ? <div className="gallery">
+      {filtered.length > 0 ? <div className="elea-grid gallery">
         {filtered.map((entry) =>
-          <article className="gallery__card" key={entry.slug}>
+          <article className="elea-grid__third gallery__card" key={entry.slug}>
             <div className="gallery__preview" data-elea-theme={brand && "brand"} inert>{entry.preview}</div>
             <div className="catalog-card__body">
               <span className="catalog-category">{entry.category}</span>
@@ -342,8 +344,8 @@ function ComponentGuide({ entry, brand, motionSwitch, section }: Readonly<{ entr
     if (heading && article.current?.contains(heading) && sections.some(item => item.id === section)) visitSection(heading);
   }, [section, sections]);
   return (
-    <div className="catalog-layout">
-      <aside className="catalog-index">
+    <div className="elea-grid catalog-layout">
+      <aside className="elea-grid__rail catalog-index">
         <Button className="catalog-index__toggle" variant="outline" size="sm" aria-expanded={indexOpen}
           aria-controls="guide-component-index" onClick={() => setIndexOpen(open => !open)}>Browse components</Button>
         <Sidebar id="guide-component-index" label="Component index" current={entry.slug}
@@ -355,7 +357,7 @@ function ComponentGuide({ entry, brand, motionSwitch, section }: Readonly<{ entr
             })),
           }))} />
       </aside>
-      <article ref={article} className="catalog-guide">
+      <article ref={article} className="elea-grid__body catalog-guide">
         <div className="catalog-guide__bar">
           <Breadcrumb label="Breadcrumb" overflowLabel="Earlier pages" items={[
             { id: "ui", label: "Components", href: brandRoute("ui", brand) },

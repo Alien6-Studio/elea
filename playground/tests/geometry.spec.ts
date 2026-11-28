@@ -12,7 +12,7 @@ test("the atlas names its six plates and describes every drawing", async ({ page
   await expect(page).toHaveTitle("Geometry of interfaces, atlas · Elea");
   await expect(page.getByRole("heading", { level: 1, name: "Atlas" })).toBeVisible();
   const studies = page.getByRole("navigation", { name: "Research", exact: true });
-  await expect(studies.getByRole("link")).toHaveText(["All studies", "Geometry of interfaces"]);
+  await expect(studies.getByRole("link")).toHaveText(["All studies", "Geometry of interfaces", "Composition of interfaces"]);
   await expect(studies.getByRole("link", { name: "Geometry of interfaces" })).toHaveAttribute("aria-current", "true");
   const guide = page.getByRole("navigation", { name: "Geometry of interfaces", exact: true });
   await expect(guide.getByRole("link")).toHaveText(["Study", "Atlas", "Laboratory"]);

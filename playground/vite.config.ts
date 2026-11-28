@@ -29,8 +29,14 @@ export default defineConfig({
   },
   build: {
     rolldownOptions: {
-      input: { index: "index.html", "glyph-carousel": "glyph-carousel.js", "geometry-lab": "geometry-lab.js", "site-profile": "site-profile.js" },
-      output: { entryFileNames: entry => ["glyph-carousel", "geometry-lab", "site-profile"].includes(entry.name) ? "[name].js" : "assets/[name]-[hash].js" },
+      input: {
+        index: "index.html",
+        "glyph-carousel": "glyph-carousel.js",
+        "geometry-lab": "geometry-lab.js",
+        "composition-lab": "composition-lab.js",
+        "site-profile": "site-profile.js",
+      },
+      output: { entryFileNames: entry => entry.name === "index" ? "assets/[name]-[hash].js" : "[name].js" },
     },
   },
   plugins: [

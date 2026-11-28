@@ -13,6 +13,11 @@ extra:
       parts:
         - { title: Atlas, slug: atlas }
         - { title: Laboratory, slug: laboratory }
+    - title: Composition of interfaces
+      slug: composition-of-interfaces
+      parts:
+        - { title: Atlas, slug: atlas }
+        - { title: Laboratory, slug: laboratory }
 theme:
   name: null
   custom_dir: overrides
@@ -22,6 +27,7 @@ plugins:
   - search
 hooks:
   - scripts/package_typeface.py
+  - scripts/research_redirects.py
 nav:
   - Overview: index.md
   - Getting started: getting-started.md

@@ -57,16 +57,18 @@ writeFileSync(new URL("header-research.html", templates), renderToStaticMarkup(<
 writeFileSync(new URL("not-found.html", templates), renderToStaticMarkup(<NotFound />));
 writeFileSync(new URL("header-typography.html", templates), renderToStaticMarkup(<SiteHeader section="typography" />));
 writeFileSync(new URL("typography-cover.html", templates), renderToString(
-  <header className="type-cover">
-    <h1>Typography</h1>
-    <div className="type-cover__family">
-      <p className="type-cover__title">ELEA <em>Sans</em></p>
-      <div className="type-cover__download">
-        <Button href={`${sitePath}assets/ELEA-Sans.zip`} download="ELEA-Sans.zip" trailingIcon="↓">Download ELEA Sans</Button>
-        <span>TTF + WOFF2</span>
+  <header className="elea-grid type-cover">
+    <div className="elea-grid__half type-cover__lead">
+      <h1>Typography</h1>
+      <div className="type-cover__family">
+        <p className="type-cover__title">ELEA <em>Sans</em></p>
+        <div className="type-cover__download">
+          <Button href={`${sitePath}assets/ELEA-Sans.zip`} download="ELEA-Sans.zip" trailingIcon="↓">Download ELEA Sans</Button>
+          <span>TTF + WOFF2</span>
+        </div>
       </div>
     </div>
-    <div id="glyph-carousel"><GlyphCarousel /></div>
+    <div id="glyph-carousel" className="elea-grid__half"><GlyphCarousel /></div>
     <p className="type-cover__details">Variable typeface <span>Roman &amp; italic <span aria-hidden="true">·</span> 100–900</span></p>
   </header>
 ));

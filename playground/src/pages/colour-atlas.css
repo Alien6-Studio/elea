@@ -85,6 +85,7 @@
 .colour-atlas__actions .elea-button { flex: 1 1 auto; }
 .atlas-roles { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
 .atlas-roles h2, .colour-themes h2 { margin: 0 0 1rem; font-size: clamp(1.3rem, 2.2vw, 1.8rem); letter-spacing: -.035em; }
+.atlas-roles__chart { margin: 0; }
 .atlas-roles dl { display: grid; gap: 2px; margin: 0; }
 .atlas-roles dl + dl { margin-top: .5rem; }
 .atlas-roles dl > div { padding: .75rem clamp(.5rem, 1.2vw, 1rem); min-width: 0; }

@@ -18,7 +18,8 @@
   {% for path in config.extra_css %}
     <link rel="stylesheet" href="{{ path | url }}">
   {% endfor %}
-  {% if page.meta.lab %}<link rel="stylesheet" href="{{ ('assets/' ~ page.meta.lab ~ '.css') | url }}">{% endif %}
+  {% set page_styles = page.meta.stylesheet or page.meta.lab %}
+  {% if page_styles %}<link rel="stylesheet" href="{{ ('assets/' ~ page_styles ~ '.css') | url }}">{% endif %}
 </head>
 {% set typography_page = page.file.src_uri == 'typography.md' %}
 {% set research_page = page.file.src_uri.startswith('research/') %}
@@ -30,7 +31,7 @@
     </main>
   {% elif typography_page %}
     {% include "header-typography.html" %}
-    <main id="main" class="site-container type-book" tabindex="-1">
+    <main id="main" class="elea-frame type-book" tabindex="-1">
       {% include "typography-cover.html" %}
       {{ page.content }}
     </main>
@@ -38,9 +39,9 @@
   {% elif research_page %}
     {% include "header-research.html" %}
     <div class="docs-guidebar">
-      <div class="site-container docs-guidebar__inner">
-        <span class="docs-guidebar__label">Research</span>
-        <nav class="docs-guidebar__links" aria-label="Research">
+      <div class="elea-frame elea-grid docs-guidebar__inner">
+        <span class="elea-grid__rail docs-guidebar__label">Research</span>
+        <nav class="elea-grid__body docs-guidebar__links" aria-label="Research">
           <a href="{{ 'research/' | url }}"{% if page.file.src_uri == 'research/index.md' %} aria-current="page"{% endif %}>All studies</a>
           {% for study in config.extra.research %}
             {% set root = 'research/' ~ study.slug %}
@@ -53,9 +54,9 @@
       {% set root = 'research/' ~ study.slug %}
       {% if study.parts and (page.file.src_uri == root ~ '.md' or page.file.src_uri.startswith(root ~ '/')) %}
         <div class="docs-guidebar docs-guidebar--study">
-          <div class="site-container docs-guidebar__inner">
-            <span class="docs-guidebar__label">{{ study.title | e }}</span>
-            <nav class="docs-guidebar__links" aria-label="{{ study.title | e }}">
+          <div class="elea-frame elea-grid docs-guidebar__inner">
+            <span class="elea-grid__rail docs-guidebar__label">{{ study.title | e }}</span>
+            <nav class="elea-grid__body docs-guidebar__links" aria-label="{{ study.title | e }}">
               <a href="{{ (root ~ '/') | url }}"{% if page.file.src_uri == root ~ '.md' %} aria-current="page"{% endif %}>Study</a>
               {% for part in study.parts %}
                 <a href="{{ (root ~ '/' ~ part.slug ~ '/') | url }}"{% if page.file.src_uri == root ~ '/' ~ part.slug ~ '.md' %} aria-current="page"{% endif %}>{{ part.title | e }}</a>
@@ -68,9 +69,9 @@
   {% else %}
     {% include "header-docs.html" %}
     <div class="docs-guidebar">
-      <div class="site-container docs-guidebar__inner">
-        <span class="docs-guidebar__label">Guides</span>
-        <nav class="docs-guidebar__links" aria-label="Documentation">
+      <div class="elea-frame elea-grid docs-guidebar__inner">
+        <span class="elea-grid__rail docs-guidebar__label">Guides</span>
+        <nav class="elea-grid__body docs-guidebar__links" aria-label="Documentation">
           {% for item in nav if not item.is_homepage %}
             <a href="{{ item.url | url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.title | e }}</a>
           {% endfor %}
@@ -79,21 +80,23 @@
     </div>
   {% endif %}
   {% if page.meta.lab %}
-    <main id="main" class="site-container research-lab" tabindex="-1">
+    <main id="main" class="elea-frame research-lab" tabindex="-1">
       <div id="research-lab" data-view="{{ page.meta.view | e }}">{{ page.content }}</div>
     </main>
     <script type="module" src="{{ ('playground/' ~ page.meta.lab ~ '.js') | url }}"></script>
   {% elif not page.is_homepage and not typography_page %}
-    <main id="main" class="site-container docs-layout" tabindex="-1">
-      {% if page.toc.items and page.toc.items[0].children %}
-        <nav class="docs-toc" aria-label="On this page">
-          <p>On this page</p>
-          {% for item in page.toc.items[0].children %}
-            <a href="{{ item.url }}">{{ item.title | e }}</a>
-          {% endfor %}
-        </nav>
-      {% endif %}
-      <article class="docs-article">
+    <main id="main" class="elea-frame elea-grid docs-layout" tabindex="-1">
+      <div class="elea-grid__rail docs-rail">
+        {% if page.toc.items and page.toc.items[0].children %}
+          <nav class="docs-toc" aria-label="On this page">
+            <p>On this page</p>
+            {% for item in page.toc.items[0].children %}
+              <a href="{{ item.url }}">{{ item.title | e }}</a>
+            {% endfor %}
+          </nav>
+        {% endif %}
+      </div>
+      <article class="elea-grid__prose docs-article">
         {{ page.content }}
         {% if page.file.src_uri == 'versions.md' and config.extra.source_revision and config.extra.docs_revision %}
           <h2>Current site build</h2>

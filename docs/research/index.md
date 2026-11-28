@@ -5,9 +5,9 @@ description: Studies on the construction of interfaces, with their sources, thei
 
 # Research
 
-Studies on how interfaces are constructed, written for any design system. Each
-one separates what can be proved, what has to be tested with observers and what
-is an artistic decision, and publishes the code that produced its figures.
+Studies of form and composition for designers. Each brings measured drawings
+together with published research and identifies the decisions that remain
+in the designer’s hands.
 
 ## Geometry of interfaces
 
@@ -19,3 +19,13 @@ four decisions, and this study measures each of them.
   its drawing.
 - [Open the laboratory](geometry-of-interfaces/laboratory.md): the same functions applied to
   working components.
+
+## Composition of interfaces
+
+How can a record, a comparison and a collection share a grid when each
+needs a different measure? A sound archive and two settings of a departure
+board show how type, shared edges and empty columns shape a layout.
+
+- [Read the composition study](composition-of-interfaces.md) for the constructions, evidence and limits.
+- [Compare three working grids](composition-of-interfaces/atlas.md) using one exhibition programme.
+- [Construct a grid and try the three archive views](composition-of-interfaces/laboratory.md) at different widths.

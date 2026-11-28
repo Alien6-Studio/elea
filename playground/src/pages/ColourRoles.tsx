@@ -128,6 +128,8 @@ export function ColourRoles({ brand, activeRole }: Readonly<{ brand: BrandTheme;
   return (
     <section className="atlas-roles" aria-labelledby="colour-roles-title" data-elea-theme="brand">
       <h2 id="colour-roles-title">Colour roles</h2>
+      {/* A colour chart: one figure on the columns, its swatches divided inside it */}
+      <figure className="atlas-roles__chart">
       <dl className="atlas-roles__brand" aria-label="Brand colours" aria-live="polite">
         {renderRole("primary")}{renderRole("secondary")}{renderRole("tertiary")}
       </dl>
@@ -143,6 +145,7 @@ export function ColourRoles({ brand, activeRole }: Readonly<{ brand: BrandTheme;
         <div className="atlas-role--surface"><dt>Focus</dt><dd><span className="atlas-roles__ring" aria-hidden="true" />Keyboard ring</dd></div>
         <div className="atlas-role--surface"><dt>Link</dt><dd><a href={brandRoute("ui/button", brand)}>Try buttons</a></dd></div>
       </dl>
+      </figure>
     </section>
   );
 }
