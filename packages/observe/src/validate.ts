@@ -117,7 +117,7 @@ export function createEventValidator(catalog: ObserveCatalogV1): (value: unknown
   return value => {
     try {
       const event = fields(value, ["schemaVersion", "kind", "target", "context", "detail"]);
-      if (!event || event.schemaVersion !== 1 || !isEventKind(event.kind)) return null;
+      if (event?.schemaVersion !== 1 || !isEventKind(event.kind)) return null;
       const { kind } = event;
       const target = parseTarget(event.target);
       const context = parseContext(event.context);

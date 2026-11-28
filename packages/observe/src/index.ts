@@ -48,7 +48,7 @@ export function createLocalObserve(options: LocalObserveOptions): LocalObserve {
   let records: readonly LocalObservation[] = empty;
 
   function notify() {
-    for (const listener of [...listeners]) {
+    for (const listener of listeners) {
       try { listener(); } catch { /* A view must not interrupt collection. */ }
     }
   }

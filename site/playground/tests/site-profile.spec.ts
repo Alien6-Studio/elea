@@ -53,7 +53,7 @@ test("the navbar applies each complete theme, including the static notebook and 
     await expect(cta).toHaveCSS("background-color", `rgb(${rgb.join(", ")})`);
   }
   const profiles = Object.entries(colorThemes).filter(([, theme]) => "profile" in theme);
-  await expect(picker).toHaveText("Réserve");
+  await expect(picker).toHaveText("Ponctuation");
   for (const [id, theme] of profiles) {
     await picker.click();
     const options = page.getByRole("listbox", { name: "Site theme" });

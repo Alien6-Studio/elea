@@ -28,10 +28,10 @@ async function selectNextDirection(carousel: Locator, name: string) {
 }
 
 for (const mode of ["light", "dark"] as const) {
-  test(`Réserve follows the public journey from the homepage to the Studio in ${mode}`, async ({ page }) => {
+  test(`Ponctuation follows the public journey from the homepage to the Studio in ${mode}`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: mode });
-    const primary = "rgb(41, 38, 191)";
-    const link = mode === "light" ? "rgb(34, 32, 159)" : "rgb(163, 162, 227)";
+    const primary = "rgb(237, 187, 40)";
+    const link = mode === "light" ? "rgb(85, 67, 14)" : "rgb(247, 226, 163)";
     const body = page.locator("body");
     await page.goto("/");
     await expect(body).toHaveCSS("background-color", surfaces[mode].paper);
@@ -47,12 +47,12 @@ for (const mode of ["light", "dark"] as const) {
     await buttonGuide.click();
     await expect(page.getByRole("button", { name: "Primary", exact: true })).toHaveCSS("background-color", primary);
     await page.getByRole("link", { name: "Edit theme", exact: true }).click();
-    await expect(page.getByRole("combobox", { name: "Theme", exact: true })).toHaveText("Réserve");
+    await expect(page.getByRole("combobox", { name: "Theme", exact: true })).toHaveText("Ponctuation");
     await expect(page.getByRole("link", { name: "Open themed gallery" })).toHaveCSS("background-color", primary);
     await expect(page.getByRole("region", { name: "Publication preview" }).getByRole("article"))
       .toHaveCSS("background-color", surfaces[mode].paper);
     await page.getByRole("link", { name: "Edit colours", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Réserve", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Ponctuation", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("gridcell", { name: "Primary 500", exact: true })).toHaveCSS("background-color", primary);
   });
 
@@ -225,7 +225,7 @@ test("choosing a colour theme in the mobile Studio updates the preview and survi
   await page.goto("/playground/#/theme");
   const selector = page.getByRole("combobox", { name: "Theme", exact: true });
   const preview = page.getByRole("region", { name: "Publication preview" }).getByRole("article");
-  await expect(selector).toHaveText("Réserve");
+  await expect(selector).toHaveText("Ponctuation");
   await selector.click();
   for (const direction of directions) await expect(page.getByRole("option", { name: direction.name, exact: true })).toBeVisible();
   await expect(page.getByRole("option")).toHaveCount(directions.length);

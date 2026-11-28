@@ -85,7 +85,7 @@ test("Réserve previews every button effect on the same primary action", async (
 });
 
 test("buttons take a size, a radius, a shadow and an effect that follows the pointer", async ({ page }) => {
-  await page.goto("/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button?scheme=reserve");
   await page.addStyleTag({ content: "* { transition: none !important; }" });
   const named = (name: string) => page.getByRole("button", { name, exact: true });
   const style = (name: string, property: string) => named(name).evaluate((element, key) => getComputedStyle(element).getPropertyValue(key), property);
@@ -349,12 +349,12 @@ test("the static notebook links to the same theme in the editor", async ({ page 
   const main = page.getByRole("main");
   await expect(main.getByRole("group", { name: "Preview a publication theme" })).toHaveCount(0);
   const sampleTitle = main.getByRole("heading", { name: "The glacier notebook" });
-  await expect(sampleTitle).toHaveCSS("font-family", /^"ELEA Sans"/);
+  await expect(sampleTitle).toHaveCSS("font-family", /^ui-monospace/);
   const faces = await page.evaluate(async () => (await document.fonts.load('400 1em "ELEA Sans"')).length);
   expect(faces).toBe(1);
   const open = main.getByRole("link", { name: "Edit this notebook" });
   expect(await textContrast(open)).toBeGreaterThanOrEqual(4.5);
-  await expect(open).toHaveAttribute("href", /#\/playground\?scheme=reserve$/);
+  await expect(open).toHaveAttribute("href", /#\/playground\?scheme=ponctuation$/);
   await open.press("Enter");
   await expect(page.getByTestId("viewer-pane").getByRole("heading", { name: "The glacier notebook" })).toBeVisible();
 });
@@ -366,7 +366,7 @@ test("the notebook and links to the studio and editor remain visible without Jav
     await page.goto("/#home-theme");
     const main = page.getByRole("main");
     await expect(main.getByRole("link", { name: "Open theme studio" })).toHaveAttribute("href", "/playground/#/theme");
-    await expect(main.getByRole("link", { name: "Edit this notebook" })).toHaveAttribute("href", /#\/playground\?scheme=reserve$/);
+    await expect(main.getByRole("link", { name: "Edit this notebook" })).toHaveAttribute("href", /#\/playground\?scheme=ponctuation$/);
     await expect(main.getByRole("heading", { name: "The glacier notebook" })).toBeVisible();
     await expect(main.getByRole("heading", { name: "Publication themes" })).toHaveAttribute("id", "home-theme");
   } finally {
@@ -404,7 +404,7 @@ test("a dialog opened from a themed container uses the tokens of that container"
 
 test("the info variant reads the info colour, which a host can set apart from its links", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/playground/#/ui/button");
+  await page.goto("/playground/#/ui/button?scheme=reserve");
   const fill = (name: string) => page.getByRole("button", { name, exact: true }).evaluate((element) => getComputedStyle(element).backgroundColor);
   await expect(page.getByRole("button", { name: "Teal info", exact: true })).toBeVisible();
   expect(await fill("Info")).toBe("rgb(71, 101, 164)");

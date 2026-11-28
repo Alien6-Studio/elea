@@ -3,7 +3,7 @@ import { NotFound } from "./components/NotFound.js";
 import { SiteFooter } from "./components/SiteFooter.js";
 import { SiteHeader } from "./components/SiteHeader.js";
 import { siteNavigation, sitePath } from "./links.js";
-import { brandRoute, exactProfile, readBrandTheme, studioTheme, type BrandTheme, type StudioThemeId } from "./pages/brandTheme.js";
+import { brandRoute, defaultSiteProfile, exactProfile, readBrandTheme, studioTheme, type BrandTheme, type StudioThemeId } from "./pages/brandTheme.js";
 import { applySiteScope, siteProfile, siteScope } from "./siteProfile.js";
 import { archivedWorkspace } from "./pages/design-lab/index.js";
 import { href, useHashRoute } from "./router.js";
@@ -91,7 +91,7 @@ export function App() {
   const saved = useSyncExternalStore(siteProfile.subscribe, siteProfile.get);
   const shared = useMemo(() => lab ? undefined : readBrandTheme(route.split("?")[1] ?? ""), [lab, route]);
   const preferred = useMemo(() => studioTheme(saved), [saved]);
-  const followsProfile = !lab && (saved !== "reserve" || editing);
+  const followsProfile = !lab && (saved !== defaultSiteProfile || editing);
   const brand = shared ?? (followsProfile ? preferred : undefined);
   const profile = shared ? exactProfile(shared) : saved;
   const scope = siteScope(profile ?? saved);

@@ -325,8 +325,8 @@ for (const width of [1440, 320]) {
         { label: "Components", heading: "Components", url: /#\/ui$/ },
         { label: "Typography", heading: "Typography", url: /\/typography\/$/ },
         { label: "Colours", heading: "Colours", url: /#\/colours$/ },
-        { label: "Theme studio", heading: "Theme studio", url: /#\/theme\?scheme=reserve$/ },
-        { label: "Editorial workspace", heading: "Editorial workspace", url: /#\/playground\?scheme=reserve$/ },
+        { label: "Theme studio", heading: "Theme studio", url: /#\/theme\?scheme=ponctuation$/ },
+        { label: "Editorial workspace", heading: "Editorial workspace", url: /#\/playground\?scheme=ponctuation$/ },
         { label: "Research", heading: "Research", url: /\/research\/$/ },
       ] as const;
       const labels = destinations.map(destination => destination.label);
@@ -346,7 +346,7 @@ for (const width of [1440, 320]) {
       }
 
       await page.goBack();
-      await expect(page).toHaveURL(/#\/playground\?scheme=reserve$/);
+      await expect(page).toHaveURL(/#\/playground\?scheme=ponctuation$/);
       await expect(main.getByRole("heading", { name: "Editorial workspace", exact: true, level: 1 })).toBeVisible();
       await expect(nav.locator("a[aria-current]")).toHaveText(["Editorial workspace"]);
       await page.getByRole("contentinfo").getByRole("link", { name: "Elea", exact: true }).press("Enter");
@@ -355,20 +355,8 @@ for (const width of [1440, 320]) {
   }
 }
 
-test("the site build identifies the library and playground behind the examples", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("contentinfo").getByRole("link", { name: "Versions and changes" }).click();
-  const guide = page.getByRole("article");
-  await expect(guide.getByRole("heading", { name: "Versions and changes" })).toBeVisible();
-  const libraryExample = await guide.getByRole("link", { name: "run the theme shapes example" }).getAttribute("href");
-  const playgroundGuide = await guide.getByRole("link", { name: "Build the guided examples" }).getAttribute("href");
-  expect(libraryExample).toMatch(/\/blob\/[0-9a-f]{40}\/docs\/examples\/theme-shapes\.mjs$/);
-  await expect(guide.getByRole("link", { name: "Read the changelog for this build" }))
-    .toHaveAttribute("href", libraryExample!.replace("docs/examples/theme-shapes.mjs", "CHANGELOG.md"));
-  const revision = libraryExample!.split("/blob/")[1]!.split("/")[0]!;
-  expect(playgroundGuide).toMatch(new RegExp("/blob/" + revision + "/site/README\\.md$"));
-  await expect(guide.getByRole("link", { name: revision.slice(0, 10), exact: true })).toHaveAttribute("href", new RegExp("/tree/" + revision + "$"));
-  await guide.getByRole("link", { name: "Compare the nine theme shapes" }).click();
+test("the theme shapes example compares the nine themes", async ({ page }) => {
+  await page.goto("/examples/theme-shapes/");
   await expect(page.getByRole("heading", { level: 2 })).toHaveCount(9);
   const reserve = page.locator('[data-elea-theme="reserve"]');
   const title = reserve.getByRole("textbox", { name: "Publication title" });

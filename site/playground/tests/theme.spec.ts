@@ -207,7 +207,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     for (const { name, seed, accent, surfaces, radius } of editions) {
       const background = surfaces[colorScheme === "light" ? 0 : 1];
       await page.goto(studioPath + "?edition=" + name.toLowerCase());
-      await expect(page.locator("html")).toHaveCSS("--elea-color-primary-500", "#2926bf");
+      await expect(page.locator("html")).toHaveCSS("--elea-color-primary-500", "#edbb28");
       const studioReader = page.getByRole("region", { name: "Publication preview" }).getByRole("article");
       await expect(studioReader).toHaveCSS("background-color", background);
       expect(await textContrast(studioReader.locator(".elea-paragraph").first())).toBeGreaterThanOrEqual(4.5);
@@ -621,7 +621,7 @@ test("a shared theme carries into the editorial workspace and back", async ({ pa
   await expect(page.getByRole("combobox", { name: "Reading typeface" })).toHaveText("Serif");
   await expect(page.getByRole("combobox", { name: "Reading density" })).toHaveText("Balanced");
   await page.goto(`${studioPath}?brand=not-a-colour&corners=Round`);
-  await expect(page.getByRole("combobox", { name: "Theme", exact: true })).toHaveText("Réserve");
+  await expect(page.getByRole("combobox", { name: "Theme", exact: true })).toHaveText("Ponctuation");
 });
 
 test("the Studio previews the reference article while the Playground keeps the editable draft", async ({ page }) => {

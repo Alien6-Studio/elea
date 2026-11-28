@@ -3,12 +3,13 @@ import { createElement, useEffect, useSyncExternalStore } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { SiteSearch } from "./src/components/SiteSearch.tsx";
 import { SiteProfileSelect } from "./src/components/SiteProfileSelect.tsx";
+import { defaultSiteProfile } from "./src/pages/brandTheme.ts";
 import { siteProfile } from "./src/siteProfile.ts";
 
 const picker = document.getElementById("site-profile-picker");
 
 function StoredProfileSelect() {
-  const profile = useSyncExternalStore(siteProfile.subscribe, siteProfile.get, () => "reserve");
+  const profile = useSyncExternalStore(siteProfile.subscribe, siteProfile.get, () => defaultSiteProfile);
   useEffect(() => { picker.hidden = false; }, []);
   return createElement(SiteProfileSelect, { profile, onProfileChange: siteProfile.set });
 }

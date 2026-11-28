@@ -19,7 +19,9 @@ export function studioTheme(id: StudioThemeId): BrandTheme {
   return { ...createThemeProfile(id), profile: id, buttonRadiusScale: "profile" };
 }
 
-export const defaultSiteTheme = studioTheme("reserve");
+// The site opens in this profile; docs/assets/site-theme.js names it for the first paint.
+export const defaultSiteProfile: StudioThemeId = "ponctuation";
+export const defaultSiteTheme = studioTheme(defaultSiteProfile);
 
 function assignmentValue(assignment: RoleAssignment | undefined) {
   if (!assignment) return undefined;

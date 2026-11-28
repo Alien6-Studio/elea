@@ -6,7 +6,7 @@ import { NotFound } from "../src/components/NotFound.js";
 import { GlyphCarousel } from "../src/components/GlyphCarousel.js";
 import { SiteHeader } from "../src/components/SiteHeader.js";
 import { SiteFooter } from "../src/components/SiteFooter.js";
-import { featuredColourThemes, makeBrandTheme, studioTheme } from "../src/pages/brandTheme.js";
+import { defaultSiteProfile, defaultSiteTheme, featuredColourThemes, makeBrandTheme, studioTheme } from "../src/pages/brandTheme.js";
 import { SiteHome } from "./site-home.js";
 import { ContrastFigure, DwellFigure, ExposureFigure, OutcomeFigure, SlotFigure, TimestampFigure } from "./observatory-figures.js";
 
@@ -27,8 +27,8 @@ for (const [specifier, target] of styles) {
 }
 // The default scope also supplies a fallback for old or unavailable stored profiles.
 const profileStyles = [
-  makeBrandTheme(studioTheme("reserve"), "elea-site").css,
-  ...featuredColourThemes.filter(id => id !== "reserve").map(id => makeBrandTheme(studioTheme(id), `elea-site-${id}`).css),
+  makeBrandTheme(defaultSiteTheme, "elea-site").css,
+  ...featuredColourThemes.filter(id => id !== defaultSiteProfile).map(id => makeBrandTheme(studioTheme(id), `elea-site-${id}`).css),
 ];
 writeFileSync(new URL("site-profile.css", assets), profileStyles.join("\n"));
 

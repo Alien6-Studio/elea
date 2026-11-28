@@ -13,7 +13,7 @@ const seconds = (ms: number) => `${(ms / 1000).toFixed(2)} s`;
 const metadata = (kind: ObserveEventV1["kind"]) => signals.find(signal => signal.kind === kind)!;
 const context = () => presentation(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
 
-function ActivationMap({ records }: { records: readonly LocalObservation[] }) {
+function ActivationMap({ records }: Readonly<{ records: readonly LocalObservation[] }>) {
   const counts = new Map<string, number>();
   for (const { event } of records) {
     if (event.kind === "interaction.activated") counts.set(event.target.slot, (counts.get(event.target.slot) ?? 0) + 1);
@@ -22,11 +22,11 @@ function ActivationMap({ records }: { records: readonly LocalObservation[] }) {
     caption="Activations per registered zone in the displayed window. Shading scales to its highest count." />;
 }
 
-function Timeline({ records, selected, onSelect }: {
+function Timeline({ records, selected, onSelect }: Readonly<{
   records: readonly LocalObservation[];
   selected: LocalObservation | undefined;
   onSelect: (index: number) => void;
-}) {
+}>) {
   if (!records.length) return <CardDescription>Events appear here when the workbench reports them.</CardDescription>;
   const start = records[0]!.elapsedMs;
   const end = records.at(-1)!.elapsedMs;
@@ -57,9 +57,27 @@ function Timeline({ records, selected, onSelect }: {
   );
 }
 
+const halfSpan = "elea-col-2 elea-col-md-4 elea-col-lg-6";
+
+function Preview({ arrangement }: Readonly<{ arrangement: "single" | "split" }>) {
+  const span = arrangement === "split" ? halfSpan : undefined;
+  return (
+    <Card variant="subtle" padding="sm">
+      <div className="elea-grid">
+        <div className={span}>
+          <strong>Field notes</strong><CardDescription>A short entry for the demonstration.</CardDescription>
+        </div>
+        <div className={span}>
+          <strong>Layout</strong><CardDescription>{arrangement === "single" ? "Single column" : "Two columns"}</CardDescription>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function Observatory() {
   const controlsElement = useRef<HTMLDivElement>(null);
-  const previewElement = useRef<HTMLDivElement>(null);
+  const previewElement = useRef<HTMLElement>(null);
   const session = useRef<{ observe: LocalObserve; unsubscribe: () => void } | null>(null);
   const [mode, setMode] = useState<"live" | "synthetic">("live");
   const [active, setActive] = useState(false);
@@ -167,7 +185,7 @@ function Observatory() {
     });
   }
 
-  function useKeyboard(tool: ToolKey, event: KeyboardEvent<HTMLButtonElement>) {
+  function stepOrSave(tool: ToolKey, event: KeyboardEvent<HTMLButtonElement>) {
     if (!event.nativeEvent.isTrusted || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if (tool === "save" && event.key === "Enter") {
       event.preventDefault();
@@ -197,8 +215,6 @@ function Observatory() {
     }
   }
 
-  const halfSpan = "elea-col-2 elea-col-md-4 elea-col-lg-6";
-
   return (
     <div className="elea-grid">
       <CardFooter role="group" aria-label="Data source">
@@ -226,24 +242,15 @@ function Observatory() {
                   aria-expanded={tool.key === "preview" ? open : undefined}
                   aria-controls={tool.key === "preview" ? "observe-preview" : undefined}
                   onClick={event => activate(tool.key, event)}
-                  onKeyDown={event => useKeyboard(tool.key, event)}>
+                  onKeyDown={event => stepOrSave(tool.key, event)}>
                   {tool.label}
                 </Button>
               </div>
             ))}
           </div>
-          <div id="observe-preview" role="region" aria-label="Document preview" ref={previewElement} hidden={!open}>
-            <Card variant="subtle" padding="sm">
-              <div className="elea-grid">
-                <div className={arrangement === "split" ? halfSpan : undefined}>
-                  <strong>Field notes</strong><CardDescription>A short entry for the demonstration.</CardDescription>
-                </div>
-                <div className={arrangement === "split" ? halfSpan : undefined}>
-                  <strong>Layout</strong><CardDescription>{arrangement === "single" ? "Single column" : "Two columns"}</CardDescription>
-                </div>
-              </div>
-            </Card>
-          </div>
+          <section id="observe-preview" aria-label="Document preview" ref={previewElement} hidden={!open}>
+            <Preview arrangement={arrangement} />
+          </section>
           <SaveStatus state={message === "Example saved locally." ? "saved" : "idle"}>{message}</SaveStatus>
         </Card>
       ) : <CardDescription>Prepared records from an example save. This view collects no activity.</CardDescription>}

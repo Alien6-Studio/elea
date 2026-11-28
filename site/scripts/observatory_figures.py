@@ -2,7 +2,7 @@
 from pathlib import Path
 
 
-def on_page_content(html, *, page, config, files):
+def on_page_content(html, *, page, config, **_):
     names = {
         "research/interaction-observatory.md": ("exposure", "outcomes"),
         "research/interaction-observatory/atlas.md": ("slot", "timestamp", "dwell", "contrast"),

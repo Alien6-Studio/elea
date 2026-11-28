@@ -1,11 +1,11 @@
-import { featuredColourThemes, type StudioThemeId } from "./pages/brandTheme.js";
+import { defaultSiteProfile, featuredColourThemes, type StudioThemeId } from "./pages/brandTheme.js";
 
 const storageKey = "elea-site-profile";
 const listeners = new Set<() => void>();
-let current: StudioThemeId = "reserve";
+let current: StudioThemeId = defaultSiteProfile;
 
 export function siteScope(id: StudioThemeId) {
-  return id === "reserve" ? "site" : `site-${id}`;
+  return id === defaultSiteProfile ? "site" : `site-${id}`;
 }
 
 let restoreTransitions = 0;
@@ -25,7 +25,7 @@ export function applySiteScope(scope: string) {
 function read(): StudioThemeId {
   try {
     const value = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey);
-    return featuredColourThemes.find(id => id === value) ?? "reserve";
+    return featuredColourThemes.find(id => id === value) ?? defaultSiteProfile;
   } catch {
     return current;
   }

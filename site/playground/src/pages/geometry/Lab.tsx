@@ -112,7 +112,7 @@ export function Lab() {
       </div>
 
       <div className="geo-lab__compare">
-        <section aria-labelledby="geo-lab-current">
+        <section aria-labelledby="geo-lab-current" data-geometry-specimen>
           <h4 id="geo-lab-current">As themed <Badge tone="neutral" variant="subtle" size="sm">Reference</Badge></h4>
           <Specimen inset={inset} />
           <p className="geo-note">The shapes of the selected theme, untouched.</p>

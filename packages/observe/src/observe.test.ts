@@ -1,6 +1,17 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import type { ActivationV1, TaskOutcomeV1 } from "./contract.js";
 import { createEventValidator, createLocalObserve, type CollectionGrantV1, type ObserveCatalogV1, type ObserveCollectorV1, type ObserveEventV1, type ObserveRecorderV1 } from "./index.js";
+
+type Expect<Value extends true> = Value;
+type Rejects<Value, Target> = Value extends Target ? false : true;
+
+export type ContractChecks = [
+  Expect<Rejects<{ source: "browser-click"; modality: "keyboard" }, ActivationV1>>,
+  Expect<Rejects<{ source: "browser-click"; task: "save"; outcome: "succeeded"; duration: null }, TaskOutcomeV1>>,
+  Expect<Rejects<null, Extract<ObserveEventV1, { kind: "state.transitioned" }>["target"]["state"]>>,
+  Expect<Rejects<"userId", keyof ObserveEventV1>>,
+];
 
 const context = {
   theme: "editorial", density: "standard", appearance: "light",

@@ -113,13 +113,13 @@
   });
 })();
 
-// Apply a saved profile before first paint. The base class keeps Réserve available
+// Apply a saved profile before first paint. The base class keeps Ponctuation, the default, available
 // while the picker validates a stored id against the theme catalogue on startup.
 (() => {
   const root = document.documentElement;
   root.classList.add("elea-site");
   try {
     const profile = sessionStorage.getItem("elea-site-profile") ?? localStorage.getItem("elea-site-profile");
-    if (profile && profile !== "reserve" && /^[a-z-]+$/.test(profile)) root.dataset.eleaTheme = "site-" + profile;
+    if (profile && profile !== "ponctuation" && /^[a-z-]+$/.test(profile)) root.dataset.eleaTheme = "site-" + profile;
   } catch { /* Storage is optional. */ }
 })();

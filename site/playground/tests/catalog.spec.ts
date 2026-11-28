@@ -494,7 +494,8 @@ test("a click in a popover does not activate the row it is declared in", async (
   await row.getByRole("button", { name: "Rename" }).click();
   const panel = page.getByRole("dialog", { name: "Rename" });
   await panel.getByRole("textbox", { name: "Title" }).fill("Cranes at dawn");
-  await panel.click({ position: { x: 4, y: 4 } });
+  // In the padding of the panel, below its rounded corner.
+  await panel.click({ position: { x: 4, y: 32 } });
   await panel.getByRole("button", { name: "Done" }).click();
   await expect(panel).toBeHidden();
   await expect(row.getByText("Cranes at dawn")).toBeVisible();

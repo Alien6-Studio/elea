@@ -1,6 +1,6 @@
 import { Select } from "@alien6-studio/elea-ui";
 import { colorThemes } from "@alien6-studio/elea-tokens/palette";
-import { featuredColourThemes, type StudioThemeId } from "../pages/brandTheme.js";
+import { defaultSiteProfile, featuredColourThemes, type StudioThemeId } from "../pages/brandTheme.js";
 
 export const siteProfileOptions = featuredColourThemes.map(value => {
   const { name, colours } = colorThemes[value];
@@ -21,7 +21,7 @@ export interface SiteProfileProps {
   onProfileChange?: (id: StudioThemeId) => void;
 }
 
-export function SiteProfileSelect({ profile = "reserve", onProfileChange }: Readonly<SiteProfileProps>) {
+export function SiteProfileSelect({ profile = defaultSiteProfile, onProfileChange }: Readonly<SiteProfileProps>) {
   return <Select
     id="site-profile"
     label="Site theme"

@@ -16,12 +16,12 @@ export function firstQualification(trace: readonly ExposureSlice[]): number | nu
   let since: number | undefined;
   let previousEnd: number | undefined;
   for (const interval of trace) {
-    if (!eligible(interval)) {
-      since = undefined;
-    } else {
+    if (eligible(interval)) {
       if (since === undefined || previousEnd !== interval.start) since = interval.start;
       const acceptedAt = since + exposureRule.minimumVisibleMs;
       if (acceptedAt < interval.end) return acceptedAt;
+    } else {
+      since = undefined;
     }
     previousEnd = interval.end;
   }

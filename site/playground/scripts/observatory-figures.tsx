@@ -166,8 +166,11 @@ export function DwellFigure() {
   );
 }
 
-const signed = (value: number, decimals = 0) =>
-  `${value < 0 ? "−" : value > 0 ? "+" : ""}${Math.abs(value).toFixed(decimals)}`;
+function signed(value: number, decimals = 0) {
+  const magnitude = Math.abs(value).toFixed(decimals);
+  if (value < 0) return `−${magnitude}`;
+  return value > 0 ? `+${magnitude}` : magnitude;
+}
 
 export function ContrastFigure() {
   const { lower, upper, observed } = outcomeContrast();

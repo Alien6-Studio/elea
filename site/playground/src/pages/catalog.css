@@ -54,7 +54,7 @@
 .catalog-filters button:hover:not([aria-pressed="true"]) { background: var(--elea-color-surface-muted); }
 .catalog-results, .catalog-category, .catalog-index h2 { color: var(--elea-color-text-muted); font-size: var(--elea-font-size-sm); }
 .catalog-results { margin: 0 0 .9rem; }
-.gallery__card { position: relative; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-shape-surface, var(--elea-radius-xl)); padding: .4rem; }
+.gallery__card { position: relative; border: 1px solid var(--elea-color-border-default); border-radius: var(--elea-shape-surface, var(--elea-radius-xl)); overflow: hidden; }
 .gallery__card:hover { border-color: var(--elea-color-text-link); }
 .gallery__card:has(.gallery__name:focus-visible) { border-color: transparent; outline: 2px solid var(--elea-color-focus); outline-offset: -2px; }
 .gallery__preview {
@@ -66,7 +66,6 @@
   gap: .45rem;
   min-height: 10.25rem;
   padding: .8rem;
-  border-radius: var(--elea-shape-surface, var(--elea-radius-lg));
   background: var(--elea-color-surface-subtle);
   background-image: radial-gradient(color-mix(in srgb, var(--elea-color-border-default), transparent 35%) 1px, transparent 1px);
   background-size: 12px 12px;

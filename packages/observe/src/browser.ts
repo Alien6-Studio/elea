@@ -1,5 +1,5 @@
 import type {
-  ExposureRuleV1, ObserveCollectorV1, ObserveContextV1, ObserveEventV1, ObserveRecorderV1, ObserveTargetV1,
+  ExposureRuleV1, ObserveCollectorV1, ObserveContextV1, ObserveEventV1, ObserveTargetV1,
 } from "./contract.js";
 
 export interface BrowserBinding {

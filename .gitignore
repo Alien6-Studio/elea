@@ -3,13 +3,16 @@ node_modules/
 **/coverage/
 *.tgz
 *.tsbuildinfo
+*.log
 .DS_Store
 .env*
 !.env.example
+.idea/
+.vscode/
+.venv/
+__pycache__/
 /AGENTS.md
 
 /.attest/
 /.trunk/
 /artifacts/
-.attest/keys/
-__pycache__/
