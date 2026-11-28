@@ -43,7 +43,7 @@
   "dependencies": {
     "@alien6-studio/elea-content": "^0.1.5",
     "@alien6-studio/elea-tokens": "^0.1.5",
-    "isomorphic-dompurify": "^4.8.0"
+    "isomorphic-dompurify": "^4.9.0"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",
